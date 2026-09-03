@@ -768,6 +768,48 @@ article.zh,article.zh *{font-family:SimSun,"Noto Serif CJK SC","Songti SC",serif
   .intro-flow table.intro-source-table{min-width:0 !important;font-size:14px}
 }
 </style>
+
+<style id="patisambhidamagga-grey-ends-draggable-popups-20260903">
+/* Match the Dhammapada's new light-grey end-row treatment. */
+.closing article{
+  background:#f2f2f2 !important;
+  border-top-color:#d8d8d8 !important;
+  border-bottom-color:#d8d8d8 !important;
+}
+
+/* Desktop-only draggable pop-up handles. */
+@media (min-width:721px){
+  .pced-panel-head,
+  .modal .fn-title{
+    cursor:move !important;
+    user-select:none;
+    -webkit-user-select:none;
+  }
+  .pced-panel-head button,
+  .modal button{
+    cursor:pointer;
+  }
+  .pced-panel.is-dragging,
+  .modal.is-dragging{
+    box-shadow:0 20px 58px rgba(0,0,0,.42) !important;
+  }
+}
+@media (max-width:720px){
+  .pced-panel,
+  .modal{
+    position:relative !important;
+    left:auto !important;
+    top:auto !important;
+    margin:0 !important;
+    transform:none !important;
+  }
+  .pced-panel-head,
+  .modal .fn-title{
+    cursor:default !important;
+  }
+}
+</style>
+
 </head>
 <body>
 <nav aria-label="Reader controls" class="topbar">
@@ -2831,6 +2873,122 @@ document.addEventListener('click',function(e){
   else prepare();
 })();
 </script>
+
+<script id="patisambhidamagga-draggable-popups-20260903">
+(function(){
+  'use strict';
+
+  const MIN_DESKTOP = 721;
+  const GAP = 8;
+  const isDesktop = () => window.innerWidth >= MIN_DESKTOP;
+
+  function panelFromHandle(target){
+    const pcedHandle = target.closest && target.closest('.pced-panel-head');
+    if(pcedHandle){
+      const panel = pcedHandle.closest('.pced-panel');
+      if(panel) return {panel: panel, handle: pcedHandle};
+    }
+
+    const noteHandle = target.closest && target.closest('.modal .fn-title');
+    if(noteHandle){
+      const panel = noteHandle.closest('.modal');
+      if(panel) return {panel: panel, handle: noteHandle};
+    }
+    return null;
+  }
+
+  function constrain(panel, left, top){
+    const rect = panel.getBoundingClientRect();
+    const maxLeft = Math.max(GAP, window.innerWidth - rect.width - GAP);
+    const maxTop = Math.max(GAP, window.innerHeight - rect.height - GAP);
+    return {
+      left: Math.min(Math.max(GAP, left), maxLeft),
+      top: Math.min(Math.max(GAP, top), maxTop)
+    };
+  }
+
+  function clearDesktopPosition(panel){
+    panel.style.position = '';
+    panel.style.left = '';
+    panel.style.top = '';
+    panel.style.margin = '';
+    panel.style.zIndex = '';
+    panel.classList.remove('is-dragging');
+  }
+
+  document.addEventListener('mousedown', function(e){
+    if(!isDesktop() || e.button !== 0) return;
+    if(e.target.closest && e.target.closest('button,a,input,textarea,select,label')) return;
+
+    const found = panelFromHandle(e.target);
+    if(!found) return;
+
+    const panel = found.panel;
+    const rect = panel.getBoundingClientRect();
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startLeft = rect.left;
+    const startTop = rect.top;
+
+    panel.style.position = 'fixed';
+    panel.style.left = startLeft + 'px';
+    panel.style.top = startTop + 'px';
+    panel.style.margin = '0';
+    panel.style.zIndex = '2';
+    panel.classList.add('is-dragging');
+
+    e.preventDefault();
+
+    function move(ev){
+      const p = constrain(
+        panel,
+        startLeft + ev.clientX - startX,
+        startTop + ev.clientY - startY
+      );
+      panel.style.left = p.left + 'px';
+      panel.style.top = p.top + 'px';
+    }
+
+    function stop(){
+      panel.classList.remove('is-dragging');
+      window.removeEventListener('mousemove', move);
+      window.removeEventListener('mouseup', stop);
+    }
+
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', stop);
+  });
+
+  /* Keep mobile behavior exactly as before. */
+  window.addEventListener('resize', function(){
+    if(isDesktop()) return;
+    document.querySelectorAll('.pced-panel, .modal').forEach(clearDesktopPosition);
+  });
+
+  /* Helpful desktop hint on the static handles. Dynamic footnote titles inherit
+     the move cursor automatically through CSS. */
+  const pcedHead = document.querySelector('.pced-panel-head');
+  if(pcedHead) pcedHead.title = '拖动标题栏可移动此窗口';
+  const bookmarkTitle = document.querySelector('#bookmark-modal .fn-title');
+  if(bookmarkTitle) bookmarkTitle.title = '拖动标题可移动此窗口';
+
+  function keepInside(panel){
+    if(!isDesktop() || panel.style.position !== 'fixed' || !panel.getClientRects().length) return;
+    const rect = panel.getBoundingClientRect();
+    const p = constrain(panel, rect.left, rect.top);
+    panel.style.left = p.left + 'px';
+    panel.style.top = p.top + 'px';
+  }
+
+  /* Footnote and PCED content can change size between openings. Re-check the
+     remembered dragged position after content updates so the window stays visible. */
+  document.querySelectorAll('.pced-panel, .modal').forEach(function(panel){
+    const observer = new MutationObserver(function(){ keepInside(panel); });
+    observer.observe(panel, {subtree:true, childList:true, characterData:true});
+  });
+})();
+</script>
+
 </body>
 <!-- Stage 8 source-verified continuation: Chinese printed pp.335–388; Gatikathā through Bojjhaṅgakathā; stops before Mettākathā. -->
 </html>
