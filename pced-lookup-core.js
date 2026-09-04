@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 2.1.0 — 2026-09-04
+ * Version 2.2.0 — 2026-09-04
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '2.1.0';
+  const VERSION = '2.2.0';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -131,6 +131,8 @@
     if (word.endsWith('ato') && word.length > 4) add(word.slice(0, -3) + 'a', '-ato → -a', 'a-stem');
     if (word.endsWith('ito') && word.length > 4) add(word.slice(0, -3) + 'i', '-ito → -i', 'i-stem');
 
+    // Conservative finite-verb endings. A generated form is never displayed
+    // unless the resulting lemma is an exact headword in the host dictionary.
     const verbRules = [
       ['āmi', 'ati'], ['āma', 'ati'], ['asi', 'ati'], ['atha', 'ati'], ['anti', 'ati'],
       ['issāmi', 'ati'], ['issati', 'ati'], ['issanti', 'ati'],
@@ -260,6 +262,21 @@
     const exactHeads = context.exact(normalized);
     if (exactHeads.length) {
       return finish(addEntryDecomposition({ ...base, mode: 'exact', tier: 1, heads: exactHeads }));
+    }
+
+    // An explicitly verified sandhi/compound is stronger evidence than a
+    // legacy related-form map. Accept it here only when every component is
+    // independently attested as a complete PCED headword.
+    const directSplit = VERIFIED_DECOMPOSITIONS[normalized];
+    if (directSplit) {
+      const components = directSplit.parts.map(part => resolvePart(part, context, options));
+      if (components.every(part => part.heads.length)) {
+        return finish({
+          ...base, mode: directSplit.kind || 'compound', tier: 2, components,
+          resolvedForm: normalized,
+          notes: [`${clicked} → ${directSplit.parts.join(' + ')} (${directSplit.kind || 'compound'})`]
+        });
+      }
     }
 
     for (const [map, label] of [
