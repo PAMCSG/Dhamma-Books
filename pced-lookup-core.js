@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 2.2.0 — 2026-09-04
+ * Version 3.0.0 — 2026-09-04
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '2.2.0';
+  const VERSION = '3.0.0';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -82,6 +82,18 @@
       }
     };
 
+    const suffixRules = (rules, family) => {
+      for (const [suffix, replacement, label = `-${suffix} → -${replacement}`] of rules) {
+        if (word.endsWith(suffix) && word.length > suffix.length + 2) {
+          add(word.slice(0, -suffix.length) + replacement, label, family);
+        }
+      }
+    };
+
+    // Regular nominal/adjectival declensions. These rules only propose
+    // dictionary forms: resolve() accepts one only when the complete result
+    // is an attested PCED headword. Explicit verified-form tables are tried
+    // before these productive paradigms.
     const aStemRules = [
       ['ānaṃ', 4], ['ehi', 3], ['ebhi', 4], ['assa', 4], ['ena', 3],
       ['esu', 3], ['asmā', 4], ['amhā', 4], ['asmiṃ', 5], ['amhi', 4],
@@ -100,6 +112,9 @@
     if (word.endsWith('āyaṃ') && word.length > 6) add(word.slice(0, -4) + 'ā', '-āyaṃ → -ā', 'ā-stem');
     if (word.endsWith('āsu') && word.length > 5) add(word.slice(0, -3) + 'ā', '-āsu → -ā', 'ā-stem');
     if (word.endsWith('ānaṃ') && word.length > 6) add(word.slice(0, -4) + 'ā', '-ānaṃ → -ā', 'ā-stem');
+    suffixRules([
+      ['aṃ', 'ā'], ['āyo', 'ā'], ['āhi', 'ā'], ['ābhi', 'ā']
+    ], 'ā-stem');
 
     if (word.endsWith('iyā') && word.length > 4) {
       add(word.slice(0, -3) + 'i', '-iyā → -i', 'i-stem');
@@ -116,6 +131,18 @@
       add(word.slice(0, -3) + 'i', '-inā → -i', 'i-stem');
       add(word.slice(0, -3) + 'ī', '-inā → -ī', 'ī-stem');
     }
+    suffixRules([
+      ['iṃ', 'i'], ['iṃ', 'ī'], ['ayo', 'i'], ['īni', 'i'], ['īni', 'ī'],
+      ['īhi', 'i'], ['īhi', 'ī'], ['ībhi', 'i'], ['ībhi', 'ī'],
+      ['īsu', 'i'], ['īsu', 'ī'], ['isu', 'i'], ['iyo', 'i'], ['iyo', 'ī'],
+      ['ī', 'i']
+    ], 'i/ī-stem');
+
+    // Adjectives and agent nouns whose dictionary citation form ends in -in.
+    suffixRules([
+      ['inaṃ', 'in'], ['inā', 'in'], ['ino', 'in'], ['issa', 'in'],
+      ['ibhi', 'in'], ['ihi', 'in'], ['īnaṃ', 'in'], ['īsu', 'in']
+    ], '-in stem');
 
     const uStemRules = [
       ['ūnaṃ', 4], ['ūbhi', 4], ['ūhi', 3], ['ūsu', 3],
@@ -127,22 +154,62 @@
         add(word.slice(0, -removeCount) + 'u', `-${suffix} → -u`, 'u-stem');
       }
     }
+    suffixRules([
+      ['ūni', 'u'], ['uyo', 'u'], ['uyā', 'u'], ['ubhi', 'u'], ['uhi', 'u'], ['usu', 'u']
+    ], 'u/ū-stem');
+
+    // -vantu/-mantu possessive adjectives. Inflected -vant/-mant forms are
+    // reduced to the PCED citation form, never matched by prefix.
+    suffixRules([
+      ['vantaṃ', 'vantu'], ['vantena', 'vantu'], ['vantassa', 'vantu'],
+      ['vanto', 'vantu'], ['vantā', 'vantu'], ['vante', 'vantu'],
+      ['vantehi', 'vantu'], ['vantebhi', 'vantu'], ['vantānaṃ', 'vantu'],
+      ['vantesu', 'vantu'], ['vatā', 'vantu'], ['vato', 'vantu'], ['vati', 'vantu']
+    ], '-vantu stem');
+    suffixRules([
+      ['mantaṃ', 'mantu'], ['mantena', 'mantu'], ['mantassa', 'mantu'],
+      ['manto', 'mantu'], ['mantā', 'mantu'], ['mante', 'mantu'],
+      ['mantehi', 'mantu'], ['mantebhi', 'mantu'], ['mantānaṃ', 'mantu'],
+      ['mantesu', 'mantu'], ['matā', 'mantu'], ['mato', 'mantu'], ['mati', 'mantu']
+    ], '-mantu stem');
+
+    // Consonant-stem relationship/agent nouns (pitar, mātar, satthar etc.).
+    suffixRules([
+      ['taraṃ', 'tar'], ['tarā', 'tar'], ['tari', 'tar'], ['taro', 'tar'],
+      ['tare', 'tar'], ['tarūhi', 'tar'], ['tarūnaṃ', 'tar']
+    ], '-tar stem');
 
     if (word.endsWith('ato') && word.length > 4) add(word.slice(0, -3) + 'a', '-ato → -a', 'a-stem');
     if (word.endsWith('ito') && word.length > 4) add(word.slice(0, -3) + 'i', '-ito → -i', 'i-stem');
 
-    // Conservative finite-verb endings. A generated form is never displayed
-    // unless the resulting lemma is an exact headword in the host dictionary.
-    const verbRules = [
-      ['āmi', 'ati'], ['āma', 'ati'], ['asi', 'ati'], ['atha', 'ati'], ['anti', 'ati'],
-      ['issāmi', 'ati'], ['issati', 'ati'], ['issanti', 'ati'],
-      ['emi', 'eti'], ['enti', 'eti'], ['etu', 'eti'], ['entu', 'eti']
-    ];
-    for (const [suffix, replacement] of verbRules) {
-      if (word.endsWith(suffix) && word.length > suffix.length + 2) {
-        add(word.slice(0, -suffix.length) + replacement, `-${suffix} → -${replacement}`, 'verb');
-      }
+    // Regular finite and non-finite verb families. Multiple conjugation
+    // classes can share a surface ending, so candidates are ordered from the
+    // most common class and every accepted lemma is independently attested.
+    suffixRules([
+      ['enti', 'eti'], ['etu', 'eti'], ['entu', 'eti'], ['emi', 'eti'], ['esi', 'eti'], ['etha', 'eti'],
+      ['onti', 'oti'], ['otu', 'oti'], ['ontu', 'oti'], ['omi', 'oti'], ['oma', 'oti'], ['osi', 'oti'], ['otha', 'oti'],
+      ['āmi', 'ati'], ['āma', 'ati'], ['asi', 'ati'], ['atha', 'ati'], ['atu', 'ati'], ['antu', 'ati'], ['anti', 'ati'],
+      ['āmi', 'āti'], ['āma', 'āti'], ['āsi', 'āti'], ['ātha', 'āti'], ['ātu', 'āti'], ['anti', 'āti'],
+      ['ate', 'ati'], ['ante', 'ati']
+    ], 'present/imperative verb');
+
+    suffixRules([
+      ['eyyaṃ', 'ati'], ['eyyuṃ', 'ati'], ['eyyāsi', 'ati'], ['eyyātha', 'ati'],
+      ['eyyāmi', 'ati'], ['eyyāma', 'ati'], ['eyya', 'ati'],
+      ['eyyaṃ', 'eti'], ['eyyuṃ', 'eti'], ['eyya', 'eti']
+    ], 'optative verb');
+
+    for (const lemmaEnding of ['ati', 'āti', 'eti', 'oti']) {
+      suffixRules([
+        ['issāmi', lemmaEnding], ['issāma', lemmaEnding], ['issasi', lemmaEnding],
+        ['issatha', lemmaEnding], ['issati', lemmaEnding], ['issanti', lemmaEnding]
+      ], 'future verb');
     }
+
+    suffixRules([
+      ['itvā', 'ati'], ['ituṃ', 'ati'], ['etvā', 'eti'], ['etuṃ', 'eti'],
+      ['otvā', 'oti'], ['otuṃ', 'oti']
+    ], 'absolutive/infinitive verb');
 
     return candidates;
   }
