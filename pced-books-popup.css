@@ -1,0 +1,90 @@
+/* Shared PCED popup profile for Dhamma-Books and Chinese-Tipitaka. */
+#dictModal .panel,
+#pced-modal .pced-panel {
+  width: min(1000px, calc(100vw - 36px));
+  max-height: 88vh;
+  border: 1px solid rgba(91, 56, 34, .2);
+  border-radius: 16px;
+  background: #fffdfb;
+  box-shadow: 0 24px 70px rgba(42, 29, 20, .34);
+  overflow: auto;
+}
+
+#dictModal .panel-head,
+#pced-modal .pced-panel-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 62px;
+  padding: 0 22px;
+  color: #fff;
+  background: #ad7752;
+}
+
+#dictModal .panel-title,
+#pced-modal .pced-title {
+  color: inherit;
+  font-size: 1.45rem;
+  font-weight: 750;
+}
+
+#dictModal .close,
+#pced-modal .pced-close {
+  border: 0;
+  color: #fff;
+  background: transparent;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#dictModal .panel-body,
+#pced-modal .pced-body {
+  padding: 18px 24px 26px;
+}
+
+#dictModal .lookup-meta,
+#dictModal .dict-meta,
+#dictModal .panel-meta,
+#pced-modal .pced-meta {
+  padding: 15px 24px 0;
+  color: #6c4935;
+}
+
+#dictModal .group-title,
+#dictModal .dict-section-title,
+#pced-modal .group-title {
+  margin: 18px 0 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #70472d;
+  background: #f4e8df;
+  font-weight: 750;
+}
+
+#dictModal .headword,
+#dictModal .pced-headword,
+#pced-modal .pced-headword {
+  color: #237b54;
+  font-size: 1.35rem;
+  font-style: italic;
+  font-weight: 750;
+}
+
+#dictModal .source,
+#dictModal .pced-source,
+#pced-modal .pced-source {
+  margin-top: 10px;
+  color: #795846;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  #dictModal .panel,
+  #pced-modal .pced-panel { width: calc(100vw - 18px); max-height: 92vh; }
+  #dictModal .panel-body,
+  #pced-modal .pced-body { padding: 14px 15px 22px; }
+}
