@@ -539,4 +539,57 @@ document.addEventListener('click',e=>{const f=e.target.closest('.footnote-ref');
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDictionary();closeFootnote();closeBookmarks()}const w=e.target.closest&&e.target.closest('.pali-word');if(w&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openDictionary(w.dataset.word)}const f=e.target.closest&&e.target.closest('.footnote-ref');if(f&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openFootnote(f.dataset.note)}});
 document.getElementById('closeDict').onclick=closeDictionary;document.getElementById('dictModal').onclick=e=>{if(e.target.id==='dictModal')closeDictionary()};document.getElementById('closeFootnote').onclick=closeFootnote;document.getElementById('footnoteModal').onclick=e=>{if(e.target.id==='footnoteModal')closeFootnote()};document.getElementById('closeBookmarks').onclick=closeBookmarks;document.getElementById('bookmarkModal').onclick=e=>{if(e.target.id==='bookmarkModal')closeBookmarks()};
 showView('contents');document.getElementById('resultCount').textContent=rows.length;
+</script>
+<style id="pamc-movable-popups">
+.modal .panel-head{cursor:move;touch-action:none;user-select:none}
+.modal .panel-head button,.modal .panel-head a,.modal .panel-head input{cursor:pointer;touch-action:auto}
+.modal .panel.pamc-dragging{user-select:none}
+</style>
+<script>
+/* Reset every popup to its beginning and allow dragging by the popup header. */
+(function(){
+  function resetModal(modal){
+    const panel=modal.querySelector('.panel');
+    if(!panel)return;
+    for(const name of ['position','left','top','width','margin','transform'])panel.style.removeProperty(name);
+    const reset=()=>{
+      panel.scrollTop=0;
+      modal.querySelectorAll('.panel-body,.tab-panel.active').forEach(el=>{el.scrollTop=0});
+    };
+    reset();
+    requestAnimationFrame(()=>requestAnimationFrame(reset));
+  }
+
+  function makeMovable(modal){
+    const panel=modal.querySelector('.panel'),handle=panel&&panel.querySelector('.panel-head');
+    if(!panel||!handle)return;
+
+    let drag=null;
+    const move=e=>{
+      if(!drag||e.pointerId!==drag.id)return;
+      const pad=8,maxLeft=Math.max(pad,window.innerWidth-drag.width-pad),maxTop=Math.max(pad,window.innerHeight-drag.height-pad);
+      panel.style.left=Math.min(maxLeft,Math.max(pad,drag.left+e.clientX-drag.x))+'px';
+      panel.style.top=Math.min(maxTop,Math.max(pad,drag.top+e.clientY-drag.y))+'px';
+    };
+    const end=e=>{
+      if(!drag||e.pointerId!==drag.id)return;
+      drag=null;panel.classList.remove('pamc-dragging');
+      window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',end);window.removeEventListener('pointercancel',end);
+    };
+    handle.addEventListener('pointerdown',e=>{
+      if(e.pointerType==='mouse'&&e.button!==0)return;
+      if(e.target.closest('button,a,input,select,textarea'))return;
+      const rect=panel.getBoundingClientRect();
+      drag={id:e.pointerId,x:e.clientX,y:e.clientY,left:rect.left,top:rect.top,width:rect.width,height:rect.height};
+      Object.assign(panel.style,{position:'fixed',left:rect.left+'px',top:rect.top+'px',width:rect.width+'px',margin:'0',transform:'none'});
+      panel.classList.add('pamc-dragging');
+      e.preventDefault();
+      window.addEventListener('pointermove',move);window.addEventListener('pointerup',end);window.addEventListener('pointercancel',end);
+    });
+
+    new MutationObserver(()=>{if(modal.classList.contains('open'))resetModal(modal)}).observe(modal,{attributes:true,attributeFilter:['class']});
+  }
+
+  document.querySelectorAll('.modal').forEach(makeMovable);
+})();
 </script></body></html>
