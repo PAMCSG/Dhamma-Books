@@ -61,3 +61,24 @@ All 13 Dhamma Books HTML readers that provide Roman-script Pāli word lookup now
 - Sentence records are excluded from a single-word Chinese-Tipiṭaka lookup.
 - Reader tab names use compact button styling with a light-brown background.
 - Popup movement now covers current and legacy panel/header class structures, dynamically added modals, pointer and touch dragging, viewport bounds, and resize correction.
+
+## Current handoff checkpoint — 6 September 2026
+
+### Completed in GitHub
+
+- Popup implementation: [`4f3db74`](https://github.com/PAMCSG/Dhamma-Books/commit/4f3db7457220aad8056b88f99a1e6b4dbe0689d0) on the default branch.
+- Chinese-Tipiṭaka feed fields `type`, `source`, and `page`: [`6b87e86`](https://github.com/PAMCSG/Chinese-tipitaka/commit/6b87e865ec64445d02c2187b4aa323c3b91ae490).
+- Paṭisambhidāmagga shared-popup connection: [`5661f93`](https://github.com/PAMCSG/Dhamma-Books/commit/5661f93b9dbc7775d00f53ae24444ba03a78e449).
+- Static verification passed for JavaScript syntax, shared-file equivalence, language-heading normalization, one combined Chinese-Tipiṭaka subheader, source display, single-word filtering, and popup drag installation.
+
+### Deployment verification still pending
+
+The deployed `tipitaka-reader.pages.dev` site is protected by Cloudflare Access. An unauthenticated browser is redirected to the Cloudflare sign-in page, so the deployed asset version and final appearance cannot be independently inspected from outside the protected session. The GitHub implementation is complete; authenticated visual acceptance on the live Pages deployment remains the next checkpoint.
+
+### Resume here
+
+1. Open a deployed book while authenticated and perform a hard refresh.
+2. Test a Pāli word with multiple Chinese-Tipiṭaka results: confirm one `中文` heading, one `《汉译巴利三藏》玛欣德尊者和译藏团队` subheader, Chinese meanings plus `出处`, and no sentence records.
+3. Confirm `English`, `Burmese`, and other language headings use the light-brown style without bilingual duplicates.
+4. Drag the popup by its title bar and confirm the compact light-brown reader tab buttons.
+5. Record the exact book URL and screenshot for any remaining book-specific exception.
