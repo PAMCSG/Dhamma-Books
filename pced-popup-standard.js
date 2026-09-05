@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.1.0 — 2026-09-05 */
+/* PAMC cross-book PCED popup standard v1.1.1 — 2026-09-06 */
 (function () {
   'use strict';
 
@@ -78,20 +78,27 @@
   function renderApprovedBlock(rows, surface) {
     const seen = new Set();
     const unique = (rows || []).filter(row => {
-      const key = [normalize(row.pali), String(row.chinese || '').trim(), String(row.source || '').trim()].join('\u241f');
+      const key = [normalize(row.pali), String(row.chinese || '').trim(),
+        String(row.source || '').trim(), String(row.page || '').trim()].join('\u241f');
       if (!row.chinese || seen.has(key)) return false;
       seen.add(key);
       return true;
     });
     if (!unique.length) return '';
     return '<div class="approved-term-block">' +
-      '<div class="approved-term-title">《汉译巴利三藏》玛欣德尊者和译藏团队</div>' +
-      unique.map(row => '<div class="approved-term-row">' +
-        '<div class="definition approved-term-definition">' + esc(row.chinese) + '</div>' +
-        (row.source ? '<div class="source approved-term-source">出处：' + esc(row.source) + '</div>' : '') +
-        (row.match === 'inflected' ? '<div class="lookup-rule">' + esc(surface) + ' → ' +
-          esc(row.matchedForm) + '（已核实词形变化）</div>' : '') +
-      '</div>').join('') + '</div>';
+      '<div class="source approved-term-title">《汉译巴利三藏》玛欣德尊者和译藏团队</div>' +
+      unique.map(row => {
+        const source = String(row.source || '').trim();
+        const page = String(row.page || '').trim();
+        const provenance = [source, page].filter(Boolean).join('，');
+        return '<div class="approved-term-row">' +
+          '<div class="definition approved-term-definition"><span>' + esc(row.chinese) + '</span>' +
+            (provenance ? '<span class="source approved-term-source">（出处：' + esc(provenance) + '）</span>' : '') +
+          '</div>' +
+          (row.match === 'inflected' ? '<div class="lookup-rule">' + esc(surface) + ' → ' +
+            esc(row.matchedForm) + '（已核实词形变化）</div>' : '') +
+        '</div>';
+      }).join('') + '</div>';
   }
 
   function renderEntry(head, approvedRows, surface, includeApproved) {
@@ -183,13 +190,10 @@
     handle.style.cursor = 'move';
     handle.style.touchAction = 'none';
     let drag = null;
-    const clamp = (value, low, high) => Math.min(Math.max(low, value), Math.max(low, high));
     const move = event => {
       if (!drag || event.pointerId !== drag.id) return;
-      const maxLeft = Math.max(0, window.innerWidth - drag.width);
-      const maxTop = Math.max(0, window.innerHeight - Math.min(drag.height, window.innerHeight));
-      panel.style.left = clamp(drag.left + event.clientX - drag.x, 0, maxLeft) + 'px';
-      panel.style.top = clamp(drag.top + event.clientY - drag.y, 0, maxTop) + 'px';
+      panel.style.left = drag.left + event.clientX - drag.x + 'px';
+      panel.style.top = drag.top + event.clientY - drag.y + 'px';
     };
     const end = event => {
       if (!drag || event.pointerId !== drag.id) return;
@@ -205,8 +209,7 @@
       drag = { id: event.pointerId, x: event.clientX, y: event.clientY, left: rect.left, top: rect.top,
         width: Math.min(rect.width, window.innerWidth), height: rect.height };
       Object.assign(panel.style, { position: 'fixed',
-        left: clamp(rect.left, 0, Math.max(0, window.innerWidth - drag.width)) + 'px',
-        top: clamp(rect.top, 0, Math.max(0, window.innerHeight - Math.min(rect.height, window.innerHeight))) + 'px',
+        left: rect.left + 'px', top: rect.top + 'px',
         width: drag.width + 'px', margin: '0', transform: 'none' });
       event.preventDefault();
       event.stopImmediatePropagation();
@@ -215,13 +218,6 @@
       window.addEventListener('pointerup', end, true);
       window.addEventListener('pointercancel', end, true);
     }, true);
-    const fit = () => {
-      if (!panel.style.left) return;
-      const rect = panel.getBoundingClientRect();
-      panel.style.left = clamp(rect.left, 0, Math.max(0, window.innerWidth - Math.min(rect.width, window.innerWidth))) + 'px';
-      panel.style.top = clamp(rect.top, 0, Math.max(0, window.innerHeight - Math.min(rect.height, window.innerHeight))) + 'px';
-    };
-    window.addEventListener('resize', fit);
   }
 
   function activateTab(modal, tab) {
@@ -450,66 +446,66 @@
       style.id = 'pamc-pced-standard-style';
       style.textContent = `
         :root{--pamc-popup-brown:#75482d;--pamc-popup-brown-dark:#603921;--pamc-popup-tan:#ead8c3;--pamc-popup-paper:#fffdf9;--pamc-popup-ink:#2d2924;--pamc-popup-blue:#0b4f8a;--pamc-popup-line:#ddc7b1}
-        .modal,#pced-modal,[data-modal]{color:var(--pamc-popup-ink);font-family:Georgia,"Times New Roman","Noto Serif SC","Songti SC",SimSun,serif}
+        .modal,#pced-modal,[data-modal]{color:var(--pamc-popup-ink);font-family:Georgia,"Times New Roman","Noto Serif SC","Songti SC",SimSun,serif;font-size:18px}
         .modal .panel,.modal .pced-panel,.modal .modalcontent,.modal .modal-content,.modal .lookup-panel,.modal .dictionary-panel,.modal .dialog,
         #pced-modal .panel,#pced-modal .pced-panel,#pced-modal .modalcontent,#pced-modal .modal-content{
           background:var(--pamc-popup-paper)!important;color:var(--pamc-popup-ink)!important;border:1px solid #a97958!important;border-radius:13px!important;box-shadow:0 20px 70px #0006!important;max-height:92vh
         }
         .modal .panel-head,.modal .pced-panel-head,.modal .modal-header,.modal .dialog-header,.modal .lookup-header,.modal .dict-header,.modal .modal-titlebar,
         #pced-modal .panel-head,#pced-modal .pced-panel-head,#pced-modal .modal-header{
-          background:var(--pamc-popup-brown)!important;color:#fff!important;padding:10px 16px!important;border:0!important;border-radius:12px 12px 0 0!important;min-height:56px;display:flex;align-items:center;gap:10px;touch-action:none
+          background:var(--pamc-popup-brown)!important;color:#fff!important;padding:8px 16px!important;border:0!important;border-radius:12px 12px 0 0!important;min-height:54px;display:flex;align-items:center;gap:10px;touch-action:none
         }
         .modal .panel-title,.modal .pced-panel-title,.modal .pced-title,.modal .modal-title,.modal .dialog-title,.modal .lookup-title,
         #pced-modal .panel-title,#pced-modal .pced-panel-title,#pced-modal .pced-title{
-          color:#fff!important;font-family:Georgia,"Times New Roman",serif!important;font-size:1.5rem!important;line-height:1.15!important;font-weight:700!important
+          color:#fff!important;font-family:Georgia,"Times New Roman",serif!important;font-size:28px!important;line-height:1.15!important;font-weight:700!important
         }
         .modal .close,.modal .close-btn,.modal .pced-close,.modal [data-close],#pced-modal .close,#pced-modal .close-btn,#pced-modal .pced-close{
-          color:#fff!important;background:transparent!important;border:1px solid #d6bda9!important;border-radius:9px!important;font-family:Arial,sans-serif!important;font-size:1.35rem!important;line-height:1!important;min-width:36px;min-height:36px;padding:4px 8px!important
+          color:#fff!important;background:transparent!important;border:1px solid #d6bda9!important;border-radius:9px!important;font-family:Arial,sans-serif!important;font-size:26px!important;line-height:1!important;min-width:36px;min-height:36px;padding:4px 8px!important
         }
         .modal .panel-body,.modal .modal-body,.modal .pced-panel-body,.modal .pced-body,#pced-modal .panel-body,#pced-modal .modal-body,#pced-modal .pced-body{
           background:var(--pamc-popup-paper)!important;color:var(--pamc-popup-ink)!important;padding:18px 22px 24px!important
         }
-        .lookup-meta,.panel-meta,#dictMeta,#pced-meta{color:#74665b!important;font-size:.82rem!important;margin-bottom:10px!important}
+        .lookup-meta,.panel-meta,#dictMeta,#pced-meta{color:#74665b!important;font-size:14px!important;margin-bottom:10px!important}
         .entry{padding:13px 0!important;border-top:1px solid #eadfd5!important;background:transparent!important}
         .entry:first-child{border-top:0!important}
-        .headword{font-family:Georgia,"Times New Roman",serif!important;font-size:1.48rem!important;font-weight:700!important;line-height:1.2!important;color:var(--pamc-popup-blue)!important;margin:4px 0 8px!important}
+        .headword{font-family:Georgia,"Times New Roman",serif!important;font-size:27px!important;font-weight:700!important;line-height:1.2!important;color:var(--pamc-popup-blue)!important;margin:4px 0 8px!important}
         .group-title,.language-title,.lang-title{
-          display:block!important;background:var(--pamc-popup-tan)!important;color:#68442f!important;border-radius:6px!important;padding:6px 10px!important;margin:12px 0 8px!important;font-family:Georgia,"Times New Roman","Noto Serif SC",SimSun,serif!important;font-size:1rem!important;font-weight:700!important;line-height:1.25!important
+          display:block!important;background:var(--pamc-popup-tan)!important;color:#68442f!important;border-radius:6px!important;padding:6px 10px!important;margin:12px 0 8px!important;font-family:Georgia,"Times New Roman","Noto Serif SC",SimSun,serif!important;font-size:22px!important;font-weight:700!important;line-height:1.25!important
         }
-        .source{color:#846b58!important;font-family:Arial,"Microsoft YaHei","Noto Sans Myanmar",sans-serif!important;font-size:.76rem!important;font-weight:600!important;line-height:1.45!important;margin:7px 0 2px!important}
-        .definition{color:var(--pamc-popup-ink)!important;font-family:Georgia,"Times New Roman","Noto Serif SC","Songti SC",SimSun,"Myanmar Text","Noto Sans Myanmar",serif!important;font-size:1.05rem!important;line-height:1.65!important}
-        .note{background:#f4eee7!important;color:var(--pamc-popup-ink)!important;border:0!important;border-radius:8px!important;padding:11px 14px!important;line-height:1.55!important;margin:8px 0 12px!important}
+        .source{color:#846b58!important;font-family:Arial,"Microsoft YaHei","Noto Sans Myanmar",sans-serif!important;font-size:14px!important;font-weight:600!important;line-height:1.45!important;margin:7px 0 2px!important}
+        .definition{color:var(--pamc-popup-ink)!important;font-family:Georgia,"Times New Roman","Noto Serif SC","Songti SC",SimSun,"Myanmar Text","Noto Sans Myanmar",serif!important;font-size:18px!important;line-height:1.65!important}
+        .note{background:#f4eee7!important;color:var(--pamc-popup-ink)!important;border:0!important;font-size:18px!important;border-radius:8px!important;padding:11px 14px!important;line-height:1.55!important;margin:8px 0 12px!important}
         .approved-term-entry{background:transparent!important;border:1px solid var(--pamc-popup-line)!important}
         .approved-term-block{border:1px solid #cfae8f;border-radius:9px;background:transparent;margin:7px 0 12px;padding:0 13px}
-        .approved-term-title{color:#68442f;font-size:.88rem;font-weight:700;line-height:1.4;padding:10px 0 7px}
+        .approved-term-title{margin:0!important;padding:10px 0 7px!important}
         .approved-term-row{padding:7px 0 10px;border-top:1px solid #eadfd5}
         .approved-term-row:first-of-type{border-top:0}
-        .approved-term-definition{font-size:1.05rem!important}
-        .approved-term-source{font-size:.74rem!important;font-weight:400!important}
-        .lookup-rule{font-size:.82rem!important;color:#75543d!important;margin-top:5px}
+        .approved-term-definition{font-size:18px!important}
+        .approved-term-source{display:inline!important;margin:0 0 0 .4em!important;font-size:14px!important;font-weight:400!important;white-space:normal}
+        .lookup-rule{font-size:14px!important;color:#75543d!important;margin-top:5px}
         .lookup-section{display:none}.lookup-section.active{display:block}
         .tabs{display:flex!important;gap:6px!important;flex-wrap:wrap!important;border-bottom:1px solid var(--pamc-popup-line)!important;margin:3px 0 13px!important;padding-bottom:8px!important}
-        .tabs button[data-tab]{display:inline-flex;align-items:center;justify-content:center;color:#68442f!important;background:var(--pamc-popup-tan)!important;border:1px solid #c7a684!important;border-radius:7px!important;padding:5px 9px!important;font-family:Arial,"Microsoft YaHei",sans-serif!important;font-size:.76rem!important;font-weight:600!important;line-height:1.25!important;box-shadow:none!important}
+        .tabs button[data-tab]{display:inline-flex;align-items:center;justify-content:center;color:#68442f!important;background:var(--pamc-popup-tan)!important;border:1px solid #c7a684!important;border-radius:7px!important;padding:5px 9px!important;font-family:Arial,"Microsoft YaHei",sans-serif!important;font-size:12px!important;font-weight:600!important;line-height:1.25!important;box-shadow:none!important}
         .tabs button[data-tab]:hover{background:#dfc5aa!important}
         .tabs button[data-tab].active{color:#fff!important;background:#9a6b49!important;border-color:#8b5d3d!important}
         .tabs button[hidden]{display:none!important}
         .mahinda-table-wrap{overflow:auto;border:1px solid var(--pamc-popup-line);border-radius:9px}
         .mahinda-table{width:100%;border-collapse:collapse;background:transparent}
         .mahinda-table th,.mahinda-table td{padding:9px 11px;border-bottom:1px solid #eadfd3;text-align:left;vertical-align:top}
-        .mahinda-table th{background:var(--pamc-popup-tan)!important;color:#68442f!important;font-size:.76rem!important}
+        .mahinda-table th{background:var(--pamc-popup-tan)!important;color:#68442f!important;font-size:12px!important}
         .ai-box{border:1px solid var(--pamc-popup-line);border-radius:10px;padding:15px;background:transparent}
-        .ai-title{color:var(--pamc-popup-blue);font-family:Georgia,"Times New Roman",serif;font-size:1.2rem;font-weight:700;margin-bottom:10px}
+        .ai-title{color:var(--pamc-popup-blue);font-family:Georgia,"Times New Roman",serif;font-size:20px;font-weight:700;margin-bottom:10px}
         .ai-source{padding:11px;background:#f4eee7;border-radius:8px;margin-bottom:12px}
         .ai-actions{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
-        .ai-actions button{padding:6px 10px;border:1px solid #b98f6d;border-radius:7px;background:var(--pamc-popup-tan);color:#68442f;cursor:pointer;font-size:.78rem}
+        .ai-actions button{padding:6px 10px;border:1px solid #b98f6d;border-radius:7px;background:var(--pamc-popup-tan);color:#68442f;cursor:pointer;font-size:13px}
         .ai-actions button.primary{background:#9a6b49;color:#fff}
-        .ai-help,.ai-status{margin:8px 0;color:#75543d;font-size:.82rem}
+        .ai-help,.ai-status{margin:8px 0;color:#75543d;font-size:14px}
         @media(max-width:600px){
           .modal,#pced-modal{padding:6px!important}
           .modal .panel-body,.modal .modal-body,.modal .pced-panel-body,.modal .pced-body,#pced-modal .panel-body,#pced-modal .pced-body{padding:14px 14px 20px!important}
-          .modal .panel-title,.modal .pced-panel-title,.modal .pced-title,.modal .modal-title,#pced-modal .panel-title,#pced-modal .pced-title{font-size:1.28rem!important}
-          .headword{font-size:1.3rem!important}.definition{font-size:1rem!important}
-          .tabs button[data-tab]{font-size:.7rem!important;padding:5px 7px!important}
+          .modal .panel-title,.modal .pced-panel-title,.modal .pced-title,.modal .modal-title,#pced-modal .panel-title,#pced-modal .pced-title{font-size:25px!important}
+          .headword{font-size:24px!important}.group-title,.language-title,.lang-title{font-size:20px!important}.definition{font-size:17px!important}
+          .tabs button[data-tab]{font-size:12px!important;padding:5px 7px!important}
         }
 `;
       document.head.append(style);
