@@ -743,4 +743,7 @@ document.addEventListener('click',e=>{const f=e.target.closest('.footnote-ref');
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDictionary();closeFootnote();closeBookmarks()}const w=e.target.closest&&e.target.closest('.pali-word');if(w&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openDictionary(w.dataset.word)}const f=e.target.closest&&e.target.closest('.footnote-ref');if(f&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openFootnote(f.dataset.note)}});
 document.getElementById('closeDict').onclick=closeDictionary;document.getElementById('dictModal').onclick=e=>{if(e.target.id==='dictModal')closeDictionary()};document.getElementById('closeFootnote').onclick=closeFootnote;document.getElementById('footnoteModal').onclick=e=>{if(e.target.id==='footnoteModal')closeFootnote()};document.getElementById('closeBookmarks').onclick=closeBookmarks;document.getElementById('bookmarkModal').onclick=e=>{if(e.target.id==='bookmarkModal')closeBookmarks()};
 showView('contents');document.getElementById('resultCount').textContent=rows.length;
-</script></body></html>
+</script><script src="pced-standard-data.js"></script>
+<script src="pced-approved-terms.js"></script>
+<script src="pced-popup-standard.js" data-pced-mode="book"></script>
+</body></html>
