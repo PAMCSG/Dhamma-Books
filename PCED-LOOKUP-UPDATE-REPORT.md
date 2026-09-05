@@ -49,4 +49,15 @@ All 13 Dhamma Books HTML readers that provide Roman-script Pāli word lookup now
 - Displays approved Chinese-Tipiṭaka terminology first, followed by Chinese, English, Burmese, and other dictionary languages.
 - Every popup opens at its first view and scroll position.
 - Popup dragging is constrained to the viewport so the window and close control cannot be lost off-screen.
-- `patisambhidamagga.html` retains its equivalent existing conservative resolver and on-screen drag implementation because its 17.5 MB source exceeds the connector’s safe single-request limit.
+- `patisambhidamagga.html` now loads the same shared popup standard. Its embedded PCED dictionary was externalized unchanged to `patisambhidamagga-pced-data.js`; exact data equivalence and all inline JavaScript were verified.
+
+
+## Unified popup presentation — 6 September 2026
+
+- Shared popup layer updated to `pced-popup-standard.js` v1.1.0.
+- All legacy PCED popup shells use the approved dark-brown title bar, paper background, blue Pāli headword, tiered heading sizes, and consistent serif text.
+- Language headings are standardized as `中文`, `English`, `Burmese`, `Japanese`, `Vietnamese`, `Korean`, and `Other`, with a light-brown heading background.
+- Exact single-word Chinese-Tipiṭaka matches appear once under `中文` in one unshaded framed group headed `《汉译巴利三藏》玛欣德尊者和译藏团队`; multiple meanings are combined and each retains its 出处.
+- Sentence records are excluded from a single-word Chinese-Tipiṭaka lookup.
+- Reader tab names use compact button styling with a light-brown background.
+- Popup movement now covers current and legacy panel/header class structures, dynamically added modals, pointer and touch dragging, viewport bounds, and resize correction.
