@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.0.0 — 2026-09-04
+ * Version 3.2.0 — 2026-09-05
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,13 +10,13 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.0.0';
+  const VERSION = '3.2.0';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
   // Verified linguistic decompositions; every part must still be validated
   // as a complete PCED headword at runtime.
-  const VERIFIED_DECOMPOSITIONS = Object.freeze({
+  const BUILTIN_DECOMPOSITIONS = Object.freeze({
     'tenupasaṅkami': Object.freeze({ kind: 'sandhi', parts: Object.freeze(['tena', 'upasaṅkami']) }),
     'yañca': Object.freeze({ kind: 'sandhi', parts: Object.freeze(['yaṃ', 'ca']) }),
     'mahāpariccāga': Object.freeze({ kind: 'compound', parts: Object.freeze(['mahanta', 'pariccāga']) }),
@@ -102,6 +102,9 @@
     for (const [suffix, removeCount] of aStemRules) {
       if (word.endsWith(suffix) && word.length > removeCount + 2) {
         add(word.slice(0, -removeCount) + 'a', `-${suffix} → -a`, 'a-stem');
+        // Some PCED proper-name/adjective entries use the masculine
+        // nominative -o as their citation form instead of the stem in -a.
+        add(word.slice(0, -removeCount) + 'o', `-${suffix} → PCED citation -o`, 'a-stem citation variant');
       }
     }
 
@@ -249,6 +252,26 @@
     return parts.length >= 2 ? { kind: value.kind || 'compound', parts } : null;
   }
 
+  function decompositionFor(key, options = {}) {
+    key = cleanWord(key);
+    return normalizeDecomposition(
+      options.decompositions?.[key] ||
+      options.compounds?.[key] ||
+      global.PCEDStandardData?.decompositions?.[key] ||
+      BUILTIN_DECOMPOSITIONS[key]
+    );
+  }
+
+  function niggahitaCaDecomposition(word) {
+    word = cleanWord(word);
+    if (!word.endsWith('ñca') || word.length <= 4) return null;
+    return {
+      kind: 'sandhi',
+      parts: [word.slice(0, -3) + 'ṃ', 'ca'],
+      label: 'ñc = ṃ + c (niggahīta assimilation)'
+    };
+  }
+
   function resolutionContext(options) {
     const dictionary = options.dictionary || {};
     const index = options.index || createExactIndex(dictionary);
@@ -270,7 +293,7 @@
     let heads = context.exact(form);
     let method = heads.length ? 'exact' : 'none';
     if (!heads.length) {
-      for (const map of [options.fallbackAliases, options.aliases, options.related]) {
+      for (const map of [options.fallbackAliases, options.aliases]) {
         const mapped = formsFromMap(map, cleanWord(form));
         heads = mapped.flatMap(context.exact);
         if (heads.length) { method = 'related'; break; }
@@ -287,6 +310,11 @@
         heads = context.exact(candidate.form);
         if (heads.length) { method = 'inflected'; break; }
       }
+    }
+    if (!heads.length) {
+      const mapped = formsFromMap(options.related, cleanWord(form));
+      heads = mapped.flatMap(context.exact);
+      if (heads.length) method = 'related';
     }
     return { surface: form, method, heads: [...new Set(heads)] };
   }
@@ -312,16 +340,22 @@
     const addEntryDecomposition = result => {
       if (result.heads.length !== 1 || result.components.length) return result;
       const head = result.heads[0];
-      const definitionSplit = decompositionFromEntry(context.dictionary[head]);
-      if (definitionSplit) {
-        const components = definitionSplit.parts.map(part => resolvePart(part, context, options));
-        // A PCED bracketed formula is treated as a displayable compound only
-        // when every component is itself an attested complete headword.
+      // The maintained standard table takes precedence over formulas embedded
+      // in individual dictionary records, which occasionally use a stem form
+      // that differs from the approved display analysis (for example mano).
+      const verifiedSplit = decompositionFor(head, options);
+      if (verifiedSplit) {
+        const components = verifiedSplit.parts.map(part => resolvePart(part, context, options));
         if (components.every(part => part.heads.length)) result.components = components;
       }
       if (!result.components.length) {
-        const verifiedSplit = VERIFIED_DECOMPOSITIONS[cleanWord(head)];
-        if (verifiedSplit) result.components = verifiedSplit.parts.map(part => resolvePart(part, context, options));
+        const definitionSplit = decompositionFromEntry(context.dictionary[head]);
+        if (definitionSplit) {
+          const components = definitionSplit.parts.map(part => resolvePart(part, context, options));
+          // A PCED bracketed formula is treated as a displayable compound only
+          // when every component is itself an attested complete headword.
+          if (components.every(part => part.heads.length)) result.components = components;
+        }
       }
       return result;
     };
@@ -331,25 +365,9 @@
       return finish(addEntryDecomposition({ ...base, mode: 'exact', tier: 1, heads: exactHeads }));
     }
 
-    // An explicitly verified sandhi/compound is stronger evidence than a
-    // legacy related-form map. Accept it here only when every component is
-    // independently attested as a complete PCED headword.
-    const directSplit = VERIFIED_DECOMPOSITIONS[normalized];
-    if (directSplit) {
-      const components = directSplit.parts.map(part => resolvePart(part, context, options));
-      if (components.every(part => part.heads.length)) {
-        return finish({
-          ...base, mode: directSplit.kind || 'compound', tier: 2, components,
-          resolvedForm: normalized,
-          notes: [`${clicked} → ${directSplit.parts.join(' + ')} (${directSplit.kind || 'compound'})`]
-        });
-      }
-    }
-
     for (const [map, label] of [
       [options.fallbackAliases, 'verified fallback headword'],
-      [options.aliases, 'verified headword'],
-      [options.related, 'verified related form']
+      [options.aliases, 'verified headword']
     ]) {
       const mapped = formsFromMap(map, normalized);
       const heads = mapped.flatMap(context.exact);
@@ -386,16 +404,37 @@
       }
     }
 
+    // Only after exact and whole-word inflection lookup has failed, treat
+    // final -ñca as niggahīta + ca. Returning this result even when the first
+    // component is unattested prevents legacy maps from inventing "añca" or
+    // "mañca" as standalone words.
+    const ncaSplit = niggahitaCaDecomposition(normalized);
+    if (ncaSplit) {
+      const components = ncaSplit.parts.map(part => resolvePart(part, context, options));
+      return finish({
+        ...base, mode: 'sandhi', tier: 4, components,
+        resolvedForm: ncaSplit.parts[0], rule: ncaSplit.label,
+        notes: [`${clicked} → ${ncaSplit.parts.join(' + ')} (${ncaSplit.label})`]
+      });
+    }
+
     const decompositionKeys = [normalized, ...candidates.map(candidate => candidate.form)];
     for (const key of decompositionKeys) {
-      const hostSplit = normalizeDecomposition(options.decompositions?.[key] || options.compounds?.[key]);
-      const split = hostSplit || VERIFIED_DECOMPOSITIONS[key];
+      const split = decompositionFor(key, options);
       if (!split) continue;
       const components = split.parts.map(part => resolvePart(part, context, options));
       return finish({
         ...base, mode: split.kind || 'compound', tier: 4, components, resolvedForm: key,
         notes: [`${clicked} → ${split.parts.join(' + ')} (${split.kind || 'compound'})`]
       });
+    }
+
+    const relatedHeads = formsFromMap(options.related, normalized).flatMap(context.exact);
+    if (relatedHeads.length) {
+      return finish(addEntryDecomposition({
+        ...base, mode: 'related', tier: 5, heads: relatedHeads,
+        resolvedForm: cleanWord(relatedHeads[0]), notes: [`${clicked} → ${relatedHeads.join(', ')} (verified related form)`]
+      }));
     }
 
     const record = options.lookupRecords?.[normalized];
@@ -405,6 +444,61 @@
     }
 
     return finish(base);
+  }
+
+  const APPROVED_TERM_STATUSES = new Set(['已确认', '规范']);
+  const APPROVED_TERM_INDEX_CACHE = new WeakMap();
+
+  function approvedTermAlternatives(pali) {
+    return String(pali || '').split(/\s*[,;/；，]\s*/)
+      .map(value => cleanWord(value))
+      // A single-word click must not inherit the translation of a phrase
+      // merely because that phrase happens to contain the same word.
+      .filter(value => value && !/\s/.test(value));
+  }
+
+  function approvedTermIndex(records) {
+    if (APPROVED_TERM_INDEX_CACHE.has(records)) return APPROVED_TERM_INDEX_CACHE.get(records);
+    const index = new Map();
+    for (const record of records) {
+      if (!APPROVED_TERM_STATUSES.has(String(record?.status || '').trim())) continue;
+      if (!String(record?.chinese || '').trim()) continue;
+      for (const form of approvedTermAlternatives(record?.pali)) {
+        if (!index.has(form)) index.set(form, []);
+        index.get(form).push(record);
+      }
+    }
+    APPROVED_TERM_INDEX_CACHE.set(records, index);
+    return index;
+  }
+
+  function approvedTermMatches(surface, resolution = {}, options = {}) {
+    const records = options.approvedTerms || global.PCEDApprovedTerms?.records || [];
+    if (!Array.isArray(records) || !records.length) return [];
+    const index = approvedTermIndex(records);
+    const exact = cleanWord(surface);
+    const collect = (forms, match) => {
+      const seen = new Set(), out = [];
+      for (const form of forms.map(cleanWord).filter(Boolean)) {
+        for (const record of index.get(form) || []) {
+          const signature = [record.id || '', record.pali || '', record.chinese || '', record.status || ''].join('\u241f');
+          if (seen.has(signature)) continue;
+          seen.add(signature);
+          out.push({ ...record, match, matchedForm: form });
+        }
+      }
+      return out;
+    };
+
+    const exactRows = collect([exact], 'exact');
+    if (exactRows.length) return exactRows;
+
+    // Only verified aliases/whole-word inflections may connect the clicked
+    // form to an approved database headword. Compound components and merely
+    // related forms are deliberately excluded.
+    if (!['alias', 'inflected'].includes(resolution.mode)) return [];
+    const heads = resolution.primaryHeads || resolution.heads || [];
+    return collect([resolution.resolvedForm, ...heads], 'inflected');
   }
 
   function classifySourceEntry(record, originalBucket = 'other') {
@@ -440,8 +534,9 @@
     createExactIndex,
     inflectionCandidates,
     resolve,
+    approvedTermMatches,
     classifySourceEntry,
     dictionaryGroups,
-    verifiedDecompositions: VERIFIED_DECOMPOSITIONS
+    verifiedDecompositions: BUILTIN_DECOMPOSITIONS
   });
 })(window);
