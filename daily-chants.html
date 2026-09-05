@@ -429,7 +429,7 @@ function escJS(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'
 function renderEntry(k){
   const e=PCED[k];if(!e)return'';
   let o=`<div class="entry"><div class="headword">${escJS(e.headword||k)}</div>`,any=false;
-  const groups=window.PCEDLookupCore.dictionaryGroups(e,'en');
+  const groups=window.PCEDLookupCore.dictionaryGroups(e,'zh');
   for(const group of groups){
     any=true;o+=`<div class="group-title">${escJS(group.title)}</div>`;
     for(const x of group.entries)o+=`<div class="source">${escJS(x.source_label||x.source||'')}</div><div class="definition">${x.definition||''}</div>`;

@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.2.0 — 2026-09-05
+ * Version 3.4.0 — 2026-09-05
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.2.0';
+  const VERSION = '3.4.0';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -19,9 +19,17 @@
   const BUILTIN_DECOMPOSITIONS = Object.freeze({
     'tenupasaṅkami': Object.freeze({ kind: 'sandhi', parts: Object.freeze(['tena', 'upasaṅkami']) }),
     'yañca': Object.freeze({ kind: 'sandhi', parts: Object.freeze(['yaṃ', 'ca']) }),
+    'panāhaṃ': Object.freeze({ kind: 'sandhi', parts: Object.freeze(['pana', 'ahaṃ']) }),
+    'etadavoca': Object.freeze({ kind: 'sandhi', parts: Object.freeze(['etaṃ', 'avoca']) }),
     'mahāpariccāga': Object.freeze({ kind: 'compound', parts: Object.freeze(['mahanta', 'pariccāga']) }),
     'dhammacakkappavattana': Object.freeze({ kind: 'compound', parts: Object.freeze(['dhammacakka', 'pavattana']) }),
     'pākārantara': Object.freeze({ kind: 'compound', parts: Object.freeze(['pākāra', 'antara']) })
+  });
+
+  // Verified whole-word spelling variants. A mapped form is accepted only
+  // when it is an exact PCED headword in the host dictionary.
+  const BUILTIN_ALIASES = Object.freeze({
+    'vīriyindriya': Object.freeze(['viriyindriya'])
   });
 
   const SOURCE_LANGUAGE = Object.freeze({
@@ -293,7 +301,7 @@
     let heads = context.exact(form);
     let method = heads.length ? 'exact' : 'none';
     if (!heads.length) {
-      for (const map of [options.fallbackAliases, options.aliases]) {
+      for (const map of [options.fallbackAliases, options.aliases, BUILTIN_ALIASES]) {
         const mapped = formsFromMap(map, cleanWord(form));
         heads = mapped.flatMap(context.exact);
         if (heads.length) { method = 'related'; break; }
@@ -367,7 +375,8 @@
 
     for (const [map, label] of [
       [options.fallbackAliases, 'verified fallback headword'],
-      [options.aliases, 'verified headword']
+      [options.aliases, 'verified headword'],
+      [BUILTIN_ALIASES, 'verified PCED spelling']
     ]) {
       const mapped = formsFromMap(map, normalized);
       const heads = mapped.flatMap(context.exact);
