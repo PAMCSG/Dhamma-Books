@@ -1213,4 +1213,8 @@ document.getElementById('goBookmark').onclick=()=>{lastActive=document.activeEle
 document.getElementById('lastPos').onclick=()=>{const id=localStorage.getItem(STORAGE+'lastPos');if(id)document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'center'})};
 function setSize(n){fontSize=Math.max(15,Math.min(28,n));document.documentElement.style.setProperty('--font',fontSize+'px');localStorage.setItem(STORAGE+'fontSize',fontSize)}document.getElementById('smaller').onclick=()=>setSize(fontSize-1);document.getElementById('larger').onclick=()=>setSize(fontSize+1);setSize(fontSize);
 document.addEventListener('click',e=>{const w=e.target.closest('.pali-word');if(w){e.stopPropagation();openDict(w.dataset.word);return}const f=e.target.closest('.fn-marker');if(f){e.stopPropagation();openNote(f.dataset.note)}});document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('dictModal');closeModal('noteModal');closeModal('bookmarkModal')}const w=e.target.closest&&e.target.closest('.pali-word');if(w&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openDict(w.dataset.word)}const f=e.target.closest&&e.target.closest('.fn-marker');if(f&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openNote(f.dataset.note)}});
-</script></body></html>
+</script><script src="pced-lookup-core.js"></script>
+<script src="pced-standard-data.js"></script>
+<script src="pced-approved-terms.js"></script>
+<script src="pced-popup-standard.js" data-pced-mode="book"></script>
+</body></html>
