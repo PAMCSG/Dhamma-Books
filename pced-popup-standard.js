@@ -96,7 +96,9 @@
   function selectedText(modal) {
     const meta = modal.querySelector('#lookupMeta,#dictMeta,#pced-meta,.lookup-meta,.panel-meta')?.textContent || '';
     const title = modal.querySelector('#lookupTitle,#dictTitle,#pced-title,.panel-title,.pced-panel-title')?.textContent || '';
-    return (lastWord || meta.replace(/^Selected(?: Pāli word)?:\s*/i, '').trim() || title.trim()).trim();
+    const selected = meta.match(/^Selected(?: Pāli word)?:\s*(.+)$/i)?.[1]?.trim() || '';
+    const titled = /^(?:PCED|Lookup|AI Translation)$/i.test(title.trim()) ? '' : title.trim();
+    return (selected || titled || lastWord).trim();
   }
 
   function resetTop(modal) {
@@ -352,6 +354,11 @@
     }
     document.querySelectorAll('.modal,#pced-modal').forEach(watchModal);
     document.addEventListener('pointerdown', event => {
+      const word = event.target.closest?.('.pali-word,.attha-word,[data-word]');
+      if (word?.dataset?.word) lastWord = word.dataset.word;
+    }, true);
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
       const word = event.target.closest?.('.pali-word,.attha-word,[data-word]');
       if (word?.dataset?.word) lastWord = word.dataset.word;
     }, true);
