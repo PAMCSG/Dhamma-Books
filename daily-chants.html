@@ -567,9 +567,11 @@ showView('contents');document.getElementById('resultCount').textContent=rows.len
     let drag=null;
     const move=e=>{
       if(!drag||e.pointerId!==drag.id)return;
-      const pad=8,maxLeft=Math.max(pad,window.innerWidth-drag.width-pad),maxTop=Math.max(pad,window.innerHeight-drag.height-pad);
-      panel.style.left=Math.min(maxLeft,Math.max(pad,drag.left+e.clientX-drag.x))+'px';
-      panel.style.top=Math.min(maxTop,Math.max(pad,drag.top+e.clientY-drag.y))+'px';
+      const visibleX=Math.min(150,drag.width),visibleY=Math.min(28,drag.handleHeight);
+      const minLeft=-(drag.width-visibleX),maxLeft=window.innerWidth-visibleX;
+      const minTop=-(drag.handleHeight-visibleY),maxTop=window.innerHeight-visibleY;
+      panel.style.left=Math.min(maxLeft,Math.max(minLeft,drag.left+e.clientX-drag.x))+'px';
+      panel.style.top=Math.min(maxTop,Math.max(minTop,drag.top+e.clientY-drag.y))+'px';
     };
     const end=e=>{
       if(!drag||e.pointerId!==drag.id)return;
@@ -580,7 +582,7 @@ showView('contents');document.getElementById('resultCount').textContent=rows.len
       if(e.pointerType==='mouse'&&e.button!==0)return;
       if(e.target.closest('button,a,input,select,textarea'))return;
       const rect=panel.getBoundingClientRect();
-      drag={id:e.pointerId,x:e.clientX,y:e.clientY,left:rect.left,top:rect.top,width:rect.width,height:rect.height};
+      drag={id:e.pointerId,x:e.clientX,y:e.clientY,left:rect.left,top:rect.top,width:rect.width,height:rect.height,handleHeight:handle.getBoundingClientRect().height};
       Object.assign(panel.style,{position:'fixed',left:rect.left+'px',top:rect.top+'px',width:rect.width+'px',margin:'0',transform:'none'});
       panel.classList.add('pamc-dragging');
       e.preventDefault();

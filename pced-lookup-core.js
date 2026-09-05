@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.4.0 — 2026-09-05
+ * Version 3.4.1 — 2026-09-05
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.4.0';
+  const VERSION = '3.4.1';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -502,12 +502,25 @@
     const exactRows = collect([exact], 'exact');
     if (exactRows.length) return exactRows;
 
-    // Only verified aliases/whole-word inflections may connect the clicked
-    // form to an approved database headword. Compound components and merely
-    // related forms are deliberately excluded.
-    if (!['alias', 'inflected'].includes(resolution.mode)) return [];
-    const heads = resolution.primaryHeads || resolution.heads || [];
-    return collect([resolution.resolvedForm, ...heads], 'inflected');
+    // The ordinary dictionary may contain an exact inflected entry (for
+    // example gotamo). That exact PCED hit must not prevent the approved-term
+    // lookup from also testing the corresponding whole-word citation form
+    // (Gotama). Every proposed form is still accepted only as an exact key in
+    // the approved-term index; no prefix, substring or fuzzy match is used.
+    const inflectedForms = [];
+    const addInflected = value => {
+      value = cleanWord(value);
+      if (value && value !== exact && !inflectedForms.includes(value)) inflectedForms.push(value);
+    };
+
+    if (['alias', 'inflected'].includes(resolution.mode)) {
+      addInflected(resolution.resolvedForm);
+      for (const head of resolution.primaryHeads || resolution.heads || []) addInflected(head);
+    }
+    for (const candidate of verifiedInflectionCandidates(exact, options)) addInflected(candidate.form);
+    for (const candidate of inflectionCandidates(exact)) addInflected(candidate.form);
+
+    return collect(inflectedForms, 'inflected');
   }
 
   function classifySourceEntry(record, originalBucket = 'other') {
