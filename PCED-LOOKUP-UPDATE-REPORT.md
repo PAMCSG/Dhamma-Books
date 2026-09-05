@@ -42,3 +42,11 @@ All 13 Dhamma Books HTML readers that provide Roman-script Pāli word lookup now
 - Representative core tests passed for `dīghaṁ` → `dīghaṃ` / `dīgha`, `bhikkhū` → `bhikkhu`, `Magadhesu` → `magadha`, `guṇena` → `guṇa`, `paññāya` → `paññā`, and `vandāmi` → `vandati`.
 - Unrelated book text, layout, navigation, bookmarks, and translation functions were not rewritten.
 
+## Repository-wide popup standard — 5 September 2026
+
+- Added `pced-popup-standard.js` and connected 13 PCED-enabled book pages.
+- Uses the shared PCED 3.4.2 resolver: exact → verified alias → verified inflection → verified compound/sandhi; no prefix, substring, or fuzzy fallback.
+- Displays approved Chinese-Tipiṭaka terminology first, followed by Chinese, English, Burmese, and other dictionary languages.
+- Every popup opens at its first view and scroll position.
+- Popup dragging is constrained to the viewport so the window and close control cannot be lost off-screen.
+- `patisambhidamagga.html` retains its equivalent existing conservative resolver and on-screen drag implementation because its 17.5 MB source exceeds the connector’s safe single-request limit.
