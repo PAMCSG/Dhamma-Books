@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.0.0 — 2026-09-05 */
+/* PAMC cross-book PCED popup standard v1.1.0 — 2026-09-05 */
 (function () {
   'use strict';
 
@@ -44,41 +44,80 @@
     };
   }
 
-  function renderEntry(head) {
+  const LANGUAGE_TITLES = Object.freeze({
+    zh: '中文', en: 'English', my: 'Burmese', ja: 'Japanese',
+    vi: 'Vietnamese', ko: 'Korean', other: 'Other'
+  });
+
+  function groupTitle(group) {
+    return LANGUAGE_TITLES[group?.key] || String(group?.title || 'Other')
+      .replace(/^中文\s*\/\s*Chinese$/i, '中文')
+      .replace(/^မြန်မာ\s*\/\s*Burmese$/i, 'Burmese')
+      .replace(/^日本語\s*\/\s*Japanese$/i, 'Japanese')
+      .replace(/^Tiếng Việt\s*\/\s*Vietnamese$/i, 'Vietnamese')
+      .replace(/^한국어\s*\/\s*Korean$/i, 'Korean');
+  }
+
+  function renderDictionaryItem(item) {
+    return '<div class="source">' + esc(item.source_label || item.source || '') + '</div>' +
+      '<div class="definition">' + (item.definition || '') + '</div>';
+  }
+
+  function isSingleWordRecord(row) {
+    return String(row?.pali || '').split(/\s*[,;/；，]\s*/)
+      .map(value => normalize(value)).some(value => value && !/\s/.test(value));
+  }
+
+  function approvedWordRows(surface, result, allRows) {
+    const approvedTerms = Array.isArray(allRows) && allRows.length
+      ? allRows : (window.PCEDApprovedTerms?.records || []);
+    return (core()?.approvedTermMatches(surface, result, { approvedTerms }) || [])
+      .filter(isSingleWordRecord);
+  }
+
+  function renderApprovedBlock(rows, surface) {
+    const seen = new Set();
+    const unique = (rows || []).filter(row => {
+      const key = [normalize(row.pali), String(row.chinese || '').trim(), String(row.source || '').trim()].join('\u241f');
+      if (!row.chinese || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    if (!unique.length) return '';
+    return '<div class="approved-term-block">' +
+      '<div class="approved-term-title">《汉译巴利三藏》玛欣德尊者和译藏团队</div>' +
+      unique.map(row => '<div class="approved-term-row">' +
+        '<div class="definition approved-term-definition">' + esc(row.chinese) + '</div>' +
+        (row.source ? '<div class="source approved-term-source">出处：' + esc(row.source) + '</div>' : '') +
+        (row.match === 'inflected' ? '<div class="lookup-rule">' + esc(surface) + ' → ' +
+          esc(row.matchedForm) + '（已核实词形变化）</div>' : '') +
+      '</div>').join('') + '</div>';
+  }
+
+  function renderEntry(head, approvedRows, surface, includeApproved) {
     const entry = dictionary()[head];
     if (!entry) return '';
-    let html = '<div class="entry"><div class="headword">' + esc(entry.headword || head) + '</div>';
     const groups = core()?.dictionaryGroups(entry, 'zh') || [];
+    let html = '<div class="entry"><div class="headword">' + esc(entry.headword || head) + '</div>';
+    const approved = includeApproved ? renderApprovedBlock(approvedRows, surface) : '';
+    const hasChinese = groups.some(group => group.key === 'zh');
+    if (approved && !hasChinese) {
+      html += '<div class="group-title" data-language="zh">中文</div>' + approved;
+    }
     for (const group of groups) {
-      html += '<div class="group-title">' + esc(group.title) + '</div>';
-      for (const item of group.entries) {
-        html += '<div class="source">' + esc(item.source_label || item.source || '') + '</div>' +
-          '<div class="definition">' + (item.definition || '') + '</div>';
-      }
+      html += '<div class="group-title" data-language="' + esc(group.key || 'other') + '">' +
+        esc(groupTitle(group)) + '</div>';
+      if (group.key === 'zh' && approved) html += approved;
+      for (const item of group.entries) html += renderDictionaryItem(item);
     }
     return html + '</div>';
   }
 
-  function approvedWordRows(surface, result) {
-    return core()?.approvedTermMatches(surface, result) || [];
-  }
-
-  function renderApprovedRows(rows, surface) {
-    return rows.map(row => '<div class="entry approved-term-entry">' +
-      '<div class="headword">' + esc(row.pali) + '</div>' +
-      '<div class="group-title">中文 / Chinese</div>' +
-      '<div class="source">《汉译巴利三藏》玛欣德尊者和译藏团队 · ' + esc(row.status || '') + '</div>' +
-      '<div class="definition">' + esc(row.chinese) + '</div>' +
-      (row.match === 'inflected' ? '<div class="lookup-rule">' + esc(surface) + ' → ' +
-        esc(row.matchedForm) + '（已核实词形变化）</div>' : '') + '</div>').join('');
-  }
-
-  function renderDictionary(surface) {
+  function renderDictionary(surface, suppliedRows) {
     const result = resolution(surface);
     const heads = result.allHeads || result.heads || [];
-    const approved = renderApprovedRows(approvedWordRows(surface, result), surface);
-    if (!heads.length) return approved + '<div class="note"><b>No reliable PCED entry was found for ' +
-      esc(surface) + '.</b><br>Only exact headwords, verified forms, conservative inflections, and verified compound or sandhi analyses were accepted.</div>';
+    const approvedRows = (Array.isArray(suppliedRows)
+      ? suppliedRows : approvedWordRows(surface, result)).filter(isSingleWordRecord);
     const shown = heads.map(head => dictionary()[head]?.headword || head).join(', ');
     const parts = (result.components || []).map(item => item.surface).join(' + ');
     let note = '';
@@ -90,7 +129,16 @@
     else if (result.mode === 'compound' || result.mode === 'sandhi' || parts) note = '<div class="note"><b>' +
       (result.mode === 'sandhi' ? 'Sandhi' : 'Compound') + ' analysis:</b> ' + esc(surface) + ' → <b>' +
       esc(parts || shown) + '</b></div>';
-    return approved + note + heads.map(renderEntry).join('');
+
+    if (!heads.length) {
+      const approved = renderApprovedBlock(approvedRows, surface);
+      const approvedEntry = approved
+        ? '<div class="entry"><div class="headword">' + esc(surface) + '</div>' +
+          '<div class="group-title" data-language="zh">中文</div>' + approved + '</div>' : '';
+      return note + approvedEntry + '<div class="note"><b>No reliable PCED entry was found for ' +
+        esc(surface) + '.</b><br>Only exact headwords, verified forms, conservative inflections, and verified compound or sandhi analyses were accepted.</div>';
+    }
+    return note + heads.map((head, index) => renderEntry(head, approvedRows, surface, index === 0)).join('');
   }
 
   function selectedText(modal) {
@@ -111,10 +159,25 @@
     requestAnimationFrame(() => requestAnimationFrame(reset));
   }
 
+  const PANEL_SELECTOR = '.panel,.pced-panel,.modalcontent,.modal-content,.lookup-panel,.dictionary-panel,.dialog';
+  const HANDLE_SELECTOR = '.panel-head,.pced-panel-head,.modal-header,.dialog-header,.lookup-header,.dict-header,.modal-titlebar';
+
+  function panelOf(modal) {
+    if (!modal) return null;
+    if (modal.matches?.('[role="dialog"]') && !modal.matches?.('.modal')) return modal;
+    return modal.querySelector(PANEL_SELECTOR);
+  }
+
+  function handleOf(panel) {
+    if (!panel) return null;
+    return panel.querySelector(HANDLE_SELECTOR) ||
+      [...panel.children].find(node => /^(HEADER|H1|H2)$/.test(node.tagName) || /head|header|titlebar/.test(node.className || ''));
+  }
+
   function installMovable(modal) {
     if (modal.dataset.pamcMovable === '1') return;
-    const panel = modal.querySelector('.panel,.pced-panel,.modalcontent');
-    const handle = panel?.querySelector('.panel-head,.pced-panel-head,.modal-header,.dialog-header');
+    const panel = panelOf(modal);
+    const handle = handleOf(panel);
     if (!panel || !handle) return;
     modal.dataset.pamcMovable = '1';
     handle.style.cursor = 'move';
@@ -141,11 +204,13 @@
       const rect = panel.getBoundingClientRect();
       drag = { id: event.pointerId, x: event.clientX, y: event.clientY, left: rect.left, top: rect.top,
         width: Math.min(rect.width, window.innerWidth), height: rect.height };
-      Object.assign(panel.style, { position: 'fixed', left: clamp(rect.left, 0, Math.max(0, window.innerWidth - drag.width)) + 'px',
+      Object.assign(panel.style, { position: 'fixed',
+        left: clamp(rect.left, 0, Math.max(0, window.innerWidth - drag.width)) + 'px',
         top: clamp(rect.top, 0, Math.max(0, window.innerHeight - Math.min(rect.height, window.innerHeight))) + 'px',
         width: drag.width + 'px', margin: '0', transform: 'none' });
       event.preventDefault();
       event.stopImmediatePropagation();
+      try { handle.setPointerCapture?.(event.pointerId); } catch (_) {}
       window.addEventListener('pointermove', move, true);
       window.addEventListener('pointerup', end, true);
       window.addEventListener('pointercancel', end, true);
@@ -190,18 +255,28 @@
     if (livePromise) return livePromise;
     livePromise = (async () => {
       const local = Array.isArray(window.PCEDApprovedTerms?.records) ? window.PCEDApprovedTerms.records : [];
-      try {
-        const response = await fetch('/api/records', { credentials: 'include', cache: 'no-store', headers: { Accept: 'application/json' } });
-        if (response.ok) {
+      const endpoints = [...new Set(['/api/records', window.PCEDApprovedTerms?.endpoint,
+        'https://chinese-tipitaka.pages.dev/api/approved-terms'].filter(Boolean))];
+      for (const endpoint of endpoints) {
+        try {
+          const response = await fetch(endpoint, {
+            credentials: endpoint.startsWith('/') ? 'include' : 'omit',
+            mode: endpoint.startsWith('/') ? 'same-origin' : 'cors',
+            cache: 'no-store', headers: { Accept: 'application/json' }
+          });
+          if (!response.ok) continue;
           const json = await response.json();
-          liveRecords = Array.isArray(json) ? json : (json.records || json.items || []);
-        }
-      } catch (_) {}
+          const rows = Array.isArray(json) ? json : (json.records || json.items || []);
+          if (Array.isArray(rows) && rows.length) { liveRecords = rows; break; }
+        } catch (_) {}
+      }
       const seen = new Set();
       return [...liveRecords, ...local].filter(row => {
-        const key = [row.id || row.dbid || '', row.pali || '', row.chinese || '', row.status || ''].join('\u241f');
-        if (seen.has(key)) return false;
-        seen.add(key); return row.pali && row.chinese;
+        if (Number(row.deleted)) return false;
+        const key = [normalize(row.pali), String(row.chinese || '').trim(), String(row.status || '').trim()].join('\u241f');
+        if (!row.pali || !row.chinese || seen.has(key)) return false;
+        seen.add(key);
+        return true;
       });
     })();
     return livePromise;
@@ -277,37 +352,69 @@
   }
 
   async function enhanceReader(modal) {
-    if (isReferenceReader) { resetTop(modal); return; }
     const surface = selectedText(modal);
     if (!surface) return;
     const phrase = /\s/.test(normalize(surface));
+    const result = resolution(surface);
     ensureReaderTabs(modal, phrase);
     const dict = modal.querySelector('#dictTab');
     const terms = modal.querySelector('#termsTab');
     const translate = modal.querySelector('#translateTab');
     const attha = modal.querySelector('#atthaTab');
-    if (dict) dict.innerHTML = phrase ? '' : renderDictionary(surface);
+    const initialRows = phrase ? [] : approvedWordRows(surface, result);
+    if (dict) dict.innerHTML = phrase ? '' : renderDictionary(surface, initialRows);
     if (attha) { try { if (typeof renderAttha === 'function') attha.innerHTML = renderAttha(surface); } catch (_) {} }
-    translate.innerHTML = renderAIBase(surface, phrase);
-    translate.onclick = event => { const button = event.target.closest('[data-pamc-ai]'); if (button) runAI(modal, surface, button.dataset.pamcAi); };
-    terms.innerHTML = '<div class="note">Searching 汉译巴利三藏…</div>';
+    if (translate) {
+      translate.innerHTML = renderAIBase(surface, phrase);
+      translate.onclick = event => {
+        const button = event.target.closest('[data-pamc-ai]');
+        if (button) runAI(modal, surface, button.dataset.pamcAi);
+      };
+    }
+    if (terms) terms.innerHTML = '<div class="note">Searching 汉译巴利三藏…</div>';
     activateTab(modal, phrase ? 'translate' : 'dict');
-    const matching = phrase ? strictPhraseRows(surface, await records()) : approvedWordRows(surface, resolution(surface));
-    if (selectedText(modal) === surface) terms.innerHTML = renderTermTable(matching, surface);
-    if (phrase && selectedText(modal) === surface) runAI(modal, surface, 'both');
+
+    const allRows = await records();
+    if (selectedText(modal) !== surface) return;
+    const matching = phrase ? strictPhraseRows(surface, allRows) : approvedWordRows(surface, result, allRows);
+    if (dict && !phrase) dict.innerHTML = renderDictionary(surface, matching);
+    if (terms) terms.innerHTML = renderTermTable(matching, surface);
+    normalizeLanguageHeadings(modal);
+    resetTop(modal);
+    if (phrase) runAI(modal, surface, 'both');
   }
 
-  function enhanceBook(modal) {
+  async function enhanceBook(modal) {
     const surface = selectedText(modal);
     if (!surface) return;
+    const result = resolution(surface);
     const body = modal.querySelector('#dictBody') || modal.querySelector('#dictTab') || modal.querySelector('#pced-body');
-    if (body) body.innerHTML = renderDictionary(surface);
+    if (body) body.innerHTML = renderDictionary(surface, approvedWordRows(surface, result));
+    resetTop(modal);
+    const allRows = await records();
+    if (selectedText(modal) !== surface) return;
+    if (body) body.innerHTML = renderDictionary(surface, approvedWordRows(surface, result, allRows));
+    normalizeLanguageHeadings(modal);
     resetTop(modal);
   }
 
+  function normalizeLanguageHeadings(modal) {
+    const map = new Map([
+      ['中文 / Chinese', '中文'], ['Chinese', '中文'],
+      ['မြန်မာ / Burmese', 'Burmese'], ['日本語 / Japanese', 'Japanese'],
+      ['Tiếng Việt / Vietnamese', 'Vietnamese'], ['한국어 / Korean', 'Korean']
+    ]);
+    modal.querySelectorAll('.group-title,.language-title,.lang-title').forEach(node => {
+      const value = node.textContent.trim();
+      if (map.has(value)) node.textContent = map.get(value);
+    });
+  }
+
   function modalOpened(modal) {
-    const panel = modal.querySelector('.panel,.pced-panel,.modalcontent');
+    const panel = panelOf(modal);
     if (panel) for (const name of ['left', 'top', 'width', 'margin', 'transform']) panel.style.removeProperty(name);
+    installMovable(modal);
+    normalizeLanguageHeadings(modal);
     const first = [...modal.querySelectorAll('.tabs button[data-tab]')].find(button => !button.hidden);
     if (mode !== 'reader' && first && !first.classList.contains('active')) first.click();
     if (mode === 'reader' && modal.id === 'lookupModal') enhanceReader(modal);
@@ -315,10 +422,25 @@
     else resetTop(modal);
   }
 
+  function isOpen(modal) {
+    return modal.classList.contains('open') || modal.getAttribute('aria-hidden') === 'false';
+  }
+
   function watchModal(modal) {
+    if (!modal || modal.dataset.pamcWatched === '1') return;
+    modal.dataset.pamcWatched = '1';
     installMovable(modal);
-    new MutationObserver(() => { if (modal.classList.contains('open')) queueMicrotask(() => modalOpened(modal)); })
-      .observe(modal, { attributes: true, attributeFilter: ['class'] });
+    new MutationObserver(() => {
+      if (isOpen(modal)) queueMicrotask(() => modalOpened(modal));
+    }).observe(modal, { attributes: true, attributeFilter: ['class', 'style', 'aria-hidden'] });
+    if (isOpen(modal)) queueMicrotask(() => modalOpened(modal));
+  }
+
+  function scanModals(root = document) {
+    const found = [];
+    if (root.matches?.('.modal,#pced-modal,[data-modal]')) found.push(root);
+    root.querySelectorAll?.('.modal,#pced-modal,[data-modal]').forEach(modal => found.push(modal));
+    [...new Set(found)].forEach(watchModal);
   }
 
   function init() {
@@ -327,22 +449,69 @@
       const style = document.createElement('style');
       style.id = 'pamc-pced-standard-style';
       style.textContent = `
-        .approved-term-entry{margin:0 0 12px;padding:13px 14px;border:1px solid #d7bd98!important;border-radius:9px;background:#fff8e9}
-        .lookup-rule{font-size:.88em;color:#75543d}
+        :root{--pamc-popup-brown:#75482d;--pamc-popup-brown-dark:#603921;--pamc-popup-tan:#ead8c3;--pamc-popup-paper:#fffdf9;--pamc-popup-ink:#2d2924;--pamc-popup-blue:#0b4f8a;--pamc-popup-line:#ddc7b1}
+        .modal,#pced-modal,[data-modal]{color:var(--pamc-popup-ink);font-family:Georgia,"Times New Roman","Noto Serif SC","Songti SC",SimSun,serif}
+        .modal .panel,.modal .pced-panel,.modal .modalcontent,.modal .modal-content,.modal .lookup-panel,.modal .dictionary-panel,.modal .dialog,
+        #pced-modal .panel,#pced-modal .pced-panel,#pced-modal .modalcontent,#pced-modal .modal-content{
+          background:var(--pamc-popup-paper)!important;color:var(--pamc-popup-ink)!important;border:1px solid #a97958!important;border-radius:13px!important;box-shadow:0 20px 70px #0006!important;max-height:92vh
+        }
+        .modal .panel-head,.modal .pced-panel-head,.modal .modal-header,.modal .dialog-header,.modal .lookup-header,.modal .dict-header,.modal .modal-titlebar,
+        #pced-modal .panel-head,#pced-modal .pced-panel-head,#pced-modal .modal-header{
+          background:var(--pamc-popup-brown)!important;color:#fff!important;padding:10px 16px!important;border:0!important;border-radius:12px 12px 0 0!important;min-height:56px;display:flex;align-items:center;gap:10px;touch-action:none
+        }
+        .modal .panel-title,.modal .pced-panel-title,.modal .pced-title,.modal .modal-title,.modal .dialog-title,.modal .lookup-title,
+        #pced-modal .panel-title,#pced-modal .pced-panel-title,#pced-modal .pced-title{
+          color:#fff!important;font-family:Georgia,"Times New Roman",serif!important;font-size:1.5rem!important;line-height:1.15!important;font-weight:700!important
+        }
+        .modal .close,.modal .close-btn,.modal .pced-close,.modal [data-close],#pced-modal .close,#pced-modal .close-btn,#pced-modal .pced-close{
+          color:#fff!important;background:transparent!important;border:1px solid #d6bda9!important;border-radius:9px!important;font-family:Arial,sans-serif!important;font-size:1.35rem!important;line-height:1!important;min-width:36px;min-height:36px;padding:4px 8px!important
+        }
+        .modal .panel-body,.modal .modal-body,.modal .pced-panel-body,.modal .pced-body,#pced-modal .panel-body,#pced-modal .modal-body,#pced-modal .pced-body{
+          background:var(--pamc-popup-paper)!important;color:var(--pamc-popup-ink)!important;padding:18px 22px 24px!important
+        }
+        .lookup-meta,.panel-meta,#dictMeta,#pced-meta{color:#74665b!important;font-size:.82rem!important;margin-bottom:10px!important}
+        .entry{padding:13px 0!important;border-top:1px solid #eadfd5!important;background:transparent!important}
+        .entry:first-child{border-top:0!important}
+        .headword{font-family:Georgia,"Times New Roman",serif!important;font-size:1.48rem!important;font-weight:700!important;line-height:1.2!important;color:var(--pamc-popup-blue)!important;margin:4px 0 8px!important}
+        .group-title,.language-title,.lang-title{
+          display:block!important;background:var(--pamc-popup-tan)!important;color:#68442f!important;border-radius:6px!important;padding:6px 10px!important;margin:12px 0 8px!important;font-family:Georgia,"Times New Roman","Noto Serif SC",SimSun,serif!important;font-size:1rem!important;font-weight:700!important;line-height:1.25!important
+        }
+        .source{color:#846b58!important;font-family:Arial,"Microsoft YaHei","Noto Sans Myanmar",sans-serif!important;font-size:.76rem!important;font-weight:600!important;line-height:1.45!important;margin:7px 0 2px!important}
+        .definition{color:var(--pamc-popup-ink)!important;font-family:Georgia,"Times New Roman","Noto Serif SC","Songti SC",SimSun,"Myanmar Text","Noto Sans Myanmar",serif!important;font-size:1.05rem!important;line-height:1.65!important}
+        .note{background:#f4eee7!important;color:var(--pamc-popup-ink)!important;border:0!important;border-radius:8px!important;padding:11px 14px!important;line-height:1.55!important;margin:8px 0 12px!important}
+        .approved-term-entry{background:transparent!important;border:1px solid var(--pamc-popup-line)!important}
+        .approved-term-block{border:1px solid #cfae8f;border-radius:9px;background:transparent;margin:7px 0 12px;padding:0 13px}
+        .approved-term-title{color:#68442f;font-size:.88rem;font-weight:700;line-height:1.4;padding:10px 0 7px}
+        .approved-term-row{padding:7px 0 10px;border-top:1px solid #eadfd5}
+        .approved-term-row:first-of-type{border-top:0}
+        .approved-term-definition{font-size:1.05rem!important}
+        .approved-term-source{font-size:.74rem!important;font-weight:400!important}
+        .lookup-rule{font-size:.82rem!important;color:#75543d!important;margin-top:5px}
         .lookup-section{display:none}.lookup-section.active{display:block}
+        .tabs{display:flex!important;gap:6px!important;flex-wrap:wrap!important;border-bottom:1px solid var(--pamc-popup-line)!important;margin:3px 0 13px!important;padding-bottom:8px!important}
+        .tabs button[data-tab]{display:inline-flex;align-items:center;justify-content:center;color:#68442f!important;background:var(--pamc-popup-tan)!important;border:1px solid #c7a684!important;border-radius:7px!important;padding:5px 9px!important;font-family:Arial,"Microsoft YaHei",sans-serif!important;font-size:.76rem!important;font-weight:600!important;line-height:1.25!important;box-shadow:none!important}
+        .tabs button[data-tab]:hover{background:#dfc5aa!important}
+        .tabs button[data-tab].active{color:#fff!important;background:#9a6b49!important;border-color:#8b5d3d!important}
         .tabs button[hidden]{display:none!important}
-        .mahinda-table-wrap{overflow:auto;border:1px solid #e0cdb8;border-radius:12px}
-        .mahinda-table{width:100%;border-collapse:collapse}
-        .mahinda-table th,.mahinda-table td{padding:10px 12px;border-bottom:1px solid #eadfd3;text-align:left;vertical-align:top}
-        .ai-box{border:1px solid #e0cdb8;border-radius:12px;padding:16px}
-        .ai-title{font-size:1.2em;font-weight:700;margin-bottom:10px}
-        .ai-source{padding:12px;background:#f7f3ee;border-radius:10px;margin-bottom:12px}
-        .ai-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-        .ai-actions button{padding:8px 12px;border:1px solid #a66b42;border-radius:9px;background:#fff;cursor:pointer}
-        .ai-actions button.primary{background:#96613d;color:#fff}
-        .ai-help,.ai-status{margin:8px 0;color:#75543d;font-size:.9em}
-        .panel-head,.pced-panel-head,.modal-header,.dialog-header{touch-action:none}
-      `;
+        .mahinda-table-wrap{overflow:auto;border:1px solid var(--pamc-popup-line);border-radius:9px}
+        .mahinda-table{width:100%;border-collapse:collapse;background:transparent}
+        .mahinda-table th,.mahinda-table td{padding:9px 11px;border-bottom:1px solid #eadfd3;text-align:left;vertical-align:top}
+        .mahinda-table th{background:var(--pamc-popup-tan)!important;color:#68442f!important;font-size:.76rem!important}
+        .ai-box{border:1px solid var(--pamc-popup-line);border-radius:10px;padding:15px;background:transparent}
+        .ai-title{color:var(--pamc-popup-blue);font-family:Georgia,"Times New Roman",serif;font-size:1.2rem;font-weight:700;margin-bottom:10px}
+        .ai-source{padding:11px;background:#f4eee7;border-radius:8px;margin-bottom:12px}
+        .ai-actions{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+        .ai-actions button{padding:6px 10px;border:1px solid #b98f6d;border-radius:7px;background:var(--pamc-popup-tan);color:#68442f;cursor:pointer;font-size:.78rem}
+        .ai-actions button.primary{background:#9a6b49;color:#fff}
+        .ai-help,.ai-status{margin:8px 0;color:#75543d;font-size:.82rem}
+        @media(max-width:600px){
+          .modal,#pced-modal{padding:6px!important}
+          .modal .panel-body,.modal .modal-body,.modal .pced-panel-body,.modal .pced-body,#pced-modal .panel-body,#pced-modal .pced-body{padding:14px 14px 20px!important}
+          .modal .panel-title,.modal .pced-panel-title,.modal .pced-title,.modal .modal-title,#pced-modal .panel-title,#pced-modal .pced-title{font-size:1.28rem!important}
+          .headword{font-size:1.3rem!important}.definition{font-size:1rem!important}
+          .tabs button[data-tab]{font-size:.7rem!important;padding:5px 7px!important}
+        }
+`;
       document.head.append(style);
     }
     const data = dictionary();
@@ -352,7 +521,10 @@
     } else {
       window.PCEDStandardData?.applyTo?.(data);
     }
-    document.querySelectorAll('.modal,#pced-modal').forEach(watchModal);
+    scanModals();
+    new MutationObserver(mutations => mutations.forEach(mutation => mutation.addedNodes.forEach(node => {
+      if (node.nodeType === 1) scanModals(node);
+    }))).observe(document.documentElement, { childList: true, subtree: true });
     document.addEventListener('pointerdown', event => {
       const word = event.target.closest?.('.pali-word,.attha-word,[data-word]');
       if (word?.dataset?.word) lastWord = word.dataset.word;
