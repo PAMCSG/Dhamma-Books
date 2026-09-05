@@ -1,21 +1,22 @@
-# Dhamma-Books Daily Chants PCED Pilot — revision 8
+# PAMC Dhamma Books
 
-Upload these four files to the root of `PAMCSG/Dhamma-Books`, replacing only files with the same names:
+The `main` branch is the authoritative source for the current Dhamma Books website.
 
-- `daily-chants.html`
-- `pced-lookup-core.js`
-- `pced-standard-data.js`
-- `pced-approved-terms.js`
+## Shared PCED files
 
-Do not replace `index.html` or any other book during this pilot test.
+- `pced-lookup-core.js` — exact and verified-form resolver
+- `pced-standard-data.js` — maintained inflections, aliases, compounds, and sandhi
+- `pced-approved-terms.js` — approved Chinese-Tipiṭaka terminology snapshot
+- `pced-popup-standard.js` — cross-book popup display, reset, and movement behavior
 
-Revision 8 updates the shared lookup core to version 3.4.0 and adds these verified sandhi analyses:
+PCED-enabled books use the Daily-Chants standard:
 
-- `panāhaṃ → pana + ahaṃ` (never the legacy unrelated result `nāhaṃ`)
-- `etadavoca → etaṃ + avoca`
+1. Approved Chinese-Tipiṭaka entry, when precisely matched
+2. Chinese PCED entries
+3. English
+4. Burmese
+5. Other correctly identified languages
 
-Daily Chants now displays its ordinary PCED language groups in the standard book order: Chinese, English, Burmese, then the remaining correctly identified languages. An approved `已确认`/`规范` entry from 汉译巴利三藏 still appears before those PCED groups when available.
+Popups reopen at the beginning and remain movable within the visible screen. Prefix, substring, and fuzzy dictionary fallbacks are not allowed.
 
-The same shared core is supplied in the Tipitaka-reader revision 8 package.
-
-After deployment, hard-refresh the browser and test `panāhaṃ`, `etadavoca`, `apatanā`, `pañca`, `katamañca`, `dhammañca`, `hetupaccaya`, `sotāyatana`, and `sotadhātu`.
+See `PCED-LOOKUP-UPDATE-REPORT.md` for rollout details and tests.
