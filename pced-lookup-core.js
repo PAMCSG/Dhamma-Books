@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.4.1 — 2026-09-05
+ * Version 3.4.2 — 2026-09-05
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.4.1';
+  const VERSION = '3.4.2';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -455,7 +455,7 @@
     return finish(base);
   }
 
-  const APPROVED_TERM_STATUSES = new Set(['已确认', '规范']);
+  const APPROVED_TERM_STATUSES = new Set(['规范', '核实', '已核实', '确认', '已确认']);
   const APPROVED_TERM_INDEX_CACHE = new WeakMap();
 
   function approvedTermAlternatives(pali) {
