@@ -15,8 +15,11 @@
   }[char]));
   const core = () => window.PCEDLookupCore;
   const dictionary = () => {
-    try { return typeof PCED !== 'undefined' ? PCED : (window.PCED || {}); }
-    catch (_) { return window.PCED || {}; }
+    try {
+      if (typeof PCED !== 'undefined') return PCED;
+      if (typeof PCED_ENTRIES !== 'undefined') return PCED_ENTRIES;
+      return window.PCED || window.PCED_ENTRIES || {};
+    } catch (_) { return window.PCED || window.PCED_ENTRIES || {}; }
   };
   const normalize = value => core()?.normalizeForMatch(value)
     .replace(/[^a-zāīūṅñṭḍṇḷṃ\s]/g, ' ').replace(/\s+/g, ' ').trim() || '';
@@ -91,13 +94,13 @@
   }
 
   function selectedText(modal) {
-    const meta = modal.querySelector('#lookupMeta,#dictMeta,.lookup-meta,.panel-meta')?.textContent || '';
-    const title = modal.querySelector('#lookupTitle,#dictTitle,.panel-title')?.textContent || '';
+    const meta = modal.querySelector('#lookupMeta,#dictMeta,#pced-meta,.lookup-meta,.panel-meta')?.textContent || '';
+    const title = modal.querySelector('#lookupTitle,#dictTitle,#pced-title,.panel-title,.pced-panel-title')?.textContent || '';
     return (lastWord || meta.replace(/^Selected(?: Pāli word)?:\s*/i, '').trim() || title.trim()).trim();
   }
 
   function resetTop(modal) {
-    const panel = modal.querySelector('.panel');
+    const panel = modal.querySelector('.panel,.pced-panel,.modalcontent');
     const reset = () => {
       if (panel) panel.scrollTop = 0;
       modal.querySelectorAll('.panel-body,.lookup-section.active,.tab-panel.active').forEach(node => { node.scrollTop = 0; });
@@ -108,8 +111,8 @@
 
   function installMovable(modal) {
     if (modal.dataset.pamcMovable === '1') return;
-    const panel = modal.querySelector('.panel');
-    const handle = panel?.querySelector('.panel-head,.modal-header,.dialog-header');
+    const panel = modal.querySelector('.panel,.pced-panel,.modalcontent');
+    const handle = panel?.querySelector('.panel-head,.pced-panel-head,.modal-header,.dialog-header');
     if (!panel || !handle) return;
     modal.dataset.pamcMovable = '1';
     handle.style.cursor = 'move';
@@ -295,18 +298,18 @@
   function enhanceBook(modal) {
     const surface = selectedText(modal);
     if (!surface) return;
-    const body = modal.querySelector('#dictBody') || modal.querySelector('#dictTab');
+    const body = modal.querySelector('#dictBody') || modal.querySelector('#dictTab') || modal.querySelector('#pced-body');
     if (body) body.innerHTML = renderDictionary(surface);
     resetTop(modal);
   }
 
   function modalOpened(modal) {
-    const panel = modal.querySelector('.panel');
+    const panel = modal.querySelector('.panel,.pced-panel,.modalcontent');
     if (panel) for (const name of ['left', 'top', 'width', 'margin', 'transform']) panel.style.removeProperty(name);
     const first = [...modal.querySelectorAll('.tabs button[data-tab]')].find(button => !button.hidden);
     if (mode !== 'reader' && first && !first.classList.contains('active')) first.click();
     if (mode === 'reader' && modal.id === 'lookupModal') enhanceReader(modal);
-    else if (modal.id === 'dictModal' || modal.id === 'lookupModal') enhanceBook(modal);
+    else if (modal.id === 'dictModal' || modal.id === 'lookupModal' || modal.id === 'pced-modal') enhanceBook(modal);
     else resetTop(modal);
   }
 
@@ -336,12 +339,18 @@
         .ai-actions button{padding:8px 12px;border:1px solid #a66b42;border-radius:9px;background:#fff;cursor:pointer}
         .ai-actions button.primary{background:#96613d;color:#fff}
         .ai-help,.ai-status{margin:8px 0;color:#75543d;font-size:.9em}
-        .panel-head,.modal-header,.dialog-header{touch-action:none}
+        .panel-head,.pced-panel-head,.modal-header,.dialog-header{touch-action:none}
       `;
       document.head.append(style);
     }
-    window.PCEDStandardData?.applyTo?.(dictionary());
-    document.querySelectorAll('.modal').forEach(watchModal);
+    const data = dictionary();
+    const sample = Object.values(data)[0];
+    if (sample && Array.isArray(sample.entries) && !('en' in sample || 'zh' in sample || 'my' in sample)) {
+      window.PCEDStandardData?.applyFlat?.(data);
+    } else {
+      window.PCEDStandardData?.applyTo?.(data);
+    }
+    document.querySelectorAll('.modal,#pced-modal').forEach(watchModal);
     document.addEventListener('pointerdown', event => {
       const word = event.target.closest?.('.pali-word,.attha-word,[data-word]');
       if (word?.dataset?.word) lastWord = word.dataset.word;
