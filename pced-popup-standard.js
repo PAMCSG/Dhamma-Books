@@ -264,7 +264,7 @@
       status.textContent = '';
       const chinese = json.chinese || json.zh || json.translation_zh || '';
       const english = json.english || json.en || json.translation_en || '';
-      const detail = json.detail || json.explanation || '';
+      const detail = json.detail || json.explanation || [json.literal, json.notes].filter(Boolean).join('\n\n');
       output.innerHTML = (chinese ? '<h3>中文 · AI 暂译</h3><div class="definition">' + esc(chinese) + '</div>' : '') +
         (english ? '<h3>English · AI Translation</h3><div class="definition">' + esc(english) + '</div>' : '') +
         (detail ? '<h3>Literal / grammatical reading</h3><div class="definition">' + esc(detail) + '</div>' : '');
