@@ -1,12 +1,12 @@
-/* PAMC cross-book PCED popup standard v1.3.4 — 2026-09-06 */
+/* PAMC cross-book PCED popup standard v1.3.5 — 2026-09-06 */
 (function () {
   'use strict';
 
   const script = document.currentScript;
   const mode = script?.dataset?.pcedMode || 'book';
-  const isReferenceReader = /(?:^|\/)kutadantasutta\.html$/i.test(location.pathname);
   const APPROVED = new Set(['规范', '已确认']);
   let lastWord = '';
+  let lastWordElement = null;
   let livePromise = null;
 
   const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -259,8 +259,14 @@
   function openFirstView(modal, preferredTab) {
     const first = [...modal.querySelectorAll('.tabs button[data-tab]')].find(button => !button.hidden);
     const tab = preferredTab || first?.dataset.tab || '';
+    const viewKey = normalize(selectedText(modal)) + '\u241f' + tab;
+    if (modal.dataset.pamcViewKey !== viewKey) {
+      modal.dataset.pamcViewKey = viewKey;
+      modal.dataset.pamcTabTouched = '0';
+    }
     const apply = () => {
-      if (!isOpen(modal)) return;
+      if (!isOpen(modal) || modal.dataset.pamcViewKey !== viewKey ||
+          modal.dataset.pamcTabTouched === '1') return;
       if (tab && modal.querySelector('#' + tab + 'Tab')) activateTab(modal, tab);
       else if (first) first.click();
       resetTop(modal);
@@ -281,14 +287,49 @@
     for (const [tab, label] of definitions) {
       let button = buttons.get(tab);
       if (!button) { button = document.createElement('button'); button.dataset.tab = tab; button.textContent = label; buttons.set(tab, button); }
+      button.type = 'button';
       button.hidden = phrase && tab === 'dict';
     }
     for (const tab of (phrase ? ['translate', 'terms', 'attha'] : ['dict', 'terms', 'translate', 'attha'])) bar.append(buttons.get(tab));
     for (const [tab] of definitions) {
       let section = modal.querySelector('#' + tab + 'Tab');
       if (!section) { section = document.createElement('div'); section.id = tab + 'Tab'; section.className = 'lookup-section'; body.append(section); }
+      else section.classList.add('lookup-section');
     }
-    bar.onclick = event => { const button = event.target.closest('button[data-tab]'); if (button && !button.hidden) activateTab(modal, button.dataset.tab); };
+    // Older reader pages install their own tab listeners. Intercept at the tab
+    // bar in the capture phase so those legacy handlers cannot re-show the
+    // dictionary panel after a standard tab has been selected.
+    bar.onclick = null;
+    if (bar.dataset.pamcTabsBound !== '1') {
+      bar.dataset.pamcTabsBound = '1';
+      bar.addEventListener('click', event => {
+        const button = event.target.closest('button[data-tab]');
+        if (!button || button.hidden) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        modal.dataset.pamcTabTouched = '1';
+        activateTab(modal, button.dataset.tab);
+      }, true);
+    }
+  }
+
+  function chineseTipitakaEnabledForBook() {
+    if (mode === 'reader') return true;
+    const setting = String(script?.dataset?.pcedChineseTipitaka || '').toLowerCase();
+    if (['on', 'true', 'yes', 'zh'].includes(setting)) return true;
+    if (['off', 'false', 'no'].includes(setting)) return false;
+    const languageOf = node => String(node?.dataset?.lang || node?.getAttribute?.('lang') || '').toLowerCase();
+    const clickedPanel = lastWordElement?.closest?.('[data-lang],.lang-panel');
+    const clickedLanguage = languageOf(clickedPanel);
+    if (clickedLanguage) return /^zh(?:-|$)/.test(clickedLanguage);
+    const scopedLanguage = languageOf(lastWordElement?.closest?.('main[lang],section[lang],article[lang]'));
+    if (scopedLanguage) return /^zh(?:-|$)/.test(scopedLanguage);
+    const activePanel = document.querySelector('.lang-panel.active[data-lang],.reader.active[data-lang],main:not([hidden])[data-lang]');
+    const activeLanguage = languageOf(activePanel);
+    if (activeLanguage) return /^zh(?:-|$)/.test(activeLanguage);
+    const bodyLanguage = String(document.body?.dataset?.translationLanguage || document.body?.getAttribute?.('lang') || '').toLowerCase();
+    if (bodyLanguage) return /^zh(?:-|$)/.test(bodyLanguage);
+    return /^zh(?:-|$)/i.test(document.documentElement.lang || '');
   }
 
   async function records() {
@@ -508,8 +549,14 @@
     if (!surface) return;
     const result = resolution(surface);
     const body = modal.querySelector('#dictBody') || modal.querySelector('#dictTab') || modal.querySelector('#pced-body');
-    if (body) body.innerHTML = renderDictionary(surface, approvedWordRows(surface, result));
+    const includeChineseTipitaka = chineseTipitakaEnabledForBook();
+    if (body) body.innerHTML = renderDictionary(surface,
+      includeChineseTipitaka ? approvedWordRows(surface, result) : []);
     resetTop(modal);
+    if (!includeChineseTipitaka) {
+      normalizeLanguageHeadings(modal);
+      return;
+    }
     const allRows = await records();
     if (selectedText(modal) !== surface) return;
     if (body) body.innerHTML = renderDictionary(surface, approvedWordRows(surface, result, allRows));
@@ -552,6 +599,10 @@
     new MutationObserver(() => {
       const open = isOpen(modal);
       if (open && !wasOpen) queueMicrotask(() => modalOpened(modal));
+      if (!open && wasOpen) {
+        modal.dataset.pamcViewKey = '';
+        modal.dataset.pamcTabTouched = '0';
+      }
       wasOpen = open;
     }).observe(modal, { attributes: true, attributeFilter: ['class', 'style', 'aria-hidden'] });
     if (wasOpen) queueMicrotask(() => modalOpened(modal));
@@ -654,7 +705,10 @@
     }))).observe(document.documentElement, { childList: true, subtree: true });
     document.addEventListener('pointerdown', event => {
       const word = event.target.closest?.('.pali-word,.attha-word,[data-word]');
-      if (word?.dataset?.word) lastWord = word.dataset.word;
+      if (word?.dataset?.word) {
+        lastWord = word.dataset.word;
+        lastWordElement = word;
+      }
     }, true);
     // Run after the host page's embedded click handler has opened and filled
     // its modal. This makes the real page integration deterministic instead
@@ -662,7 +716,10 @@
     document.addEventListener('click', event => {
       const word = event.target.closest?.('.pali-word,.attha-word,[data-word]');
       if (!word) return;
-      if (word.dataset?.word) lastWord = word.dataset.word;
+      if (word.dataset?.word) {
+        lastWord = word.dataset.word;
+        lastWordElement = word;
+      }
       queueMicrotask(() => document.querySelectorAll('.modal,#pced-modal,[data-modal]').forEach(modal => {
         if (isOpen(modal)) modalOpened(modal);
       }));
@@ -670,7 +727,10 @@
     document.addEventListener('keydown', event => {
       if (event.key !== 'Enter' && event.key !== ' ') return;
       const word = event.target.closest?.('.pali-word,.attha-word,[data-word]');
-      if (word?.dataset?.word) lastWord = word.dataset.word;
+      if (word?.dataset?.word) {
+        lastWord = word.dataset.word;
+        lastWordElement = word;
+      }
     }, true);
     document.addEventListener('selectionchange', () => {
       const text = window.getSelection()?.toString().replace(/\s+/g, ' ').trim();
