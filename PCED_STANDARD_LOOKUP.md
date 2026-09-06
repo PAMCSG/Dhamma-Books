@@ -55,10 +55,19 @@ The automated suite also covers the historical `ṁ`/`ṃ`/`ŋ` variants, common
 | Use | Records included |
 | --- | --- |
 | Centralized published data | All non-deleted records |
-| Tipitaka-reader **汉译巴利三藏** tab | All matching non-deleted records, with status |
-| PCED popup's Chinese-Tipitaka results | Matching non-deleted single-word records, with status retained |
+| Tipitaka-reader **汉译巴利三藏** tab | All matching non-deleted records; status retained internally but not displayed |
+| PCED popup's Chinese-Tipitaka results | Matching non-deleted single-word records; status retained internally but not displayed |
 | AI terminology priority | Only `规范` and `已确认` |
 | Deleted records | Never published or displayed |
 
 The working statuses `待核实`, `规范`, `已确认`, and `有异译` are all valid publication content. Neither `待核实` nor `有异译` may be removed from the published snapshot or reader lookup because of status. Only the AI terminology-priority step filters to `规范` and `已确认`.
+
+## Cross-book popup presentation correction — 6 September 2026
+
+This section supersedes any older display wording that said a book popup or the Tipitaka-reader **汉译巴利三藏** tab should show a record's status.
+
+1. Chinese-Tipitaka matching is independent of PCED success. A matching non-deleted Chinese-Tipitaka record must be extracted and displayed even when PCED reports no reliable entry for the clicked word. Required regression example: `evaṃvaṇṇo`.
+2. Every newly opened popup in every book resets to its first available tab or first language section and to the top of its content. It must not retain a previous tab or scroll position.
+3. Book popups and the Tipitaka-reader **汉译巴利三藏** tab do not display `状态` or its value. Status remains in the centralized published record for internal publication and AI-priority logic.
+4. `出处` remains displayed, and deleted records remain excluded.
 
