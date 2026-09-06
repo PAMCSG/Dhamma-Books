@@ -417,9 +417,12 @@
 
     const allRows = await records();
     if (selectedText(modal) !== surface) return;
-    const matching = phrase ? strictPhraseRows(surface, allRows) : approvedWordRows(surface, result, allRows);
-    if (dict && !phrase) dict.innerHTML = renderDictionary(surface, matching);
-    if (terms) terms.innerHTML = renderTermTable(matching, surface);
+    // PCED and AI use approved terminology only. The separate Chinese-Tipitaka
+    // tab shows every precise non-deleted database match, regardless of status.
+    const dictionaryRows = phrase ? [] : approvedWordRows(surface, result, allRows);
+    const termRows = strictPhraseRows(surface, allRows);
+    if (dict && !phrase) dict.innerHTML = renderDictionary(surface, dictionaryRows);
+    if (terms) terms.innerHTML = renderTermTable(termRows, surface);
     normalizeLanguageHeadings(modal);
     resetTop(modal);
     if (phrase) runAI(modal, surface, 'both');
