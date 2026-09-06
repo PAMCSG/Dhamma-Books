@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.2 — 2026-09-06 */
+/* PAMC cross-book PCED popup standard v1.4.0 — 2026-09-06 */
 (function () {
   'use strict';
 
@@ -71,7 +71,7 @@
     const exact = normalize(surface);
     if (!exact) return [];
     return (Array.isArray(allRows) ? allRows : []).filter(row => {
-      if (Number(row?.deleted) || !row?.chinese) return false;
+      if (Number(row?.deleted) || !row?.chinese || !APPROVED.has(String(row?.status || '').trim())) return false;
       return String(row?.pali || '').split(/\s*[,;/；，]\s*/)
         .map(value => normalize(value))
         .some(value => value === exact && !/\s/.test(value));
@@ -85,8 +85,8 @@
     // it must still work when the dictionary resolver returns no headword.
     const direct = directPublishedRows(surface, approvedTerms);
     const resolved = (core()?.approvedTermMatches(surface, result, {
-      approvedTerms, includeAllStatuses: true
-    }) || []).filter(isSingleWordRecord);
+      approvedTerms, includeAllStatuses: false
+    }) || []).filter(row => APPROVED.has(String(row?.status || '').trim())).filter(isSingleWordRecord);
     const seen = new Set();
     return [...direct, ...resolved].filter(row => {
       if (!isSingleWordRecord(row)) return false;
