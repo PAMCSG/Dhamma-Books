@@ -1,11 +1,11 @@
-/* PAMC cross-book PCED popup standard v1.2.0 — 2026-09-06 */
+/* PAMC cross-book PCED popup standard v1.2.1 — 2026-09-06 */
 (function () {
   'use strict';
 
   const script = document.currentScript;
   const mode = script?.dataset?.pcedMode || 'book';
   const isReferenceReader = /(?:^|\/)kutadantasutta\.html$/i.test(location.pathname);
-  const APPROVED = new Set(['规范', '核实', '已核实', '确认', '已确认']);
+  const APPROVED = new Set(['规范', '已确认']);
   let lastWord = '';
   let livePromise = null;
 
@@ -70,15 +70,16 @@
   function approvedWordRows(surface, result, allRows) {
     const approvedTerms = Array.isArray(allRows) && allRows.length
       ? allRows : (window.PCEDApprovedTerms?.records || []);
-    return (core()?.approvedTermMatches(surface, result, { approvedTerms }) || [])
+    return (core()?.approvedTermMatches(surface, result, { approvedTerms, includeAllStatuses: true }) || [])
       .filter(isSingleWordRecord);
   }
 
   function renderApprovedBlock(rows, surface) {
     const seen = new Set();
     const unique = (rows || []).filter(row => {
-      const key = [normalize(row.pali), String(row.chinese || '').trim(),
-        String(row.source || '').trim()].join('\u241f');
+      const key = [String(row.dbid || row.id || '').trim(), normalize(row.pali),
+        String(row.chinese || '').trim(), String(row.source || '').trim(),
+        String(row.status || '').trim()].join('\u241f');
       if (!row.chinese || seen.has(key)) return false;
       seen.add(key);
       return true;
@@ -88,8 +89,10 @@
       '<div class="source approved-term-title">《汉译巴利三藏》玛欣德尊者和译藏团队</div>' +
       unique.map(row => {
         const source = String(row.source || '').trim();
+        const status = String(row.status || '').trim();
         return '<div class="approved-term-row">' +
           '<div class="definition approved-term-definition"><span>' + esc(row.chinese) + '</span>' +
+            (status ? '<span class="source approved-term-status">（状态：' + esc(status) + '）</span>' : '') +
             (source ? '<span class="source approved-term-source">（出处：' + esc(source) + '）</span>' : '') +
           '</div>' +
           (row.match === 'inflected' ? '<div class="lookup-rule">' + esc(surface) + ' → ' +
@@ -282,7 +285,7 @@
   function renderTermTable(rows, surface) {
     if (!rows.length) return '<div class="note">No precise 汉译巴利三藏 match was found for <b>' + esc(surface) + '</b>.</div>';
     return '<div class="mahinda-table-wrap"><table class="mahinda-table"><thead><tr><th>Pāli</th><th>玛欣德尊者翻译</th><th>状态</th></tr></thead><tbody>' +
-      rows.map(row => '<tr><td>' + esc(row.pali) + '</td><td>' + esc(row.chinese) + '</td><td>' + esc(row.status || '待核对') + '</td></tr>').join('') +
+      rows.map(row => '<tr><td>' + esc(row.pali) + '</td><td>' + esc(row.chinese) + '</td><td>' + esc(row.status || '待核实') + '</td></tr>').join('') +
       '</tbody></table></div>';
   }
 
@@ -292,7 +295,7 @@
       '<button class="primary" data-pamc-ai="both">Chinese + English</button>' +
       '<button data-pamc-ai="zh">中文</button><button data-pamc-ai="en">English</button>' +
       '<button data-pamc-ai="detail">Detailed explanation</button></div>' +
-      '<div class="ai-help">Terminology marked 规范、核实、已核实、确认 or 已确认 is supplied to AI first. Only precise whole-word or contiguous-phrase matches are used.</div>' +
+      '<div class="ai-help">Only terminology marked 规范 or 已确认 is supplied to AI first. Only precise whole-word or contiguous-phrase matches are used.</div>' +
       '<div class="ai-status" data-pamc-ai-status></div><div data-pamc-ai-result></div></div>';
   }
 
@@ -459,7 +462,7 @@
         .approved-term-row{padding:7px 0 10px;border-top:1px solid #eadfd5}
         .approved-term-row:first-of-type{border-top:0}
         .approved-term-definition{font-size:18px!important}
-        .approved-term-source{display:inline!important;margin:0 0 0 .4em!important;font-size:14px!important;font-weight:400!important;white-space:normal}
+        .approved-term-source,.approved-term-status{display:inline!important;margin:0 0 0 .4em!important;font-size:14px!important;font-weight:400!important;white-space:normal}
         .lookup-rule{font-size:14px!important;color:#75543d!important;margin-top:5px}
         .lookup-section{display:none}.lookup-section.active{display:block}
         .tabs{display:flex!important;gap:6px!important;flex-wrap:wrap!important;border-bottom:1px solid var(--pamc-popup-line)!important;margin:3px 0 13px!important;padding-bottom:8px!important}
