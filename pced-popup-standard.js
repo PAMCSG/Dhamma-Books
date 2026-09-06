@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.2 — 2026-09-06 */
+/* PAMC cross-book PCED popup standard v1.3.3 — 2026-09-06 */
 (function () {
   'use strict';
 
@@ -89,7 +89,7 @@
     }) || []).filter(isSingleWordRecord);
     const seen = new Set();
     return [...direct, ...resolved].filter(row => {
-      if (!isSingleWordRecord(row)) return false;
+      if (!isSingleWordRecord(row) || !APPROVED.has(String(row.status || '').trim())) return false;
       const key = [String(row.dbid || row.id || '').trim(), normalize(row.pali),
         String(row.chinese || '').trim(), String(row.source || '').trim(),
         String(row.status || '').trim()].join('\u241f');
@@ -422,9 +422,15 @@
 
     const allRows = await records();
     if (selectedText(modal) !== surface) return;
-    const matching = phrase ? strictPhraseRows(surface, allRows) : approvedWordRows(surface, result, allRows);
-    if (dict && !phrase) dict.innerHTML = renderDictionary(surface, matching);
-    if (terms) terms.innerHTML = renderTermTable(matching, surface);
+    const allMatching = phrase ? strictPhraseRows(surface, allRows) : [
+      ...directPublishedRows(surface, allRows),
+      ...(core()?.approvedTermMatches(surface, result, {
+        approvedTerms: allRows, includeAllStatuses: true
+      }) || []).filter(isSingleWordRecord)
+    ];
+    const approvedMatching = phrase ? [] : approvedWordRows(surface, result, allRows);
+    if (dict && !phrase) dict.innerHTML = renderDictionary(surface, approvedMatching);
+    if (terms) terms.innerHTML = renderTermTable(allMatching, surface);
     normalizeLanguageHeadings(modal);
     resetTop(modal);
     if (phrase) runAI(modal, surface, 'both');
