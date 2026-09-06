@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.3 — 2026-09-06 */
+/* PAMC cross-book PCED popup standard v1.3.4 — 2026-09-06 */
 (function () {
   'use strict';
 
@@ -352,6 +352,73 @@
     return kept;
   }
 
+  function matchedPhraseRows(text, allRows, includeAllStatuses = false) {
+    const rows = Array.isArray(allRows) ? allRows : [];
+    const seen = new Set();
+    const kept = [];
+    const usable = row => (includeAllStatuses || APPROVED.has(String(row?.status || '').trim())) && row?.pali && row?.chinese &&
+      !/(?:…|\.\.\.)/.test(String(row.pali));
+    const add = candidates => {
+      for (const row of candidates || []) {
+        if (!usable(row)) continue;
+        const key = [String(row.dbid || row.id || '').trim(), normalize(row.pali),
+          String(row.chinese).trim(), String(row.status).trim()].join('\u241f');
+        if (seen.has(key)) continue;
+        seen.add(key);
+        kept.push(row);
+      }
+    };
+
+    // Preserve exact and contiguous phrase matches first. Then resolve every
+    // complete selected word independently so inflected forms such as Gotamo,
+    // Magadhesu and Ambalaṭṭhikāyaṃ reach their authoritative citation forms.
+    add(strictPhraseRows(text, rows));
+    const tokens = normalize(text).split(/\s+/).filter(Boolean);
+    const approvedIndex = new Map();
+    for (const row of rows) {
+      if (!usable(row)) continue;
+      for (const form of String(row.pali || '').split(/\s*[,;/；，]\s*/).map(normalize)) {
+        if (!form || /\s/.test(form)) continue;
+        if (!approvedIndex.has(form)) approvedIndex.set(form, []);
+        approvedIndex.get(form).push(row);
+      }
+    }
+
+    for (const token of tokens) {
+      const result = resolution(token);
+      const directTokenRows = core()?.approvedTermMatches(token, result, {
+        approvedTerms: rows, includeAllStatuses
+      }) || [];
+      const beforeDirect = kept.length;
+      add(directTokenRows);
+      // A complete authoritative match outranks incidental substrings inside
+      // that term (for example Ambalaṭṭhikā must not also inject amba).
+      if (kept.length > beforeDirect) continue;
+
+      // A verified dictionary decomposition is safe evidence that an approved
+      // term occurs as a complete compound member (for example bhikkhu in
+      // bhikkhusaṃghena and bhikkhusatehi).
+      const componentForms = [
+        ...(result.componentHeads || []),
+        ...(result.components || []).flatMap(part => [part.surface, ...(part.heads || [])])
+      ];
+      const beforeComponents = kept.length;
+      for (const form of componentForms) add(approvedIndex.get(normalize(form)) || []);
+      if (kept.length > beforeComponents) continue;
+
+      // Some transparent compounds have no maintained decomposition. Accept a
+      // project term at one edge only when the remainder independently resolves
+      // to an attested complete PCED word (for example sakya + putta/kula).
+      for (let split = 4; split <= token.length - 2; split++) {
+        const left = token.slice(0, split);
+        const right = token.slice(split);
+        const leftRows = approvedIndex.get(left);
+        if (leftRows && (resolution(right).allHeads || []).length) add(leftRows);
+      }
+    }
+    return kept;
+  }
+
   function renderTermTable(rows, surface) {
     if (!rows.length) return '<div class="note">No precise 汉译巴利三藏 match was found for <b>' + esc(surface) + '</b>.</div>';
     return '<div class="mahinda-table-wrap"><table class="mahinda-table"><thead><tr><th>Pāli</th><th>玛欣德尊者翻译</th></tr></thead><tbody>' +
@@ -365,7 +432,7 @@
       '<button class="primary" data-pamc-ai="both">Chinese + English</button>' +
       '<button data-pamc-ai="zh">中文</button><button data-pamc-ai="en">English</button>' +
       '<button data-pamc-ai="detail">Detailed explanation</button></div>' +
-      '<div class="ai-help">Only terminology marked 规范 or 已确认 is supplied to AI first. Only precise whole-word or contiguous-phrase matches are used.</div>' +
+      '<div class="ai-help">Only terminology marked 规范 or 已确认 is supplied to AI first. Precise phrase, whole-word, verified inflection and verified compound-member matches are used.</div>' +
       '<div class="ai-status" data-pamc-ai-status></div><div data-pamc-ai-result></div></div>';
   }
 
@@ -374,8 +441,8 @@
     const output = modal.querySelector('[data-pamc-ai-result]');
     if (!status || !output) return;
     status.textContent = 'AI is preparing the translation…';
-    const matches = strictPhraseRows(surface, await records());
-    const confirmed = matches.filter(row => APPROVED.has(row.status)).map(row => ({
+    const matches = matchedPhraseRows(surface, await records());
+    const confirmed = matches.map(row => ({
       pali: row.pali, chinese: row.chinese, status: row.status
     }));
     try {
@@ -422,7 +489,7 @@
 
     const allRows = await records();
     if (selectedText(modal) !== surface) return;
-    const allMatching = phrase ? strictPhraseRows(surface, allRows) : [
+    const allMatching = phrase ? matchedPhraseRows(surface, allRows, true) : [
       ...directPublishedRows(surface, allRows),
       ...(core()?.approvedTermMatches(surface, result, {
         approvedTerms: allRows, includeAllStatuses: true
