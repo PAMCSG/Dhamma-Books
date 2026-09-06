@@ -119,3 +119,12 @@ The deployed `tipitaka-reader.pages.dev` site is protected by Cloudflare Access.
 - AI terminology priority remains restricted to exactly `规范` and `已确认` in the shared browser logic.
 - Static verification passed for shared-file equality with Tipitaka-reader, all-status display mode, status/source rendering, approved-only AI filtering, absence of reader-side publication controls, centralized published-feed use, all-non-deleted publication SQL, and JavaScript syntax.
 
+## Popup extraction and initial-view correction — 6 September 2026
+
+- The requirement was saved before implementation in authoritative master version 1.9 and repository documentation commit `7ac7f8e`.
+- Shared popup standard v1.3.0 makes exact Chinese-Tipitaka matching independent of PCED headword resolution, so a published `evaṃvaṇṇo` record can render even when PCED reports no reliable entry.
+- Each newly opened popup now resets once to its first available tab/section and to scroll position zero; modal attribute changes while already open no longer re-run initialization and restore stale tab state.
+- Popup Chinese-Tipitaka blocks and the Tipitaka-reader terminology table no longer display `状态`. The status field remains in published data and the AI priority filter still accepts only `规范` and `已确认`.
+- `出处` remains visible and deleted records remain excluded.
+- Code commit: `6386a3ad3ba6885203d71d6b4df8aefa72ad5cd2`. GitHub verification confirmed identical popup blobs in both reader repositories, valid JavaScript syntax, no status label/column, exact-match fallback presence, source rendering, and unchanged AI status filtering.
+
