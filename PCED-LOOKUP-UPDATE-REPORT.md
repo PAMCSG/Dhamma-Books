@@ -92,3 +92,12 @@ The deployed `tipitaka-reader.pages.dev` site is protected by Cloudflare Access.
 - End-to-end verification passed for `bhante` → `尊者（出处：《上座部佛教汉译译名用语规范》·附表四·部分南北传佛教用语对照表）`.
 - Duplicate resolution now merges fields instead of allowing an empty live value to erase sourced fallback provenance. Regression verification passed for `Gotamo → Gotama → 果德玛（出处：《上座部佛教汉译译名用语规范》·附表三·古梵今巴·诸佛名）`.
 - Fix commits: popup [`0bbbb57`](https://github.com/PAMCSG/Dhamma-Books/commit/0bbbb57f0c558e3af86385f2ba297e9e20df1d0d); bundled terminology [`dad3614`](https://github.com/PAMCSG/Dhamma-Books/commit/dad361496a4feb234325a25146638d4086ac6987).
+
+## Generic provenance fallback — 6 September 2026
+
+- Source-less approved terms are now compared against the 559 aligned Chinese-Tipiṭaka corpus records.
+- The provenance index covers 14,884 exact and verified-inflection forms. Exact Pāli token matches are accepted directly; inflected matches require agreement with the Chinese wording before a citation is assigned.
+- This conservatively added provenance to 344 previously source-less bundled terms: 180 exact-token matches and 164 verified inflected matches.
+- Existing non-empty `source` and `page` values always take priority, and empty live duplicates cannot erase derived or authoritative provenance.
+- The cache key is now `pamc_pced_approved_terms_v4`.
+- Regression verification passed for `purohito → purohita → 国师，司祭（出处：巴利三藏 > 经藏 > 长部 > 戒蕴品 > 《古德丹德经》，134）`.
