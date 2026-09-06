@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.2.1 — 2026-09-06 */
+/* PAMC cross-book PCED popup standard v1.3.0 — 2026-09-06 */
 (function () {
   'use strict';
 
@@ -67,11 +67,36 @@
       .map(value => normalize(value)).some(value => value && !/\s/.test(value));
   }
 
+  function directPublishedRows(surface, allRows) {
+    const exact = normalize(surface);
+    if (!exact) return [];
+    return (Array.isArray(allRows) ? allRows : []).filter(row => {
+      if (Number(row?.deleted) || !row?.chinese) return false;
+      return String(row?.pali || '').split(/\s*[,;/；，]\s*/)
+        .map(value => normalize(value))
+        .some(value => value === exact && !/\s/.test(value));
+    }).map(row => ({ ...row, match: 'exact', matchedForm: exact }));
+  }
+
   function approvedWordRows(surface, result, allRows) {
     const approvedTerms = Array.isArray(allRows) && allRows.length
       ? allRows : (window.PCEDApprovedTerms?.records || []);
-    return (core()?.approvedTermMatches(surface, result, { approvedTerms, includeAllStatuses: true }) || [])
-      .filter(isSingleWordRecord);
+    // Exact Chinese-Tipitaka matching is deliberately independent of PCED:
+    // it must still work when the dictionary resolver returns no headword.
+    const direct = directPublishedRows(surface, approvedTerms);
+    const resolved = (core()?.approvedTermMatches(surface, result, {
+      approvedTerms, includeAllStatuses: true
+    }) || []).filter(isSingleWordRecord);
+    const seen = new Set();
+    return [...direct, ...resolved].filter(row => {
+      if (!isSingleWordRecord(row)) return false;
+      const key = [String(row.dbid || row.id || '').trim(), normalize(row.pali),
+        String(row.chinese || '').trim(), String(row.source || '').trim(),
+        String(row.status || '').trim()].join('\u241f');
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
   }
 
   function renderApprovedBlock(rows, surface) {
@@ -89,10 +114,8 @@
       '<div class="source approved-term-title">《汉译巴利三藏》玛欣德尊者和译藏团队</div>' +
       unique.map(row => {
         const source = String(row.source || '').trim();
-        const status = String(row.status || '').trim();
         return '<div class="approved-term-row">' +
           '<div class="definition approved-term-definition"><span>' + esc(row.chinese) + '</span>' +
-            (status ? '<span class="source approved-term-status">（状态：' + esc(status) + '）</span>' : '') +
             (source ? '<span class="source approved-term-source">（出处：' + esc(source) + '）</span>' : '') +
           '</div>' +
           (row.match === 'inflected' ? '<div class="lookup-rule">' + esc(surface) + ' → ' +
@@ -157,10 +180,17 @@
   }
 
   function resetTop(modal) {
-    const panel = modal.querySelector('.panel,.pced-panel,.modalcontent');
+    const panel = panelOf(modal);
     const reset = () => {
-      if (panel) panel.scrollTop = 0;
-      modal.querySelectorAll('.panel-body,.lookup-section.active,.tab-panel.active').forEach(node => { node.scrollTop = 0; });
+      const nodes = new Set([modal, panel, ...modal.querySelectorAll(
+        '.panel-body,#dictBody,#dictTab,#pced-body,.lookup-section,.tab-panel'
+      )]);
+      for (const node of nodes) {
+        if (!node) continue;
+        node.scrollTop = 0;
+        node.scrollLeft = 0;
+        try { node.scrollTo({ top: 0, left: 0, behavior: 'instant' }); } catch (_) {}
+      }
     };
     reset();
     requestAnimationFrame(() => requestAnimationFrame(reset));
@@ -226,6 +256,20 @@
     resetTop(modal);
   }
 
+  function openFirstView(modal, preferredTab) {
+    const first = [...modal.querySelectorAll('.tabs button[data-tab]')].find(button => !button.hidden);
+    const tab = preferredTab || first?.dataset.tab || '';
+    const apply = () => {
+      if (!isOpen(modal)) return;
+      if (tab && modal.querySelector('#' + tab + 'Tab')) activateTab(modal, tab);
+      else if (first) first.click();
+      resetTop(modal);
+    };
+    apply();
+    queueMicrotask(apply);
+    requestAnimationFrame(() => requestAnimationFrame(apply));
+  }
+
   function ensureReaderTabs(modal, phrase) {
     const body = modal.querySelector('.panel-body') || modal.querySelector('.panel');
     let bar = body.querySelector('.tabs');
@@ -284,8 +328,8 @@
 
   function renderTermTable(rows, surface) {
     if (!rows.length) return '<div class="note">No precise 汉译巴利三藏 match was found for <b>' + esc(surface) + '</b>.</div>';
-    return '<div class="mahinda-table-wrap"><table class="mahinda-table"><thead><tr><th>Pāli</th><th>玛欣德尊者翻译</th><th>状态</th></tr></thead><tbody>' +
-      rows.map(row => '<tr><td>' + esc(row.pali) + '</td><td>' + esc(row.chinese) + '</td><td>' + esc(row.status || '待核实') + '</td></tr>').join('') +
+    return '<div class="mahinda-table-wrap"><table class="mahinda-table"><thead><tr><th>Pāli</th><th>玛欣德尊者翻译</th></tr></thead><tbody>' +
+      rows.map(row => '<tr><td>' + esc(row.pali) + '</td><td>' + esc(row.chinese) + '</td></tr>').join('') +
       '</tbody></table></div>';
   }
 
@@ -348,7 +392,7 @@
       };
     }
     if (terms) terms.innerHTML = '<div class="note">Searching 汉译巴利三藏…</div>';
-    activateTab(modal, phrase ? 'translate' : 'dict');
+    openFirstView(modal, phrase ? 'translate' : 'dict');
 
     const allRows = await records();
     if (selectedText(modal) !== surface) return;
@@ -391,8 +435,7 @@
     if (panel) for (const name of ['left', 'top', 'width', 'margin', 'transform']) panel.style.removeProperty(name);
     installMovable(modal);
     normalizeLanguageHeadings(modal);
-    const first = [...modal.querySelectorAll('.tabs button[data-tab]')].find(button => !button.hidden);
-    if (mode !== 'reader' && first && !first.classList.contains('active')) first.click();
+    if (mode !== 'reader') openFirstView(modal);
     if (mode === 'reader' && modal.id === 'lookupModal') enhanceReader(modal);
     else if (modal.id === 'dictModal' || modal.id === 'lookupModal' || modal.id === 'pced-modal') enhanceBook(modal);
     else resetTop(modal);
@@ -406,10 +449,13 @@
     if (!modal || modal.dataset.pamcWatched === '1') return;
     modal.dataset.pamcWatched = '1';
     installMovable(modal);
+    let wasOpen = isOpen(modal);
     new MutationObserver(() => {
-      if (isOpen(modal)) queueMicrotask(() => modalOpened(modal));
+      const open = isOpen(modal);
+      if (open && !wasOpen) queueMicrotask(() => modalOpened(modal));
+      wasOpen = open;
     }).observe(modal, { attributes: true, attributeFilter: ['class', 'style', 'aria-hidden'] });
-    if (isOpen(modal)) queueMicrotask(() => modalOpened(modal));
+    if (wasOpen) queueMicrotask(() => modalOpened(modal));
   }
 
   function scanModals(root = document) {
