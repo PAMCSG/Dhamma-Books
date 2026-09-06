@@ -54,7 +54,7 @@ All 13 Dhamma Books HTML readers that provide Roman-script Pāli word lookup now
 
 ## Unified popup presentation — 6 September 2026
 
-- Shared popup layer updated to `pced-popup-standard.js` v1.1.1.
+- Shared popup layer updated to `pced-popup-standard.js` v1.1.2.
 - All legacy PCED popup shells use the approved dark-brown title bar, paper background, blue Pāli headword, tiered heading sizes, and consistent serif text.
 - Language headings are standardized as `中文`, `English`, `Burmese`, `Japanese`, `Vietnamese`, `Korean`, and `Other`, with a light-brown heading background.
 - Exact single-word Chinese-Tipiṭaka matches appear once under `中文` in one unshaded framed group. The `《汉译巴利三藏》玛欣德尊者和译藏团队` subheader now uses the same source-label font and size as dictionary source labels; multiple meanings are combined, with each `出处` (source and page when available) displayed inline beside its Chinese meaning.
@@ -90,3 +90,5 @@ The deployed `tipitaka-reader.pages.dev` site is protected by Cloudflare Access.
 - The bundled fallback was enriched from the authoritative Chinese-Tipitaka standard and seed records; 244 bundled records now carry locally available source provenance even when the live API is unavailable.
 - The popup renderer displays each result inline as `Chinese meaning（出处：source，page）`, omitting only unavailable components.
 - End-to-end verification passed for `bhante` → `尊者（出处：《上座部佛教汉译译名用语规范》·附表四·部分南北传佛教用语对照表）`.
+- Duplicate resolution now merges fields instead of allowing an empty live value to erase sourced fallback provenance. Regression verification passed for `Gotamo → Gotama → 果德玛（出处：《上座部佛教汉译译名用语规范》·附表三·古梵今巴·诸佛名）`.
+- Fix commits: popup [`0bbbb57`](https://github.com/PAMCSG/Dhamma-Books/commit/0bbbb57f0c558e3af86385f2ba297e9e20df1d0d); bundled terminology [`dad3614`](https://github.com/PAMCSG/Dhamma-Books/commit/dad361496a4feb234325a25146638d4086ac6987).
