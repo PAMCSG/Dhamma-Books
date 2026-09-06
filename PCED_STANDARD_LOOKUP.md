@@ -71,3 +71,13 @@ This section supersedes any older display wording that said a book popup or the 
 3. Book popups and the Tipitaka-reader **汉译巴利三藏** tab do not display `状态` or its value. Status remains in the centralized published record for internal publication and AI-priority logic.
 4. `出处` remains displayed, and deleted records remain excluded.
 
+## Final centralized publication rule — 6 September 2026 (master v1.11)
+
+- **发布词库更新** publishes every non-deleted record to the centralized versioned snapshot, including `待核实`, `规范`, `已确认`, and `有异译`. Deleted records are excluded.
+- The **PCED Dictionary** in Dhamma-Books and Tipitaka-reader shows only matching non-deleted single-word records whose status is exactly `规范` or `已确认`.
+- Tipitaka-reader's separate **汉译巴利三藏** tab shows every related matching non-deleted record, regardless of status. It must never show unrelated rows.
+- AI terminology priority uses only `规范` and `已确认`.
+- Status and internal page data remain in the snapshot but are not displayed. The popup displays the database's actual `出处` and hides the numeric internal page.
+- Source precedence is: latest validated publication, previous validated browser cache, then bundled fallback. An older bundled or inferred source must never merge into or override a newer published record.
+- The 2,207-record publication at `2026-09-06T06:42:11.667Z` succeeded, but the consumer feed was intercepted by Cloudflare Access. The read-only GET/OPTIONS feed must be reachable by both book sites while editor and POST publication access remain protected.
+- Regression cases: `accayena` and `uppādo → uppāda` must both display the actual current database source `巴汉翻译语料库`; `evaṃvaṇṇo` must render independently of PCED headword success; every new word popup opens on PCED Dictionary at scroll position zero.

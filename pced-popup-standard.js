@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.2 — 2026-09-06 */
+/* PAMC cross-book PCED popup standard v1.4.0 — 2026-09-06 */
 (function () {
   'use strict';
 
@@ -71,7 +71,7 @@
     const exact = normalize(surface);
     if (!exact) return [];
     return (Array.isArray(allRows) ? allRows : []).filter(row => {
-      if (Number(row?.deleted) || !row?.chinese) return false;
+      if (Number(row?.deleted) || !row?.chinese || !APPROVED.has(String(row?.status || '').trim())) return false;
       return String(row?.pali || '').split(/\s*[,;/；，]\s*/)
         .map(value => normalize(value))
         .some(value => value === exact && !/\s/.test(value));
@@ -85,8 +85,8 @@
     // it must still work when the dictionary resolver returns no headword.
     const direct = directPublishedRows(surface, approvedTerms);
     const resolved = (core()?.approvedTermMatches(surface, result, {
-      approvedTerms, includeAllStatuses: true
-    }) || []).filter(isSingleWordRecord);
+      approvedTerms, includeAllStatuses: false
+    }) || []).filter(row => APPROVED.has(String(row?.status || '').trim())).filter(isSingleWordRecord);
     const seen = new Set();
     return [...direct, ...resolved].filter(row => {
       if (!isSingleWordRecord(row)) return false;
@@ -298,9 +298,9 @@
       let rows = Array.isArray(window.PCEDApprovedTerms?.records)
         ? [...window.PCEDApprovedTerms.records] : [];
 
-      // The protected Tipitaka reader has a same-D1 endpoint. Merge its current
-      // non-deleted records so a database exact match is not lost merely
-      // because the published browser snapshot is stale or incomplete.
+      // The protected Tipitaka reader has a same-D1 endpoint. Its complete
+      // current non-deleted response is authoritative, so stale bundled
+      // provenance can never be merged back into a current database row.
       if (mode === 'reader') {
         try {
           const response = await fetch('/api/records', {
@@ -310,15 +310,10 @@
           if (response.ok) {
             const data = await response.json();
             const incoming = Array.isArray(data) ? data : (data.records || []);
-            if (Array.isArray(incoming)) {
-              const merged = new Map();
-              const keyOf = row => String(row?.dbid || row?.id || '').trim() ||
-                [normalize(row?.pali), String(row?.chinese || '').trim()].join('\u241f');
-              for (const row of rows) if (keyOf(row)) merged.set(keyOf(row), row);
-              for (const row of incoming) if (!Number(row?.deleted) && keyOf(row)) {
-                merged.set(keyOf(row), { ...(merged.get(keyOf(row)) || {}), ...row });
-              }
-              rows = [...merged.values()];
+            if (Array.isArray(incoming) && incoming.length) {
+              // A complete current same-D1 response is authoritative. Never merge
+              // older bundled provenance into current database rows.
+              rows = incoming.filter(row => !Number(row?.deleted) && row?.pali && row?.chinese);
             }
           }
         } catch (_) {}
@@ -422,9 +417,12 @@
 
     const allRows = await records();
     if (selectedText(modal) !== surface) return;
-    const matching = phrase ? strictPhraseRows(surface, allRows) : approvedWordRows(surface, result, allRows);
-    if (dict && !phrase) dict.innerHTML = renderDictionary(surface, matching);
-    if (terms) terms.innerHTML = renderTermTable(matching, surface);
+    // PCED and AI use approved terminology only. The separate Chinese-Tipitaka
+    // tab shows every precise non-deleted database match, regardless of status.
+    const dictionaryRows = phrase ? [] : approvedWordRows(surface, result, allRows);
+    const termRows = strictPhraseRows(surface, allRows);
+    if (dict && !phrase) dict.innerHTML = renderDictionary(surface, dictionaryRows);
+    if (terms) terms.innerHTML = renderTermTable(termRows, surface);
     normalizeLanguageHeadings(modal);
     resetTop(modal);
     if (phrase) runAI(modal, surface, 'both');
