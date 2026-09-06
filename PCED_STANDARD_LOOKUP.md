@@ -47,3 +47,18 @@ New books must import the standard data before the core and apply the supplement
 | `āyasmā`, `sakkacca`, `suvatthi` | exact PCED headword |
 
 The automated suite also covers the historical `ṁ`/`ṃ`/`ŋ` variants, common `bhikkhu` forms, `gahakūṭaṁ`/`gahakūṭaṃ`, and the “no arbitrary partial match” rule.
+
+## Central publication and consumer status rules — 6 September 2026
+
+“Published” does not mean “approved for AI use.” The centralized publication includes every non-deleted Chinese-Tipitaka record and preserves each record's status and `出处`.
+
+| Use | Records included |
+| --- | --- |
+| Centralized published data | All non-deleted records |
+| Tipitaka-reader **汉译巴利三藏** tab | All matching non-deleted records, with status |
+| PCED popup's Chinese-Tipitaka results | Matching non-deleted single-word records, with status retained |
+| AI terminology priority | Only `规范` and `已确认` |
+| Deleted records | Never published or displayed |
+
+The working statuses `待核实`, `规范`, `已确认`, and `有异译` are all valid publication content. Neither `待核实` nor `有异译` may be removed from the published snapshot or reader lookup because of status. Only the AI terminology-priority step filters to `规范` and `已确认`.
+
