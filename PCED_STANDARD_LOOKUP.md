@@ -47,17 +47,3 @@ New books must import the standard data before the core and apply the supplement
 | `āyasmā`, `sakkacca`, `suvatthi` | exact PCED headword |
 
 The automated suite also covers the historical `ṁ`/`ṃ`/`ŋ` variants, common `bhikkhu` forms, `gahakūṭaṁ`/`gahakūṭaṃ`, and the “no arbitrary partial match” rule.
-
-## Deployment access topology — 6 September 2026
-
-The centralized publication remains owned by Chinese-Tipitaka, but reader browsers do not fetch through the protected Chinese-Tipitaka hostname. Each deployed consumer exposes a same-origin, read-only `/api/published-terms` endpoint backed by the same Cloudflare D1 binding `DB -> chinese-tipitaka-db`.
-
-- Chinese-Tipitaka alone provides authenticated preview and publish controls.
-- Tipitaka-reader and Dhamma-Books provide GET/OPTIONS only; they cannot edit or publish database records.
-- The consumer endpoint reads only the current immutable version in `term_publication_state` and `published_terms`.
-- Every non-deleted published record remains available to ordinary lookup, including `待核实`, `规范`, `已确认`, and `有异译`.
-- Only `规范` and `已确认` are eligible for authoritative AI terminology priority.
-- Same-origin delivery avoids a protected cross-site request and allows Chinese-Tipitaka's administrative interface to remain behind Cloudflare Access.
-
-Both consumer Cloudflare Pages projects must bind `DB` to the same `chinese-tipitaka-db`. If a reader cannot load the current publication, it retains its last valid cached or bundled snapshot.
-
