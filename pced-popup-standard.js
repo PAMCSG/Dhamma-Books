@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.6 — 2026-09-06 */
+/* PAMC cross-book PCED popup standard v1.3.7 — 2026-09-06 */
 (function () {
   'use strict';
 
@@ -466,11 +466,39 @@
     return kept;
   }
 
+  function termTabWordRows(surface, result, allRows) {
+    const rows = Array.isArray(allRows) ? allRows : [];
+    const matched = [
+      ...directPublishedRows(surface, rows),
+      ...(core()?.approvedTermMatches(surface, result, {
+        approvedTerms: rows, includeAllStatuses: true
+      }) || [])
+    ];
+    const forms = new Set([
+      normalize(surface), normalize(result?.resolvedForm),
+      ...(result?.primaryHeads || []).map(normalize),
+      ...(result?.heads || []).map(normalize),
+      ...(result?.allHeads || []).map(normalize)
+    ].filter(form => form && !/\s/.test(form)));
+    for (const row of matched) {
+      for (const form of String(row?.pali || '').split(/\s*[,;/；，]\s*/).map(normalize)) {
+        if (form && !/\s/.test(form)) forms.add(form);
+      }
+    }
+    const containing = rows.filter(row => {
+      if (Number(row?.deleted) || !row?.pali || !row?.chinese) return false;
+      const tokens = normalize(row.pali).split(/\s+/).filter(Boolean);
+      return [...forms].some(form => tokens.includes(form));
+    });
+    return uniqueTermRows([...matched, ...containing]);
+  }
+
   function renderTermTable(rows, surface) {
     const unique = uniqueTermRows(rows);
     if (!unique.length) return '<div class="note">No precise 汉译巴利三藏 match was found for <b>' + esc(surface) + '</b>.</div>';
-    return '<div class="mahinda-table-wrap"><table class="mahinda-table"><thead><tr><th>Pāli</th><th>玛欣德尊者翻译</th></tr></thead><tbody>' +
-      unique.map(row => '<tr><td>' + esc(row.pali) + '</td><td>' + esc(row.chinese) + '</td></tr>').join('') +
+    return '<div class="mahinda-table-wrap"><table class="mahinda-table"><thead><tr><th>Pāli</th><th>玛欣德尊者翻译</th><th>状态</th></tr></thead><tbody>' +
+      unique.map(row => '<tr><td>' + esc(row.pali) + '</td><td>' + esc(row.chinese) + '</td><td>' +
+        esc(row.status || '') + '</td></tr>').join('') +
       '</tbody></table></div>';
   }
 
@@ -537,12 +565,8 @@
 
     const allRows = await records();
     if (selectedText(modal) !== surface) return;
-    const allMatching = phrase ? matchedPhraseRows(surface, allRows, true) : [
-      ...directPublishedRows(surface, allRows),
-      ...(core()?.approvedTermMatches(surface, result, {
-        approvedTerms: allRows, includeAllStatuses: true
-      }) || []).filter(isSingleWordRecord)
-    ];
+    const allMatching = phrase ? matchedPhraseRows(surface, allRows, true)
+      : termTabWordRows(surface, result, allRows);
     const approvedMatching = phrase ? [] : approvedWordRows(surface, result, allRows);
     if (dict && !phrase) dict.innerHTML = renderDictionary(surface, approvedMatching, 'zh');
     if (terms) terms.innerHTML = renderTermTable(allMatching, surface);
