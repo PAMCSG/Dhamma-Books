@@ -457,6 +457,7 @@
 
   const APPROVED_TERM_STATUSES = new Set(['规范', '核实', '已核实', '确认', '已确认']);
   const APPROVED_TERM_INDEX_CACHE = new WeakMap();
+  const PUBLISHED_TERM_INDEX_CACHE = new WeakMap();
 
   function approvedTermAlternatives(pali) {
     return String(pali || '').split(/\s*[,;/；，]\s*/)
@@ -466,25 +467,26 @@
       .filter(value => value && !/\s/.test(value));
   }
 
-  function approvedTermIndex(records) {
-    if (APPROVED_TERM_INDEX_CACHE.has(records)) return APPROVED_TERM_INDEX_CACHE.get(records);
+  function approvedTermIndex(records, includeAllStatuses = false) {
+    const cache = includeAllStatuses ? PUBLISHED_TERM_INDEX_CACHE : APPROVED_TERM_INDEX_CACHE;
+    if (cache.has(records)) return cache.get(records);
     const index = new Map();
     for (const record of records) {
-      if (!APPROVED_TERM_STATUSES.has(String(record?.status || '').trim())) continue;
+      if (!includeAllStatuses && !APPROVED_TERM_STATUSES.has(String(record?.status || '').trim())) continue;
       if (!String(record?.chinese || '').trim()) continue;
       for (const form of approvedTermAlternatives(record?.pali)) {
         if (!index.has(form)) index.set(form, []);
         index.get(form).push(record);
       }
     }
-    APPROVED_TERM_INDEX_CACHE.set(records, index);
+    cache.set(records, index);
     return index;
   }
 
   function approvedTermMatches(surface, resolution = {}, options = {}) {
     const records = options.approvedTerms || global.PCEDApprovedTerms?.records || [];
     if (!Array.isArray(records) || !records.length) return [];
-    const index = approvedTermIndex(records);
+    const index = approvedTermIndex(records, !!options.includeAllStatuses);
     const exact = cleanWord(surface);
     const collect = (forms, match) => {
       const seen = new Set(), out = [];
