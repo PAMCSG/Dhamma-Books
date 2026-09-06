@@ -71,3 +71,10 @@ This section supersedes any older display wording that said a book popup or the 
 3. Book popups and the Tipitaka-reader **汉译巴利三藏** tab do not display `状态` or its value. Status remains in the centralized published record for internal publication and AI-priority logic.
 4. `出处` remains displayed, and deleted records remain excluded.
 
+## Reader tab reliability and Dhamma-Books language scope — 6 September 2026
+
+1. `kutadantasutta.html` is the accepted Tipitaka-reader reference. Every other existing sutta must switch **汉译巴利三藏** and **AI Translation** reliably; a visually selected tab must never leave the PCED Dictionary panel displayed.
+2. Standard reader tab activation takes precedence over conflicting legacy per-page tab listeners. A delayed first-tab reset must stop as soon as the user deliberately selects another tab.
+3. In Dhamma-Books only, Chinese-Tipitaka table extraction and display is enabled for Chinese-version books, including the Chinese side of a bilingual reader. It is disabled for English, Burmese, and other non-Chinese versions.
+4. This Dhamma-Books gate does not remove ordinary Chinese definitions originating from PCED and does not change exact, verified-inflection, compound, sandhi, source, or status rules.
+5. Tipitaka-reader continues to show eligible Chinese-Tipitaka results at the beginning of **PCED Dictionary** and retains its separate **汉译巴利三藏** tab in every sutta.
