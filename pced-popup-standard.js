@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.1 — 2026-09-06 */
+/* PAMC cross-book PCED popup standard v1.3.2 — 2026-09-06 */
 (function () {
   'use strict';
 
@@ -493,7 +493,12 @@
 
   function init() {
     if (!core() || !Object.keys(dictionary()).length) return;
-    window.addEventListener('pced-approved-terms-updated', () => { livePromise = null; });
+    window.addEventListener('pced-approved-terms-updated', () => {
+      livePromise = null;
+      queueMicrotask(() => document.querySelectorAll('.modal,#pced-modal,[data-modal]').forEach(modal => {
+        if (isOpen(modal)) modalOpened(modal);
+      }));
+    });
     if (!document.getElementById('pamc-pced-standard-style')) {
       const style = document.createElement('style');
       style.id = 'pamc-pced-standard-style';
@@ -577,6 +582,17 @@
     document.addEventListener('pointerdown', event => {
       const word = event.target.closest?.('.pali-word,.attha-word,[data-word]');
       if (word?.dataset?.word) lastWord = word.dataset.word;
+    }, true);
+    // Run after the host page's embedded click handler has opened and filled
+    // its modal. This makes the real page integration deterministic instead
+    // of depending only on attribute-observer timing.
+    document.addEventListener('click', event => {
+      const word = event.target.closest?.('.pali-word,.attha-word,[data-word]');
+      if (!word) return;
+      if (word.dataset?.word) lastWord = word.dataset.word;
+      queueMicrotask(() => document.querySelectorAll('.modal,#pced-modal,[data-modal]').forEach(modal => {
+        if (isOpen(modal)) modalOpened(modal);
+      }));
     }, true);
     document.addEventListener('keydown', event => {
       if (event.key !== 'Enter' && event.key !== ' ') return;
