@@ -128,3 +128,8 @@ The deployed `tipitaka-reader.pages.dev` site is protected by Cloudflare Access.
 - `出处` remains visible and deleted records remain excluded.
 - Code commit: `6386a3ad3ba6885203d71d6b4df8aefa72ad5cd2`. GitHub verification confirmed identical popup blobs in both reader repositories, valid JavaScript syntax, no status label/column, exact-match fallback presence, source rendering, and unchanged AI status filtering.
 
+## Shared popup v1.3.1 — 6 September 2026
+
+- Kept the shared popup asset byte-identical with Tipitaka-reader.
+- The new same-database `/api/records` merge is gated to reader mode; Dhamma-Books continues using the centralized published snapshot.
+- JavaScript syntax, hidden status presentation, visible source presentation, and shared-file equality checks passed.
