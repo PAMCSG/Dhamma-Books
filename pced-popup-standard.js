@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.1.1 — 2026-09-06 */
+/* PAMC cross-book PCED popup standard v1.1.2 — 2026-09-06 */
 (function () {
   'use strict';
 
@@ -266,14 +266,19 @@
           if (Array.isArray(rows) && rows.length) { liveRecords = rows; break; }
         } catch (_) {}
       }
-      const seen = new Set();
-      return [...liveRecords, ...local].filter(row => {
-        if (Number(row.deleted)) return false;
-        const key = [normalize(row.pali), String(row.chinese || '').trim(), String(row.status || '').trim()].join('\u241f');
-        if (!row.pali || !row.chinese || seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
+      const merged = new Map();
+      for (const row of [...local, ...liveRecords]) {
+        if (Number(row.deleted) || !row.pali || !row.chinese) continue;
+        const key = [normalize(row.pali), String(row.chinese || '').trim()].join('\u241f');
+        const previous = merged.get(key) || {};
+        merged.set(key, {
+          ...previous, ...row,
+          type: String(row.type || previous.type || '').trim(),
+          source: String(row.source || previous.source || '').trim(),
+          page: String(row.page || previous.page || '').trim()
+        });
+      }
+      return [...merged.values()];
     })();
     return livePromise;
   }
