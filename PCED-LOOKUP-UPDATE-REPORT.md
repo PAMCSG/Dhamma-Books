@@ -146,3 +146,10 @@ The reported screenshot was matched to `patisambhidamagga.html` and its `#pced-m
 - In Dhamma-Books, Chinese-Tipitaka table results are enabled only for Chinese book contexts. English, Burmese, and other non-Chinese contexts retain ordinary PCED results without Chinese-Tipitaka insertion. Bilingual readers use the language panel containing the clicked word.
 - Tipitaka-reader remains enabled for Chinese-Tipitaka results in **PCED Dictionary** and its separate **汉译巴利三藏** tab.
 - Static verification passed for JavaScript syntax, byte-identical shared popup files, legacy-listener interception, first-tab race guards, and nine reader/language-profile cases. The local browser package lacked its executable and the browser download was blocked by the test environment gateway, so deployed interaction testing remains required after merge.
+
+## Duplicate-row and language-order correction — 6 September 2026
+
+- Shared popup v1.3.6 de-duplicates Chinese-Tipitaka rows before rendering the Tipitaka-reader **汉译巴利三藏** table. The exact and verified matching paths can no longer display the same database record twice; distinct meanings, sources, or statuses remain separate.
+- Dhamma-Books now passes the current book language into the shared dictionary-group renderer. English versions display English → Chinese → Burmese → other languages and continue to omit Chinese-Tipitaka extraction. Chinese versions display Chinese-Tipitaka first, then Chinese → English → Burmese → other languages.
+- Tipitaka-reader keeps Chinese-Tipitaka first within **PCED Dictionary**, followed by Chinese → English → Burmese → other languages.
+- Static verification passed for JavaScript syntax, byte-identical shared popup files, nine Chinese-Tipitaka inclusion profiles, four language-order profiles, and duplicate removal while retaining a distinct alternative translation.
