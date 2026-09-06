@@ -153,3 +153,10 @@ The reported screenshot was matched to `patisambhidamagga.html` and its `#pced-m
 - Dhamma-Books now passes the current book language into the shared dictionary-group renderer. English versions display English → Chinese → Burmese → other languages and continue to omit Chinese-Tipitaka extraction. Chinese versions display Chinese-Tipitaka first, then Chinese → English → Burmese → other languages.
 - Tipitaka-reader keeps Chinese-Tipitaka first within **PCED Dictionary**, followed by Chinese → English → Burmese → other languages.
 - Static verification passed for JavaScript syntax, byte-identical shared popup files, nine Chinese-Tipitaka inclusion profiles, four language-order profiles, and duplicate removal while retaining a distinct alternative translation.
+
+## Reader terminology status and whole-word matching — 6 September 2026
+
+- Shared popup v1.3.7 leaves **PCED Dictionary** and AI status eligibility unchanged.
+- The Tipitaka-reader **汉译巴利三藏** table now displays Pāli, 玛欣德尊者翻译 and `状态`, including every matching non-deleted status.
+- Single-word lookup combines exact and verified-inflection/headword forms, then includes database phrases containing those forms as complete Pāli words. Loose substrings and deleted records are excluded.
+- Verification passed for `ibbhā → ibbha`, all-status results, phrase-containing matches, rejection of an `ibbhavāda` substring, duplicate removal, the status column, existing language profiles and tab guards.
