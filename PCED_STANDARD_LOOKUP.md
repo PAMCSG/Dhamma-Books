@@ -78,3 +78,10 @@ This section supersedes any older display wording that said a book popup or the 
 3. In Dhamma-Books only, Chinese-Tipitaka table extraction and display is enabled for Chinese-version books, including the Chinese side of a bilingual reader. It is disabled for English, Burmese, and other non-Chinese versions.
 4. This Dhamma-Books gate does not remove ordinary Chinese definitions originating from PCED and does not change exact, verified-inflection, compound, sandhi, source, or status rules.
 5. Tipitaka-reader continues to show eligible Chinese-Tipitaka results at the beginning of **PCED Dictionary** and retains its separate **汉译巴利三藏** tab in every sutta.
+
+## Duplicate rows and language order — 6 September 2026
+
+1. The Tipitaka-reader **汉译巴利三藏** tab displays each matching database record once. If the direct exact-match and verified matcher paths return the same Pāli, Chinese translation, source, and status, the duplicate is removed before rendering. Distinct records with different values remain visible.
+2. Dhamma-Books English versions display ordinary PCED sections as English, Chinese, Burmese, then other correctly identified languages. They do not extract or display Chinese-Tipitaka records.
+3. Dhamma-Books Chinese versions and Tipitaka-reader **PCED Dictionary** display eligible Chinese-Tipitaka results first, followed by ordinary PCED Chinese, English, Burmese, then other languages.
+4. Required duplicate regressions include `tena`, `kathāsallāpo`, and `Gotamo` when the database contains only one corresponding record.
