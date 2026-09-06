@@ -100,4 +100,14 @@ The deployed `tipitaka-reader.pages.dev` site is protected by Cloudflare Access.
 - This conservatively added provenance to 344 previously source-less bundled terms: 180 exact-token matches and 164 verified inflected matches.
 - Existing non-empty `source` and `page` values always take priority, and empty live duplicates cannot erase derived or authoritative provenance.
 - The cache key is now `pamc_pced_approved_terms_v4`.
-- Regression verification passed for `purohito → purohita → 国师，司祭（出处：巴利三藏 > 经藏 > 长部 > 戒蕴品 > 《古德丹德经》，134）`.
+- Regression verification passed for `purohito → purohita → 国师，司祭（出处：巴利三藏 > 经藏 > 长部 > 戒蕴品 > 《古德丹德经》）`; the internal page value is not displayed.
+
+## 6 September 2026 — source-only citations and generic official-PCED coverage
+
+- Updated the shared popup standard to version `1.1.3`.
+- Chinese Tipiṭaka results now display only `（出处：…）`. Numeric page fields remain available internally but are never appended to the popup citation.
+- Popup de-duplication now ignores hidden page numbers, so the same Pāli/Chinese/source result is not repeated merely because it has several page references.
+- Expanded `pced-standard-data.js` from 1,659 to 18,082 validated entries using the official PCED 2.0.5 source dictionary: 12,154 top-level headwords and 4,269 explicitly labelled sub-headwords found inside their parent PCED entries.
+- The shared resolver remains conservative: a grammatical rule may propose a lemma, but it is accepted only when the complete lemma is present in the validated PCED index. No fuzzy, substring, or arbitrary prefix match was enabled.
+- Cross-book regression tests passed for `bodhisattassa → bodhisatta`, `uppalaṃ → uppala`, `sīlagandho → sīlagandha`, `tagaraṃ → tagara`, `Sammadaññā → sammadañña`, `purohito → purohita`, and `gotamo → gotama`.
+
