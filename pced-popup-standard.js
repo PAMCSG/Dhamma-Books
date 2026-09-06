@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.1.3 — 2026-09-06 */
+/* PAMC cross-book PCED popup standard v1.2.0 — 2026-09-06 */
 (function () {
   'use strict';
 
@@ -7,7 +7,6 @@
   const isReferenceReader = /(?:^|\/)kutadantasutta\.html$/i.test(location.pathname);
   const APPROVED = new Set(['规范', '核实', '已核实', '确认', '已确认']);
   let lastWord = '';
-  let liveRecords = [];
   let livePromise = null;
 
   const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -248,35 +247,10 @@
   async function records() {
     if (livePromise) return livePromise;
     livePromise = (async () => {
-      const local = Array.isArray(window.PCEDApprovedTerms?.records) ? window.PCEDApprovedTerms.records : [];
-      const endpoints = [...new Set(['/api/records', window.PCEDApprovedTerms?.endpoint,
-        'https://chinese-tipitaka.pages.dev/api/approved-terms'].filter(Boolean))];
-      for (const endpoint of endpoints) {
-        try {
-          const response = await fetch(endpoint, {
-            credentials: endpoint.startsWith('/') ? 'include' : 'omit',
-            mode: endpoint.startsWith('/') ? 'same-origin' : 'cors',
-            cache: 'no-store', headers: { Accept: 'application/json' }
-          });
-          if (!response.ok) continue;
-          const json = await response.json();
-          const rows = Array.isArray(json) ? json : (json.records || json.items || []);
-          if (Array.isArray(rows) && rows.length) { liveRecords = rows; break; }
-        } catch (_) {}
-      }
-      const merged = new Map();
-      for (const row of [...local, ...liveRecords]) {
-        if (Number(row.deleted) || !row.pali || !row.chinese) continue;
-        const key = [normalize(row.pali), String(row.chinese || '').trim()].join('\u241f');
-        const previous = merged.get(key) || {};
-        merged.set(key, {
-          ...previous, ...row,
-          type: String(row.type || previous.type || '').trim(),
-          source: String(row.source || previous.source || '').trim(),
-          page: String(row.page || previous.page || '').trim()
-        });
-      }
-      return [...merged.values()];
+      try { await window.PCEDApprovedTerms?.ready; } catch (_) {}
+      const rows = Array.isArray(window.PCEDApprovedTerms?.records)
+        ? window.PCEDApprovedTerms.records : [];
+      return rows.filter(row => !Number(row?.deleted) && row?.pali && row?.chinese);
     })();
     return livePromise;
   }
@@ -444,6 +418,7 @@
 
   function init() {
     if (!core() || !Object.keys(dictionary()).length) return;
+    window.addEventListener('pced-approved-terms-updated', () => { livePromise = null; });
     if (!document.getElementById('pamc-pced-standard-style')) {
       const style = document.createElement('style');
       style.id = 'pamc-pced-standard-style';
