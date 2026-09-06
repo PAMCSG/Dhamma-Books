@@ -82,3 +82,11 @@ The deployed `tipitaka-reader.pages.dev` site is protected by Cloudflare Access.
 3. Confirm `English`, `Burmese`, and other language headings use the light-brown style without bilingual duplicates.
 4. Drag the popup by its title bar and confirm the compact light-brown reader tab buttons.
 5. Record the exact book URL and screenshot for any remaining book-specific exception.
+
+## Chinese-Tipiṭaka provenance correction — 6 September 2026
+
+- Root cause: the bundled approved-term snapshot and its `freezeRecords()` projection retained only `id`, `pali`, `chinese`, and `status`, discarding the live API's `type`, `source`, and `page` fields.
+- The projection now preserves `type`, `source`, and `page`, and the browser cache key was advanced to `pamc_pced_approved_terms_v2` so previously cached source-less records cannot mask the correction.
+- The bundled fallback was enriched from the authoritative Chinese-Tipitaka standard and seed records; 244 bundled records now carry locally available source provenance even when the live API is unavailable.
+- The popup renderer displays each result inline as `Chinese meaning（出处：source，page）`, omitting only unavailable components.
+- End-to-end verification passed for `bhante` → `尊者（出处：《上座部佛教汉译译名用语规范》·附表四·部分南北传佛教用语对照表）`.
