@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.0 — 2026-09-06 */
+/* PAMC cross-book PCED popup standard v1.3.1 — 2026-09-06 */
 (function () {
   'use strict';
 
@@ -295,8 +295,34 @@
     if (livePromise) return livePromise;
     livePromise = (async () => {
       try { await window.PCEDApprovedTerms?.ready; } catch (_) {}
-      const rows = Array.isArray(window.PCEDApprovedTerms?.records)
-        ? window.PCEDApprovedTerms.records : [];
+      let rows = Array.isArray(window.PCEDApprovedTerms?.records)
+        ? [...window.PCEDApprovedTerms.records] : [];
+
+      // The protected Tipitaka reader has a same-D1 endpoint. Merge its current
+      // non-deleted records so a database exact match is not lost merely
+      // because the published browser snapshot is stale or incomplete.
+      if (mode === 'reader') {
+        try {
+          const response = await fetch('/api/records', {
+            credentials: 'include', cache: 'no-store',
+            headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' }
+          });
+          if (response.ok) {
+            const data = await response.json();
+            const incoming = Array.isArray(data) ? data : (data.records || []);
+            if (Array.isArray(incoming)) {
+              const merged = new Map();
+              const keyOf = row => String(row?.dbid || row?.id || '').trim() ||
+                [normalize(row?.pali), String(row?.chinese || '').trim()].join('\u241f');
+              for (const row of rows) if (keyOf(row)) merged.set(keyOf(row), row);
+              for (const row of incoming) if (!Number(row?.deleted) && keyOf(row)) {
+                merged.set(keyOf(row), { ...(merged.get(keyOf(row)) || {}), ...row });
+              }
+              rows = [...merged.values()];
+            }
+          }
+        } catch (_) {}
+      }
       return rows.filter(row => !Number(row?.deleted) && row?.pali && row?.chinese);
     })();
     return livePromise;
