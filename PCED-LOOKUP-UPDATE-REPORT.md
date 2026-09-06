@@ -133,3 +133,7 @@ The deployed `tipitaka-reader.pages.dev` site is protected by Cloudflare Access.
 - Kept the shared popup asset byte-identical with Tipitaka-reader.
 - The new same-database `/api/records` merge is gated to reader mode; Dhamma-Books continues using the centralized published snapshot.
 - JavaScript syntax, hidden status presentation, visible source presentation, and shared-file equality checks passed.
+
+### Paṭisambhidāmagga screenshot path
+
+The reported screenshot was matched to `patisambhidamagga.html` and its `#pced-modal` shell. That page now requests `pced-popup-standard.js?v=1.3.2`; v1.3.2 reprocesses the real modal immediately after the embedded host click and again when Chinese-Tipitaka data finishes loading.
