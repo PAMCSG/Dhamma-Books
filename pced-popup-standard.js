@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.1.2 — 2026-09-06 */
+/* PAMC cross-book PCED popup standard v1.1.3 — 2026-09-06 */
 (function () {
   'use strict';
 
@@ -79,7 +79,7 @@
     const seen = new Set();
     const unique = (rows || []).filter(row => {
       const key = [normalize(row.pali), String(row.chinese || '').trim(),
-        String(row.source || '').trim(), String(row.page || '').trim()].join('\u241f');
+        String(row.source || '').trim()].join('\u241f');
       if (!row.chinese || seen.has(key)) return false;
       seen.add(key);
       return true;
@@ -89,11 +89,9 @@
       '<div class="source approved-term-title">《汉译巴利三藏》玛欣德尊者和译藏团队</div>' +
       unique.map(row => {
         const source = String(row.source || '').trim();
-        const page = String(row.page || '').trim();
-        const provenance = [source, page].filter(Boolean).join('，');
         return '<div class="approved-term-row">' +
           '<div class="definition approved-term-definition"><span>' + esc(row.chinese) + '</span>' +
-            (provenance ? '<span class="source approved-term-source">（出处：' + esc(provenance) + '）</span>' : '') +
+            (source ? '<span class="source approved-term-source">（出处：' + esc(source) + '）</span>' : '') +
           '</div>' +
           (row.match === 'inflected' ? '<div class="lookup-rule">' + esc(surface) + ' → ' +
             esc(row.matchedForm) + '（已核实词形变化）</div>' : '') +
