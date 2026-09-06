@@ -298,9 +298,9 @@
       let rows = Array.isArray(window.PCEDApprovedTerms?.records)
         ? [...window.PCEDApprovedTerms.records] : [];
 
-      // The protected Tipitaka reader has a same-D1 endpoint. Merge its current
-      // non-deleted records so a database exact match is not lost merely
-      // because the published browser snapshot is stale or incomplete.
+      // The protected Tipitaka reader has a same-D1 endpoint. Its complete
+      // current non-deleted response is authoritative, so stale bundled
+      // provenance can never be merged back into a current database row.
       if (mode === 'reader') {
         try {
           const response = await fetch('/api/records', {
