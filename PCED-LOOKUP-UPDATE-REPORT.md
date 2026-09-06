@@ -137,3 +137,12 @@ The deployed `tipitaka-reader.pages.dev` site is protected by Cloudflare Access.
 ### Paṭisambhidāmagga screenshot path
 
 The reported screenshot was matched to `patisambhidamagga.html` and its `#pced-modal` shell. That page now requests `pced-popup-standard.js?v=1.3.2`; v1.3.2 reprocesses the real modal immediately after the embedded host click and again when Chinese-Tipitaka data finishes loading.
+
+## Reader-tab reliability and Dhamma-Books language gate — 6 September 2026
+
+- The approved requirements were recorded before implementation in the controlling master document version 16 and in `PCED_STANDARD_LOOKUP.md`.
+- Shared popup v1.3.5 prevents legacy per-sutta tab listeners from restoring PCED content after **汉译巴利三藏** or **AI Translation** is selected.
+- Delayed initial-tab callbacks now stop once the user has deliberately selected a tab, eliminating the intermittent first-tab race.
+- In Dhamma-Books, Chinese-Tipitaka table results are enabled only for Chinese book contexts. English, Burmese, and other non-Chinese contexts retain ordinary PCED results without Chinese-Tipitaka insertion. Bilingual readers use the language panel containing the clicked word.
+- Tipitaka-reader remains enabled for Chinese-Tipitaka results in **PCED Dictionary** and its separate **汉译巴利三藏** tab.
+- Static verification passed for JavaScript syntax, byte-identical shared popup files, legacy-listener interception, first-tab race guards, and nine reader/language-profile cases. The local browser package lacked its executable and the browser download was blocked by the test environment gateway, so deployed interaction testing remains required after merge.
