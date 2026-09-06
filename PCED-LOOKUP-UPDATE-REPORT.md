@@ -111,3 +111,11 @@ The deployed `tipitaka-reader.pages.dev` site is protected by Cloudflare Access.
 - The shared resolver remains conservative: a grammatical rule may propose a lemma, but it is accepted only when the complete lemma is present in the validated PCED index. No fuzzy, substring, or arbitrary prefix match was enabled.
 - Cross-book regression tests passed for `bodhisattassa → bodhisatta`, `uppalaṃ → uppala`, `sīlagandho → sīlagandha`, `tagaraṃ → tagara`, `Sammadaññā → sammadañña`, `purohito → purohita`, and `gotamo → gotama`.
 
+## All-status publication correction — 6 September 2026
+
+- Requirements were documented before implementation in the authoritative master requirements version 1.8 and in `PCED_STANDARD_LOOKUP.md` commit `5ffee61`.
+- Display matching now includes every non-deleted published single-word record, including `待核实`, `规范`, `已确认`, and `有异译`; status and `出处` are retained in the popup. Core commit: `18dbd29`; popup commit: `083be36`.
+- No publication control was added to Dhamma-Books. Publication remains an authenticated Chinese-Tipitaka administration action.
+- AI terminology priority remains restricted to exactly `规范` and `已确认` in the shared browser logic.
+- Static verification passed for shared-file equality with Tipitaka-reader, all-status display mode, status/source rendering, approved-only AI filtering, absence of reader-side publication controls, centralized published-feed use, all-non-deleted publication SQL, and JavaScript syntax.
+
