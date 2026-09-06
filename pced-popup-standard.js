@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.5 — 2026-09-06 */
+/* PAMC cross-book PCED popup standard v1.3.6 — 2026-09-06 */
 (function () {
   'use strict';
 
@@ -78,6 +78,17 @@
     }).map(row => ({ ...row, match: 'exact', matchedForm: exact }));
   }
 
+  function uniqueTermRows(rows) {
+    const seen = new Set();
+    return (Array.isArray(rows) ? rows : []).filter(row => {
+      const key = [normalize(row?.pali), String(row?.chinese || '').trim(),
+        String(row?.source || '').trim(), String(row?.status || '').trim()].join('\u241f');
+      if (!row?.chinese || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
   function approvedWordRows(surface, result, allRows) {
     const approvedTerms = Array.isArray(allRows) && allRows.length
       ? allRows : (window.PCEDApprovedTerms?.records || []);
@@ -87,28 +98,12 @@
     const resolved = (core()?.approvedTermMatches(surface, result, {
       approvedTerms, includeAllStatuses: true
     }) || []).filter(isSingleWordRecord);
-    const seen = new Set();
-    return [...direct, ...resolved].filter(row => {
-      if (!isSingleWordRecord(row) || !APPROVED.has(String(row.status || '').trim())) return false;
-      const key = [String(row.dbid || row.id || '').trim(), normalize(row.pali),
-        String(row.chinese || '').trim(), String(row.source || '').trim(),
-        String(row.status || '').trim()].join('\u241f');
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
+    return uniqueTermRows([...direct, ...resolved]).filter(row =>
+      isSingleWordRecord(row) && APPROVED.has(String(row.status || '').trim()));
   }
 
   function renderApprovedBlock(rows, surface) {
-    const seen = new Set();
-    const unique = (rows || []).filter(row => {
-      const key = [String(row.dbid || row.id || '').trim(), normalize(row.pali),
-        String(row.chinese || '').trim(), String(row.source || '').trim(),
-        String(row.status || '').trim()].join('\u241f');
-      if (!row.chinese || seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
+    const unique = uniqueTermRows(rows);
     if (!unique.length) return '';
     return '<div class="approved-term-block">' +
       '<div class="source approved-term-title">《汉译巴利三藏》玛欣德尊者和译藏团队</div>' +
@@ -124,10 +119,10 @@
       }).join('') + '</div>';
   }
 
-  function renderEntry(head, approvedRows, surface, includeApproved) {
+  function renderEntry(head, approvedRows, surface, includeApproved, primaryLanguage) {
     const entry = dictionary()[head];
     if (!entry) return '';
-    const groups = core()?.dictionaryGroups(entry, 'zh') || [];
+    const groups = core()?.dictionaryGroups(entry, primaryLanguage) || [];
     let html = '<div class="entry"><div class="headword">' + esc(entry.headword || head) + '</div>';
     const approved = includeApproved ? renderApprovedBlock(approvedRows, surface) : '';
     const hasChinese = groups.some(group => group.key === 'zh');
@@ -143,7 +138,7 @@
     return html + '</div>';
   }
 
-  function renderDictionary(surface, suppliedRows) {
+  function renderDictionary(surface, suppliedRows, primaryLanguage = 'zh') {
     const result = resolution(surface);
     const heads = result.allHeads || result.heads || [];
     const approvedRows = (Array.isArray(suppliedRows)
@@ -168,7 +163,8 @@
       return note + approvedEntry + '<div class="note"><b>No reliable PCED entry was found for ' +
         esc(surface) + '.</b><br>Only exact headwords, verified forms, conservative inflections, and verified compound or sandhi analyses were accepted.</div>';
     }
-    return note + heads.map((head, index) => renderEntry(head, approvedRows, surface, index === 0)).join('');
+    return note + heads.map((head, index) =>
+      renderEntry(head, approvedRows, surface, index === 0, primaryLanguage)).join('');
   }
 
   function selectedText(modal) {
@@ -313,23 +309,33 @@
     }
   }
 
+  function contextLanguage() {
+    const languageOf = node => String(node?.dataset?.lang || node?.getAttribute?.('lang') || '').toLowerCase();
+    const clickedPanel = lastWordElement?.closest?.('[data-lang],.lang-panel');
+    const clickedLanguage = languageOf(clickedPanel);
+    if (clickedLanguage) return clickedLanguage;
+    const scopedLanguage = languageOf(lastWordElement?.closest?.('main[lang],section[lang],article[lang]'));
+    if (scopedLanguage) return scopedLanguage;
+    const activePanel = document.querySelector('.lang-panel.active[data-lang],.reader.active[data-lang],main:not([hidden])[data-lang]');
+    const activeLanguage = languageOf(activePanel);
+    if (activeLanguage) return activeLanguage;
+    const bodyLanguage = String(document.body?.dataset?.translationLanguage || document.body?.getAttribute?.('lang') || '').toLowerCase();
+    if (bodyLanguage) return bodyLanguage;
+    return String(document.documentElement.lang || '').toLowerCase();
+  }
+
   function chineseTipitakaEnabledForBook() {
     if (mode === 'reader') return true;
     const setting = String(script?.dataset?.pcedChineseTipitaka || '').toLowerCase();
     if (['on', 'true', 'yes', 'zh'].includes(setting)) return true;
     if (['off', 'false', 'no'].includes(setting)) return false;
-    const languageOf = node => String(node?.dataset?.lang || node?.getAttribute?.('lang') || '').toLowerCase();
-    const clickedPanel = lastWordElement?.closest?.('[data-lang],.lang-panel');
-    const clickedLanguage = languageOf(clickedPanel);
-    if (clickedLanguage) return /^zh(?:-|$)/.test(clickedLanguage);
-    const scopedLanguage = languageOf(lastWordElement?.closest?.('main[lang],section[lang],article[lang]'));
-    if (scopedLanguage) return /^zh(?:-|$)/.test(scopedLanguage);
-    const activePanel = document.querySelector('.lang-panel.active[data-lang],.reader.active[data-lang],main:not([hidden])[data-lang]');
-    const activeLanguage = languageOf(activePanel);
-    if (activeLanguage) return /^zh(?:-|$)/.test(activeLanguage);
-    const bodyLanguage = String(document.body?.dataset?.translationLanguage || document.body?.getAttribute?.('lang') || '').toLowerCase();
-    if (bodyLanguage) return /^zh(?:-|$)/.test(bodyLanguage);
-    return /^zh(?:-|$)/i.test(document.documentElement.lang || '');
+    return /^zh(?:-|$)/.test(contextLanguage());
+  }
+
+  function preferredDictionaryLanguage() {
+    if (mode === 'reader' || chineseTipitakaEnabledForBook()) return 'zh';
+    const language = contextLanguage().split('-')[0];
+    return ['en', 'my'].includes(language) ? language : 'en';
   }
 
   async function records() {
@@ -461,9 +467,10 @@
   }
 
   function renderTermTable(rows, surface) {
-    if (!rows.length) return '<div class="note">No precise 汉译巴利三藏 match was found for <b>' + esc(surface) + '</b>.</div>';
+    const unique = uniqueTermRows(rows);
+    if (!unique.length) return '<div class="note">No precise 汉译巴利三藏 match was found for <b>' + esc(surface) + '</b>.</div>';
     return '<div class="mahinda-table-wrap"><table class="mahinda-table"><thead><tr><th>Pāli</th><th>玛欣德尊者翻译</th></tr></thead><tbody>' +
-      rows.map(row => '<tr><td>' + esc(row.pali) + '</td><td>' + esc(row.chinese) + '</td></tr>').join('') +
+      unique.map(row => '<tr><td>' + esc(row.pali) + '</td><td>' + esc(row.chinese) + '</td></tr>').join('') +
       '</tbody></table></div>';
   }
 
@@ -516,7 +523,7 @@
     const translate = modal.querySelector('#translateTab');
     const attha = modal.querySelector('#atthaTab');
     const initialRows = phrase ? [] : approvedWordRows(surface, result);
-    if (dict) dict.innerHTML = phrase ? '' : renderDictionary(surface, initialRows);
+    if (dict) dict.innerHTML = phrase ? '' : renderDictionary(surface, initialRows, 'zh');
     if (attha) { try { if (typeof renderAttha === 'function') attha.innerHTML = renderAttha(surface); } catch (_) {} }
     if (translate) {
       translate.innerHTML = renderAIBase(surface, phrase);
@@ -537,7 +544,7 @@
       }) || []).filter(isSingleWordRecord)
     ];
     const approvedMatching = phrase ? [] : approvedWordRows(surface, result, allRows);
-    if (dict && !phrase) dict.innerHTML = renderDictionary(surface, approvedMatching);
+    if (dict && !phrase) dict.innerHTML = renderDictionary(surface, approvedMatching, 'zh');
     if (terms) terms.innerHTML = renderTermTable(allMatching, surface);
     normalizeLanguageHeadings(modal);
     resetTop(modal);
@@ -550,8 +557,9 @@
     const result = resolution(surface);
     const body = modal.querySelector('#dictBody') || modal.querySelector('#dictTab') || modal.querySelector('#pced-body');
     const includeChineseTipitaka = chineseTipitakaEnabledForBook();
+    const primaryLanguage = preferredDictionaryLanguage();
     if (body) body.innerHTML = renderDictionary(surface,
-      includeChineseTipitaka ? approvedWordRows(surface, result) : []);
+      includeChineseTipitaka ? approvedWordRows(surface, result) : [], primaryLanguage);
     resetTop(modal);
     if (!includeChineseTipitaka) {
       normalizeLanguageHeadings(modal);
@@ -559,7 +567,8 @@
     }
     const allRows = await records();
     if (selectedText(modal) !== surface) return;
-    if (body) body.innerHTML = renderDictionary(surface, approvedWordRows(surface, result, allRows));
+    if (body) body.innerHTML = renderDictionary(surface,
+      approvedWordRows(surface, result, allRows), primaryLanguage);
     normalizeLanguageHeadings(modal);
     resetTop(modal);
   }
