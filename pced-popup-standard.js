@@ -310,15 +310,10 @@
           if (response.ok) {
             const data = await response.json();
             const incoming = Array.isArray(data) ? data : (data.records || []);
-            if (Array.isArray(incoming)) {
-              const merged = new Map();
-              const keyOf = row => String(row?.dbid || row?.id || '').trim() ||
-                [normalize(row?.pali), String(row?.chinese || '').trim()].join('\u241f');
-              for (const row of rows) if (keyOf(row)) merged.set(keyOf(row), row);
-              for (const row of incoming) if (!Number(row?.deleted) && keyOf(row)) {
-                merged.set(keyOf(row), { ...(merged.get(keyOf(row)) || {}), ...row });
-              }
-              rows = [...merged.values()];
+            if (Array.isArray(incoming) && incoming.length) {
+              // A complete current same-D1 response is authoritative. Never merge
+              // older bundled provenance into current database rows.
+              rows = incoming.filter(row => !Number(row?.deleted) && row?.pali && row?.chinese);
             }
           }
         } catch (_) {}
