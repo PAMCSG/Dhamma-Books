@@ -20,3 +20,15 @@ PCED-enabled books use the Daily-Chants standard:
 Popups reopen at the beginning and remain movable within the visible screen. Prefix, substring, and fuzzy dictionary fallbacks are not allowed.
 
 See `PCED-LOOKUP-UPDATE-REPORT.md` for rollout details and tests.
+
+## Shared reader controls and screen header — 7 September 2026
+
+Every current and future reader book must load `dhamma-books-reader-standard.css` and `dhamma-books-reader-standard.js`.
+
+The shared contract provides:
+
+- **Book Mark:** one header button and one modal supporting add, list, go and delete, stored separately for each book in the browser.
+- **Search:** searches the active visible reading text, filters native reading blocks, highlights all matches, moves to the first match, reports no results, and restores the pre-search display and position when cleared.
+- **Screen header:** background `#4c3324`, white text, system UI font, 18 px desktop title / 16 px mobile title, and 14 px desktop controls / 12 px mobile controls.
+
+Book-specific content, body typography, language switching, PCED language profiles, dictionary/terminology data and AI behavior remain outside this shared standard.

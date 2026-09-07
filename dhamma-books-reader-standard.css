@@ -1,0 +1,110 @@
+/* Dhamma-Books shared reader controls v1.0.0 */
+:root{
+  --db-header-bg:#4c3324;
+  --db-header-text:#ffffff;
+  --db-header-font:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --db-header-title-size:18px;
+  --db-header-control-size:14px;
+  --db-panel:#fffdf9;
+  --db-line:#dfd5c8;
+  --db-accent:#8d5d3c;
+}
+body>header:first-of-type,
+body>nav.topbar,
+body>.topbar{
+  background:var(--db-header-bg)!important;
+  color:var(--db-header-text)!important;
+  font-family:var(--db-header-font)!important;
+}
+body>header:first-of-type .top,
+body>header:first-of-type .topbar-inner,
+body>nav.topbar .topbar-inner,
+body>.topbar .topbar-inner{
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  flex-wrap:wrap!important;
+  color:var(--db-header-text)!important;
+  font-family:var(--db-header-font)!important;
+}
+body>header:first-of-type .brand,
+body>header:first-of-type .bar-title,
+body>header:first-of-type .app-brand-title,
+body>nav.topbar .app-brand-title,
+body>.topbar .app-brand-title{
+  color:var(--db-header-text)!important;
+  font-family:var(--db-header-font)!important;
+  font-size:var(--db-header-title-size)!important;
+  line-height:1.25!important;
+  font-weight:700!important;
+}
+body>header:first-of-type button,
+body>header:first-of-type input,
+body>header:first-of-type a,
+body>nav.topbar button,
+body>nav.topbar input,
+body>nav.topbar a,
+body>.topbar button,
+body>.topbar input,
+body>.topbar a{
+  font-family:var(--db-header-font)!important;
+  font-size:var(--db-header-control-size)!important;
+}
+.db-legacy-control{display:none!important}
+.db-standard-controls{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-left:auto}
+.db-standard-controls button{
+  border:1px solid #ffffff55!important;
+  border-radius:7px!important;
+  background:#ffffff14!important;
+  color:#fff!important;
+  padding:7px 10px!important;
+  line-height:1.2!important;
+  cursor:pointer!important;
+}
+.db-standard-controls button:hover,.db-standard-controls button:focus{background:#ffffff28!important}
+.db-searchbox{display:flex;align-items:center;gap:5px}
+.db-searchbox input{
+  width:min(230px,42vw)!important;
+  min-height:34px!important;
+  border:1px solid #ffffff66!important;
+  border-radius:7px!important;
+  background:#fff!important;
+  color:#2c2925!important;
+  padding:6px 9px!important;
+}
+.db-search-status{min-width:0;color:#fff;font:12px/1.2 var(--db-header-font)}
+mark.db-search-hit{
+  background:#ffe08a!important;
+  color:inherit!important;
+  padding:.02em .1em;
+  border-radius:.18em;
+  box-shadow:0 0 0 1px rgba(153,92,0,.25);
+}
+mark.db-search-hit.db-search-current{
+  background:#ffb44f!important;
+  box-shadow:0 0 0 2px rgba(153,72,0,.35);
+}
+.db-bookmark-overlay{
+  position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;
+  padding:18px;background:#0008;font-family:var(--db-header-font);color:#2c2925;
+}
+.db-bookmark-overlay.open{display:flex}
+.db-bookmark-panel{width:min(720px,96vw);max-height:86vh;overflow:auto;border-radius:12px;background:var(--db-panel);box-shadow:0 14px 48px #0008}
+.db-bookmark-head{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--db-accent);color:#fff}
+.db-bookmark-title{margin-right:auto;font-size:18px;font-weight:700}
+.db-bookmark-close{border:1px solid #ffffff66;border-radius:7px;background:#ffffff18;color:#fff;font-size:22px;line-height:1;padding:4px 9px;cursor:pointer}
+.db-bookmark-body{padding:15px 18px 20px}
+.db-bookmark-current{margin:0 0 12px;color:#766e65;font-size:13px;line-height:1.45}
+.db-bookmark-add,.db-bookmark-row button{border:1px solid #c9b5a4;border-radius:7px;background:#fff;color:#4c3324;padding:7px 10px;cursor:pointer}
+.db-bookmark-add{background:#8d5d3c;color:#fff;border-color:#8d5d3c}
+.db-bookmark-list{margin-top:13px}
+.db-bookmark-empty{padding:12px 0;color:#766e65}
+.db-bookmark-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;border-top:1px solid var(--db-line);padding:10px 0}
+.db-bookmark-label{min-width:0;overflow-wrap:anywhere;font-size:14px;line-height:1.4}
+.db-bookmark-time{display:block;margin-top:2px;color:#8a7c70;font-size:11px}
+@media(max-width:760px){
+  :root{--db-header-title-size:16px;--db-header-control-size:12px}
+  .db-standard-controls{width:100%;margin-left:0}
+  .db-searchbox{flex:1 1 230px}.db-searchbox input{flex:1;width:auto!important;min-width:100px}
+  .db-bookmark-row{grid-template-columns:1fr auto}.db-bookmark-label{grid-column:1/-1}
+}
