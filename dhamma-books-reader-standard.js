@@ -52,7 +52,15 @@
   }
   function isChantingEdition(){
     const name=location.pathname.split('/').pop().toLowerCase();
-    return /^pali-chanting-book(?:-chinese|-burmese)?\.html$/.test(name);
+    // Chanting Book category: Daily Chants Burmese deliberately keeps its existing views.
+    return [
+      'daily-chants.html',
+      'paccayaniddeso.html',
+      'paccayaniddeso-chinese.html',
+      'pali-chanting-book.html',
+      'pali-chanting-book-chinese.html',
+      'pali-chanting-book-burmese.html'
+    ].includes(name);
   }
   function installContinuousChantingFlow(){
     if(!isChantingEdition()) return;
