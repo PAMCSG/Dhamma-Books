@@ -23,7 +23,7 @@ See `PCED-LOOKUP-UPDATE-REPORT.md` for rollout details and tests.
 
 ## Shared reader controls and screen header — 7 September 2026
 
-Every current and future reader book must load `dhamma-books-reader-standard.css` and `dhamma-books-reader-standard.js` using the current cache version. Shared reader standard v1.2.0 also retires legacy save/go bookmark buttons so a book displays only the common bookmark control.
+Every current and future reader book must load `dhamma-books-reader-standard.css` and `dhamma-books-reader-standard.js` using the current cache version. Shared reader standard v1.3.0 retires legacy save/go bookmark buttons so a book displays only the common bookmark control, and enforces continuous contents-to-reader flow for every Pāli Chanting Book edition.
 
 The shared contract provides:
 
@@ -43,4 +43,4 @@ The repository landing page is not a reader book and is outside this reader-inte
 
 ### Continuous reading after contents
 
-The English `pali-chanting-book.html` presents its reader directly after the table of contents. Its Contents and Reader header controls scroll to those positions; they must not hide one section in order to show the other. Preserve this continuous-flow rule when maintaining that edition. The Chinese and Burmese chanting editions are not yet covered by this rule.
+All three chanting editions—English `pali-chanting-book.html`, Chinese `pali-chanting-book-chinese.html`, and Burmese `pali-chanting-book-burmese.html`—present their readers directly after the table of contents. Their Contents and Reader header controls scroll to those positions; they must not hide one section in order to show the other. Preserve this continuous-flow rule when maintaining any chanting edition. The first English heading must remain a paired `VANDANĀ | Homage` row and must not be covered by the sticky column header.
