@@ -93,3 +93,10 @@ Book popups continue to hide status. The Tipitaka-reader **汉译巴利三藏** 
 3. It includes matching non-deleted records from every status. A selected word matches its exact form, verified inflection/headword, and database phrases containing that form as a complete Pāli word. Loose substring matches are prohibited.
 4. The same database record is rendered once even when several matching routes find it. Deleted records remain excluded.
 5. AI terminology priority remains restricted to `规范` and `已确认`.
+
+
+## Shared terminology table layout — synchronized 7 September 2026
+
+- Shared popup v1.3.9 uses equal, wider Pāli and Chinese widths, a narrower normally-wrapping 出处 column, and a non-wrapping 状态 column.
+- Desktop layout avoids left clipping and unnecessary inner horizontal scrolling; narrow mobile screens may scroll horizontally.
+- No lookup, language-gating, AI, source, status, duplicate, or deletion logic is changed.

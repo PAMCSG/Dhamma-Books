@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.8 — 2026-09-07 */
+/* PAMC cross-book PCED popup standard v1.3.9 — 2026-09-07 */
 (function () {
   'use strict';
 
@@ -704,10 +704,13 @@
         .tabs button[data-tab]:hover{background:#dfc5aa!important}
         .tabs button[data-tab].active{color:#fff!important;background:#9a6b49!important;border-color:#8b5d3d!important}
         .tabs button[hidden]{display:none!important}
-        .mahinda-table-wrap{overflow:auto;border:1px solid var(--pamc-popup-line);border-radius:9px}
-        .mahinda-table{width:100%;border-collapse:collapse;background:transparent}
-        .mahinda-table th,.mahinda-table td{padding:9px 11px;border-bottom:1px solid #eadfd3;text-align:left;vertical-align:top}
+        .mahinda-table-wrap{width:100%;max-width:100%;overflow-x:hidden;border:1px solid var(--pamc-popup-line);border-radius:9px}
+        .mahinda-table{width:100%;max-width:100%;table-layout:fixed;border-collapse:collapse;background:transparent}
+        .mahinda-table th,.mahinda-table td{padding:9px 11px;border-bottom:1px solid #eadfd3;text-align:left;vertical-align:top;white-space:normal;overflow-wrap:anywhere;word-break:normal}
         .mahinda-table th{background:var(--pamc-popup-tan)!important;color:#68442f!important;font-size:12px!important}
+        .mahinda-table th:nth-child(1),.mahinda-table td:nth-child(1),.mahinda-table th:nth-child(2),.mahinda-table td:nth-child(2){width:33%}
+        .mahinda-table th:nth-child(3),.mahinda-table td:nth-child(3){width:23%;white-space:normal;overflow-wrap:break-word;word-break:normal}
+        .mahinda-table th:nth-child(4),.mahinda-table td:nth-child(4){width:11%;min-width:4.8em;white-space:nowrap;overflow-wrap:normal;word-break:keep-all}
         .ai-box{border:1px solid var(--pamc-popup-line);border-radius:10px;padding:15px;background:transparent}
         .ai-title{color:var(--pamc-popup-blue);font-family:Georgia,"Times New Roman",serif;font-size:20px;font-weight:700;margin-bottom:10px}
         .ai-source{padding:11px;background:#f4eee7;border-radius:8px;margin-bottom:12px}
@@ -721,6 +724,8 @@
           .modal .panel-title,.modal .pced-panel-title,.modal .pced-title,.modal .modal-title,#pced-modal .panel-title,#pced-modal .pced-title{font-size:25px!important}
           .headword{font-size:24px!important}.group-title,.language-title,.lang-title{font-size:20px!important}.definition{font-size:17px!important}
           .tabs button[data-tab]{font-size:12px!important;padding:5px 7px!important}
+          .mahinda-table-wrap{overflow-x:auto}
+          .mahinda-table{min-width:620px}
         }
 `;
       document.head.append(style);
