@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.8 — 2026-09-07 */
+/* PAMC cross-book PCED popup standard v1.3.9 — 2026-09-07 */
 (function () {
   'use strict';
 
@@ -179,7 +179,7 @@
     const panel = panelOf(modal);
     const reset = () => {
       const nodes = new Set([modal, panel, ...modal.querySelectorAll(
-        '.panel-body,#dictBody,#dictTab,#pced-body,.lookup-section,.tab-panel'
+        '.panel-body,#dictBody,#dictTab,#pced-body,.lookup-section,.tab-panel,.mahinda-table-wrap'
       )]);
       for (const node of nodes) {
         if (!node) continue;
@@ -496,7 +496,10 @@
   function renderTermTable(rows, surface) {
     const unique = uniqueTermRows(rows);
     if (!unique.length) return '<div class="note">No precise 汉译巴利三藏 match was found for <b>' + esc(surface) + '</b>.</div>';
-    return '<div class="mahinda-table-wrap"><table class="mahinda-table"><thead><tr><th>Pāli</th><th>玛欣德尊者翻译</th><th>出处</th><th>状态</th></tr></thead><tbody>' +
+    return '<div class="mahinda-table-wrap"><table class="mahinda-table">' +
+      '<colgroup><col class="mahinda-col-pali"><col class="mahinda-col-chinese">' +
+      '<col class="mahinda-col-source"><col class="mahinda-col-status"></colgroup>' +
+      '<thead><tr><th>Pāli</th><th>玛欣德尊者翻译</th><th>出处</th><th>状态</th></tr></thead><tbody>' +
       unique.map(row => '<tr><td>' + esc(row.pali) + '</td><td>' + esc(row.chinese) + '</td><td>' +
         esc(row.source || '') + '</td><td>' + esc(row.status || '') + '</td></tr>').join('') +
       '</tbody></table></div>';
@@ -704,10 +707,14 @@
         .tabs button[data-tab]:hover{background:#dfc5aa!important}
         .tabs button[data-tab].active{color:#fff!important;background:#9a6b49!important;border-color:#8b5d3d!important}
         .tabs button[hidden]{display:none!important}
-        .mahinda-table-wrap{overflow:auto;border:1px solid var(--pamc-popup-line);border-radius:9px}
-        .mahinda-table{width:100%;border-collapse:collapse;background:transparent}
-        .mahinda-table th,.mahinda-table td{padding:9px 11px;border-bottom:1px solid #eadfd3;text-align:left;vertical-align:top}
+        .mahinda-table-wrap{overflow-x:auto;overflow-y:hidden;border:1px solid var(--pamc-popup-line);border-radius:9px}
+        .mahinda-table{width:100%;table-layout:fixed;border-collapse:collapse;background:transparent;margin:0!important;transform:none!important}
+        .mahinda-col-pali,.mahinda-col-chinese{width:32%}
+        .mahinda-col-source{width:25%}
+        .mahinda-col-status{width:11%}
+        .mahinda-table th,.mahinda-table td{padding:9px 11px;border-bottom:1px solid #eadfd3;text-align:left;vertical-align:top;white-space:normal;overflow-wrap:break-word;word-break:normal}
         .mahinda-table th{background:var(--pamc-popup-tan)!important;color:#68442f!important;font-size:12px!important}
+        .mahinda-table th:nth-child(4),.mahinda-table td:nth-child(4){white-space:nowrap;overflow-wrap:normal;word-break:keep-all}
         .ai-box{border:1px solid var(--pamc-popup-line);border-radius:10px;padding:15px;background:transparent}
         .ai-title{color:var(--pamc-popup-blue);font-family:Georgia,"Times New Roman",serif;font-size:20px;font-weight:700;margin-bottom:10px}
         .ai-source{padding:11px;background:#f4eee7;border-radius:8px;margin-bottom:12px}
