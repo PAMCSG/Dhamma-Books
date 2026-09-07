@@ -135,6 +135,14 @@ mark.db-search-hit.db-search-current{
 .db-bookmark-label{min-width:0;overflow-wrap:anywhere;font-size:14px;line-height:1.4}
 .db-bookmark-time{display:block;margin-top:2px;color:var(--db-muted);font-size:11px}
 
+/* Chanting readers display contents and text in one flow. Their column labels
+   must stay in normal document order so they cannot cover the first title. */
+body:is(.reader-en,.reader-zh,.reader-my) #contentsView+#readerView .col-head{
+  position:static!important;
+  top:auto!important;
+  z-index:auto!important;
+}
+
 /* Keep the first English chanting title together as one bilingual header row. */
 body.reader-en #contentsView+#readerView #vandana-1{
   display:grid!important;
