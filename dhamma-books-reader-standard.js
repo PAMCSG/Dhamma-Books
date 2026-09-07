@@ -1,9 +1,31 @@
-/* Dhamma-Books shared bookmark, search, and header behavior v1.0.0 */
+/* Dhamma-Books shared bookmark, search, and header behavior v1.1.0 */
 (function(){
   'use strict';
   const BOOKMARK_KEY='dhamma-books:bookmarks:'+location.pathname;
   const LEGACY_CONTROL_IDS=['bookmarkBtn','saveBookmark','goBookmark','returnBookmark','searchInput','searchBtn'];
+  const STRINGS={
+    en:{bookmark:'Book Mark',search:'Search',placeholder:'Search text…',modal:'Book Marks',add:'Add book mark here',current:'Current position: ',empty:'No book marks saved.',go:'Go',remove:'Delete',noResults:'No results',matches:n=>n+' match'+(n===1?'':'es'),close:'Close book marks'},
+    zh:{bookmark:'书签',search:'搜索',placeholder:'搜索文字…',modal:'书签',add:'在此处添加书签',current:'当前位置：',empty:'尚未保存书签。',go:'前往',remove:'删除',noResults:'没有结果',matches:n=>'找到 '+n+' 个匹配',close:'关闭书签'},
+    my:{bookmark:'စာညှပ်',search:'ရှာ',placeholder:'ရှာရန်',modal:'စာညှပ်များ',add:'ဤနေရာတွင် စာညှပ်သိမ်း',current:'လက်ရှိနေရာ - ',empty:'စာညှပ် မရှိသေးပါ။',go:'သွားမည်',remove:'ဖျက်မည်',noResults:'မတွေ့ပါ',matches:n=>n+' ခု တွေ့သည်',close:'စာညှပ်များ ပိတ်ရန်'}
+  };
   let beforeSearch=null;
+
+  function pathLanguage(){
+    const path=location.pathname.toLowerCase();
+    if(path.includes('burmese')) return 'my';
+    if(path.includes('chinese')||path.includes('dhammapada')||path.includes('patisambhidamagga')||path.includes('zhiguan')||path.includes('twelve-kinds')) return 'zh';
+    return '';
+  }
+  function currentLanguage(){
+    const fixed=pathLanguage();
+    if(fixed) return fixed;
+    const visible=[...document.querySelectorAll('main[data-lang],main[id$="Panel"],main[id^="reader-"]')].find(isVisible);
+    const value=(visible?.dataset.lang||visible?.id||'').toLowerCase();
+    if(value.includes('zh')) return 'zh';
+    if(value.includes('my')) return 'my';
+    return 'en';
+  }
+  function words(){return STRINGS[currentLanguage()]||STRINGS.en}
 
   function screenHeader(){
     return document.querySelector('body>header:first-of-type,body>nav.topbar,body>.topbar');
@@ -46,8 +68,9 @@
     const status=create('span',{id:'db-search-status',class:'db-search-status','aria-live':'polite'});
     searchbox.append(input,search);
     controls.append(bookmark,searchbox,status);
-    host.append(controls);
-    return {bookmark,input,search,status};
+    const spacer=[...host.children].find(node=>node.classList?.contains('spacer'));
+    if(spacer) host.insertBefore(controls,spacer); else host.append(controls);
+    return {bookmark,input,search,status,controls};
   }
 
   function normalize(value){
@@ -139,7 +162,8 @@
       const marks=highlight(unit,raw);total+=marks.length;
       if(!first&&marks.length) first=marks[0];
     });
-    if(status) status.textContent=total?total+' match'+(total===1?'':'es'):'No results';
+    const text=words();
+    if(status) status.textContent=total?text.matches(total):text.noResults;
     if(first){
       first.classList.add('db-search-current');
       setTimeout(()=>first.scrollIntoView({behavior:'smooth',block:'center'}),25);
@@ -211,14 +235,15 @@
       }));
     }
     function render(){
-      const anchor=currentAnchor(candidates);current.textContent='Current position: '+bookmarkLabel(anchor);
+      const text=words(),anchor=currentAnchor(candidates);current.textContent=text.current+bookmarkLabel(anchor);
+      title.textContent=text.modal;add.textContent=text.add;close.setAttribute('aria-label',text.close);
       list.replaceChildren();
       const items=loadBookmarks();
-      if(!items.length){list.append(create('div',{class:'db-bookmark-empty',text:'No book marks saved.'}));return}
+      if(!items.length){list.append(create('div',{class:'db-bookmark-empty',text:text.empty}));return}
       items.forEach(item=>{
         const row=create('div',{class:'db-bookmark-row'}),label=create('div',{class:'db-bookmark-label',text:item.label||'Reading position'});
         label.append(create('span',{class:'db-bookmark-time',text:new Date(item.createdAt).toLocaleString()}));
-        const goButton=create('button',{type:'button',text:'Go'}),remove=create('button',{type:'button',text:'Delete'});
+        const goButton=create('button',{type:'button',text:text.go}),remove=create('button',{type:'button',text:text.remove});
         goButton.addEventListener('click',()=>go(item));
         remove.addEventListener('click',()=>{saveBookmarks(loadBookmarks().filter(saved=>saved.id!==item.id));render()});
         row.append(label,goButton,remove);list.append(row);
@@ -238,10 +263,23 @@
   function init(){
     const controls=buildControls();
     if(!controls) return;
+    function applyLanguage(){
+      const text=words();
+      controls.bookmark.textContent=text.bookmark;
+      controls.bookmark.setAttribute('aria-label',text.modal);
+      controls.search.textContent=text.search;
+      controls.input.placeholder=text.placeholder;
+      controls.input.setAttribute('aria-label',text.placeholder);
+    }
+    applyLanguage();
+    ['langEn','langZh','enBtn','zhBtn','langMy','myBtn'].forEach(id=>{
+      const button=document.getElementById(id);
+      if(button) button.addEventListener('click',()=>setTimeout(applyLanguage,0));
+    });
     installSearch(controls);
     const bookmark=buildBookmarkModal(allAnchorCandidates());
     controls.bookmark.addEventListener('click',bookmark.openModal);
-    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,version:'1.0.0'};
+    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.1.0'};
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();
