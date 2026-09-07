@@ -96,3 +96,15 @@ Implemented shared contents styling (CSS v1.3.1) for all five books currently li
 The shared reader JavaScript v1.3.1 identifies these five filenames, adds `body.db-standard-contents`, and refreshes their existing shared CSS link to `?v=1.3.1`. Book HTML files remain byte-for-byte unchanged. Both language editions use the same cream panel, pale heading/group backgrounds, brown headings, solid warm borders, 10 px panel corners, and consistent row spacing. Contents headings are 22 px desktop / 20 px mobile; entries 18 px / 17 px; page numbers 14 px. Language fonts, natural title wrapping, subsection indentation, and right-aligned page numbers are retained. All contents remain one column; the title/page-number cells inside each row do not represent two contents columns.
 
 This change is styling only: original contents entries/targets, book wording, reading flow, language switching, main-text styles, PCED, screen headers, bookmarks, search, and Previously Read behavior are retained. The opt-in does not affect other categories or Daily Chants Burmese. The wider continuous-reading implementation status above remains a separate audit item.
+
+
+### Contents asset-loading correction — 7 September 2026
+
+After PR #18 deployed, a user screenshot still showed the old Mindfulness of Breathing contents. The five category books still referenced shared JavaScript/CSS v1.1.0; the styling marker depended on the new JavaScript arriving through that old URL. Deployment success alone does not verify visible styling.
+
+All five book HTML files now declare `body.db-standard-contents` directly and request both shared assets with `?v=1.3.1`. Contents styling therefore no longer depends on JavaScript initialization, and the changed URLs avoid reuse of v1.1.0 asset caches. The existing shared-JavaScript opt-in remains idempotent. For future shared-asset changes, update affected book asset URLs in the HTML, not only from inside the changed JavaScript.
+
+Only the body class and two asset versions change in each book. Book text, all links, embedded dictionaries, PCED scripts, language controls and reader logic are preserved.
+
+
+Coverage is **eight language contents pages across five HTML files**: Mindfulness of Breathing (English/Chinese), The Only Way for the Realization of Nibbāna (English/Chinese), The Requisites of Enlightenment (English/Chinese), 止观法要 (Chinese), and 佛陀的十二种恶报 (Chinese). Both `.contents` (including `.contents.zh-text`) and `.toc` panels are covered by the shared selectors, including initially hidden language panels.
