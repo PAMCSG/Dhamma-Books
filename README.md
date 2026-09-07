@@ -163,7 +163,7 @@ Batch 1 implements this in `mindfulness-of-breathing.html` and `the-only-way-for
 
 Validation: removing the added style exactly reproduces each original file. Existing Pāli markers, text, data-word attributes, PCED scripts, and language-navigation fixes are unchanged. Marker styles were inspected for inline colour conflicts. Live rendered colour and interaction still require visual verification; no browser verification is claimed.
 
-Batch 2 is implemented below. Remaining checkpoint: Batch 3 — 《止观法要》 and 《佛陀的十二种恶报》. Record each batch in its own pull request before continuing.
+Batches 2 and 3 are implemented below. The five-book Pāli-colour rollout is complete in source; live-site appearance remains to be verified. Each batch is recorded in its own pull request.
 
 
 ### Pāli heading exception and complete-word correction — 7 September 2026
@@ -180,3 +180,12 @@ Validation: book text and all scripts remain unchanged. Mindfulness changes only
 `the-requisites-of-enlightenment.html` now applies blue `#155CA8` to existing Pāli word, title and punctuation markers in both English and Chinese body text. Headings (including section and subsection headings), screen headers and cover titles retain their normal colours. The heading exception covers markers nested inside headings and markers on heading elements themselves.
 
 The change is one inline style block, covering 3,457 existing Pāli word markers across both editions. Removing the inserted block reproduces the original file exactly: book text, scripts, PCED attributes, language navigation, bookmarks and search remain unchanged. No shared asset version change is needed. Source preservation and uploaded content are checked; live browser rendering and deployment are not verified in this session.
+
+
+### Batch 3: 止观法要 and 佛陀的十二种恶报 Pāli colour — 7 September 2026
+
+`zhiguan-fayao.html` and `the-buddhas-twelve-kinds-of-evil-retribution.html` apply blue `#155CA8` to body Pāli markers and Pāli-only blocks, including their punctuation. Headings at every level, screen headers and cover titles retain their standard colours. The local inline styles also cover minor headings; no shared asset cache update is required.
+
+The two Chinese books contain 373 and 1,006 Pāli word markers respectively after correction. In the Twelve Retributions paragraph `row-vipaka12-227`, the previously split `Anom` + marked `ā` is one complete `Anomā` marker, and previously unmarked `Uruvela` receives the existing keyboard/click PCED attributes. Visible wording and spelling are unchanged. Source-reference abbreviations remain unchanged.
+
+Validation: reversing the style insertions and these two marker corrections reproduces both original HTML files byte-for-byte. Visible text, all scripts, navigation targets and search attributes are preserved. No shared PCED files, dictionary data, other books or catalogue files change. Browser rendering and live PCED interaction are not verified because Chromium is unavailable in this workspace; live-site appearance remains an explicit follow-up.
