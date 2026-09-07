@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.7 — 2026-09-06 */
+/* PAMC cross-book PCED popup standard v1.3.8 — 2026-09-07 */
 (function () {
   'use strict';
 
@@ -496,9 +496,9 @@
   function renderTermTable(rows, surface) {
     const unique = uniqueTermRows(rows);
     if (!unique.length) return '<div class="note">No precise 汉译巴利三藏 match was found for <b>' + esc(surface) + '</b>.</div>';
-    return '<div class="mahinda-table-wrap"><table class="mahinda-table"><thead><tr><th>Pāli</th><th>玛欣德尊者翻译</th><th>状态</th></tr></thead><tbody>' +
+    return '<div class="mahinda-table-wrap"><table class="mahinda-table"><thead><tr><th>Pāli</th><th>玛欣德尊者翻译</th><th>出处</th><th>状态</th></tr></thead><tbody>' +
       unique.map(row => '<tr><td>' + esc(row.pali) + '</td><td>' + esc(row.chinese) + '</td><td>' +
-        esc(row.status || '') + '</td></tr>').join('') +
+        esc(row.source || '') + '</td><td>' + esc(row.status || '') + '</td></tr>').join('') +
       '</tbody></table></div>';
   }
 
