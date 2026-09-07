@@ -1,4 +1,4 @@
-/* Dhamma-Books shared reader controls v1.2.0 */
+/* Dhamma-Books shared reader controls v1.3.0 */
 :root{
   --db-header-bg:#A8734F;
   --db-header-text:#ffffff;
@@ -134,6 +134,27 @@ mark.db-search-hit.db-search-current{
 .db-bookmark-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;border-top:1px solid var(--db-line);padding:10px 0}
 .db-bookmark-label{min-width:0;overflow-wrap:anywhere;font-size:14px;line-height:1.4}
 .db-bookmark-time{display:block;margin-top:2px;color:var(--db-muted);font-size:11px}
+
+/* Keep the first English chanting title together as one bilingual header row. */
+body.reader-en #contentsView+#readerView #vandana-1{
+  display:grid!important;
+  grid-template-columns:1.08fr 1fr!important;
+  padding:0!important;
+  scroll-margin-top:160px!important;
+  background:#f6eee6!important;
+  border-top:1px solid #d7c7b7!important;
+  border-bottom:2px solid #b99b75!important;
+}
+body.reader-en #contentsView+#readerView #vandana-1>div{
+  display:flex;align-items:center;margin:0;padding:12px 14px;font-weight:700;
+}
+body.reader-en #contentsView+#readerView #vandana-1>.heading-eng{
+  border-left:1px solid #d7c7b7;color:var(--db-pali-dark);
+}
+@media(max-width:900px){
+  body.reader-en #contentsView+#readerView #vandana-1{grid-template-columns:1fr!important}
+  body.reader-en #contentsView+#readerView #vandana-1>.heading-eng{border-left:0;border-top:1px solid var(--db-line)}
+}
 @media(max-width:760px){
   :root{--db-header-title-size:16px;--db-header-control-size:12px}
   body>header:first-of-type .top,
