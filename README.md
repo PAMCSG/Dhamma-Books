@@ -108,3 +108,14 @@ Only the body class and two asset versions change in each book. Book text, all l
 
 
 Coverage is **eight language contents pages across five HTML files**: Mindfulness of Breathing (English/Chinese), The Only Way for the Realization of Nibbāna (English/Chinese), The Requisites of Enlightenment (English/Chinese), 止观法要 (Chinese), and 佛陀的十二种恶报 (Chinese). Both `.contents` (including `.contents.zh-text`) and `.toc` panels are covered by the shared selectors, including initially hidden language panels.
+
+
+### Language navigation pilot — 7 September 2026
+
+Scope: Mindfulness of Breathing and the three Pāli Chanting Book editions only. `dhamma-books-language-pilot.js?v=1.0.0` is loaded after the existing reader standard in these four HTML files. Other books, including Daily Chants Burmese, are excluded.
+
+Mindfulness index buttons open the existing combined HTML with `?lang=en` or `?lang=zh`, overriding the saved language. In-book toggles use the current section at the reading line and matching `data-section`; English endnotes have no Chinese counterpart and fall back to the conclusion. Entry links start at the cover. Book content and the combined-file structure are retained.
+
+Each chanting edition has English / 中文 / မြန်မာ buttons. Switching carries the current passage or heading ID in the destination URL fragment. Above the reader, switching opens contents. Restoration runs after page load and offsets the target below the header. Shared IDs, rather than translation page numbers or whole-book scroll percentages, determine the position.
+
+Validation: JavaScript syntax passed; every chanting passage/section candidate exists in all three editions. HTML changes are limited to the index buttons and one versioned script include per reader; existing text and PCED code are retained. Automated browser verification could not run because this workspace has no installed Chromium executable. Visual and live PCED checks remain required before wider rollout.
