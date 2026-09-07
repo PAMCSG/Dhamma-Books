@@ -163,7 +163,7 @@ Batch 1 implements this in `mindfulness-of-breathing.html` and `the-only-way-for
 
 Validation: removing the added style exactly reproduces each original file. Existing Pāli markers, text, data-word attributes, PCED scripts, and language-navigation fixes are unchanged. Marker styles were inspected for inline colour conflicts. Live rendered colour and interaction still require visual verification; no browser verification is claimed.
 
-Remaining checkpoints: Batch 2 — The Requisites of Enlightenment / 《觉悟资粮——菩提分手册》, English and Chinese. Batch 3 — 《止观法要》 and 《佛陀的十二种恶报》. These batches have not been implemented by the Batch 1 change. Record each batch in its own pull request before continuing.
+Batch 2 is implemented below. Remaining checkpoint: Batch 3 — 《止观法要》 and 《佛陀的十二种恶报》. Record each batch in its own pull request before continuing.
 
 
 ### Pāli heading exception and complete-word correction — 7 September 2026
@@ -173,3 +173,10 @@ Follow-up to PR #23: both Batch 1 books now let Pāli markers inside headings in
 In The Only Way English body text, the split `Pari` + marked `nibbāna` is now one `Parinibbāna` marker with `data-word="parinibbāna"`, preserving the visible wording and existing PCED interaction attributes.
 
 Validation: book text and all scripts remain unchanged. Mindfulness changes only by the heading CSS rule; The Only Way additionally corrects one complete-word marker. Live browser appearance has not been verified.
+
+
+### Batch 2: Requisites Pāli colour — 7 September 2026
+
+`the-requisites-of-enlightenment.html` now applies blue `#155CA8` to existing Pāli word, title and punctuation markers in both English and Chinese body text. Headings (including section and subsection headings), screen headers and cover titles retain their normal colours. The heading exception covers markers nested inside headings and markers on heading elements themselves.
+
+The change is one inline style block, covering 3,457 existing Pāli word markers across both editions. Removing the inserted block reproduces the original file exactly: book text, scripts, PCED attributes, language navigation, bookmarks and search remain unchanged. No shared asset version change is needed. Source preservation and uploaded content are checked; live browser rendering and deployment are not verified in this session.
