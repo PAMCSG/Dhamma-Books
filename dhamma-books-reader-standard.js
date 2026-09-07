@@ -1,4 +1,4 @@
-/* Dhamma-Books shared bookmark, search, and header behavior v1.2.0 */
+/* Dhamma-Books shared bookmark, search, header, and chanting-flow behavior v1.3.0 */
 (function(){
   'use strict';
   const BOOKMARK_KEY='dhamma-books:bookmarks:'+location.pathname;
@@ -49,6 +49,31 @@
     document.querySelectorAll('button[onclick*="saveBookmark"],button[onclick*="gotoBookmark"],button[onclick*="openBookmarks"]').forEach(node=>{
       node.classList.add('db-legacy-control');
     });
+  }
+  function isChantingEdition(){
+    const name=location.pathname.split('/').pop().toLowerCase();
+    return /^pali-chanting-book(?:-chinese|-burmese)?\.html$/.test(name);
+  }
+  function installContinuousChantingFlow(){
+    if(!isChantingEdition()) return;
+    const contents=document.getElementById('contentsView'),reader=document.getElementById('readerView');
+    if(!contents||!reader) return;
+    const contentsButton=document.getElementById('btnContents'),readerButton=document.getElementById('btnReader');
+    function show(which){
+      const atContents=which==='contents';
+      contents.classList.remove('hidden');reader.classList.remove('hidden');
+      contentsButton?.classList.toggle('active',atContents);
+      readerButton?.classList.toggle('active',!atContents);
+    }
+    window.showView=show;
+    if(contentsButton) contentsButton.onclick=()=>{
+      if(typeof window.saveCurrentPosition==='function') window.saveCurrentPosition();
+      show('contents');contents.scrollIntoView({behavior:'smooth',block:'start'});
+    };
+    if(readerButton) readerButton.onclick=()=>{
+      show('reader');reader.scrollIntoView({behavior:'smooth',block:'start'});
+    };
+    show('contents');
   }
   function create(tag,props){
     const node=document.createElement(tag);
@@ -264,6 +289,7 @@
   }
 
   function init(){
+    installContinuousChantingFlow();
     const controls=buildControls();
     if(!controls) return;
     function applyLanguage(){
@@ -282,7 +308,7 @@
     installSearch(controls);
     const bookmark=buildBookmarkModal(allAnchorCandidates());
     controls.bookmark.addEventListener('click',bookmark.openModal);
-    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.1.0'};
+    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.0'};
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();
