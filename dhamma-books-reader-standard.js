@@ -1,4 +1,4 @@
-/* Dhamma-Books shared bookmark, search, and header behavior v1.1.0 */
+/* Dhamma-Books shared bookmark, search, and header behavior v1.2.0 */
 (function(){
   'use strict';
   const BOOKMARK_KEY='dhamma-books:bookmarks:'+location.pathname;
@@ -45,6 +45,9 @@
       if(!node) return;
       const wrap=/^search/.test(id)?node.closest('.searchbox,.search-wrap'):null;
       (wrap||node).classList.add('db-legacy-control');
+    });
+    document.querySelectorAll('button[onclick*="saveBookmark"],button[onclick*="gotoBookmark"],button[onclick*="openBookmarks"]').forEach(node=>{
+      node.classList.add('db-legacy-control');
     });
   }
   function create(tag,props){

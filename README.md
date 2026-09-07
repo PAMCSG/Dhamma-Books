@@ -23,7 +23,7 @@ See `PCED-LOOKUP-UPDATE-REPORT.md` for rollout details and tests.
 
 ## Shared reader controls and screen header — 7 September 2026
 
-Every current and future reader book must load `dhamma-books-reader-standard.css` and `dhamma-books-reader-standard.js`.
+Every current and future reader book must load `dhamma-books-reader-standard.css` and `dhamma-books-reader-standard.js` using the current cache version. Shared reader standard v1.2.0 also retires legacy save/go bookmark buttons so a book displays only the common bookmark control.
 
 The shared contract provides:
 
@@ -40,3 +40,7 @@ Every reader book uses the same visual palette: primary/header brown `#A8734F`, 
 The shared controls use English, Chinese or Burmese according to the active reading language, including bookmark-modal actions and search feedback. Bilingual books update these labels when the reading language changes. At normal desktop width, controls stay on the main header row; mobile may wrap.
 
 The repository landing page is not a reader book and is outside this reader-interface contract.
+
+### Continuous reading after contents
+
+The English `pali-chanting-book.html` presents its reader directly after the table of contents. Its Contents and Reader header controls scroll to those positions; they must not hide one section in order to show the other. Preserve this continuous-flow rule when maintaining that edition. The Chinese and Burmese chanting editions are not yet covered by this rule.
