@@ -119,3 +119,27 @@ Mindfulness index buttons open the existing combined HTML with `?lang=en` or `?l
 Each chanting edition has English / 中文 / မြန်မာ buttons. Switching carries the current passage or heading ID in the destination URL fragment. Above the reader, switching opens contents. Restoration runs after page load and offsets the target below the header. Shared IDs, rather than translation page numbers or whole-book scroll percentages, determine the position.
 
 Validation: JavaScript syntax passed; every chanting passage/section candidate exists in all three editions. HTML changes are limited to the index buttons and one versioned script include per reader; existing text and PCED code are retained. Automated browser verification could not run because this workspace has no installed Chromium executable. Visual and live PCED checks remain required before wider rollout.
+
+
+### Approved language navigation and remaining-book rollout — 7 September 2026
+
+The user tested the merged PR #20 pilot (Mindfulness of Breathing and all three Pāli Chanting editions) and confirmed: “they are nicely done.” This is the approved Dhamma-Books language-navigation behavior.
+
+Requirements:
+- The index offers a separate button for every available reading language before entering a multilingual book.
+- Combined English/Chinese readers remain one HTML file; index links select the initial language.
+- Inside each multilingual book, provide buttons for all available editions. Switching goes to the corresponding passage or current section, not the cover.
+- Use shared passage IDs or semantic section keys; do not equate printed page numbers across translations.
+- Keep book text, language-specific typography, contents styling, PCED, search, bookmarks and Previously Read behavior.
+- Scope remains Dhamma-Books only. Daily Chants Burmese retains its existing exception.
+
+This rollout adds The Only Way for the Realization of Nibbāna, Paccayaniddeso (English/Chinese), and The Requisites of Enlightenment / 《觉悟资粮——菩提分手册》. The approved pilot files remain unchanged.
+
+Implementation: these four reader files load `dhamma-books-language-navigation.js?v=1.0.0` after their existing scripts. The two combined readers receive English / 中文 index links using `?lang=en` and `?lang=zh`; explicit entry selection overrides the saved language and opens the cover. Their existing in-book buttons preserve the current semantic section. Cover and contents also match across languages. Where Requisites has edition-specific material, use the nearest preceding shared section (or nearest following shared section when none precedes it). These are section-level matches, not claims of sentence-level alignment.
+
+Paccayaniddeso receives English / 中文 header buttons. Switching transfers the current visible passage or section ID through the URL fragment and restores it below the header after load. Above the main reader, switching opens contents.
+
+Validation and deployment status are recorded with the rollout pull request. The user's pilot approval is separate from validation of these newly added books.
+
+
+Rollout validation: JavaScript syntax passed; all 39 Paccayaniddeso navigation candidates exist in both editions; 354 semantic-section positions across both combined readers resolve in both directions, including cover, contents and edition-only fallback. Every existing reader HTML byte is retained apart from the added script include. Chromium is still unavailable in this workspace, so these new books require live visual checks after deployment.
