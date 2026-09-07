@@ -84,3 +84,15 @@ Use consistent panel borders, rounded corners, row spacing, and heading hierarch
 #### Implementation status
 
 This section records the approved standard, not a claim that every book already implements it. PR #16 enabled continuous reading for Daily Chants English and Paccayaniddeso English/Chinese, alongside the three Pāli Chanting editions. The remaining books and category-specific contents columns still require an implementation audit and any necessary changes. Daily Chants Burmese remains excluded.
+
+
+### Pa-Auk and Mahinda contents styling — 7 September 2026
+
+Implemented shared contents styling (CSS v1.3.1) for all five books currently listed in these two landing-page categories:
+
+- **Books by The Most Venerable Pa-Auk Tawya Sayadawgyi:** `mindfulness-of-breathing.html`, `the-only-way-for-realization-of-nibbana.html`.
+- **玛欣德尊者译著 / Dhamma Books authored or translated by Venerable Mahinda:** `the-requisites-of-enlightenment.html`, `zhiguan-fayao.html`, `the-buddhas-twelve-kinds-of-evil-retribution.html`.
+
+The shared reader JavaScript v1.3.1 identifies these five filenames, adds `body.db-standard-contents`, and refreshes their existing shared CSS link to `?v=1.3.1`. Book HTML files remain byte-for-byte unchanged. Both language editions use the same cream panel, pale heading/group backgrounds, brown headings, solid warm borders, 10 px panel corners, and consistent row spacing. Contents headings are 22 px desktop / 20 px mobile; entries 18 px / 17 px; page numbers 14 px. Language fonts, natural title wrapping, subsection indentation, and right-aligned page numbers are retained. All contents remain one column; the title/page-number cells inside each row do not represent two contents columns.
+
+This change is styling only: original contents entries/targets, book wording, reading flow, language switching, main-text styles, PCED, screen headers, bookmarks, search, and Previously Read behavior are retained. The opt-in does not affect other categories or Daily Chants Burmese. The wider continuous-reading implementation status above remains a separate audit item.

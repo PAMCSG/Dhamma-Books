@@ -1,4 +1,4 @@
-/* Dhamma-Books shared bookmark, search, header, and chanting-flow behavior v1.3.0 */
+/* Dhamma-Books shared bookmark, search, header, and chanting-flow behavior v1.3.1 */
 (function(){
   'use strict';
   const BOOKMARK_KEY='dhamma-books:bookmarks:'+location.pathname;
@@ -296,7 +296,26 @@
     return {openModal};
   }
 
+  function installCategoryContentsStyle(){
+    const name=location.pathname.split('/').pop().toLowerCase();
+    if(![
+      'mindfulness-of-breathing.html',
+      'the-only-way-for-realization-of-nibbana.html',
+      'the-requisites-of-enlightenment.html',
+      'zhiguan-fayao.html',
+      'the-buddhas-twelve-kinds-of-evil-retribution.html'
+    ].includes(name)) return;
+    document.body.classList.add('db-standard-contents');
+    // Refresh the existing shared stylesheet without rewriting large book files.
+    const stylesheet=document.querySelector('link[rel="stylesheet"][href*="dhamma-books-reader-standard.css"]');
+    if(stylesheet){
+      const url=new URL(stylesheet.href,document.baseURI);
+      url.searchParams.set('v','1.3.1');
+      if(stylesheet.href!==url.href) stylesheet.href=url.href;
+    }
+  }
   function init(){
+    installCategoryContentsStyle();
     installContinuousChantingFlow();
     const controls=buildControls();
     if(!controls) return;
@@ -316,7 +335,7 @@
     installSearch(controls);
     const bookmark=buildBookmarkModal(allAnchorCandidates());
     controls.bookmark.addEventListener('click',bookmark.openModal);
-    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.0'};
+    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.1'};
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();
