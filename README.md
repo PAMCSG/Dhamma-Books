@@ -143,3 +143,13 @@ Validation and deployment status are recorded with the rollout pull request. The
 
 
 Rollout validation: JavaScript syntax passed; all 39 Paccayaniddeso navigation candidates exist in both editions; 354 semantic-section positions across both combined readers resolve in both directions, including cover, contents and edition-only fallback. Every existing reader HTML byte is retained apart from the added script include. Chromium is still unavailable in this workspace, so these new books require live visual checks after deployment.
+
+
+
+### Language-navigation corrections — 7 September 2026
+
+Follow-up to PR #21: The Only Way now uses 49 explicitly paired English/Chinese headings rather than broad chapter/page labels. The final position restoration runs after the original language handler's deferred scrolling. Switching returns to the corresponding shared subsection heading; edition-specific subsections use the preceding shared heading. This is not sentence-level alignment.
+
+Both Paccayaniddeso headers contain English and 中文 links in the HTML, enhanced to passage-preserving buttons by the navigation script. Hide the redundant Reader / 阅读 control while retaining its element for existing reader code. Insert the language group beside Previously Read using that control's actual parent. Requisites index choices place 中文 before English. All four affected readers use navigation version 1.0.1.
+
+Validation: JavaScript syntax and all 49 unique heading pairs checked; both static edition-link groups and hidden Reader controls verified. Browser rendering and live interaction remain unverified because Chromium is unavailable. Book text and PCED scripts are unchanged.

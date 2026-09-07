@@ -1,4 +1,4 @@
-/* Approved Dhamma-Books language navigation: remaining three books, v1.0.0. */
+/* Approved Dhamma-Books language navigation: remaining three books, v1.0.1. */
 (function(){
   'use strict';
   const name=location.pathname.split('/').pop();
@@ -17,9 +17,9 @@
   function key(node){
     if(node.classList.contains('cover'))return 'top';
     if(node.classList.contains('contents')||node.classList.contains('toc'))return 'contents';
-    return node.dataset.section;
+    return node.dataset.languageSection||node.dataset.section;
   }
-  function sections(panel){return [...panel.querySelectorAll('.cover,.contents,.toc,[data-section]')];}
+  function sections(panel){return [...panel.querySelectorAll(panel.querySelector('[data-language-section]')?'.cover,.contents,[data-language-section]':'.cover,.contents,.toc,[data-section]')];}
   function counterpart(sourcePanel,destination){
     const source=sections(sourcePanel),targets=sections(destination),here=current(source);
     const matching=k=>targets.find(n=>key(n)===k);
@@ -32,6 +32,13 @@
     return targets[0];
   }
   function init(){
+    if(name==='the-only-way-for-realization-of-nibbana.html'){
+      // Explicit corresponding headings; translations have different heading counts.
+      const pairs=[[1,3],[2,4],[7,5],[8,6],[26,7],[28,8],[38,9],[39,10],[41,11],[42,12],[43,13],[48,14],[49,15],[50,16],[51,18],[52,19],[53,21],[54,22],[55,23],[56,24],[57,26],[58,28],[59,29],[60,30],[61,31],[64,32],[66,33],[67,34],[68,35],[69,36],[70,37],[71,38],[72,39],[73,40],[74,41],[76,42],[92,43],[99,44],[100,46],[104,47],[107,48],[108,50],[109,52],[110,53],[111,54],[112,55],[113,56],[114,57],[120,58]];
+      const en=[...document.querySelectorAll('#reader-en h2.section-heading')];
+      const zh=[...document.querySelectorAll('#reader-zh h1,#reader-zh h2,#reader-zh h3')];
+      pairs.forEach(([e,z],i)=>{en[e].dataset.languageSection='heading-'+i;zh[z].dataset.languageSection='heading-'+i;});
+    }
     const config=combined[name];
     if(config){
       const panel=lang=>document.getElementById(config.panels[lang]);
@@ -41,10 +48,10 @@
         button.addEventListener('click',()=>{
           const source=active();
           const target=source===panel(lang)?null:counterpart(source,panel(lang));
-          setTimeout(()=>{
+          setTimeout(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{
             go(target);
             const url=new URL(location.href);url.searchParams.set('lang',lang);url.hash='';history.replaceState(null,'',url);
-          },0);
+          })),0);
         },true);
       });
       const chosen=new URLSearchParams(location.search).get('lang');
@@ -56,7 +63,7 @@
     }
     if(!editions[name])return;
     const host=document.querySelector('.topbar-inner');
-    const group=document.createElement('span');group.id='db-language-options';group.setAttribute('role','group');group.setAttribute('aria-label','Book language');
+    const group=document.getElementById('db-language-options')||document.createElement('span');group.replaceChildren();group.id='db-language-options';group.setAttribute('role','group');group.setAttribute('aria-label','Book language');
     group.style.cssText='display:inline-flex;gap:4px;flex-wrap:wrap;align-items:center';
     Object.entries(editions).forEach(([file,lang])=>{
       const button=document.createElement('button');button.type='button';button.textContent=lang==='en'?'English':'中文';
@@ -70,7 +77,8 @@
       };
       group.append(button);
     });
-    host.insertBefore(group,document.getElementById('previousRead'));
+    const previous=document.getElementById('previousRead');
+    (previous?.parentNode||host).insertBefore(group,previous||null);
     function restore(){
       let id;try{id=decodeURIComponent(location.hash.slice(1));}catch(_){return;}
       const target=document.getElementById(id);
@@ -84,3 +92,4 @@
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
+
