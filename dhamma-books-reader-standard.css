@@ -247,7 +247,8 @@ body.db-standard-contents :is(.contents,.toc) .toc-row:focus-visible{
 }
 /* Approved body-heading hierarchy for the bilingual rollout. */
 :is(#reader-en,#reader-zh) > :is(.section-heading,.subheading).db-main-heading,
-:is(#enPanel,#zhPanel) .reader-body > :is(.section-heading,.sub-heading).db-main-heading{
+:is(#enPanel,#zhPanel) .reader-body > :is(.section-heading,.sub-heading).db-main-heading,
+#reader-zh .book-body > :is(.section-heading,.sub-heading).db-main-heading{
   margin:44px 0 22px;
   padding:15px 18px;
   border:0;
@@ -261,7 +262,8 @@ body.db-standard-contents :is(.contents,.toc) .toc-row:focus-visible{
   letter-spacing:normal;
 }
 :is(#reader-en,#reader-zh) > :is(.section-heading,.subheading).db-subheading,
-:is(#enPanel,#zhPanel) .reader-body > :is(.section-heading,.sub-heading).db-subheading{
+:is(#enPanel,#zhPanel) .reader-body > :is(.section-heading,.sub-heading).db-subheading,
+#reader-zh .book-body > :is(.section-heading,.sub-heading).db-subheading{
   margin:30px 0 14px;
   padding:0 0 6px;
   border:0;
@@ -281,9 +283,11 @@ body.db-standard-contents :is(.contents,.toc) .toc-row:focus-visible{
   body.db-standard-contents :is(.contents,.toc) .toc-row.sub2{padding-left:46px}
   body.db-standard-contents :is(.contents,.toc) .toc-group{padding:11px 14px;font-size:17px}
   :is(#reader-en,#reader-zh) > :is(.section-heading,.subheading).db-main-heading,
-  :is(#enPanel,#zhPanel) .reader-body > :is(.section-heading,.sub-heading).db-main-heading{font-size:19px;padding:13px 14px}
+  :is(#enPanel,#zhPanel) .reader-body > :is(.section-heading,.sub-heading).db-main-heading,
+  #reader-zh .book-body > :is(.section-heading,.sub-heading).db-main-heading{font-size:19px;padding:13px 14px}
   :is(#reader-en,#reader-zh) > :is(.section-heading,.subheading).db-subheading,
-  :is(#enPanel,#zhPanel) .reader-body > :is(.section-heading,.sub-heading).db-subheading{font-size:17px}
+  :is(#enPanel,#zhPanel) .reader-body > :is(.section-heading,.sub-heading).db-subheading,
+  #reader-zh .book-body > :is(.section-heading,.sub-heading).db-subheading{font-size:17px}
 }
 /* Shared footnote/endnote popup standard: quieter title and lighter brown header. */
 :is(#noteModal,#footnoteModal) .panel-head{
