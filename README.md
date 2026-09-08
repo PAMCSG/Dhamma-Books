@@ -23,7 +23,7 @@ See `PCED-LOOKUP-UPDATE-REPORT.md` for rollout details and tests.
 
 ## Shared reader controls and screen header — 7 September 2026
 
-Every current and future reader book must load `dhamma-books-reader-standard.css` and `dhamma-books-reader-standard.js` using the current cache version. Shared CSS v1.3.4 includes the footnote/endnote popup and book-heading standards below. Shared reader standard v1.3.0 retires legacy save/go bookmark buttons so a book displays only the common bookmark control, and provides the continuous contents-to-reader behavior described below.
+Every current and future reader book must load `dhamma-books-reader-standard.css` and `dhamma-books-reader-standard.js` using the current cache version. Shared CSS v1.3.5 includes the footnote/endnote popup and book-heading standards below. Shared reader standard v1.3.0 retires legacy save/go bookmark buttons so a book displays only the common bookmark control, and provides the continuous contents-to-reader behavior described below.
 
 The shared contract provides:
 
@@ -43,7 +43,7 @@ The repository landing page is not a reader book and is outside this reader-inte
 
 #### Footnote and endnote popup
 
-Every Dhamma-Books footnote or endnote popup uses a smaller, quieter header than the book screen header: 18 px on desktop and 16 px on mobile. Its header background is the shared lighter brown `#A8734F`, with white title and close-button text. The note body retains the book's normal text sizing and Pāli treatment. Shared CSS v1.3.4 applies this rule to both existing popup IDs, `noteModal` and `footnoteModal`.
+Every Dhamma-Books footnote or endnote popup uses a smaller, quieter header than the book screen header: 18 px on desktop and 16 px on mobile. Its header background is the shared lighter brown `#A8734F`, with white title and close-button text. The note body retains the book's normal text sizing and Pāli treatment. Shared CSS v1.3.5 applies this rule to both existing popup IDs, `noteModal` and `footnoteModal`.
 
 ### Contents-page and continuous-reading standard — Dhamma-Books only
 
@@ -178,6 +178,8 @@ The approved The Only Way heading treatment now also applies to 《证悟涅槃�
 Shared reader standard v1.3.3 derives the Mindfulness heading levels from its existing `toc-row sub` markers and assigns the Chinese Only Way hierarchy from the printed contents: 中译序, Chapters 1–5, and 尾注 are major headings. This changes presentation only; reader wording, contents links, language switching, bookmarks, search, notes and PCED behavior remain unchanged.
 
 Shared reader standard v1.3.4 extends the same treatment to The Requisites of Enlightenment / 《觉悟资粮——菩提分手册》. In English, the three prefaces, Introduction, Chapters I–X and Glossary are major headings; the other 11 headings are subordinate. In Chinese, the 15 existing contents-level headings are major and the 31 existing lower-level headings are subordinate. The classification uses the book's existing elements at runtime, without rewriting its HTML or wording.
+
+Shared reader standard v1.3.5 extends the approved hierarchy to 《止观法要》 and 《佛陀的十二种恶报》. 《止观法要》 has 10 major headings and 18 subordinate headings; its 48 third-level minor headings retain their existing smaller left-aligned treatment. 《佛陀的十二种恶报》 has 18 major headings and 6 subordinate headings. The update assigns presentation classes at runtime and does not rewrite either book's HTML or wording.
 
 
 ### Pāli text colour standard and staged rollout — 7 September 2026
