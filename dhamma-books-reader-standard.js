@@ -1,4 +1,4 @@
-/* Dhamma-Books shared bookmark, search, header, and chanting-flow behavior v1.3.4 */
+/* Dhamma-Books shared bookmark, search, header, and chanting-flow behavior v1.3.5 */
 (function(){
   'use strict';
   const BOOKMARK_KEY='dhamma-books:bookmarks:'+location.pathname;
@@ -310,7 +310,7 @@
     const stylesheet=document.querySelector('link[rel="stylesheet"][href*="dhamma-books-reader-standard.css"]');
     if(stylesheet){
       const url=new URL(stylesheet.href,document.baseURI);
-      url.searchParams.set('v','1.3.4');
+      url.searchParams.set('v','1.3.5');
       if(stylesheet.href!==url.href) stylesheet.href=url.href;
     }
   }
@@ -352,6 +352,12 @@
       chinese?.querySelectorAll(':scope > .section-heading,:scope > .sub-heading').forEach(heading=>{
         setLevel(heading,heading.classList.contains('sub-heading'));
       });
+      return;
+    }
+    if(name==='zhiguan-fayao.html'||name==='the-buddhas-twelve-kinds-of-evil-retribution.html'){
+      document.querySelectorAll('#reader-zh .book-body > .section-heading,#reader-zh .book-body > .sub-heading').forEach(heading=>{
+        setLevel(heading,heading.classList.contains('sub-heading'));
+      });
     }
   }
   function init(){
@@ -376,7 +382,7 @@
     installSearch(controls);
     const bookmark=buildBookmarkModal(allAnchorCandidates());
     controls.bookmark.addEventListener('click',bookmark.openModal);
-    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.4'};
+    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.5'};
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();
