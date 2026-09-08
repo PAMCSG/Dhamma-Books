@@ -1,4 +1,4 @@
-/* Approved Dhamma-Books language navigation: remaining three books, v1.0.1. */
+/* Approved Dhamma-Books language navigation: remaining three books, v1.0.2. */
 (function(){
   'use strict';
   const name=location.pathname.split('/').pop();
@@ -20,6 +20,30 @@
     return node.dataset.languageSection||node.dataset.section;
   }
   function sections(panel){return [...panel.querySelectorAll(panel.querySelector('[data-language-section]')?'.cover,.contents,[data-language-section]':'.cover,.contents,.toc,[data-section]')];}
+  function documentTop(node){return window.scrollY+node.getBoundingClientRect().top;}
+  function capturePosition(panel){
+    const nodes=sections(panel),readingY=window.scrollY+line();
+    let before=nodes[0],after=null;
+    for(const node of nodes){
+      if(documentTop(node)<=readingY)before=node;
+      else{after=node;break;}
+    }
+    const start=documentTop(before);
+    const end=after?documentTop(after):documentTop(panel)+panel.scrollHeight;
+    const ratio=end>start?Math.max(0,Math.min(1,(readingY-start)/(end-start))):0;
+    return {key:key(before),nextKey:after&&key(after),ratio};
+  }
+  function correspondingPosition(position,destination){
+    const targets=sections(destination),matching=k=>targets.find(n=>key(n)===k);
+    let before=position&&matching(position.key);
+    if(!before)return documentTop(targets[0]);
+    const index=targets.indexOf(before);
+    const after=(position.nextKey&&matching(position.nextKey))||targets[index+1];
+    const start=documentTop(before);
+    const end=after?documentTop(after):documentTop(destination)+destination.scrollHeight;
+    return start+(end-start)*position.ratio;
+  }
+  function goPosition(documentY){window.scrollTo({top:Math.max(0,documentY-line()),behavior:'instant'});}
   function counterpart(sourcePanel,destination){
     const source=sections(sourcePanel),targets=sections(destination),here=current(source);
     const matching=k=>targets.find(n=>key(n)===k);
@@ -47,9 +71,13 @@
         const button=document.getElementById(config.buttons[lang]);
         button.addEventListener('click',()=>{
           const source=active();
-          const target=source===panel(lang)?null:counterpart(source,panel(lang));
+          const same=source===panel(lang);
+          const detailed=name==='the-only-way-for-realization-of-nibbana.html';
+          const position=!same&&detailed?capturePosition(source):null;
+          const target=!same&&!detailed?counterpart(source,panel(lang)):null;
           setTimeout(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{
-            go(target);
+            if(position)goPosition(correspondingPosition(position,panel(lang)));
+            else go(target);
             const url=new URL(location.href);url.searchParams.set('lang',lang);url.hash='';history.replaceState(null,'',url);
           })),0);
         },true);
@@ -92,4 +120,3 @@
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
-
