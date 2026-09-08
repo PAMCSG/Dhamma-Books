@@ -23,7 +23,7 @@ See `PCED-LOOKUP-UPDATE-REPORT.md` for rollout details and tests.
 
 ## Shared reader controls and screen header — 7 September 2026
 
-Every current and future reader book must load `dhamma-books-reader-standard.css` and `dhamma-books-reader-standard.js` using the current cache version. Shared reader standard v1.3.0 retires legacy save/go bookmark buttons so a book displays only the common bookmark control, and provides the continuous contents-to-reader behavior described below.
+Every current and future reader book must load `dhamma-books-reader-standard.css` and `dhamma-books-reader-standard.js` using the current cache version. Shared CSS v1.3.2 includes the footnote/endnote popup standard below. Shared reader standard v1.3.0 retires legacy save/go bookmark buttons so a book displays only the common bookmark control, and provides the continuous contents-to-reader behavior described below.
 
 The shared contract provides:
 
@@ -40,6 +40,10 @@ Every reader book uses the same visual palette: primary/header brown `#A8734F`, 
 The shared controls use English, Chinese or Burmese according to the active reading language, including bookmark-modal actions and search feedback. Bilingual books update these labels when the reading language changes. At normal desktop width, controls stay on the main header row; mobile may wrap.
 
 The repository landing page is not a reader book and is outside this reader-interface contract.
+
+#### Footnote and endnote popup
+
+Every Dhamma-Books footnote or endnote popup uses a smaller, quieter header than the book screen header: 18 px on desktop and 16 px on mobile. Its header background is the shared lighter brown `#A8734F`, with white title and close-button text. The note body retains the book's normal text sizing and Pāli treatment. Shared CSS v1.3.2 applies this rule to both existing popup IDs, `noteModal` and `footnoteModal`.
 
 ### Contents-page and continuous-reading standard — Dhamma-Books only
 
@@ -153,6 +157,19 @@ Follow-up to PR #21: The Only Way now uses 49 explicitly paired English/Chinese 
 Both Paccayaniddeso headers contain English and 中文 links in the HTML, enhanced to passage-preserving buttons by the navigation script. Hide the redundant Reader / 阅读 control while retaining its element for existing reader code. Insert the language group beside Previously Read using that control's actual parent. Requisites index choices place 中文 before English. All four affected readers use navigation version 1.0.1.
 
 Validation: JavaScript syntax and all 49 unique heading pairs checked; both static edition-link groups and hidden Reader controls verified. Browser rendering and live interaction remain unverified because Chromium is unavailable. Book text and PCED scripts are unchanged.
+
+
+### The Only Way English structure and position-preserving language toggle — 8 September 2026
+
+The English edition follows the hierarchy printed in the authoritative PAMC 07/2014 PDF. Top-level headings listed in bold in the English contents — Preface, The Great Mindfulness-Foundation Sutta, Introduction, Samatha Meditation, Vipassanā Meditation and Endnotes — use the standard prominent heading treatment: centred text on a pale panel, a lighter-brown top rule, rounded corners and the normal heading colour. Lower-level headings use a simpler left-aligned treatment with brown text and a thin divider. Pāli inside either heading inherits the heading colour.
+
+This hierarchy is the standard for current and future Dhamma-Books text: top-level headings are prominent and centred; subheadings are simpler and left aligned. Determine hierarchy from the source book's contents and typography rather than treating every bold line as the same heading level.
+
+Numbered and bracket-numbered passages in the English body display each printed point as a separate indented line. The implementation adds structural wrappers around the existing text and existing PCED elements; it does not rewrite the wording.
+
+The Only Way retains its 49 explicit English/Chinese heading pairs. Navigation v1.0.2 additionally records the reader's proportional position between the surrounding paired headings before changing language, then restores the same position within the corresponding translated interval after the original language handler finishes. This makes English-to-Chinese and Chinese-to-English switching reversible within long sections instead of returning only to the beginning of a broad subsection.
+
+Validation uses the PAMC 07/2014, 85-page printed edition (88 PDF pages including covers/front matter). The six bold top-level contents entries correspond to six centred headings; the remaining 114 English body headings use the subheading treatment. All 424 numeric or bracketed point markers found across 314 English paragraphs have structural list-item presentation, including continuations split by the source layout. English and Chinese visible reader text and all Pāli `data-word` markers are unchanged. JavaScript syntax and a simulated mid-section English/Chinese round trip passed. All fifteen readers request shared CSS and JavaScript v1.3.2; the footnote selector covers both popup structures used by the thirteen readers that currently contain notes. Automated browser rendering remains unavailable in this workspace, so deployed visual and interaction checks remain required.
 
 
 ### Pāli text colour standard and staged rollout — 7 September 2026
