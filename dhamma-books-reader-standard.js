@@ -1,4 +1,4 @@
-/* Dhamma-Books shared bookmark, search, header, and chanting-flow behavior v1.3.2 */
+/* Dhamma-Books shared bookmark, search, header, and chanting-flow behavior v1.3.3 */
 (function(){
   'use strict';
   const BOOKMARK_KEY='dhamma-books:bookmarks:'+location.pathname;
@@ -310,12 +310,40 @@
     const stylesheet=document.querySelector('link[rel="stylesheet"][href*="dhamma-books-reader-standard.css"]');
     if(stylesheet){
       const url=new URL(stylesheet.href,document.baseURI);
-      url.searchParams.set('v','1.3.2');
+      url.searchParams.set('v','1.3.3');
       if(stylesheet.href!==url.href) stylesheet.href=url.href;
+    }
+  }
+  function installApprovedHeadingHierarchy(){
+    const name=location.pathname.split('/').pop().toLowerCase();
+    const setLevel=(heading,isSubheading)=>{
+      if(!heading) return;
+      heading.classList.toggle('db-main-heading',!isSubheading);
+      heading.classList.toggle('db-subheading',isSubheading);
+    };
+    if(name==='mindfulness-of-breathing.html'){
+      document.querySelectorAll('#en-contents a.toc-row[href^="#"],#zh-contents a.toc-row[href^="#"]').forEach(link=>{
+        const heading=document.getElementById(decodeURIComponent(link.hash.slice(1)));
+        if(heading?.matches('#reader-en > .section-heading,#reader-zh > .section-heading')){
+          setLevel(heading,link.classList.contains('sub'));
+        }
+      });
+      setLevel(document.getElementById('en-endnotes'),false);
+      return;
+    }
+    if(name==='the-only-way-for-realization-of-nibbana.html'){
+      const chinese=document.getElementById('reader-zh');
+      if(!chinese) return;
+      const major=new Set(['中译序','第一章绪论','第二章大念处经','第三章总说','第四章止业处','第五章观业处','尾注']);
+      chinese.querySelectorAll(':scope > .section-heading,:scope > .subheading').forEach(heading=>{
+        const title=(heading.textContent||'').replace(/\s+/g,'');
+        setLevel(heading,!major.has(title));
+      });
     }
   }
   function init(){
     installCategoryContentsStyle();
+    installApprovedHeadingHierarchy();
     installContinuousChantingFlow();
     const controls=buildControls();
     if(!controls) return;
@@ -335,7 +363,7 @@
     installSearch(controls);
     const bookmark=buildBookmarkModal(allAnchorCandidates());
     controls.bookmark.addEventListener('click',bookmark.openModal);
-    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.2'};
+    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.3'};
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();
