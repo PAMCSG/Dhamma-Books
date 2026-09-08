@@ -1,4 +1,4 @@
-/* Dhamma-Books shared bookmark, search, header, and chanting-flow behavior v1.3.3 */
+/* Dhamma-Books shared bookmark, search, header, and chanting-flow behavior v1.3.4 */
 (function(){
   'use strict';
   const BOOKMARK_KEY='dhamma-books:bookmarks:'+location.pathname;
@@ -310,7 +310,7 @@
     const stylesheet=document.querySelector('link[rel="stylesheet"][href*="dhamma-books-reader-standard.css"]');
     if(stylesheet){
       const url=new URL(stylesheet.href,document.baseURI);
-      url.searchParams.set('v','1.3.3');
+      url.searchParams.set('v','1.3.4');
       if(stylesheet.href!==url.href) stylesheet.href=url.href;
     }
   }
@@ -339,6 +339,19 @@
         const title=(heading.textContent||'').replace(/\s+/g,'');
         setLevel(heading,!major.has(title));
       });
+      return;
+    }
+    if(name==='the-requisites-of-enlightenment.html'){
+      const english=document.querySelector('#enPanel .reader-body');
+      const chinese=document.querySelector('#zhPanel .reader-body');
+      const majorEnglish=new Set(["Editor’s Preface","Preface to the Second Edition","Translator’s Preface","Introduction","Glossary"]);
+      english?.querySelectorAll(':scope > .section-heading').forEach(heading=>{
+        const title=(heading.textContent||'').replace(/\s+/g,' ').trim();
+        setLevel(heading,!(majorEnglish.has(title)||/^(?:[IVX]+)\./.test(title)));
+      });
+      chinese?.querySelectorAll(':scope > .section-heading,:scope > .sub-heading').forEach(heading=>{
+        setLevel(heading,heading.classList.contains('sub-heading'));
+      });
     }
   }
   function init(){
@@ -363,7 +376,7 @@
     installSearch(controls);
     const bookmark=buildBookmarkModal(allAnchorCandidates());
     controls.bookmark.addEventListener('click',bookmark.openModal);
-    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.3'};
+    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.4'};
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();
