@@ -71,9 +71,11 @@ Keep entries in the book's original reading order. Titles may wrap naturally; pa
 
 #### Fixed contents window
 
-The contents heading (for example, `Contents · 目录`) sits outside and immediately above the scrolling contents window. It must never be sticky inside that window or cover a contents entry. Only the entries scroll within the fixed window.
+Use the Daily Chants Burmese contents panel as the structural reference. Each contents panel has one rounded outer frame, with no separate inner frames around its groups. Its title sits in a pale-brown header strip matching Daily Chants Burmese and remains outside the scrolling entries, so it never covers an entry. A button in the same header strip opens and collapses the entries; the screen-header Contents button always opens the panel before scrolling to it.
 
-The standard contents window is tall enough to show approximately three more entry rows than the earlier Dhammapada implementation of 9 September 2026, while remaining practical on a mobile screen. A− and A+ must resize both the book's reading text and its contents headings, entries and page numbers.
+Use only `目录` as the contents-panel title in a Chinese book and only `Content` in an English book. The scrolling entries retain each book's existing colours, fonts and styles, apart from removing inner group frames.
+
+The entries window uses the Daily Chants Burmese height plus approximately one normal entry row: `calc(52vh + 3.2em)` on desktop and `calc(46vh + 3.2em)` on mobile. A− and A+ must resize both the book's reading text and its contents headings, entries and page numbers.
 
 #### Contents-page colours and style
 
