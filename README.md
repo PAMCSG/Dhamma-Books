@@ -37,7 +37,9 @@ Book-specific content, body typography, language switching, PCED language profil
 
 Every reader book uses the same visual palette: primary/header brown `#A8734F`, secondary brown `#8F5D3B`, body `#F2EEE9`, paper/panel `#FFFDF9`, main text `#302A26`, pale area `#F4E8DF`, border `#DFCBBB`, muted text `#7B685A`, Pāli blue `#155CA8`, and dark Pāli blue `#0D477F`. Header text is white and header controls use translucent white.
 
-The shared controls use English, Chinese or Burmese according to the active reading language, including bookmark-modal actions and search feedback. Bilingual books update these labels when the reading language changes. At normal desktop width, controls stay on the main header row; mobile may wrap.
+The shared controls use English, Chinese or Burmese according to the active reading language, including bookmark-modal actions and search feedback. Bilingual books update these labels when the reading language changes.
+
+On desktop and mobile, the complete screen header stays fixed at the top in one non-wrapping row and remains fully visible while the page scrolls. Its contents are always left-justified in this sequence: logo, book name, Contents, language button (when present), A−, A+, Book Mark, Last Position, search input, Search. The row itself must not scroll sideways. Controls may become compact on narrow screens, but they must remain usable. Search input and placeholder text must remain clearly readable and no smaller than 15 px on mobile.
 
 The repository landing page is not a reader book and is outside this reader-interface contract.
 
@@ -66,6 +68,12 @@ Preserve all book wording, paragraph order, translations, footnotes, PCED lookup
 | Daily Chants Burmese | Existing layout retained; excluded from this update. |
 
 Keep entries in the book's original reading order. Titles may wrap naturally; page numbers, where present, remain aligned and readable. Preserve all contents links and section hierarchy.
+
+#### Fixed contents window
+
+The contents heading (for example, `Contents · 目录`) sits outside and immediately above the scrolling contents window. It must never be sticky inside that window or cover a contents entry. Only the entries scroll within the fixed window.
+
+The standard contents window is tall enough to show approximately three more entry rows than the earlier Dhammapada implementation of 9 September 2026, while remaining practical on a mobile screen. A− and A+ must resize both the book's reading text and its contents headings, entries and page numbers.
 
 #### Contents-page colours and style
 
