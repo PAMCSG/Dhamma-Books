@@ -329,6 +329,12 @@ body{padding-top:var(--dhammapada-header-height)}
   inset:0 0 auto 0;
   z-index:50;
 }
+body>nav.topbar{
+  position:fixed!important;
+  inset:0 0 auto 0!important;
+  width:100%!important;
+  z-index:2147482000!important;
+}
 .topbar-inner{
   width:100%!important;
   max-width:none!important;
@@ -355,19 +361,52 @@ body{padding-top:var(--dhammapada-header-height)}
   max-height:none;
   overflow-y:hidden;
   overflow-x:hidden;
+  padding:0!important;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#fbf6f0;
   scroll-margin-top:calc(var(--dhammapada-header-height) + 10px);
 }
-.contents>h2{
+.contents-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 15px;
+  background:#f4e9df;
+}
+.contents-head h2{
   position:static;
-  padding:8px 0 12px;
+  margin:0!important;
+  padding:0;
+  color:#66442f;
   font-size:calc(var(--font) + 4px)!important;
 }
+.contents-toggle{
+  flex:0 0 auto;
+  border:1px solid #cbb6a6!important;
+  border-radius:7px;
+  background:#fff!important;
+  color:#68452f!important;
+  padding:6px 9px;
+  cursor:pointer;
+  font:600 14px Arial,"Microsoft YaHei",sans-serif;
+}
 .contents-scroll{
-  max-height:calc(58vh + 9em);
+  max-height:calc(52vh + 3.2em);
   overflow-y:auto;
   overflow-x:hidden;
   overscroll-behavior:contain;
   scrollbar-gutter:stable;
+  padding:6px 10px 12px;
+}
+.contents.collapsed .contents-scroll{display:none}
+.contents .toc-group{
+  margin:0;
+  border:0;
+  border-radius:0;
+  overflow:visible;
+  background:transparent;
 }
 .contents .toc-group h3{font-size:var(--font)!important}
 .contents .toc-list a{font-size:var(--font)!important}
@@ -395,7 +434,7 @@ mark.dhammapada-search-current{
 }
 @media(max-width:720px){
   :root{--dhammapada-header-height:52px}
-  .topbar-inner{
+  body>nav.topbar .topbar-inner{
     min-height:var(--dhammapada-header-height);
     padding:4px 5px!important;
     gap:clamp(2px,.65vw,4px)!important;
@@ -439,8 +478,8 @@ mark.dhammapada-search-current{
     padding:4px 5px!important;
     font-size:15px!important;
   }
-  .contents{padding:14px 12px!important}
-  .contents-scroll{max-height:calc(52vh + 9em)}
+  .contents{padding:0!important}
+  .contents-scroll{max-height:calc(46vh + 3.2em)}
   .book-hero-inner{display:flex!important;align-items:flex-start!important;gap:14px!important}
   .book-cover-frame{
     flex:0 0 94px!important;
@@ -473,8 +512,8 @@ mark.dhammapada-search-current{
   </section>
   
     <section class="contents" id="zh-contents">
-      <h2>Contents · 目录</h2>
-      <div class="contents-scroll">
+      <div class="contents-head"><h2>目录</h2><button class="contents-toggle" id="contentsToggle" type="button" aria-controls="dhammapadaContentsList" aria-expanded="true">收起</button></div>
+      <div class="contents-scroll" id="dhammapadaContentsList">
       <div class="toc-group"><h3>凡例与绪论</h3><ol class="toc-list"><li><a href="#frontmatter"><span>凡例</span><span class="toc-page">I</span></a></li><li><a href="#introduction"><span>绪论</span><span class="toc-page">1</span></a></li><li><a href="#intro-1"><span>第一节 书名解题</span><span class="toc-page">1</span></a></li><li><a href="#intro-2"><span>第二节 《法句》的编集与流传</span><span class="toc-page">7</span></a></li><li><a href="#intro-3"><span>第三节 法句偈的历史影响</span><span class="toc-page">9</span></a></li><li><a href="#intro-4"><span>第四节 《法句》内容述要</span><span class="toc-page">14</span></a></li><li><a href="#intro-5"><span>第五节 《法句》选读</span><span class="toc-page">19</span></a></li><li><a href="#intro-6"><span>第六节 关于《法句》依词释</span><span class="toc-page">41</span></a></li><li><a href="#intro-7"><span>第七节 《法句》的其它文本</span><span class="toc-page">48</span></a></li><li><a href="#intro-8"><span>第八节 译释过程</span><span class="toc-page">62</span></a></li></ol></div>
       <div class="toc-group"><h3>《法句》二十六品</h3><ol class="toc-list"><li><a href="#chapter-1"><span><span class="pali">Yamakavagga</span>　一、双品</span><span class="toc-page">65</span></a></li><li><a href="#chapter-2"><span><span class="pali">Appamādavagga</span>　二、不放逸品</span><span class="toc-page">76</span></a></li><li><a href="#chapter-3"><span><span class="pali">Cittavagga</span>　三、心品</span><span class="toc-page">83</span></a></li><li><a href="#chapter-4"><span><span class="pali">Pupphavagga</span>　四、花品</span><span class="toc-page">88</span></a></li><li><a href="#chapter-5"><span><span class="pali">Bālavagga</span>　五、愚人品</span><span class="toc-page">96</span></a></li><li><a href="#chapter-6"><span><span class="pali">Paṇḍitavagga</span>　六、智者品</span><span class="toc-page">104</span></a></li><li><a href="#chapter-7"><span><span class="pali">Arahantavagga</span>　七、阿拉汉品</span><span class="toc-page">111</span></a></li><li><a href="#chapter-8"><span><span class="pali">Sahassavagga</span>　八、千品</span><span class="toc-page">116</span></a></li><li><a href="#chapter-9"><span><span class="pali">Pāpavagga</span>　九、恶品</span><span class="toc-page">123</span></a></li><li><a href="#chapter-10"><span><span class="pali">Daṇḍavagga</span>　十、棍棒品</span><span class="toc-page">130</span></a></li><li><a href="#chapter-11"><span><span class="pali">Jarāvagga</span>　十一、老品</span><span class="toc-page">138</span></a></li><li><a href="#chapter-12"><span><span class="pali">Attavagga</span>　十二、自己品</span><span class="toc-page">144</span></a></li><li><a href="#chapter-13"><span><span class="pali">Lokavagga</span>　十三、世间品</span><span class="toc-page">149</span></a></li><li><a href="#chapter-14"><span><span class="pali">Buddhavagga</span>　十四、佛陀品</span><span class="toc-page">155</span></a></li><li><a href="#chapter-15"><span><span class="pali">Sukhavagga</span>　十五、快乐品</span><span class="toc-page">164</span></a></li><li><a href="#chapter-16"><span><span class="pali">Piyavagga</span>　十六、喜愛品</span><span class="toc-page">170</span></a></li><li><a href="#chapter-17"><span><span class="pali">Kodhavagga</span>　十七、愤怒品</span><span class="toc-page">176</span></a></li><li><a href="#chapter-18"><span><span class="pali">Malavagga</span>　十八、秽垢品</span><span class="toc-page">182</span></a></li><li><a href="#chapter-19"><span><span class="pali">Dhammaṭṭhavagga</span>　十九、法住品</span><span class="toc-page">191</span></a></li><li><a href="#chapter-20"><span><span class="pali">Maggavagga</span>　二十、道品</span><span class="toc-page">199</span></a></li><li><a href="#chapter-21"><span><span class="pali">Pakiṇṇakavagga</span>　二十一、杂品</span><span class="toc-page">207</span></a></li><li><a href="#chapter-22"><span><span class="pali">Nirayavagga</span>　二十二、地狱品</span><span class="toc-page">214</span></a></li><li><a href="#chapter-23"><span><span class="pali">Nāgavagga</span>　二十三、象品</span><span class="toc-page">221</span></a></li><li><a href="#chapter-24"><span><span class="pali">Taṇhāvagga</span>　二十四、渴愛品</span><span class="toc-page">228</span></a></li><li><a href="#chapter-25"><span><span class="pali">Bhikkhuvagga</span>　二十五、比库品</span><span class="toc-page">241</span></a></li><li><a href="#chapter-26"><span><span class="pali">Brāhmaṇavagga</span>　二十六、婆罗门品</span><span class="toc-page">252</span></a></li></ol></div>
       <div class="toc-group"><h3>附录</h3><ol class="toc-list"><li><a href="#references"><span>主要参考资料</span><span class="toc-page">273</span></a></li></ol></div>
@@ -672,7 +711,7 @@ document.getElementById('dictClose').onclick=()=>closeModal('dictModal');documen
 function openNote(key){lastActive=document.activeElement;const f=FOOTNOTES[key];const n=f?.number||key.split('-').pop();document.getElementById('noteTitle').textContent='注释 '+n;document.getElementById('noteBody').innerHTML=f?`<div>${f.html}</div><div class="bookmark-meta">书内页码 ${esc(f.page)}</div>`:'<div class="note">未找到注释内容。</div>';document.getElementById('noteModal').classList.add('open')}
 document.getElementById('noteClose').onclick=()=>closeModal('noteModal');document.getElementById('noteModal').onclick=e=>{if(e.target.id==='noteModal')closeModal('noteModal')};
 const readingEls=[...document.querySelectorAll('.verse-card,.section-heading,.chapter-heading,.source-page,.references')];let currentId=null;function updatePos(){let best=null,d=Infinity;for(const el of readingEls){const r=el.getBoundingClientRect(),dd=Math.abs(r.top-110);if(dd<d){d=dd;best=el}}if(best){if(!best.id)best.id='auto-'+readingEls.indexOf(best);currentId=best.id;localStorage.setItem(STORAGE+'lastPos',currentId)}}let tm=null;window.addEventListener('scroll',()=>{clearTimeout(tm);tm=setTimeout(updatePos,120)},{passive:true});window.addEventListener('beforeunload',updatePos);
-document.getElementById('contentsBtn').onclick=e=>{e.preventDefault();document.getElementById('zh-contents').scrollIntoView({behavior:'smooth',block:'start'})};
+const contentsPanel=document.getElementById('zh-contents'),contentsToggle=document.getElementById('contentsToggle');function setContentsOpen(open){contentsPanel.classList.toggle('collapsed',!open);contentsToggle.setAttribute('aria-expanded',String(open));contentsToggle.textContent=open?'收起':'展开'}contentsToggle.onclick=()=>setContentsOpen(contentsPanel.classList.contains('collapsed'));document.getElementById('contentsBtn').onclick=e=>{e.preventDefault();setContentsOpen(true);contentsPanel.scrollIntoView({behavior:'smooth',block:'start'})};
 function getBms(){try{return JSON.parse(localStorage.getItem(STORAGE+'bookmarks')||'[]')}catch(_){return[]}}function setBms(v){localStorage.setItem(STORAGE+'bookmarks',JSON.stringify(v))}
 function sectionTitle(el){let p=el;while(p){if(p.matches&&p.matches('.section-heading,.sub-heading,.minor-heading'))return p.innerText.trim();p=p.previousElementSibling}return '法句 · Dhammapada'}
 document.getElementById('saveBookmark').onclick=()=>{updatePos();const el=document.getElementById(currentId)||readingEls[0];if(!el)return;const item={id:el.id,page:el.dataset.bookPage||'',title:sectionTitle(el),saved:new Date().toISOString()};let b=getBms().filter(x=>x.id!==item.id);b.unshift(item);setBms(b.slice(0,30));renderBms()};
