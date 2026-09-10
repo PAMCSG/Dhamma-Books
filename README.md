@@ -21,7 +21,7 @@ PCED-enabled books use the Daily-Chants standard:
 4. Burmese
 5. Other correctly identified languages
 
-Popups reopen at the beginning and remain movable within the visible screen. Prefix, substring, and fuzzy dictionary fallbacks are not allowed.
+Popups reopen at the beginning and remain movable within the visible screen. They appear above a fixed or sticky book header, keep their own header and close button visible on mobile, and scroll long results internally within the viewport. Prefix, substring, and fuzzy dictionary fallbacks are not allowed.
 
 See `PCED-LOOKUP-UPDATE-REPORT.md` for rollout details and tests.
 
@@ -232,3 +232,10 @@ The change is one inline style block, covering 3,457 existing Pāli word markers
 The two Chinese books contain 373 and 1,006 Pāli word markers respectively after correction. In the Twelve Retributions paragraph `row-vipaka12-227`, the previously split `Anom` + marked `ā` is one complete `Anomā` marker, and previously unmarked `Uruvela` receives the existing keyboard/click PCED attributes. Visible wording and spelling are unchanged. Source-reference abbreviations remain unchanged.
 
 Validation: reversing the style insertions and these two marker corrections reproduces both original HTML files byte-for-byte. Visible text, all scripts, navigation targets and search attributes are preserved. No shared PCED files, dictionary data, other books or catalogue files change. Browser rendering and live PCED interaction are not verified because Chromium is unavailable in this workspace; live-site appearance remains an explicit follow-up.
+
+
+### Mobile PCED popup visibility — 10 September 2026
+
+`pced-popup-standard.js` keeps PCED dictionary popups above fixed or sticky book headers. On mobile, a popup begins at the top of the dynamic viewport, keeps its own title and close button visible, and constrains long definitions to internal scrolling. The selectors are limited to the supported PCED modal IDs: `dictModal`, `lookupModal`, and `pced-modal`.
+
+The popup remains movable and continues to reopen at the beginning. Dictionary data, matching logic, result order, book text, footnotes and reader controls are unchanged. Static validation confirms the viewport and stacking rules and the existing PCED script reference in 《佛陀的十二种恶报》; live mobile interaction remains to be checked after deployment.
