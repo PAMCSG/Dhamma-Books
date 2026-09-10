@@ -148,6 +148,14 @@ Keep each book's existing Contents-entry fonts, hierarchy, colours and styling. 
 - The mobile input text and placeholder must be at least 15 px and clearly readable.
 - Search controls stay on the mobile header's second row and remain fully inside the viewport.
 
+### PCED dictionary popup
+
+- A PCED popup must appear above the book's fixed or sticky screen header, never behind it.
+- On mobile, the complete popup header, selected Pāli word and close button must be visible when the popup opens.
+- Long dictionary results scroll inside a viewport-bounded popup; their length must not push the popup header outside the visible screen.
+- Reopening a popup starts at the beginning of its results.
+- Preserve the established ability to move the popup and preserve all PCED lookup data, matching and display order.
+
 ## 7. Book Mark and Last Position
 
 - Provide one Book Mark header button, not duplicate legacy bookmark controls.
@@ -189,6 +197,7 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 - [ ] Two-finger pinch-to-zoom still works.
 - [ ] A− and A+ resize both reading text and Contents text.
 - [ ] Book Mark, Last Position and Search work on mobile.
+- [ ] A PCED popup opens above the book header with its own header and close button visible; long results scroll internally from the beginning.
 - [ ] Cover remains on the left on mobile without causing horizontal overflow.
 - [ ] Contents uses one outer frame with no inner frame.
 - [ ] Contents title row stays outside the scrolling entries.
