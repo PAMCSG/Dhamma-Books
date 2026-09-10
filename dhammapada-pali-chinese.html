@@ -373,13 +373,13 @@ body>nav.topbar{
   justify-content:space-between;
   gap:12px;
   padding:12px 15px;
-  background:#e7e2de;
+  background:#f4e9df;
 }
 .contents-head h2{
   position:static;
   margin:0!important;
   padding:0;
-  color:#514a45;
+  color:#66442f;
   font-size:calc(var(--font) + 4px)!important;
 }
 .contents-toggle{
@@ -497,6 +497,40 @@ mark.dhammapada-search-current{
     margin:0!important;
   }
   .book-hero-text{text-align:left!important;padding-top:0!important}
+}
+
+/* Keep the complete mobile page inside the layout viewport. `overflow-x:clip`
+   removes accidental document-level sideways scrolling without creating a
+   scroll container, so the two-row sticky header continues to behave like the
+   Daily Chants Burmese header. Browser pinch-to-zoom remains available. */
+@media(max-width:720px){
+  html,
+  body{
+    width:100%;
+    max-width:100%;
+    overflow-x:clip;
+  }
+  body>nav.topbar{
+    position:-webkit-sticky!important;
+    position:sticky!important;
+    inset:auto!important;
+    top:0!important;
+    max-width:100%!important;
+    transform:none!important;
+  }
+  body>nav.topbar .topbar-inner{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+  .reader,
+  .cover.dhammapada-cover,
+  .book-hero-inner,
+  .book-hero-text,
+  .contents{
+    min-width:0!important;
+    max-width:100%!important;
+  }
 }
 </style>
 </head><body>
