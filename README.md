@@ -2,6 +2,10 @@
 
 The `main` branch is the authoritative source for the current Dhamma Books website.
 
+## Reader interface standard
+
+`BOOK-READER-INTERFACE-STANDARD.md` is the authoritative, reusable standard for improving an existing reader book or creating a new one. It consolidates the approved requirements for the screen header, mobile behaviour, Contents panel, cover layout, font controls, Search, Book Mark, Last Position, language editions, non-regression protection and acceptance testing. Use Dhammapada as the approved implementation example and Daily Chants Burmese as the mobile sticky-header and Contents-window behaviour reference.
+
 ## Shared PCED files
 
 - `pced-lookup-core.js` — exact and verified-form resolver
