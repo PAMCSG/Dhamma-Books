@@ -39,7 +39,7 @@ Every reader book uses the same visual palette: primary/header brown `#A8734F`, 
 
 The shared controls use English, Chinese or Burmese according to the active reading language, including bookmark-modal actions and search feedback. Bilingual books update these labels when the reading language changes.
 
-On desktop and mobile, the complete screen header stays fixed at the top in one non-wrapping row and remains fully visible while the page scrolls. Its contents are always left-justified in this sequence: logo, book name, Contents, language button (when present), A−, A+, Book Mark, Last Position, search input, Search. The row itself must not scroll sideways. Controls may become compact on narrow screens, but they must remain usable. Search input and placeholder text must remain clearly readable and no smaller than 15 px on mobile.
+On desktop, the complete screen header stays fixed at the top in one non-wrapping row. On mobile, follow the Pāli Chanting Burmese pattern: use a sticky, naturally sized two-row header that remains at the top during page scrolling. The first row contains the logo, book name, Contents, language button (when present), A−, A+, Book Mark and Last Position; the second row contains the search input followed by Search. Both rows are always left-justified, never scroll sideways and remain fully visible. Search input and placeholder text must remain clearly readable and no smaller than 15 px on mobile.
 
 The repository landing page is not a reader book and is outside this reader-interface contract.
 
@@ -71,7 +71,7 @@ Keep entries in the book's original reading order. Titles may wrap naturally; pa
 
 #### Fixed contents window
 
-Use the Daily Chants Burmese contents panel as the structural reference. Each contents panel has one rounded outer frame, with no separate inner frames around its groups. Its title sits in a pale-brown header strip matching Daily Chants Burmese and remains outside the scrolling entries, so it never covers an entry. A button in the same header strip opens and collapses the entries; the screen-header Contents button always opens the panel before scrolling to it.
+Use the Daily Chants Burmese contents panel as the structural reference. Each contents panel has one rounded outer frame, with no separate inner frames around its groups. Its title sits in a warm-grey header strip using background `#E7E2DE` and title text `#514A45`, and remains outside the scrolling entries so it never covers an entry. A button in the same header strip opens and collapses the entries; the screen-header Contents button always opens the panel before scrolling to it.
 
 Use only `目录` as the contents-panel title in a Chinese book and only `Content` in an English book. The scrolling entries retain each book's existing colours, fonts and styles, apart from removing inner group frames.
 
@@ -89,6 +89,8 @@ Use the repository's shared warm-brown reader palette consistently:
 | Primary headings / accents | `#A8734F` |
 | Secondary accents | `#8F5D3B` |
 | Pale section backgrounds | `#F4E8DF` |
+| Contents title-strip background | `#E7E2DE` |
+| Contents title text | `#514A45` |
 | Panel borders and row separators | `#DFCBBB` |
 | Muted text / page numbers | `#7B685A` |
 | Pāli emphasis, where used | `#155CA8`, darker `#0D477F` |

@@ -373,13 +373,13 @@ body>nav.topbar{
   justify-content:space-between;
   gap:12px;
   padding:12px 15px;
-  background:#f4e9df;
+  background:#e7e2de;
 }
 .contents-head h2{
   position:static;
   margin:0!important;
   padding:0;
-  color:#66442f;
+  color:#514a45;
   font-size:calc(var(--font) + 4px)!important;
 }
 .contents-toggle{
@@ -433,16 +433,23 @@ mark.dhammapada-search-current{
   box-shadow:0 0 0 2px rgba(153,72,0,.35);
 }
 @media(max-width:720px){
-  :root{--dhammapada-header-height:52px}
+  :root{--dhammapada-header-height:84px}
+  body{padding-top:0!important}
+  body>nav.topbar{
+    position:sticky!important;
+    inset:auto!important;
+    top:0!important;
+    width:100%!important;
+  }
   body>nav.topbar .topbar-inner{
     min-height:var(--dhammapada-header-height);
     padding:4px 5px!important;
     gap:clamp(2px,.65vw,4px)!important;
-    flex-wrap:nowrap!important;
+    flex-wrap:wrap!important;
     align-content:center!important;
     justify-content:flex-start!important;
     overflow-x:hidden!important;
-    overflow-y:hidden!important;
+    overflow-y:visible!important;
     white-space:nowrap!important;
   }
   .topbar .app-brand{
@@ -466,13 +473,15 @@ mark.dhammapada-search-current{
   }
   .topbar .searchbox{
     display:flex!important;
-    flex:1 1 auto!important;
+    order:2!important;
+    flex:1 0 100%!important;
+    width:100%!important;
     min-width:0!important;
     gap:3px!important;
   }
   .topbar .searchbox input{
     flex:1 1 auto!important;
-    width:clamp(64px,19vw,78px)!important;
+    width:auto!important;
     min-width:0!important;
     min-height:32px!important;
     padding:4px 5px!important;
