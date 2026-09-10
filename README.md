@@ -21,7 +21,7 @@ PCED-enabled books use the Daily-Chants standard:
 4. Burmese
 5. Other correctly identified languages
 
-Popups reopen at the beginning and remain movable within the visible screen. They appear above a fixed or sticky book header, keep their own header and close button visible on mobile, and scroll long results internally within the viewport. Prefix, substring, and fuzzy dictionary fallbacks are not allowed.
+Popups reopen at the beginning and remain movable within the visible screen. On mobile, they open below the complete visible book header, keep both the book header and their own header and close button visible, and scroll long results internally within the remaining viewport. Prefix, substring, and fuzzy dictionary fallbacks are not allowed.
 
 See `PCED-LOOKUP-UPDATE-REPORT.md` for rollout details and tests.
 
@@ -236,6 +236,6 @@ Validation: reversing the style insertions and these two marker corrections repr
 
 ### Mobile PCED popup visibility — 10 September 2026
 
-`pced-popup-standard.js` keeps PCED dictionary popups above fixed or sticky book headers. On mobile, a popup begins at the top of the dynamic viewport, keeps its own title and close button visible, and constrains long definitions to internal scrolling. The selectors are limited to the supported PCED modal IDs: `dictModal`, `lookupModal`, and `pced-modal`.
+`pced-popup-standard.js` v1.3.10 keeps PCED dictionary popups clear of fixed or sticky book headers. On mobile, it measures the actual rendered screen-header height and opens the popup immediately below the complete visible header. Long definitions are constrained to internal scrolling within the dynamic viewport space that remains below the header. The selectors are limited to the supported PCED modal IDs: `dictModal`, `lookupModal`, and `pced-modal`.
 
-The popup remains movable and continues to reopen at the beginning. Dictionary data, matching logic, result order, book text, footnotes and reader controls are unchanged. Static validation confirms the viewport and stacking rules and the existing PCED script reference in 《佛陀的十二种恶报》; live mobile interaction remains to be checked after deployment.
+The offset is recalculated when the popup opens and when the layout or visual viewport resizes. The popup remains movable and continues to reopen at the beginning. Desktop positioning, dictionary data, matching logic, result order, book text, footnotes and reader controls are unchanged. Static validation confirms the dynamic header-offset and remaining-height rules and the existing PCED script reference in 《佛陀的十二种恶报》; live mobile interaction remains to be checked after deployment.
