@@ -199,9 +199,13 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 - [ ] Inline scripts compile and no existing reader feature regresses.
 - [ ] Only the intended book interface and documentation changed.
 
-## 11. Applying this standard in a future chat
+## 11. Implementation status
+
+- `dhammapada-pali-chinese.html` is the approved reference implementation.
+- `the-buddhas-twelve-kinds-of-evil-retribution.html` was brought into conformity on 10 September 2026. Its fixed/sticky header, control order, mobile Search row, collapsible fixed-height Contents window, font controls, Search, Book Mark and Last Position follow this standard. Its book content, cover, illustrations, body design, headings, Pāli treatment, footnotes and PCED integration were preserved.
+
+## 12. Applying this standard in a future chat
 
 Use this instruction:
 
 > Improve `<book filename>` to conform to `BOOK-READER-INTERFACE-STANDARD.md`. Use `dhammapada-pali-chinese.html` as the approved implementation example and `daily-chants-burmese.html` as the mobile sticky-header and Contents-window behaviour reference. Change only the interface items required by the standard; preserve all book content and unrelated features. Test against the acceptance checklist and update the implementation status before opening a pull request.
-
