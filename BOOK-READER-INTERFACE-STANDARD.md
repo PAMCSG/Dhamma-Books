@@ -150,9 +150,11 @@ Keep each book's existing Contents-entry fonts, hierarchy, colours and styling. 
 
 ### PCED dictionary popup
 
-- A PCED popup must appear above the book's fixed or sticky screen header, never behind it.
-- On mobile, the complete popup header, selected Pāli word and close button must be visible when the popup opens.
-- Long dictionary results scroll inside a viewport-bounded popup; their length must not push the popup header outside the visible screen.
+- A PCED popup must never appear behind the book's fixed or sticky screen header.
+- On mobile, open the popup below the complete visible screen header so the book header remains visible and is not covered.
+- Measure the actual rendered header height rather than assuming a fixed offset, because the mobile header height can vary by book, language and screen width.
+- The complete popup header, selected Pāli word and close button must be visible when the popup opens.
+- Long dictionary results use only the viewport space remaining below the book header and scroll inside the popup; their length must not push either header outside the visible screen.
 - Reopening a popup starts at the beginning of its results.
 - Preserve the established ability to move the popup and preserve all PCED lookup data, matching and display order.
 
@@ -197,7 +199,7 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 - [ ] Two-finger pinch-to-zoom still works.
 - [ ] A− and A+ resize both reading text and Contents text.
 - [ ] Book Mark, Last Position and Search work on mobile.
-- [ ] A PCED popup opens above the book header with its own header and close button visible; long results scroll internally from the beginning.
+- [ ] On mobile, a PCED popup opens below the complete book header without covering it; its own header and close button remain visible, and long results scroll internally from the beginning.
 - [ ] Cover remains on the left on mobile without causing horizontal overflow.
 - [ ] Contents uses one outer frame with no inner frame.
 - [ ] Contents title row stays outside the scrolling entries.
