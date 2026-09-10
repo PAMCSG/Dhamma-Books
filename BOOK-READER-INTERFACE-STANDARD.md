@@ -1,0 +1,211 @@
+# Dhamma-Books Reader Interface Standard
+
+**Status:** Approved standard for every current and future reader book in `PAMCSG/Dhamma-Books`  
+**Approved reference implementation:** `dhammapada-pali-chinese.html`  
+**Behaviour reference:** `daily-chants-burmese.html`  
+**Last consolidated:** 10 September 2026
+
+This is the normative interface standard for improving an existing book or adding a new book. Apply it one book at a time. Do not change book wording, translations, paragraph order, images, tables, footnotes, PCED data or unrelated styling merely to make the interface conform.
+
+## 1. Required shared assets
+
+Every reader book must load the current versions of:
+
+- `dhamma-books-reader-standard.css`
+- `dhamma-books-reader-standard.js`
+
+When a shared asset changes, update its versioned URL in each affected HTML file so deployed browsers do not reuse an older cached copy.
+
+The final header structure must be present in the initial HTML and styled correctly on the first paint. JavaScript may enhance the existing controls, but it must not briefly show an old or duplicate header and replace it after loading. There must be no old-header flash when first entering a book.
+
+## 2. Screen header
+
+### Control order and alignment
+
+Use this exact left-to-right sequence:
+
+1. Logo
+2. Book name
+3. Contents button
+4. Language button or buttons, when the book has more than one language
+5. A−
+6. A+
+7. Book Mark
+8. Last Position
+9. Search field
+10. Search button
+
+All controls, fields and rows are left-justified. Do not use a flexible spacer to push some controls to the right.
+
+Labels must follow the active book language. For example, Chinese books use Chinese control labels and Burmese books use Burmese control labels. Language buttons appear only when applicable.
+
+### Desktop
+
+- Keep the complete header fixed at the top while the book scrolls.
+- Keep every item in one non-wrapping row.
+- Do not allow the header row to scroll sideways.
+
+### Mobile
+
+Follow the behaviour of Pāli Chanting Burmese and Daily Chants Burmese:
+
+- The complete header is one sticky unit and remains at the top while the book scrolls.
+- The first row contains the logo, book name, Contents, language buttons when applicable, A−, A+, Book Mark and Last Position.
+- The second row contains the Search field followed by the Search button.
+- The two rows stay together; the first row must never scroll away while only the Search row remains visible.
+- The Search row occupies the available viewport width without extending beyond it.
+- The page, header and book body must not slide left or right during normal unzoomed one-finger scrolling.
+- Preserve native two-finger pinch-to-zoom. Do not use `user-scalable=no`, a restrictive `maximum-scale`, or touch rules that disable zooming.
+
+Use `overflow-x: clip` or an equivalent layout-width correction at the document level so accidental horizontal layout overflow does not create a competing scroll container or break sticky positioning. Tables or other genuinely wide components may have their own contained horizontal scroller, but must not widen the whole page.
+
+### Header appearance
+
+| Element | Standard |
+| --- | --- |
+| Background | `#A8734F` |
+| Text | White |
+| Title font size | 18 px desktop; 16 px mobile |
+| Control font size | 14 px desktop; 12 px mobile |
+| Search input and placeholder | At least 15 px on mobile |
+
+Controls must remain large enough to tap. Compact mobile spacing is permitted only when the controls remain legible and functional.
+
+## 3. Font-size controls
+
+- A− and A+ must work with touch as well as mouse input.
+- Each press must visibly resize the active book text.
+- They must also resize the Contents heading, Contents entries and Contents page numbers.
+- Do not hard-code descendant font sizes in a way that prevents them from following the book's font-size setting.
+- Preserve the selected size consistently while the reader remains in use, according to the book's established storage behaviour.
+
+## 4. Contents panel
+
+Use Daily Chants Burmese as the structural reference.
+
+### Structure
+
+- Use one rounded outer frame only.
+- Do not place a second frame around the list or around individual Contents groups.
+- Put the Contents title row outside and above the scrolling entries window.
+- The title row must never cover an entry as the Contents list scrolls.
+- Place an Expand/Collapse button in the title row.
+- The screen-header Contents button must expand the panel when necessary and then move to it.
+- Only the entries scroll inside the fixed-height window; the Contents title row stays visible above them.
+
+### Title wording
+
+| Book language | Panel title |
+| --- | --- |
+| Chinese | `目录` only |
+| English | `Content` only |
+| Burmese | Use the approved Burmese Contents label already established for that book |
+
+Do not combine two languages in the title, such as `Contents · 目录`, unless a later book-specific requirement expressly asks for it.
+
+### Size
+
+The entries window uses the Daily Chants Burmese height plus approximately one normal Contents-entry row:
+
+- Desktop: `calc(52vh + 3.2em)`
+- Mobile: `calc(46vh + 3.2em)`
+
+### Colours
+
+| Element | Colour |
+| --- | --- |
+| Title-row background | `#F4E9DF` |
+| Title text | `#66442F` |
+| Contents panel | `#FFFDF9` |
+| Main entry text | `#302A26` |
+| Borders and row separators | `#DFCBBB` |
+| Muted text and page numbers | `#7B685A` |
+
+Keep each book's existing Contents-entry fonts, hierarchy, colours and styling. Apart from the title row, fixed scrolling window and removal of inner frames, do not restyle the actual entries merely for standardisation.
+
+### Columns and reading flow
+
+- Books in the Chanting Book 念诵本 category may use one or two Contents columns. Two columns collapse to one on a narrow screen.
+- Every other book uses one Contents column on desktop and mobile.
+- Main text follows the Contents panel continuously on the same page.
+- Contents links land below the sticky/fixed screen header so the destination heading remains visible.
+
+## 5. Book cover
+
+- Display the cover on the left and the title/edition information on the right on both desktop and mobile.
+- Do not centre the cover above the text on mobile.
+- Reduce the cover width and spacing responsively so the side-by-side arrangement fits the viewport.
+- Allow the information column to shrink and wrap naturally; it must not force horizontal page movement.
+- Preserve the original cover image, wording, credits and metadata.
+
+## 6. Search
+
+- Search must work with touch and mouse input.
+- Search only the active visible reading text.
+- Highlight all matches and move to the first match.
+- Report when no result is found.
+- Clearing the Search field restores the previous view and reading position.
+- The mobile input text and placeholder must be at least 15 px and clearly readable.
+- Search controls stay on the mobile header's second row and remain fully inside the viewport.
+
+## 7. Book Mark and Last Position
+
+- Provide one Book Mark header button, not duplicate legacy bookmark controls.
+- The bookmark window supports add, list, go and delete, with bookmarks stored separately for each book.
+- Last Position returns to the reader's most recently stored position.
+- Restored positions and Contents targets must be offset below the complete header rather than hidden behind it.
+
+## 8. Language editions
+
+- A multilingual book displays only the language buttons that actually exist.
+- Put Chinese first where Chinese and English buttons are paired.
+- Switching languages should return to the corresponding passage or nearest shared heading, using semantic section identifiers rather than raw page percentages.
+- Header labels, Search feedback and bookmark actions follow the active language.
+
+## 9. Non-regression requirements
+
+An interface-standard change must preserve:
+
+- all book wording and translations;
+- paragraph and section order;
+- cover image and book illustrations;
+- tables and source-page references;
+- footnotes and endnotes;
+- PCED word lookup and its language profile;
+- Chinese-Tipiṭaka terminology integration where applicable;
+- search, bookmarks, Last Position and language navigation not directly being corrected;
+- the book's established body typography, Pāli treatment and actual Contents-entry styling.
+
+## 10. Acceptance checklist
+
+Test every improved or newly added book at desktop width and at a narrow mobile width.
+
+- [ ] No old or duplicate header flashes on entry.
+- [ ] Desktop header remains at the top in one row and follows the required sequence.
+- [ ] Mobile header remains at the top as one complete two-row unit.
+- [ ] Search is on the mobile second row and is fully visible.
+- [ ] All header items and both rows are left-justified.
+- [ ] Normal mobile scrolling does not move the whole page sideways.
+- [ ] Two-finger pinch-to-zoom still works.
+- [ ] A− and A+ resize both reading text and Contents text.
+- [ ] Book Mark, Last Position and Search work on mobile.
+- [ ] Cover remains on the left on mobile without causing horizontal overflow.
+- [ ] Contents uses one outer frame with no inner frame.
+- [ ] Contents title row stays outside the scrolling entries.
+- [ ] Contents title wording and pinkish colour pair are correct.
+- [ ] Contents height matches the standard.
+- [ ] Main text follows Contents continuously.
+- [ ] Contents targets and restored positions are not hidden behind the header.
+- [ ] Inline scripts compile and no existing reader feature regresses.
+- [ ] Only the intended book interface and documentation changed.
+
+## 11. Implementation status
+
+- `dhammapada-pali-chinese.html` is the approved reference implementation.
+- `the-buddhas-twelve-kinds-of-evil-retribution.html` was brought into conformity on 10 September 2026. Its fixed/sticky header, control order, mobile Search row, collapsible fixed-height Contents window, font controls, Search, Book Mark and Last Position follow this standard. Its book content, cover, illustrations, body design, headings, Pāli treatment, footnotes and PCED integration were preserved.
+
+## 12. Applying this standard in a future chat
+
+Use this instruction:
+
+> Improve `<book filename>` to conform to `BOOK-READER-INTERFACE-STANDARD.md`. Use `dhammapada-pali-chinese.html` as the approved implementation example and `daily-chants-burmese.html` as the mobile sticky-header and Contents-window behaviour reference. Change only the interface items required by the standard; preserve all book content and unrelated features. Test against the acceptance checklist and update the implementation status before opening a pull request.
