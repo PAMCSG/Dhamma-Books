@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.9 — 2026-09-07 */
+/* PAMC cross-book PCED popup standard v1.3.10 — 2026-09-10 */
 (function () {
   'use strict';
 
@@ -609,9 +609,29 @@
     });
   }
 
+  function positionBelowMobileHeader(modal) {
+    const isPcedModal = modal?.id === 'dictModal' || modal?.id === 'lookupModal' || modal?.id === 'pced-modal';
+    const mobile = window.matchMedia?.('(max-width:600px)')?.matches;
+    if (!isPcedModal || !mobile) {
+      modal?.style.removeProperty('--pamc-pced-header-offset');
+      return;
+    }
+    const candidates = document.querySelectorAll('body > header,body > nav,.topbar,.appbar');
+    let bottom = 0;
+    candidates.forEach(header => {
+      const rect = header.getBoundingClientRect();
+      const position = getComputedStyle(header).position;
+      if ((position === 'fixed' || position === 'sticky') && rect.top <= 2 && rect.bottom > 0) {
+        bottom = Math.max(bottom, Math.min(rect.bottom, window.innerHeight));
+      }
+    });
+    modal.style.setProperty('--pamc-pced-header-offset', Math.ceil(bottom) + 'px');
+  }
+
   function modalOpened(modal) {
     const panel = panelOf(modal);
     if (panel) for (const name of ['left', 'top', 'width', 'margin', 'transform']) panel.style.removeProperty(name);
+    positionBelowMobileHeader(modal);
     installMovable(modal);
     normalizeLanguageHeadings(modal);
     if (mode !== 'reader') openFirstView(modal);
@@ -721,11 +741,15 @@
         .ai-help,.ai-status{margin:8px 0;color:#75543d;font-size:14px}
         @media(max-width:600px){
           .modal,#pced-modal{padding:6px!important}
-          #dictModal,#lookupModal,#pced-modal{align-items:flex-start!important}
+          #dictModal,#lookupModal,#pced-modal{
+            top:var(--pamc-pced-header-offset,0px)!important;
+            bottom:0!important;
+            align-items:flex-start!important
+          }
           #dictModal>.panel,#lookupModal>.panel,#pced-modal>.panel,#pced-modal>.pced-panel,
           #pced-modal>.modalcontent,#pced-modal>.modal-content{
-            max-height:calc(100vh - 12px)!important;
-            max-height:calc(100dvh - 12px)!important;
+            max-height:calc(100vh - var(--pamc-pced-header-offset,0px) - 12px)!important;
+            max-height:calc(100dvh - var(--pamc-pced-header-offset,0px) - 12px)!important;
             margin:0 auto!important
           }
           .modal .panel-body,.modal .modal-body,.modal .pced-panel-body,.modal .pced-body,#pced-modal .panel-body,#pced-modal .pced-body{padding:14px 14px 20px!important}
@@ -746,6 +770,11 @@
       window.PCEDStandardData?.applyTo?.(data);
     }
     scanModals();
+    const repositionOpenModals = () => document.querySelectorAll('#dictModal,#lookupModal,#pced-modal').forEach(modal => {
+      if (isOpen(modal)) positionBelowMobileHeader(modal);
+    });
+    window.addEventListener('resize', repositionOpenModals, { passive: true });
+    window.visualViewport?.addEventListener('resize', repositionOpenModals, { passive: true });
     new MutationObserver(mutations => mutations.forEach(mutation => mutation.addedNodes.forEach(node => {
       if (node.nodeType === 1) scanModals(node);
     }))).observe(document.documentElement, { childList: true, subtree: true });
