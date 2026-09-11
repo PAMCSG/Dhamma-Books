@@ -3,7 +3,7 @@
 **Status:** Approved standard for every current and future reader book in `PAMCSG/Dhamma-Books`  
 **Approved reference implementation:** `dhammapada-pali-chinese.html`  
 **Behaviour reference:** `daily-chants-burmese.html`  
-**Last consolidated:** 10 September 2026
+**Last consolidated:** 11 September 2026
 
 This is the normative interface standard for improving an existing book or adding a new book. Apply it one book at a time. Do not change book wording, translations, paragraph order, images, tables, footnotes, PCED data or unrelated styling merely to make the interface conform.
 
@@ -64,9 +64,14 @@ Use `overflow-x: clip` or an equivalent layout-width correction at the document 
 | --- | --- |
 | Background | `#A8734F` |
 | Text | White |
+| Font family | `Arial`, `Microsoft YaHei`, `PingFang SC`, `Noto Sans CJK SC`, `Noto Sans SC`, `Noto Sans Myanmar`, `Myanmar Text`, `sans-serif` |
 | Title font size | 18 px desktop; 16 px mobile |
 | Control font size | 14 px desktop; 12 px mobile |
 | Search input and placeholder | At least 15 px on mobile |
+
+Use this same shared font stack for every wording in the screen header, including the book name, Contents, language labels, A−, A+, Book Mark, Search input and Search button. The book name and button labels are bold; Search input text and its placeholder are regular weight. Do not allow book-specific fonts to override the shared header font.
+
+Centre every button label and every button-like header link both vertically and horizontally. Implement this on the control itself with flex alignment (`align-items: center` and `justify-content: center`), centred text and a consistent line height; do not rely on unequal padding to make a label appear centred.
 
 Controls must remain large enough to tap. Compact mobile spacing is permitted only when the controls remain legible and functional.
 
@@ -232,6 +237,8 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 - [ ] Mobile header remains at the top as one complete two-row unit.
 - [ ] Search is on the mobile second row and is fully visible.
 - [ ] All header items and both rows are left-justified.
+- [ ] Every header wording uses the shared multilingual font stack; book-specific fonts do not override it.
+- [ ] Every button and button-like link label is centred vertically and horizontally.
 - [ ] Normal mobile scrolling does not move the whole page sideways.
 - [ ] Two-finger pinch-to-zoom still works.
 - [ ] A− and A+ resize both reading text and Contents text.

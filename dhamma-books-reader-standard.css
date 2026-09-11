@@ -1,8 +1,8 @@
-/* Dhamma-Books shared reader controls v1.3.8 */
+/* Dhamma-Books shared reader controls v1.3.9 */
 :root{
   --db-header-bg:#A8734F;
   --db-header-text:#ffffff;
-  --db-header-font:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --db-header-font:Arial,"Microsoft YaHei","PingFang SC","Noto Sans CJK SC","Noto Sans SC","Noto Sans Myanmar","Myanmar Text",sans-serif;
   --db-header-title-size:18px;
   --db-header-control-size:14px;
   --db-secondary:#8F5D3B;
@@ -81,6 +81,34 @@ body>.topbar input,
 body>.topbar a{
   font-family:var(--db-header-font)!important;
   font-size:var(--db-header-control-size)!important;
+}
+body>header:first-of-type :where(button,input,a,span,label,select,option),
+body>nav.topbar :where(button,input,a,span,label,select,option),
+body>.topbar :where(button,input,a,span,label,select,option){
+  font-family:var(--db-header-font)!important;
+  font-style:normal!important;
+}
+body>header:first-of-type button,
+body>header:first-of-type a:not(.app-home-logo):not(.home-logo),
+body>nav.topbar button,
+body>nav.topbar a:not(.app-home-logo):not(.home-logo),
+body>.topbar button,
+body>.topbar a:not(.app-home-logo):not(.home-logo){
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+  text-align:center!important;
+  vertical-align:middle!important;
+  line-height:1.2!important;
+  font-weight:700!important;
+}
+body>header:first-of-type input,
+body>nav.topbar input,
+body>.topbar input{
+  box-sizing:border-box!important;
+  line-height:1.2!important;
+  font-weight:400!important;
 }
 .db-legacy-control{display:none!important}
 .db-standard-controls{display:flex;align-items:center;gap:7px;flex:0 0 auto;flex-wrap:nowrap;margin-left:0}
