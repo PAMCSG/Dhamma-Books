@@ -1,4 +1,4 @@
-/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.10 */
+/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.11 */
 (function(){
   'use strict';
   const BOOKMARK_KEY='dhamma-books:bookmarks:'+location.pathname;
@@ -326,7 +326,7 @@
     const stylesheet=document.querySelector('link[rel="stylesheet"][href*="dhamma-books-reader-standard.css"]');
     if(stylesheet){
       const url=new URL(stylesheet.href,document.baseURI);
-      url.searchParams.set('v','1.3.8');
+      url.searchParams.set('v','1.3.11');
       if(stylesheet.href!==url.href) stylesheet.href=url.href;
     }
   }
@@ -396,6 +396,44 @@
     const measure=()=>header&&document.documentElement.style.setProperty('--db-mindfulness-header-height',Math.ceil(header.getBoundingClientRect().height)+'px');
     measure();addEventListener('resize',measure,{passive:true});if(header&&window.ResizeObserver)new ResizeObserver(measure).observe(header);
   }
+  function installRequisitesReaderStandard(){
+    if(location.pathname.split('/').pop().toLowerCase()!=='the-requisites-of-enlightenment.html') return;
+    document.body.classList.add('db-requisites-reader-standard');
+    const header=screenHeader();
+    document.querySelectorAll('#en-toc,#zh-toc').forEach(contents=>{
+      const toggle=contents.querySelector(':scope > .contents-head > .contents-toggle');
+      const scroll=contents.querySelector(':scope > .contents-scroll');
+      if(!toggle||!scroll) return;
+      const setOpen=open=>{
+        contents.classList.toggle('collapsed',!open);
+        toggle.setAttribute('aria-expanded',String(open));
+        toggle.textContent=contents.id==='zh-toc'?(open?'收起':'展开'):(open?'Collapse':'Expand');
+      };
+      toggle.addEventListener('click',()=>setOpen(contents.classList.contains('collapsed')));
+      setOpen(true);
+    });
+    document.getElementById('contentsBtn')?.addEventListener('click',event=>{
+      event.preventDefault();
+      const contents=document.getElementById(currentLanguage()==='zh'?'zh-toc':'en-toc');
+      contents?.classList.remove('collapsed');
+      const toggle=contents?.querySelector('.contents-toggle');
+      if(toggle){toggle.setAttribute('aria-expanded','true');toggle.textContent=currentLanguage()==='zh'?'收起':'Collapse'}
+      contents?.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+    const measure=()=>header&&document.documentElement.style.setProperty('--db-requisites-header-height',Math.ceil(header.getBoundingClientRect().height)+'px');
+    measure();addEventListener('resize',measure,{passive:true});if(header&&window.ResizeObserver)new ResizeObserver(measure).observe(header);
+  }
+  function migrateRequisitesBookmark(candidates){
+    if(location.pathname.split('/').pop().toLowerCase()!=='the-requisites-of-enlightenment.html') return;
+    let saved=[];try{saved=JSON.parse(localStorage.getItem(BOOKMARK_KEY)||'[]')}catch{}
+    if(Array.isArray(saved)&&saved.length) return;
+    let legacy;try{legacy=JSON.parse(localStorage.getItem('bodhi-bookmark')||'null')}catch{}
+    if(!legacy) return;
+    const target=(legacy.id&&document.getElementById(legacy.id))||(legacy.id&&document.querySelector('[data-section="'+CSS.escape(legacy.id)+'"]'));
+    const candidate=target&&(candidates.includes(target)?target:target.closest('.source-page,.page-anchor,.text-block,.pair-row,.reading-row,.source-paragraph,.verse-card,section[id],article[id]'));
+    const item={id:'legacy-'+Date.now(),createdAt:new Date().toISOString(),anchor:candidate?.dataset.dbBookmarkAnchor||'',offset:0,scrollY:Number(legacy.y)||0,lang:legacy.lang||'zh',label:(target?.textContent||'Imported book mark').replace(/\s+/g,' ').trim().slice(0,90)};
+    try{localStorage.setItem(BOOKMARK_KEY,JSON.stringify([item]))}catch{}
+  }
   function init(){
     ensurePopupMovementStandard();
     installCategoryContentsStyle();
@@ -404,6 +442,7 @@
     const controls=buildControls();
     if(!controls) return;
     installMindfulnessReaderStandard(controls);
+    installRequisitesReaderStandard();
     function applyLanguage(){
       const text=words();
       controls.bookmark.textContent=text.bookmark;
@@ -418,9 +457,11 @@
       if(button) button.addEventListener('click',()=>setTimeout(applyLanguage,0));
     });
     installSearch(controls);
-    const bookmark=buildBookmarkModal(allAnchorCandidates());
+    const candidates=allAnchorCandidates();
+    migrateRequisitesBookmark(candidates);
+    const bookmark=buildBookmarkModal(candidates);
     controls.bookmark.addEventListener('click',bookmark.openModal);
-    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.10'};
+    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.11'};
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();

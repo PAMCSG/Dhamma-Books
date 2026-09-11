@@ -1,4 +1,4 @@
-/* Dhamma-Books shared reader controls v1.3.10 */
+/* Dhamma-Books shared reader controls v1.3.11 */
 :root{
   --db-header-bg:#A8734F;
   --db-header-text:#ffffff;
@@ -197,6 +197,48 @@ body.db-mindfulness-reader-standard :is(.section-heading,.contents,[id]){scroll-
   body.db-mindfulness-reader-standard .db-searchbox input{font-size:15px!important;min-width:0!important;width:auto!important;flex:1 1 auto!important}
   body.db-mindfulness-reader-standard .contents-head{padding:14px}
   body.db-mindfulness-reader-standard .contents-scroll{height:calc(46vh + 3.2em)}
+}
+
+/* The Requisites of Enlightenment: final static bilingual header and scrolling Contents. */
+body.db-requisites-reader-standard{padding-top:var(--db-requisites-header-height,66px)!important;overflow-x:clip!important}
+body.db-requisites-reader-standard .topbar{position:fixed!important;inset:0 0 auto 0!important;width:100%!important;padding:0!important;z-index:2147482900!important}
+body.db-requisites-reader-standard .topbar-inner{width:100%!important;max-width:none!important;margin:0!important;flex-wrap:nowrap!important;overflow:visible!important}
+body.db-requisites-reader-standard .db-standard-controls{display:contents!important}
+body.db-requisites-reader-standard .app-brand{order:1;min-width:0!important;margin:0!important}
+body.db-requisites-reader-standard #contentsBtn{order:2}
+body.db-requisites-reader-standard .lang-toggle{order:3}
+body.db-requisites-reader-standard #fontMinus{order:4}
+body.db-requisites-reader-standard #fontPlus{order:5}
+body.db-requisites-reader-standard .db-bookmark-button{order:6}
+body.db-requisites-reader-standard .db-searchbox{order:7;min-width:0!important}
+body.db-requisites-reader-standard .lang-toggle #zhBtn{order:1}
+body.db-requisites-reader-standard .lang-toggle #enBtn{order:2}
+body.db-requisites-reader-standard .app-brand-title{display:block!important;max-width:clamp(120px,22vw,290px)!important}
+body.db-requisites-reader-standard .db-searchbox input{width:clamp(110px,17vw,230px)!important}
+body.db-requisites-reader-standard .contents{font-size:var(--font)!important;overflow:hidden!important;border:1px solid #DFCBBB!important;border-radius:9px!important;background:#FFFDF9!important}
+body.db-requisites-reader-standard .contents-head{display:flex;align-items:center;gap:12px;margin:0;padding:16px 20px;background:#F4E9DF;color:#66442F}
+body.db-requisites-reader-standard .contents-head>h2{flex:1;margin:0!important;padding:0!important;background:transparent!important;color:#66442F!important;font-size:1.15em!important;line-height:1.4!important}
+body.db-requisites-reader-standard .contents-toggle{flex:0 0 auto;border:1px solid #DFCBBB!important;border-radius:7px!important;background:#FFFDF9!important;color:#66442F!important;padding:6px 10px!important;font-family:inherit!important;font-size:.78em!important;font-weight:700!important;line-height:1.2!important;cursor:pointer}
+body.db-requisites-reader-standard .contents-scroll{height:calc(52vh + 3.2em);overflow-y:auto;overscroll-behavior:contain;background:#FFFDF9}
+body.db-requisites-reader-standard .contents.collapsed .contents-scroll{display:none}
+body.db-requisites-reader-standard .contents .toc-row{font-size:1em!important}
+body.db-requisites-reader-standard .contents .toc-page{font-size:.8em!important}
+body.db-requisites-reader-standard :is(.section-heading,.contents,[id]){scroll-margin-top:calc(var(--db-requisites-header-height,66px) + 10px)!important}
+body.db-requisites-reader-standard>.modal{background:transparent!important}
+@media(max-width:760px){
+  body.db-requisites-reader-standard{padding-top:0!important}
+  body.db-requisites-reader-standard .topbar{position:sticky!important;inset:auto!important;top:0!important}
+  body.db-requisites-reader-standard .topbar-inner{flex-wrap:wrap!important;align-content:flex-start!important;gap:2px!important;padding:6px 7px!important}
+  body.db-requisites-reader-standard .app-brand{flex:0 1 clamp(40px,14vw,85px)!important;gap:2px!important}
+  body.db-requisites-reader-standard .app-brand-title{display:block!important;max-width:none!important;font-size:16px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+  body.db-requisites-reader-standard .topbar button,
+  body.db-requisites-reader-standard .topbar a:not(.app-home-logo){font-size:12px!important;padding:4px!important;min-height:32px!important}
+  body.db-requisites-reader-standard .lang-toggle button{font-size:12px!important;padding:4px!important;min-height:30px!important}
+  body.db-requisites-reader-standard .db-searchbox{order:20!important;flex:1 1 100%!important;width:100%!important;max-width:100%!important}
+  body.db-requisites-reader-standard .db-searchbox input{font-size:15px!important;min-width:0!important;width:auto!important;flex:1 1 auto!important}
+  body.db-requisites-reader-standard .contents-head{padding:14px}
+  body.db-requisites-reader-standard .contents-scroll{height:calc(46vh + 3.2em)}
+  body.db-requisites-reader-standard :is(.section-heading,.contents,[id]){scroll-margin-top:calc(var(--db-requisites-header-height,104px) + 10px)!important}
 }
 .db-bookmark-panel{width:min(720px,96vw);max-height:86vh;overflow:auto;border-radius:12px;background:var(--db-panel);box-shadow:0 14px 48px #0008}
 .db-bookmark-head{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--db-accent);color:#fff}
