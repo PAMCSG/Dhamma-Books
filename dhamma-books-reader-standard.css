@@ -1,4 +1,4 @@
-/* Dhamma-Books shared reader controls v1.3.15 */
+/* Dhamma-Books shared reader controls v1.3.16 */
 :root{
   --db-header-bg:#A8734F;
   --db-header-text:#ffffff;
@@ -58,6 +58,135 @@ body>.topbar .topbar-inner{
   flex-wrap:nowrap!important;
   color:var(--db-header-text)!important;
   font-family:var(--db-header-font)!important;
+}
+
+/* Daily Chants Burmese: final header, standard-width reading page, scrolling
+   Contents, and approved book-heading hierarchy. */
+body.db-daily-chants-burmese-standard{
+  padding-top:var(--db-daily-burmese-header-height,66px)!important;
+  overflow-x:clip!important;
+}
+body.db-daily-chants-burmese-standard .topbar{
+  position:fixed!important;
+  inset:0 0 auto 0!important;
+  width:100%!important;
+  z-index:2147482900!important;
+}
+body.db-daily-chants-burmese-standard .topbar-inner{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:8px 12px!important;
+  gap:8px!important;
+  flex-wrap:nowrap!important;
+  overflow:visible!important;
+}
+body.db-daily-chants-burmese-standard .bar-title{
+  display:block!important;
+  flex:0 1 auto!important;
+  min-width:0!important;
+  max-width:clamp(150px,25vw,360px)!important;
+  margin-right:0!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+body.db-daily-chants-burmese-standard #contentsBtn{order:2}
+body.db-daily-chants-burmese-standard #smaller{order:3}
+body.db-daily-chants-burmese-standard #larger{order:4}
+body.db-daily-chants-burmese-standard .db-standard-controls{display:contents!important}
+body.db-daily-chants-burmese-standard .db-bookmark-button{order:5}
+body.db-daily-chants-burmese-standard .db-searchbox{order:6;min-width:0!important;flex:0 1 auto!important}
+body.db-daily-chants-burmese-standard .db-searchbox input{width:clamp(130px,22vw,260px)!important}
+body.db-daily-chants-burmese-standard .db-search-status{order:7}
+body.db-daily-chants-burmese-standard .contents-panel{font-size:var(--font-size)!important}
+body.db-daily-chants-burmese-standard .contents-list{
+  height:calc(52vh + 3.2em)!important;
+  max-height:none!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+}
+body.db-daily-chants-burmese-standard .toc-item{font-size:.84em!important}
+body.db-daily-chants-burmese-standard .toc-item.level-3{font-size:.78em!important}
+body.db-daily-chants-burmese-standard .contents-head h2{font-size:1.06em!important}
+body.db-daily-chants-burmese-standard :is(.contents-panel,.source-page,[id]){
+  scroll-margin-top:calc(var(--db-daily-burmese-header-height,66px) + 10px)!important;
+}
+@media(min-width:761px){
+  body.db-daily-chants-burmese-standard .reader{
+    width:min(1080px,calc(100% - 28px))!important;
+    max-width:1080px!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+}
+body.db-daily-chants-burmese-standard .source-page:not(.picture-page):not(.mahānamakkāra-page)>h2.section-heading{
+  margin:44px 0 22px!important;
+  padding:15px 18px!important;
+  border:0!important;
+  border-top:4px solid var(--db-header-bg)!important;
+  border-radius:12px!important;
+  background:var(--db-pale)!important;
+  color:var(--db-ink)!important;
+  text-align:center!important;
+  font-size:calc(var(--font-size) + 3px)!important;
+  line-height:1.35!important;
+  letter-spacing:normal!important;
+}
+body.db-daily-chants-burmese-standard .source-page:not(.picture-page):not(.mahānamakkāra-page)>h3.section-heading{
+  margin:30px 0 14px!important;
+  padding:0 0 7px!important;
+  border:0!important;
+  border-bottom:1px solid var(--db-line)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:var(--db-secondary)!important;
+  text-align:left!important;
+  font-size:var(--font-size)!important;
+  line-height:1.45!important;
+  letter-spacing:normal!important;
+}
+body.db-daily-chants-burmese-standard .fn-modal{
+  top:var(--db-daily-burmese-header-height,66px)!important;
+}
+@media(max-width:760px){
+  html.db-daily-chants-burmese-root,
+  body.db-daily-chants-burmese-standard{
+    width:100%!important;
+    max-width:100%!important;
+    overflow-x:clip!important;
+  }
+  body.db-daily-chants-burmese-standard{padding-top:0!important}
+  body.db-daily-chants-burmese-standard .topbar{
+    position:sticky!important;
+    inset:auto!important;
+    top:0!important;
+    max-width:100%!important;
+    transform:none!important;
+  }
+  body.db-daily-chants-burmese-standard .topbar-inner{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    padding:6px 7px!important;
+    gap:3px!important;
+    flex-wrap:wrap!important;
+    align-content:flex-start!important;
+    overflow-x:clip!important;
+    overflow-y:visible!important;
+  }
+  body.db-daily-chants-burmese-standard .home-logo{order:1;flex:0 0 36px!important;width:36px!important;height:38px!important}
+  body.db-daily-chants-burmese-standard .bar-title{order:1;flex:0 1 clamp(42px,19vw,92px)!important;max-width:none!important;font-size:16px!important}
+  body.db-daily-chants-burmese-standard .topbar button,
+  body.db-daily-chants-burmese-standard .topbar a:not(.home-logo){min-height:32px!important;padding:4px 6px!important;font-size:12px!important}
+  body.db-daily-chants-burmese-standard .db-searchbox{order:20!important;display:flex!important;flex:1 1 calc(100% - 74px)!important;max-width:100%!important}
+  body.db-daily-chants-burmese-standard .db-searchbox input{flex:1 1 auto!important;min-width:0!important;width:auto!important;max-width:none!important;font-size:15px!important}
+  body.db-daily-chants-burmese-standard .db-search-status{order:21!important;flex:0 1 68px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-size:11px!important}
+  body.db-daily-chants-burmese-standard :is(.reader,.cover-block,.cover-copy,.contents-panel,.contents-head,.contents-list,.source-page){min-width:0!important;max-width:100%!important}
+  body.db-daily-chants-burmese-standard .contents-list{height:calc(46vh + 3.2em)!important}
+  body.db-daily-chants-burmese-standard .source-page:not(.picture-page):not(.mahānamakkāra-page)>h2.section-heading{font-size:calc(var(--font-size) + 1px)!important;padding:13px 14px!important}
+  body.db-daily-chants-burmese-standard :is(.contents-panel,.source-page,[id]){scroll-margin-top:calc(var(--db-daily-burmese-header-height,104px) + 10px)!important}
+  body.db-daily-chants-burmese-standard .fn-modal{top:var(--db-daily-burmese-header-height,104px)!important}
 }
 body>header:first-of-type .brand,
 body>header:first-of-type .bar-title,

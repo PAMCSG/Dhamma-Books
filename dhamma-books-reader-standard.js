@@ -1,4 +1,4 @@
-/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.16 */
+/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.17 */
 (function(){
   'use strict';
   const BOOKMARK_KEY='dhamma-books:bookmarks:'+location.pathname;
@@ -397,6 +397,28 @@
     const measure=()=>header&&document.documentElement.style.setProperty('--db-mindfulness-header-height',Math.ceil(header.getBoundingClientRect().height)+'px');
     measure();addEventListener('resize',measure,{passive:true});if(header&&window.ResizeObserver)new ResizeObserver(measure).observe(header);
   }
+  function installDailyChantsBurmeseStandard(){
+    if(location.pathname.split('/').pop().toLowerCase()!=='daily-chants-burmese.html') return;
+    document.body.classList.add('db-daily-chants-burmese-standard');
+    const header=screenHeader();
+    const contents=document.getElementById('contentsPanel');
+    const toggle=document.getElementById('contentsToggle');
+    const setOpen=open=>{
+      if(!contents||!toggle) return;
+      contents.classList.toggle('collapsed',!open);
+      toggle.setAttribute('aria-expanded',String(open));
+      toggle.textContent=open?'ပိတ်မည်':'ဖွင့်မည်';
+    };
+    toggle?.addEventListener('click',()=>setOpen(contents.classList.contains('collapsed')));
+    document.getElementById('contentsBtn')?.addEventListener('click',event=>{
+      event.preventDefault();
+      setOpen(true);
+      contents?.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+    setOpen(true);
+    const measure=()=>header&&document.documentElement.style.setProperty('--db-daily-burmese-header-height',Math.ceil(header.getBoundingClientRect().height)+'px');
+    measure();addEventListener('resize',measure,{passive:true});if(header&&window.ResizeObserver)new ResizeObserver(measure).observe(header);
+  }
   function installRequisitesReaderStandard(){
     if(location.pathname.split('/').pop().toLowerCase()!=='the-requisites-of-enlightenment.html') return;
     document.body.classList.add('db-requisites-reader-standard');
@@ -483,6 +505,14 @@
     const item={id:'legacy-'+Date.now(),createdAt:new Date().toISOString(),anchor:candidate?.dataset.dbBookmarkAnchor||'',offset:0,scrollY:Number(legacy.y)||0,lang:legacy.lang||'zh',label:(target?.textContent||'Imported book mark').replace(/\s+/g,' ').trim().slice(0,90)};
     try{localStorage.setItem(BOOKMARK_KEY,JSON.stringify([item]))}catch{}
   }
+  function migrateDailyChantsBurmeseBookmark(){
+    if(location.pathname.split('/').pop().toLowerCase()!=='daily-chants-burmese.html'||loadBookmarks().length) return;
+    let raw=null;try{raw=localStorage.getItem('pamc-daily-chants-burmese-bookmark')}catch{}
+    if(raw===null) return;
+    const scrollY=Number(raw);
+    if(!Number.isFinite(scrollY)||scrollY<0) return;
+    saveBookmarks([{id:'legacy-'+Date.now(),createdAt:new Date().toISOString(),anchor:'',offset:0,scrollY,lang:'my',label:'ယခင်စာညှပ်'}]);
+  }
   function migratePatisambhidamaggaBookmarks(candidates){
     if(location.pathname.split('/').pop().toLowerCase()!=='patisambhidamagga.html') return;
     if(loadBookmarks().length) return;
@@ -520,6 +550,7 @@
     const controls=buildControls();
     if(!controls) return;
     installMindfulnessReaderStandard(controls);
+    installDailyChantsBurmeseStandard();
     installRequisitesReaderStandard();
     installOnlyWayReaderStandard();
     installPatisambhidamaggaReaderStandard();
@@ -538,12 +569,13 @@
     });
     installSearch(controls);
     const candidates=allAnchorCandidates();
+    migrateDailyChantsBurmeseBookmark();
     migrateRequisitesBookmark(candidates);
     migratePatisambhidamaggaBookmarks(candidates);
     migrateOnlyWayBookmarks(candidates);
     const bookmark=buildBookmarkModal(candidates);
     controls.bookmark.addEventListener('click',bookmark.openModal);
-    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.16'};
+    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.17'};
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();

@@ -27,7 +27,7 @@ See `PCED-LOOKUP-UPDATE-REPORT.md` for rollout details and tests.
 
 ## Shared reader controls and screen header — 7 September 2026
 
-Every current and future reader book must load `dhamma-books-reader-standard.css` and `dhamma-books-reader-standard.js` using the current cache version. Shared CSS v1.3.5 includes the footnote/endnote popup and book-heading standards below. Shared reader standard v1.3.0 retires legacy save/go bookmark buttons so a book displays only the common bookmark control, and provides the continuous contents-to-reader behavior described below.
+Every current and future reader book must load `dhamma-books-reader-standard.css` and `dhamma-books-reader-standard.js` using the current cache version. Shared CSS v1.3.16 includes the footnote/endnote popup, responsive page-width and book-heading standards below. Shared reader standard v1.3.17 retires legacy save/go and automatic last-read controls so a book displays only the common bookmark control, and provides the continuous contents-to-reader behavior described below.
 
 The shared contract provides:
 
@@ -55,11 +55,11 @@ Every Dhamma-Books footnote or endnote popup uses a smaller, quieter header than
 
 This standard applies only to current and future books in the **PAMCSG/Dhamma-Books repository**. It does not apply to Tipitaka-reader, Chinese-tipitaka, Meditation-App, or the repository landing page.
 
-**Exception:** Daily Chants Burmese (`daily-chants-burmese.html`) retains its existing behavior and contents-page layout; do not change it as part of this standard.
+Daily Chants Burmese (`daily-chants-burmese.html`) originally served as the behaviour reference and was excluded from the early rollout. Its 11 September 2026 conformance update now applies the same Contents-window and continuous-reading requirements while preserving its Burmese content and source-faithful printed-page layouts.
 
 #### Continuous reading
 
-For every other book, **main text follows contents continuously** in the same page. Contents and Reader controls scroll to their respective positions without hiding either section. Contents links must reach the corresponding heading without a screen header or column-label row covering it.
+For every book, **main text follows contents continuously** in the same page. Contents and Reader controls scroll to their respective positions without hiding either section. Contents links must reach the corresponding heading without a screen header or column-label row covering it.
 
 Preserve all book wording, paragraph order, translations, footnotes, PCED lookup functions, bookmarks and search. Contents-page column rules do not change side-by-side language columns in the main text. Preserve the existing Pāli Chanting English paired `VANDANĀ | Homage` heading and the fix that keeps its column-label row from covering the title.
 
@@ -101,7 +101,7 @@ Use consistent panel borders, rounded corners, row spacing, and heading hierarch
 
 #### Implementation status
 
-This section records the approved standard, not a claim that every book already implements it. PR #16 enabled continuous reading for Daily Chants English and Paccayaniddeso English/Chinese, alongside the three Pāli Chanting editions. The remaining books and category-specific contents columns still require an implementation audit and any necessary changes. Daily Chants Burmese remains excluded.
+This section records the approved standard, not a claim that every book already implements it. PR #16 enabled continuous reading for Daily Chants English and Paccayaniddeso English/Chinese, alongside the three Pāli Chanting editions. Daily Chants Burmese joined this standard on 11 September 2026. Remaining books still require an implementation audit and any necessary changes.
 
 
 ### Pa-Auk and Mahinda contents styling — 7 September 2026
@@ -252,7 +252,7 @@ Dhammapada's PCED, footnote, bookmark and Nissaya popup overlays no longer dim t
 
 `pced-popup-standard.js` v1.3.13 explicitly handles the 37 existing Dhammapada Contents links. Each valid fragment target is aligned below the measured complete screen header, then briefly realigned while initial fonts, preceding lazy embedded images and the page height settle. Automatic correction stops after five seconds or as soon as the reader deliberately scrolls or touches elsewhere. The link targets and book HTML remain unchanged.
 
-The same version makes popup movement a shared Dhamma-Books standard. Movable PCED, footnote, bookmark and book-specific popups use pointer capture for mouse and one-finger dragging, plus a touch fallback for older browsers. Title-bar dragging suppresses page movement; popup-body scrolling remains available. Dragged coordinates override book-specific mobile centring rules, preserve the complete mobile book header, and keep enough title bar visible to recover or close the popup. Reopening restores the popup's documented default position. `dhamma-books-reader-standard.js` v1.3.6 bootstraps this movement-only support for a reader without the PCED popup script, currently Daily Chants Burmese, while preserving its layout exception. Popup content, lookup logic, stacking and other books' navigation remain unchanged.
+The same version makes popup movement a shared Dhamma-Books standard. Movable PCED, footnote, bookmark and book-specific popups use pointer capture for mouse and one-finger dragging, plus a touch fallback for older browsers. Title-bar dragging suppresses page movement; popup-body scrolling remains available. Dragged coordinates override book-specific mobile centring rules, preserve the complete mobile book header, and keep enough title bar visible to recover or close the popup. Reopening restores the popup's documented default position. `dhamma-books-reader-standard.js` v1.3.6 first bootstrapped this movement-only support for Daily Chants Burmese because that reader has no PCED popup script; the bootstrap remains in use after its later interface conformance update. Popup content, lookup logic, stacking and other books' navigation remain unchanged.
 
 
 ### Shared last-opened-on-top popup stacking — 11 September 2026
@@ -298,7 +298,7 @@ The existing one-column Contents entries are placed in a fixed-height internal s
 
 ### Repository-wide popup background standard — 11 September 2026
 
-All Dhamma-Books popup overlays are transparent so opening PCED, footnote, bookmark, Nissaya or another supported popup never dims the reading text behind it. Popup panels remain opaque and readable, retaining their established border, shadow, close behaviour, movement, internal scrolling and last-opened-on-top order. The current shared stylesheet is v1.3.15, `pced-popup-standard.js` is v1.3.16, and `dhamma-books-reader-standard.js` is v1.3.16.
+All Dhamma-Books popup overlays are transparent so opening PCED, footnote, bookmark, Nissaya or another supported popup never dims the reading text behind it. Popup panels remain opaque and readable, retaining their established border, shadow, close behaviour, movement, internal scrolling and last-opened-on-top order. The current shared stylesheet is v1.3.16, `pced-popup-standard.js` is v1.3.16, and `dhamma-books-reader-standard.js` is v1.3.17.
 
 
 ### 《觉悟资粮》 bilingual reader-interface conformance — 11 September 2026
@@ -333,3 +333,11 @@ Every other book uses the width of 觉悟资粮: a centred reading page with a m
 Further mobile testing found that the browser could remove the sticky header from view when PCED locked the book page. Popup runtime v1.3.16 now records the complete rendered header height before the Pāli-word action, holds that header fixed above the popup for the duration of the page lock, positions and constrains the movable popup below it, and restores the normal sticky header after the last PCED popup closes. The overlay remains transparent and the popup panel remains opaque and independently scrollable.
 
 The standard now includes a mandatory full-conformance procedure. A request to change a book according to the standard requires an audit of the initial HTML, shared assets and conflicting legacy rules; viewport testing at 320, 360 and 412 CSS pixels plus desktop; explicit root/body `scrollWidth` checks and an actual swipe test; feature and content-integrity validation; cache-version updates; and honest reporting when rendered or physical-device verification is unavailable. Source-only checks must not be reported as proof of complete visual conformance.
+
+### Daily Chants Burmese conformance and book-heading standard — 11 September 2026
+
+`daily-chants-burmese.html` now contains its final Burmese screen header directly in the initial HTML: logo, book name, `မာတိကာ`, A−, A+, one `စာညှပ်`, Search field and Search button. The desktop header is fixed in one row; the complete mobile header is one sticky two-row unit with Search on the second row. The former separate Save/Go bookmark buttons, Last Read control, and automatic last-read tracking are removed. If the reader previously saved a deliberate legacy bookmark, it is imported into the shared Book Mark window.
+
+Daily Chants Burmese is not one of the documented two-column wide-page exceptions. Its desktop reader therefore follows 觉悟资粮 at a centred 1080 px maximum with at least 14 px side clearance. Its Burmese-only Contents title remains fixed above the internally scrolling list, and A−/A+ resize both Contents and reading text.
+
+The Mindfulness of Breathing `INTRODUCTION` treatment is now the documented book-text heading standard: primary chapter and major-section headings use centred text on a pale `#F4E8DF` panel with a 4 px `#A8734F` top rule and rounded corners; subordinate headings are left aligned with secondary-brown text and a thin bottom divider. Hierarchy follows the source Contents and typography, Pāli inside headings inherits the heading colour, and exceptional source-faithful illustrated title layouts remain unchanged. Daily Chants Burmese applies this hierarchy to its `h2` and `h3` section headings while preserving its printed-page exceptions, wording, images, source-page order and footnotes. It loads shared stylesheet v1.3.16 and reader runtime v1.3.17.
