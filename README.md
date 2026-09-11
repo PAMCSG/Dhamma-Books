@@ -270,7 +270,14 @@ The English `Content` and Chinese `目录` panels are also present in the initia
 
 ### Automatic last-read control retirement — 11 September 2026
 
-Last Position, Last Read, Previously Read and equivalent automatic-return controls are retired from the Dhamma-Books reader standard for every language and book. Readers must not track page scrolling solely to maintain an automatic last-read position. Book Mark remains the reader-controlled way to save and return to positions. Mindfulness of Breathing and Dhammapada are updated under this decision; the remaining books require a later repository-wide rollout. Dhammapada still determines the current reading position when the reader deliberately saves a bookmark, but it no longer tracks scrolling or unloading in the background.
+Last Position, Last Read, Previously Read and equivalent automatic-return controls are retired from the Dhamma-Books reader standard for every language and book. Readers must not track page scrolling solely to maintain an automatic last-read position. Book Mark remains the reader-controlled way to save and return to positions. Mindfulness of Breathing, Dhammapada and 《佛陀的十二种恶报》 are updated under this decision; the remaining books require a later repository-wide rollout. Dhammapada and 《佛陀的十二种恶报》 still determine the current reading position when the reader deliberately saves a bookmark, but they no longer track scrolling or unloading in the background.
+
+
+### 《佛陀的十二种恶报》 reader-interface correction — 11 September 2026
+
+`the-buddhas-twelve-kinds-of-evil-retribution.html` now presents the correct final screen header directly in its initial HTML. The desktop header is fixed, full-width, non-wrapping and contains, in order, the logo and book name, `目录`, A−, A+, `书签`, and Search. The complete mobile header remains one sticky two-row unit, with the same controls on the first row and Search on the second. The retired `上次阅读` control and its automatic scroll/unload position tracking are removed; manual bookmark saving still determines the current position only when the reader chooses to save it.
+
+The one-column `目录` panel keeps its title and `收起` / `展开` control outside the scrolling entries. Its entries now use the standard fixed internal height on both desktop and mobile, so the Contents itself scrolls on either screen size while the main book text continues below it. The book loads shared stylesheet v1.3.8, reader JavaScript v1.3.10 and popup runtime v1.3.15. Popup overlays remain transparent, so the reading text behind a popup is never dimmed. Book wording, cover, illustrations, paragraph order, headings, Pāli treatment, footnotes, search results, saved bookmarks and PCED data are unchanged.
 
 
 ### 《止观法要》 reader-interface conformance — 11 September 2026
