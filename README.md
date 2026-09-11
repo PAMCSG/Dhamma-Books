@@ -4,7 +4,7 @@ The `main` branch is the authoritative source for the current Dhamma Books websi
 
 ## Reader interface standard
 
-`BOOK-READER-INTERFACE-STANDARD.md` is the authoritative, reusable standard for improving an existing reader book or creating a new one. It consolidates the approved requirements for the screen header, mobile behaviour, Contents panel, cover layout, font controls, Search, Book Mark, Last Position, language editions, non-regression protection and acceptance testing. Use Dhammapada as the approved implementation example and Daily Chants Burmese as the mobile sticky-header and Contents-window behaviour reference.
+`BOOK-READER-INTERFACE-STANDARD.md` is the authoritative, reusable standard for improving an existing reader book or creating a new one. It consolidates the approved requirements for the screen header, mobile behaviour, Contents panel, cover layout, font controls, Search, Book Mark, language editions, non-regression protection and acceptance testing. Use Dhammapada as the approved implementation example and Daily Chants Burmese as the mobile sticky-header and Contents-window behaviour reference.
 
 ## Shared PCED files
 
@@ -43,7 +43,7 @@ Every reader book uses the same visual palette: primary/header brown `#A8734F`, 
 
 The shared controls use English, Chinese or Burmese according to the active reading language, including bookmark-modal actions and search feedback. Bilingual books update these labels when the reading language changes.
 
-On desktop, the complete screen header stays fixed at the top in one non-wrapping row. On mobile, follow the Pāli Chanting Burmese pattern: use one sticky, naturally sized two-row header that remains together at the top during page scrolling. The first row contains the logo, book name, Contents, language button (when present), A−, A+, Book Mark and Last Position; the second row contains the search input followed by Search. Both rows are always left-justified and remain fully visible. The page, header and book body must fit the layout viewport and must not slide sideways during normal unzoomed scrolling. Preserve the browser's native two-finger pinch-to-zoom; do not use `user-scalable=no`, a restrictive `maximum-scale`, or touch rules that disable zooming. Search input and placeholder text must remain clearly readable and no smaller than 15 px on mobile.
+On desktop, the complete screen header stays fixed at the top in one non-wrapping row. On mobile, follow the Pāli Chanting Burmese pattern: use one sticky, naturally sized two-row header that remains together at the top during page scrolling. The first row contains the logo, book name, Contents, language button (when present), A−, A+ and Book Mark; the second row contains the search input followed by Search. Both rows are always left-justified and remain fully visible. The page, header and book body must fit the layout viewport and must not slide sideways during normal unzoomed scrolling. Preserve the browser's native two-finger pinch-to-zoom; do not use `user-scalable=no`, a restrictive `maximum-scale`, or touch rules that disable zooming. Search input and placeholder text must remain clearly readable and no smaller than 15 px on mobile.
 
 The repository landing page is not a reader book and is outside this reader-interface contract.
 
@@ -61,15 +61,13 @@ This standard applies only to current and future books in the **PAMCSG/Dhamma-Bo
 
 For every other book, **main text follows contents continuously** in the same page. Contents and Reader controls scroll to their respective positions without hiding either section. Contents links must reach the corresponding heading without a screen header or column-label row covering it.
 
-Preserve all book wording, paragraph order, translations, footnotes, PCED lookup functions, bookmarks, search, and Previously Read behavior. Contents-page column rules do not change side-by-side language columns in the main text. Preserve the existing Pāli Chanting English paired `VANDANĀ | Homage` heading and the fix that keeps its column-label row from covering the title.
+Preserve all book wording, paragraph order, translations, footnotes, PCED lookup functions, bookmarks and search. Contents-page column rules do not change side-by-side language columns in the main text. Preserve the existing Pāli Chanting English paired `VANDANĀ | Homage` heading and the fix that keeps its column-label row from covering the title.
 
 #### Contents-page columns
 
 | Book category | Contents layout |
 | --- | --- |
-| Chanting Book 念诵本, except Daily Chants Burmese | One or two columns permitted; two columns should collapse to one on narrow screens. |
-| All other Dhamma-Books categories | One column only on desktop and mobile. |
-| Daily Chants Burmese | Existing layout retained; excluded from this update. |
+| Every Dhamma-Books category, including Chanting Book 念诵本 | One column only on desktop and mobile. |
 
 Keep entries in the book's original reading order. Titles may wrap naturally; page numbers, where present, remain aligned and readable. Preserve all contents links and section hierarchy.
 
@@ -115,7 +113,7 @@ Implemented shared contents styling (CSS v1.3.1) for all five books currently li
 
 The shared reader JavaScript v1.3.1 identifies these five filenames, adds `body.db-standard-contents`, and refreshes their existing shared CSS link to `?v=1.3.1`. Book HTML files remain byte-for-byte unchanged. Both language editions use the same cream panel, pale heading/group backgrounds, brown headings, solid warm borders, 10 px panel corners, and consistent row spacing. Contents headings are 22 px desktop / 20 px mobile; entries 18 px / 17 px; page numbers 14 px. Language fonts, natural title wrapping, subsection indentation, and right-aligned page numbers are retained. All contents remain one column; the title/page-number cells inside each row do not represent two contents columns.
 
-This change is styling only: original contents entries/targets, book wording, reading flow, language switching, main-text styles, PCED, screen headers, bookmarks, search, and Previously Read behavior are retained. The opt-in does not affect other categories or Daily Chants Burmese. The wider continuous-reading implementation status above remains a separate audit item.
+This change is styling only: original contents entries/targets, book wording, reading flow, language switching, main-text styles, PCED, screen headers, bookmarks and search are retained. The opt-in does not affect other categories or Daily Chants Burmese. The wider continuous-reading implementation status above remains a separate audit item.
 
 
 ### Contents asset-loading correction — 7 September 2026
@@ -150,7 +148,7 @@ Requirements:
 - Combined English/Chinese readers remain one HTML file; index links select the initial language.
 - Inside each multilingual book, provide buttons for all available editions. Switching goes to the corresponding passage or current section, not the cover.
 - Use shared passage IDs or semantic section keys; do not equate printed page numbers across translations.
-- Keep book text, language-specific typography, contents styling, PCED, search, bookmarks and Previously Read behavior.
+- Keep book text, language-specific typography, contents styling, PCED, search and bookmarks.
 - Scope remains Dhamma-Books only. Daily Chants Burmese retains its existing exception.
 
 This rollout adds The Only Way for the Realization of Nibbāna, Paccayaniddeso (English/Chinese), and The Requisites of Enlightenment / 《觉悟资粮——菩提分手册》. The approved pilot files remain unchanged.
@@ -170,7 +168,7 @@ Rollout validation: JavaScript syntax passed; all 39 Paccayaniddeso navigation c
 
 Follow-up to PR #21: The Only Way now uses 49 explicitly paired English/Chinese headings rather than broad chapter/page labels. The final position restoration runs after the original language handler's deferred scrolling. Switching returns to the corresponding shared subsection heading; edition-specific subsections use the preceding shared heading. This is not sentence-level alignment.
 
-Both Paccayaniddeso headers contain English and 中文 links in the HTML, enhanced to passage-preserving buttons by the navigation script. Hide the redundant Reader / 阅读 control while retaining its element for existing reader code. Insert the language group beside Previously Read using that control's actual parent. Requisites index choices place 中文 before English. All four affected readers use navigation version 1.0.1.
+Both Paccayaniddeso headers contain English and 中文 links in the HTML, enhanced to passage-preserving buttons by the navigation script. Hide the redundant Reader / 阅读 control while retaining its element for existing reader code. Insert the language group beside the existing reader controls. Requisites index choices place 中文 before English. All four affected readers use navigation version 1.0.1.
 
 Validation: JavaScript syntax and all 49 unique heading pairs checked; both static edition-link groups and hidden Reader controls verified. Browser rendering and live interaction remain unverified because Chromium is unavailable. Book text and PCED scripts are unchanged.
 
@@ -268,12 +266,16 @@ The active layer is applied inline with important priority, so legacy book-speci
 
 `mindfulness-of-breathing.html` now follows the approved screen-header, scrolling Contents and popup standards in both its English and Chinese editions. The final header is present in the initial HTML, so an old header, duplicate controls, incorrect order or temporary desktop layout cannot appear while JavaScript loads. The desktop header is fixed and non-wrapping; the mobile header remains one complete two-row unit, with Search on the second row. Chinese is listed before English, and one Book Mark window replaces the two legacy bookmark buttons while retaining separate multilingual reading positions.
 
-The English `Content` and Chinese `目录` panels are also present in the initial HTML. Each uses one rounded frame, a non-scrolling title/Expand-Collapse row and the standard fixed-height one-column entries window, with internal scrolling on both desktop and mobile. PCED, footnote and bookmark popups use the current shared below-header positioning, internal scrolling, mouse and one-finger movement, and last-opened-on-top behavior. Book wording, translations, covers, paragraph order, language correspondence, headings, Pāli treatment, footnotes and PCED data are unchanged. This update uses shared stylesheet v1.3.7 and reader JavaScript v1.3.9; the popup runtime remains v1.3.15.
+The English `Content` and Chinese `目录` panels are also present in the initial HTML. Each uses one rounded frame, a non-scrolling title/Expand-Collapse row and the standard fixed-height one-column entries window, with internal scrolling on both desktop and mobile. PCED, footnote and bookmark popups use the current shared below-header positioning, internal scrolling, mouse and one-finger movement, and last-opened-on-top behavior. Book wording, translations, covers, paragraph order, language correspondence, headings, Pāli treatment, footnotes and PCED data are unchanged. This update uses shared stylesheet v1.3.8 and reader JavaScript v1.3.10; the popup runtime remains v1.3.15.
+
+### Automatic last-read control retirement — 11 September 2026
+
+Last Position, Last Read, Previously Read and equivalent automatic-return controls are retired from the Dhamma-Books reader standard for every language and book. Readers must not track page scrolling solely to maintain an automatic last-read position. Book Mark remains the reader-controlled way to save and return to positions. Mindfulness of Breathing is the first reader updated under this decision; the remaining books require a later repository-wide rollout.
 
 
 ### 《止观法要》 reader-interface conformance — 11 September 2026
 
-`zhiguan-fayao.html` now follows the approved screen-header, Contents-window and popup standards. Its desktop header is fixed; its mobile header is one sticky two-row unit with the reader controls on the first row and Search on the second. The former separate save/open bookmark buttons are consolidated into one `书签` control, with `在此处保存书签` inside the existing bookmark popup. Search, font-size controls, Last Position and stored bookmark data are preserved.
+`zhiguan-fayao.html` now follows the approved screen-header, Contents-window and popup standards. Its desktop header is fixed; its mobile header is one sticky two-row unit with the reader controls on the first row and Search on the second. The former separate save/open bookmark buttons are consolidated into one `书签` control, with `在此处保存书签` inside the existing bookmark popup. Search, font-size controls and stored bookmark data are preserved. Removal of its former automatic last-read control remains part of the repository-wide rollout.
 
 The existing one-column Contents entries are placed in a fixed-height internal scrolling window below a non-scrolling `目录` / `收起` title row. The standard desktop and mobile heights, Expand/Collapse behavior, font resizing and below-header link offsets are applied without changing any entry, page number or destination. PCED, footnote and bookmark popups load the current versioned shared runtime for mobile below-header positioning, internal scrolling, mouse and one-finger movement, last-opened-on-top stacking and transparent overlays. Footnote popup titles use `註释` and the shared lighter, smaller header treatment. Book text, translations, paragraph order, images, headings, footnotes and PCED data are unchanged.
 

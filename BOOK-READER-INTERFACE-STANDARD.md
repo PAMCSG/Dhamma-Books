@@ -31,9 +31,8 @@ Use this exact left-to-right sequence:
 5. A−
 6. A+
 7. Book Mark
-8. Last Position
-9. Search field
-10. Search button
+8. Search field
+9. Search button
 
 All controls, fields and rows are left-justified. Do not use a flexible spacer to push some controls to the right.
 
@@ -50,7 +49,7 @@ Labels must follow the active book language. For example, Chinese books use Chin
 Follow the behaviour of Pāli Chanting Burmese and Daily Chants Burmese:
 
 - The complete header is one sticky unit and remains at the top while the book scrolls.
-- The first row contains the logo, book name, Contents, language buttons when applicable, A−, A+, Book Mark and Last Position.
+- The first row contains the logo, book name, Contents, language buttons when applicable, A−, A+ and Book Mark.
 - The second row contains the Search field followed by the Search button.
 - The two rows stay together; the first row must never scroll away while only the Search row remains visible.
 - The Search row occupies the available viewport width without extending beyond it.
@@ -195,12 +194,13 @@ While a Dhammapada PCED, footnote or Nissaya popup is open, keep the exact word,
 
 The 37 Dhammapada Contents links retain their existing unique fragment targets. Handle their navigation explicitly so the selected target is aligned 10 px below the measured complete screen header. During the first navigation after entering the book, recheck that alignment while fonts and any preceding embedded images finish loading and while the initial page height settles. Stop automatic realignment after five seconds or immediately when the reader deliberately scrolls or touches outside another Contents link. Preserve the selected URL fragment. This stability correction is Dhammapada-specific and must not change another book's Contents navigation.
 
-## 7. Book Mark and Last Position
+## 7. Book Mark
 
 - Provide one Book Mark header button, not duplicate legacy bookmark controls.
 - The bookmark window supports add, list, go and delete, with bookmarks stored separately for each book.
-- Last Position returns to the reader's most recently stored position.
-- Restored positions and Contents targets must be offset below the complete header rather than hidden behind it.
+- Do not provide a Last Position, Last Read, Previously Read or equivalent automatic-return control in any book.
+- Do not run background scroll tracking solely to maintain an automatic last-read position.
+- Book Mark destinations and Contents targets must be offset below the complete header rather than hidden behind it.
 
 ## 8. Language editions
 
@@ -220,7 +220,7 @@ An interface-standard change must preserve:
 - footnotes and endnotes;
 - PCED word lookup and its language profile;
 - Chinese-Tipiṭaka terminology integration where applicable;
-- search, bookmarks, Last Position and language navigation not directly being corrected;
+- search, bookmarks and language navigation not directly being corrected;
 - the book's established body typography, Pāli treatment and actual Contents-entry styling.
 
 ## 10. Acceptance checklist
@@ -235,7 +235,7 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 - [ ] Normal mobile scrolling does not move the whole page sideways.
 - [ ] Two-finger pinch-to-zoom still works.
 - [ ] A− and A+ resize both reading text and Contents text.
-- [ ] Book Mark, Last Position and Search work on mobile.
+- [ ] Book Mark and Search work on mobile, and no automatic last-read control is present.
 - [ ] On mobile, a PCED popup opens below the complete book header without covering it; its own header and close button remain visible, and long results scroll internally from the beginning.
 - [ ] Every movable popup can be dragged from its title bar with a mouse and with one finger; title-bar dragging does not scroll the book, popup-body scrolling still works, and enough of the title bar remains visible.
 - [ ] The most recently opened or refreshed popup is always on top at every nesting depth; closing it reveals earlier open popups without resetting them.
@@ -256,9 +256,9 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 ## 11. Implementation status
 
 - `dhammapada-pali-chinese.html` is the approved reference implementation.
-- `the-buddhas-twelve-kinds-of-evil-retribution.html` was brought into conformity on 10 September 2026. Its fixed/sticky header, control order, mobile Search row, collapsible fixed-height Contents window, font controls, Search, Book Mark and Last Position follow this standard. Its book content, cover, illustrations, body design, headings, Pāli treatment, footnotes and PCED integration were preserved.
+- `the-buddhas-twelve-kinds-of-evil-retribution.html` was brought into conformity on 10 September 2026. Its fixed/sticky header, control order, mobile Search row, collapsible fixed-height Contents window, font controls, Search and Book Mark follow this standard. Its book content, cover, illustrations, body design, headings, Pāli treatment, footnotes and PCED integration were preserved. Removal of its former automatic last-read control remains part of the repository-wide rollout.
 - `zhiguan-fayao.html` was brought into conformity on 11 September 2026. Its fixed desktop and two-row sticky mobile header, single Book Mark control, Search row, collapsible fixed-height one-column Contents window, font controls and popup integration follow this standard. Its PCED, footnote and bookmark popups use the shared mobile positioning, movement and last-opened-on-top behavior; Chinese footnote titles use `註释`. Its book content, cover, body hierarchy, Pāli treatment, footnotes and PCED data were preserved.
-- `mindfulness-of-breathing.html` was brought into conformity on 11 September 2026. Its bilingual English/Chinese reader uses the fixed desktop and complete two-row mobile header, with Chinese listed before English, one Book Mark control, Last Position and active-language Search. The final header and both one-column Contents structures are present in the initial HTML, so neither a legacy header nor a temporary layout can flash before JavaScript enhancement. Both English and Chinese Contents entries scroll inside the standard fixed-height window on desktop and mobile beneath a non-scrolling title row. Its PCED, footnote and bookmark popups use the shared below-header positioning, movement, internal scrolling and last-opened-on-top behavior. Book content, covers, language correspondence, headings, Pāli treatment, footnotes and PCED data were preserved.
+- `mindfulness-of-breathing.html` was brought into conformity on 11 September 2026. Its bilingual English/Chinese reader uses the fixed desktop and complete two-row mobile header, with Chinese listed before English, one Book Mark control and active-language Search. It has no Last Position, Last Read or Previously Read control and performs no automatic last-read scroll tracking. The final header and both one-column Contents structures are present in the initial HTML, so neither a legacy header nor a temporary layout can flash before JavaScript enhancement. Both English and Chinese Contents entries scroll inside the standard fixed-height window on desktop and mobile beneath a non-scrolling title row. Its PCED, footnote and bookmark popups use the shared below-header positioning, movement, internal scrolling and last-opened-on-top behavior. Book content, covers, language correspondence, headings, Pāli treatment, footnotes and PCED data were preserved.
 
 ## 12. Applying this standard in a future chat
 

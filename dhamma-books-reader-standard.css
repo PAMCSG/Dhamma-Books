@@ -1,4 +1,4 @@
-/* Dhamma-Books shared reader controls v1.3.7 */
+/* Dhamma-Books shared reader controls v1.3.8 */
 :root{
   --db-header-bg:#A8734F;
   --db-header-text:#ffffff;
@@ -144,8 +144,7 @@ body.db-mindfulness-reader-standard .lang-toggle{order:3}
 body.db-mindfulness-reader-standard #smaller{order:4}
 body.db-mindfulness-reader-standard #larger{order:5}
 body.db-mindfulness-reader-standard .db-bookmark-button{order:6}
-body.db-mindfulness-reader-standard #lastPos{order:7}
-body.db-mindfulness-reader-standard .db-searchbox{order:8}
+body.db-mindfulness-reader-standard .db-searchbox{order:7}
 body.db-mindfulness-reader-standard .lang-toggle #langZh{order:1}
 body.db-mindfulness-reader-standard .lang-toggle #langEn{order:2}
 body.db-mindfulness-reader-standard .contents{font-size:var(--font)!important;overflow:hidden!important}
