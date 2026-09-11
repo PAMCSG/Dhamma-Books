@@ -168,6 +168,12 @@ The title bar uses Pointer Events with pointer capture and `touch-action: none`;
 
 Constrain a moved popup so enough of its title bar remains visible to move or close it. On mobile, do not let dragging cover the complete fixed/sticky book header. Reopening the popup clears its dragged coordinates and restores that popup type's documented default position. Shared movement must not alter popup content, stacking, internal scrolling or close behaviour.
 
+### Popup stacking
+
+Every Dhamma-Books popup participates in one shared last-opened-on-top stack. Whenever a PCED, footnote, bookmark, Nissaya or other supported book-specific popup opens—or is reopened with newly selected content—it must move above every popup that is already open. Do not assign a popup type a permanently higher layer than another popup type.
+
+Nested depth is unrestricted. For example, Dhammapada must support Nissaya → footnote → PCED with PCED on top. Closing the top popup removes only that popup from the stack and reveals every earlier popup in its existing position and state. Preserve independent opener highlights, movement, internal scrolling, transparent-overlay rules and default opening positions. Apply the active layer as an inline important value so old book-specific `z-index` declarations cannot override the shared order.
+
 ### Footnote popup wording
 
 Use `註释`, not `注释`, as the title of a Chinese footnote popup. This terminology rule changes the popup title only; do not rewrite ordinary book text containing `注释`.
@@ -176,7 +182,7 @@ Use `註释`, not `注释`, as the title of a Chinese footnote popup. This termi
 
 `dhammapada-pali-chinese.html` has a book-specific Nissaya/依词释 popup. Its default position is one normal body-text line below the complete rendered screen header on desktop and mobile. Measure the actual header height and body-text line height rather than assuming a fixed offset. Long Nissaya content scrolls internally within the remaining dynamic viewport space, and the popup remains movable.
 
-When a reader selects a footnote superscript inside an open Nissaya popup, the footnote popup must appear above the Nissaya popup. Closing the footnote leaves the Nissaya popup open. This layering rule is limited to Dhammapada and must not change another book's footnote opening or positioning.
+When a reader selects a footnote superscript inside an open Nissaya popup, the footnote popup must appear above the Nissaya popup. Closing the footnote leaves the Nissaya popup open. If a Pāli word in that footnote is then selected, PCED opens above both earlier popups according to the shared popup-stacking standard.
 
 In Dhammapada, the PCED, footnote, bookmark and Nissaya popup overlays are transparent so the main reading text remains visible; their popup panels remain opaque and readable. Preserve their established close controls, outside-click behaviour, internal scrolling and movement. The no-dimming rule is currently Dhammapada-specific.
 
@@ -229,6 +235,7 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 - [ ] Book Mark, Last Position and Search work on mobile.
 - [ ] On mobile, a PCED popup opens below the complete book header without covering it; its own header and close button remain visible, and long results scroll internally from the beginning.
 - [ ] Every movable popup can be dragged from its title bar with a mouse and with one finger; title-bar dragging does not scroll the book, popup-body scrolling still works, and enough of the title bar remains visible.
+- [ ] The most recently opened or refreshed popup is always on top at every nesting depth; closing it reveals earlier open popups without resetting them.
 - [ ] In Dhammapada, Nissaya opens one body-text line below the complete header, a nested footnote opens above it, and popup overlays do not dim the main text.
 - [ ] In Dhammapada, the exact PCED word, footnote superscript or Nissaya button remains highlighted while its popup is open; nested highlights clear independently when their corresponding popup closes.
 - [ ] On the first Dhammapada Contents selection after entry, the correct target remains aligned below the complete header after the initial layout settles.
