@@ -1,4 +1,4 @@
-/* Dhamma-Books shared bookmark, search, header, and chanting-flow behavior v1.3.5 */
+/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.6 */
 (function(){
   'use strict';
   const BOOKMARK_KEY='dhamma-books:bookmarks:'+location.pathname;
@@ -9,6 +9,14 @@
     my:{bookmark:'စာညှပ်',search:'ရှာ',placeholder:'ရှာရန်',modal:'စာညှပ်များ',add:'ဤနေရာတွင် စာညှပ်သိမ်း',current:'လက်ရှိနေရာ - ',empty:'စာညှပ် မရှိသေးပါ။',go:'သွားမည်',remove:'ဖျက်မည်',noResults:'မတွေ့ပါ',matches:n=>n+' ခု တွေ့သည်',close:'စာညှပ်များ ပိတ်ရန်'}
   };
   let beforeSearch=null;
+
+  function ensurePopupMovementStandard(){
+    if(window.PAMCPopupMovement||document.querySelector('script[src*="pced-popup-standard.js"]')) return;
+    const popupScript=document.createElement('script');
+    popupScript.src=new URL('pced-popup-standard.js?v=1.3.13',document.baseURI).href;
+    popupScript.dataset.pcedMode='book';
+    document.head.append(popupScript);
+  }
 
   function pathLanguage(){
     const path=location.pathname.toLowerCase();
@@ -361,6 +369,7 @@
     }
   }
   function init(){
+    ensurePopupMovementStandard();
     installCategoryContentsStyle();
     installApprovedHeadingHierarchy();
     installContinuousChantingFlow();
@@ -382,7 +391,7 @@
     installSearch(controls);
     const bookmark=buildBookmarkModal(allAnchorCandidates());
     controls.bookmark.addEventListener('click',bookmark.openModal);
-    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.5'};
+    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.6'};
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();
