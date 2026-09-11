@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.12 — 2026-09-11 */
+/* PAMC cross-book PCED popup standard v1.3.13 — 2026-09-11 */
 (function () {
   'use strict';
 
@@ -193,8 +193,9 @@
     requestAnimationFrame(() => requestAnimationFrame(reset));
   }
 
-  const PANEL_SELECTOR = '.panel,.pced-panel,.modalcontent,.modal-content,.lookup-panel,.dictionary-panel,.dialog';
-  const HANDLE_SELECTOR = '.panel-head,.pced-panel-head,.modal-header,.dialog-header,.lookup-header,.dict-header,.modal-titlebar';
+  const MOVABLE_MODAL_SELECTOR = '.modal,#pced-modal,[data-modal],.db-bookmark-overlay,.fn-modal';
+  const PANEL_SELECTOR = '.panel,.pced-panel,.modalcontent,.modal-content,.lookup-panel,.dictionary-panel,.dialog,.db-bookmark-panel,.fn-dialog';
+  const HANDLE_SELECTOR = '.panel-head,.pced-panel-head,.modal-header,.dialog-header,.lookup-header,.dict-header,.modal-titlebar,.db-bookmark-head,#fnTitle';
 
   function panelOf(modal) {
     if (!modal) return null;
@@ -214,37 +215,93 @@
     const handle = handleOf(panel);
     if (!panel || !handle) return;
     modal.dataset.pamcMovable = '1';
-    handle.style.cursor = 'move';
-    handle.style.touchAction = 'none';
+    handle.style.setProperty('cursor', 'move', 'important');
+    handle.style.setProperty('touch-action', 'none', 'important');
+    handle.style.setProperty('user-select', 'none', 'important');
     let drag = null;
+
+    const viewport = () => {
+      const view = window.visualViewport;
+      return view ? {
+        left: view.offsetLeft, top: view.offsetTop,
+        right: view.offsetLeft + view.width, bottom: view.offsetTop + view.height
+      } : { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight };
+    };
+
+    const constrainedPosition = (left, top) => {
+      const view = viewport();
+      const titleRect = handle.getBoundingClientRect();
+      const visibleWidth = Math.min(Math.max(titleRect.width * .3, 72), drag.width);
+      const visibleHeight = Math.min(Math.max(titleRect.height, 44), drag.height);
+      const mobile = window.matchMedia?.('(max-width:600px)')?.matches;
+      const protectedTop = mobile ? Math.max(view.top, visibleScreenHeaderBottom()) : view.top;
+      return {
+        left: Math.min(Math.max(left, view.left - drag.width + visibleWidth), view.right - visibleWidth),
+        top: Math.min(Math.max(top, protectedTop), view.bottom - visibleHeight)
+      };
+    };
+
+    const place = (left, top) => {
+      const position = constrainedPosition(left, top);
+      panel.style.setProperty('position', 'fixed', 'important');
+      panel.style.setProperty('left', position.left + 'px', 'important');
+      panel.style.setProperty('top', position.top + 'px', 'important');
+      panel.style.setProperty('width', drag.width + 'px', 'important');
+      panel.style.setProperty('margin', '0', 'important');
+      panel.style.setProperty('transform', 'none', 'important');
+    };
+
     const move = event => {
       if (!drag || event.pointerId !== drag.id) return;
-      panel.style.left = drag.left + event.clientX - drag.x + 'px';
-      panel.style.top = drag.top + event.clientY - drag.y + 'px';
+      place(drag.left + event.clientX - drag.x, drag.top + event.clientY - drag.y);
+      event.preventDefault();
+      event.stopPropagation();
     };
     const end = event => {
       if (!drag || event.pointerId !== drag.id) return;
+      try { handle.releasePointerCapture?.(event.pointerId); } catch (_) {}
       drag = null;
-      window.removeEventListener('pointermove', move, true);
-      window.removeEventListener('pointerup', end, true);
-      window.removeEventListener('pointercancel', end, true);
     };
     handle.addEventListener('pointerdown', event => {
       if (event.pointerType === 'mouse' && event.button !== 0) return;
+      if (event.isPrimary === false) return;
       if (event.target.closest('button,a,input,select,textarea')) return;
       const rect = panel.getBoundingClientRect();
       drag = { id: event.pointerId, x: event.clientX, y: event.clientY, left: rect.left, top: rect.top,
         width: Math.min(rect.width, window.innerWidth), height: rect.height };
-      Object.assign(panel.style, { position: 'fixed',
-        left: rect.left + 'px', top: rect.top + 'px',
-        width: drag.width + 'px', margin: '0', transform: 'none' });
+      place(rect.left, rect.top);
       event.preventDefault();
       event.stopImmediatePropagation();
       try { handle.setPointerCapture?.(event.pointerId); } catch (_) {}
-      window.addEventListener('pointermove', move, true);
-      window.addEventListener('pointerup', end, true);
-      window.addEventListener('pointercancel', end, true);
     }, true);
+    handle.addEventListener('pointermove', move, true);
+    handle.addEventListener('pointerup', end, true);
+    handle.addEventListener('pointercancel', end, true);
+
+    // Fallback for older touch browsers without Pointer Events.
+    if (!window.PointerEvent) {
+      const touchPoint = event => Array.from(event.changedTouches).find(touch => touch.identifier === drag?.id);
+      handle.addEventListener('touchstart', event => {
+        if (event.target.closest('button,a,input,select,textarea') || event.touches.length !== 1) return;
+        const touch = event.changedTouches[0];
+        const rect = panel.getBoundingClientRect();
+        drag = { id: touch.identifier, x: touch.clientX, y: touch.clientY, left: rect.left, top: rect.top,
+          width: Math.min(rect.width, window.innerWidth), height: rect.height };
+        place(rect.left, rect.top);
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }, { capture: true, passive: false });
+      handle.addEventListener('touchmove', event => {
+        const touch = touchPoint(event);
+        if (!drag || !touch) return;
+        place(drag.left + touch.clientX - drag.x, drag.top + touch.clientY - drag.y);
+        event.preventDefault();
+        event.stopPropagation();
+      }, { capture: true, passive: false });
+      const touchEnd = event => { if (touchPoint(event)) drag = null; };
+      handle.addEventListener('touchend', touchEnd, true);
+      handle.addEventListener('touchcancel', touchEnd, true);
+    }
   }
 
   function activateTab(modal, tab) {
@@ -627,6 +684,66 @@
     return location.pathname.split('/').pop().toLowerCase() === 'dhammapada-pali-chinese.html';
   }
 
+  function installDhammapadaContentsNavigation() {
+    if (!isDhammapada()) return;
+    const contents = document.getElementById('zh-contents');
+    if (!contents || contents.dataset.pamcStableNavigation === '1') return;
+    contents.dataset.pamcStableNavigation = '1';
+    let active = null;
+
+    const stop = () => {
+      if (!active) return;
+      active.timers.forEach(clearTimeout);
+      active.resizeObserver?.disconnect();
+      active = null;
+    };
+
+    const align = behavior => {
+      if (!active || performance.now() > active.expires) { stop(); return; }
+      const rect = active.element.getBoundingClientRect();
+      const desiredTop = visibleScreenHeaderBottom() + 10;
+      const top = Math.max(0, window.scrollY + rect.top - desiredTop);
+      if (Math.abs(rect.top - desiredTop) > 1) window.scrollTo({ left: 0, top, behavior });
+    };
+
+    contents.querySelectorAll('a[href^="#"]').forEach(link => link.addEventListener('click', event => {
+      let id;
+      try { id = decodeURIComponent(link.hash.slice(1)); } catch (_) { id = link.hash.slice(1); }
+      const target = document.getElementById(id);
+      if (!target) return;
+      event.preventDefault();
+      stop();
+      const element = target.matches('.anchor-target') ? (target.nextElementSibling || target) : target;
+      active = { element, expires: performance.now() + 5000, timers: [], resizeObserver: null };
+      history.pushState(null, '', link.getAttribute('href'));
+      align('smooth');
+      active.timers.push(setTimeout(() => align('instant'), 100));
+      active.timers.push(setTimeout(() => align('instant'), 300));
+      active.timers.push(setTimeout(() => align('instant'), 700));
+      active.timers.push(setTimeout(() => align('instant'), 1400));
+      active.timers.push(setTimeout(() => { align('instant'); stop(); }, 5000));
+      document.fonts?.ready?.then(() => align('instant'));
+      document.querySelectorAll('img').forEach(image => {
+        const targetFollowsImage = Boolean(image.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_FOLLOWING);
+        if (targetFollowsImage && !image.complete) {
+          image.addEventListener('load', () => align('instant'), { once: true });
+          image.addEventListener('error', () => align('instant'), { once: true });
+        }
+      });
+      if (window.ResizeObserver) {
+        active.resizeObserver = new ResizeObserver(() => align('instant'));
+        active.resizeObserver.observe(document.body);
+      }
+    }));
+
+    // A deliberate reader gesture ends automatic realignment immediately.
+    window.addEventListener('wheel', stop, { passive: true });
+    window.addEventListener('touchstart', stop, { passive: true });
+    window.addEventListener('pointerdown', event => {
+      if (!event.target.closest?.('#zh-contents a[href^="#"]')) stop();
+    }, { passive: true });
+  }
+
   function dhammapadaTriggerModal(element) {
     if (!isDhammapada() || !element) return '';
     if (element.closest?.('.nissaya-button')) return 'nissayaModal';
@@ -736,14 +853,20 @@
 
   function scanModals(root = document) {
     const found = [];
-    if (root.matches?.('.modal,#pced-modal,[data-modal]')) found.push(root);
-    root.querySelectorAll?.('.modal,#pced-modal,[data-modal]').forEach(modal => found.push(modal));
+    if (root.matches?.(MOVABLE_MODAL_SELECTOR)) found.push(root);
+    root.querySelectorAll?.(MOVABLE_MODAL_SELECTOR).forEach(modal => found.push(modal));
     [...new Set(found)].forEach(watchModal);
   }
 
   function init() {
-    if (!core() || !Object.keys(dictionary()).length) return;
     if (isDhammapada()) document.body.classList.add('pamc-dhammapada-popup-standard');
+    installDhammapadaContentsNavigation();
+    scanModals();
+    new MutationObserver(mutations => mutations.forEach(mutation => mutation.addedNodes.forEach(node => {
+      if (node.nodeType === 1) scanModals(node);
+    }))).observe(document.documentElement, { childList: true, subtree: true });
+    window.PAMCPopupMovement = Object.freeze({ install: installMovable, scan: scanModals, version: '1.0.0' });
+    if (!core() || !Object.keys(dictionary()).length) return;
     window.addEventListener('pced-approved-terms-updated', () => {
       livePromise = null;
       queueMicrotask(() => document.querySelectorAll('.modal,#pced-modal,[data-modal]').forEach(modal => {
@@ -860,7 +983,6 @@
     } else {
       window.PCEDStandardData?.applyTo?.(data);
     }
-    scanModals();
     const repositionOpenModals = () => {
       document.querySelectorAll('#dictModal,#lookupModal,#pced-modal').forEach(modal => {
         if (isOpen(modal)) positionBelowMobileHeader(modal);
@@ -870,9 +992,6 @@
     };
     window.addEventListener('resize', repositionOpenModals, { passive: true });
     window.visualViewport?.addEventListener('resize', repositionOpenModals, { passive: true });
-    new MutationObserver(mutations => mutations.forEach(mutation => mutation.addedNodes.forEach(node => {
-      if (node.nodeType === 1) scanModals(node);
-    }))).observe(document.documentElement, { childList: true, subtree: true });
     document.addEventListener('pointerdown', event => {
       rememberDhammapadaSelection(event.target);
       const word = event.target.closest?.('.pali-word,.attha-word,[data-word]');
