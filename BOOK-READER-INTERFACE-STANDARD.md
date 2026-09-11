@@ -125,8 +125,7 @@ Keep each book's existing Contents-entry fonts, hierarchy, colours and styling. 
 
 ### Columns and reading flow
 
-- Books in the Chanting Book 念诵本 category may use one or two Contents columns. Two columns collapse to one on a narrow screen.
-- Every other book uses one Contents column on desktop and mobile.
+- Every book uses one Contents column on desktop and mobile, including books in the Chanting Book 念诵本 category.
 - Main text follows the Contents panel continuously on the same page.
 - Contents links land below the sticky/fixed screen header so the destination heading remains visible.
 
@@ -259,7 +258,7 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 - `dhammapada-pali-chinese.html` is the approved reference implementation.
 - `the-buddhas-twelve-kinds-of-evil-retribution.html` was brought into conformity on 10 September 2026. Its fixed/sticky header, control order, mobile Search row, collapsible fixed-height Contents window, font controls, Search, Book Mark and Last Position follow this standard. Its book content, cover, illustrations, body design, headings, Pāli treatment, footnotes and PCED integration were preserved.
 - `zhiguan-fayao.html` was brought into conformity on 11 September 2026. Its fixed desktop and two-row sticky mobile header, single Book Mark control, Search row, collapsible fixed-height one-column Contents window, font controls and popup integration follow this standard. Its PCED, footnote and bookmark popups use the shared mobile positioning, movement and last-opened-on-top behavior; Chinese footnote titles use `註释`. Its book content, cover, body hierarchy, Pāli treatment, footnotes and PCED data were preserved.
-- `mindfulness-of-breathing.html` was brought into conformity on 11 September 2026. Its bilingual English/Chinese reader uses the fixed desktop and complete two-row mobile header, with Chinese listed before English, one Book Mark control, Last Position and active-language Search. Both one-column Contents panels have the standard non-scrolling title row and fixed-height scrolling entries window. Its PCED, footnote and bookmark popups use the shared below-header positioning, movement, internal scrolling and last-opened-on-top behavior. Book content, covers, language correspondence, headings, Pāli treatment, footnotes and PCED data were preserved.
+- `mindfulness-of-breathing.html` was brought into conformity on 11 September 2026. Its bilingual English/Chinese reader uses the fixed desktop and complete two-row mobile header, with Chinese listed before English, one Book Mark control, Last Position and active-language Search. The final header and both one-column Contents structures are present in the initial HTML, so neither a legacy header nor a temporary layout can flash before JavaScript enhancement. Both English and Chinese Contents entries scroll inside the standard fixed-height window on desktop and mobile beneath a non-scrolling title row. Its PCED, footnote and bookmark popups use the shared below-header positioning, movement, internal scrolling and last-opened-on-top behavior. Book content, covers, language correspondence, headings, Pāli treatment, footnotes and PCED data were preserved.
 
 ## 12. Applying this standard in a future chat
 

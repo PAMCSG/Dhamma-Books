@@ -1,4 +1,4 @@
-/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.8 */
+/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.9 */
 (function(){
   'use strict';
   const BOOKMARK_KEY='dhamma-books:bookmarks:'+location.pathname;
@@ -102,8 +102,16 @@
   }
   function buildControls(){
     const header=screenHeader(),host=headerHost(header);
-    if(!host||document.getElementById('db-standard-controls')) return null;
+    if(!host) return null;
     hideLegacyControls();
+    const existing=document.getElementById('db-standard-controls');
+    if(existing){
+      const bookmark=document.getElementById('db-bookmark-button');
+      const input=document.getElementById('db-search-input');
+      const search=document.getElementById('db-search-button');
+      const status=document.getElementById('db-search-status');
+      return bookmark&&input&&search&&status?{bookmark,input,search,status,controls:existing}:null;
+    }
     const controls=create('div',{id:'db-standard-controls',class:'db-standard-controls'});
     const bookmark=create('button',{id:'db-bookmark-button',type:'button',text:'Book Mark','aria-label':'Open book marks'});
     const searchbox=create('div',{class:'db-searchbox'});
@@ -318,7 +326,7 @@
     const stylesheet=document.querySelector('link[rel="stylesheet"][href*="dhamma-books-reader-standard.css"]');
     if(stylesheet){
       const url=new URL(stylesheet.href,document.baseURI);
-      url.searchParams.set('v','1.3.5');
+      url.searchParams.set('v','1.3.7');
       if(stylesheet.href!==url.href) stylesheet.href=url.href;
     }
   }
@@ -371,23 +379,11 @@
   function installMindfulnessReaderStandard(controls){
     if(location.pathname.split('/').pop().toLowerCase()!=='mindfulness-of-breathing.html') return;
     document.body.classList.add('db-mindfulness-reader-standard');
-    const header=screenHeader(),host=headerHost(header),last=document.getElementById('lastPos');
-    const language=document.querySelector('.lang-toggle'),zh=document.getElementById('langZh'),en=document.getElementById('langEn');
-    if(language&&zh&&en&&language.firstElementChild!==zh) language.insertBefore(zh,en);
-    if(host&&controls?.bookmark&&controls?.input&&last){
-      controls.bookmark.classList.add('db-bookmark-button');
-      host.insertBefore(controls.bookmark,last);
-      last.after(controls.input.closest('.db-searchbox'));
-      if(controls.status) controls.input.closest('.db-searchbox').append(controls.status);
-      controls.controls.remove();
-    }
+    const header=screenHeader();
     document.querySelectorAll('#en-contents,#zh-contents').forEach(contents=>{
-      if(contents.querySelector(':scope > .contents-head')) return;
-      const heading=contents.querySelector(':scope > h2');if(!heading)return;
-      heading.textContent=contents.id==='zh-contents'?'目录':'Content';
-      const head=create('div',{class:'contents-head'}),toggle=create('button',{class:'contents-toggle',type:'button'}),scroll=create('div',{class:'contents-scroll'});
-      [...contents.children].filter(node=>node!==heading).forEach(node=>scroll.append(node));
-      head.append(heading,toggle);contents.append(head,scroll);
+      const toggle=contents.querySelector(':scope > .contents-head > .contents-toggle');
+      const scroll=contents.querySelector(':scope > .contents-scroll');
+      if(!toggle||!scroll)return;
       const setOpen=open=>{contents.classList.toggle('collapsed',!open);toggle.setAttribute('aria-expanded',String(open));toggle.textContent=contents.id==='zh-contents'?(open?'收起':'展开'):(open?'Collapse':'Expand')};
       toggle.addEventListener('click',()=>setOpen(contents.classList.contains('collapsed')));setOpen(true);
     });
@@ -424,7 +420,7 @@
     installSearch(controls);
     const bookmark=buildBookmarkModal(allAnchorCandidates());
     controls.bookmark.addEventListener('click',bookmark.openModal);
-    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.8'};
+    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.9'};
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();
