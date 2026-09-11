@@ -1,4 +1,4 @@
-/* Dhamma-Books shared reader controls v1.3.11 */
+/* Dhamma-Books shared reader controls v1.3.12 */
 :root{
   --db-header-bg:#A8734F;
   --db-header-text:#ffffff;
@@ -239,6 +239,51 @@ body.db-requisites-reader-standard>.modal{background:transparent!important}
   body.db-requisites-reader-standard .contents-head{padding:14px}
   body.db-requisites-reader-standard .contents-scroll{height:calc(46vh + 3.2em)}
   body.db-requisites-reader-standard :is(.section-heading,.contents,[id]){scroll-margin-top:calc(var(--db-requisites-header-height,104px) + 10px)!important}
+}
+
+/* Paṭisambhidāmagga: final static Chinese header and scrolling Contents. */
+body.db-patisambhidamagga-reader-standard{padding-top:var(--db-patisambhidamagga-header-height,66px)!important;overflow-x:clip!important}
+body.db-patisambhidamagga-reader-standard .topbar{position:fixed!important;inset:0 0 auto 0!important;width:100%!important;padding:0!important;z-index:2147482900!important}
+body.db-patisambhidamagga-reader-standard .topbar-inner{width:100%!important;max-width:none!important;margin:0!important;padding:8px 12px!important;display:flex!important;align-items:center!important;gap:8px!important;flex-wrap:nowrap!important;overflow:visible!important}
+body.db-patisambhidamagga-reader-standard .app-brand{order:1;display:flex!important;align-items:center!important;gap:8px!important;flex:0 1 auto!important;min-width:0!important;margin:0!important}
+body.db-patisambhidamagga-reader-standard .app-brand-title{display:block!important;max-width:clamp(145px,24vw,340px)!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+body.db-patisambhidamagga-reader-standard #contentsBtn{order:2}
+body.db-patisambhidamagga-reader-standard #fontMinus{order:3}
+body.db-patisambhidamagga-reader-standard #fontPlus{order:4}
+body.db-patisambhidamagga-reader-standard .db-standard-controls{display:contents!important}
+body.db-patisambhidamagga-reader-standard .db-bookmark-button,
+body.db-patisambhidamagga-reader-standard #db-bookmark-button{order:5}
+body.db-patisambhidamagga-reader-standard .db-searchbox{order:6;min-width:0!important;flex:0 1 auto!important}
+body.db-patisambhidamagga-reader-standard .db-searchbox input{width:clamp(120px,21vw,260px)!important}
+body.db-patisambhidamagga-reader-standard :is(.row article,.closing article,.matika-summary article){font-size:var(--patis-reader-font,17px)!important}
+body.db-patisambhidamagga-reader-standard .patis-contents{font-size:var(--patis-reader-font,17px)!important;overflow:hidden!important;border:1px solid var(--db-line)!important;border-radius:10px!important;background:var(--db-panel)!important}
+body.db-patisambhidamagga-reader-standard .patis-contents .contents-head{display:flex!important;align-items:center!important;gap:12px!important;margin:0!important;padding:16px 20px!important;background:var(--db-pale)!important;color:#66442F!important}
+body.db-patisambhidamagga-reader-standard .patis-contents .contents-head>h2{flex:1!important;margin:0!important;padding:0!important;background:transparent!important;color:#66442F!important;text-align:left!important;font:700 1.15em/1.4 inherit!important}
+body.db-patisambhidamagga-reader-standard .patis-contents .contents-toggle{display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;border:1px solid var(--db-line)!important;border-radius:7px!important;background:var(--db-panel)!important;color:#66442F!important;padding:6px 10px!important;font:700 .78em/1.2 inherit!important;cursor:pointer!important}
+body.db-patisambhidamagga-reader-standard .patis-contents .contents-scroll{height:calc(52vh + 3.2em)!important;overflow-y:auto!important;overscroll-behavior:contain!important;background:var(--db-panel)!important}
+body.db-patisambhidamagga-reader-standard .patis-contents.collapsed .contents-scroll{display:none!important}
+body.db-patisambhidamagga-reader-standard .patis-contents .toc-group{margin:0!important;padding:0!important;border:0!important;border-radius:0!important;overflow:visible!important;background:var(--db-panel)!important}
+body.db-patisambhidamagga-reader-standard .patis-contents .toc-group h3{margin:0!important;padding:11px 18px!important;border-top:1px solid var(--db-line)!important;background:var(--db-pale)!important;color:var(--db-secondary)!important;font:700 1em/1.4 inherit!important}
+body.db-patisambhidamagga-reader-standard .patis-contents .toc-list{columns:auto 1!important;margin:0!important;padding:0!important}
+body.db-patisambhidamagga-reader-standard .patis-contents .toc-list a{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:14px!important;align-items:baseline!important;padding:9px 18px!important;border:0!important;background:var(--db-panel)!important;color:var(--db-ink)!important;font:400 1em/1.45 inherit!important}
+body.db-patisambhidamagga-reader-standard .patis-contents .toc-page{font-size:.82em!important}
+body.db-patisambhidamagga-reader-standard :is(#contents,.anchor-target,.frontmatter-section,.intro-flow,.section-head,.reading-row,.closing,[id]){scroll-margin-top:calc(var(--db-patisambhidamagga-header-height,66px) + 10px)!important}
+@media(max-width:760px){
+  body.db-patisambhidamagga-reader-standard{padding-top:0!important}
+  body.db-patisambhidamagga-reader-standard .topbar{position:sticky!important;inset:auto!important;top:0!important}
+  body.db-patisambhidamagga-reader-standard .topbar-inner{padding:6px 7px!important;gap:3px!important;flex-wrap:wrap!important;align-content:flex-start!important;overflow:visible!important}
+  body.db-patisambhidamagga-reader-standard .app-brand{flex:0 1 clamp(70px,30vw,150px)!important;gap:4px!important}
+  body.db-patisambhidamagga-reader-standard .app-brand-title{display:block!important;max-width:none!important;font-size:16px!important}
+  body.db-patisambhidamagga-reader-standard .topbar button,
+  body.db-patisambhidamagga-reader-standard .topbar a:not(.app-home-logo){min-height:32px!important;padding:4px 6px!important;font-size:12px!important}
+  body.db-patisambhidamagga-reader-standard .db-searchbox{order:20!important;flex:1 1 100%!important;width:100%!important;max-width:100%!important}
+  body.db-patisambhidamagga-reader-standard .db-searchbox input{flex:1 1 auto!important;min-width:0!important;width:auto!important;font-size:15px!important}
+  body.db-patisambhidamagga-reader-standard .db-search-status{flex:0 0 auto!important;font-size:11px!important}
+  body.db-patisambhidamagga-reader-standard .patis-contents .contents-head{padding:14px!important}
+  body.db-patisambhidamagga-reader-standard .patis-contents .contents-scroll{height:calc(46vh + 3.2em)!important}
+  body.db-patisambhidamagga-reader-standard .patis-contents .toc-group h3{padding:10px 14px!important}
+  body.db-patisambhidamagga-reader-standard .patis-contents .toc-list a{padding:9px 14px!important}
+  body.db-patisambhidamagga-reader-standard :is(#contents,.anchor-target,.frontmatter-section,.intro-flow,.section-head,.reading-row,.closing,[id]){scroll-margin-top:calc(var(--db-patisambhidamagga-header-height,104px) + 10px)!important}
 }
 .db-bookmark-panel{width:min(720px,96vw);max-height:86vh;overflow:auto;border-radius:12px;background:var(--db-panel);box-shadow:0 14px 48px #0008}
 .db-bookmark-head{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--db-accent);color:#fff}
