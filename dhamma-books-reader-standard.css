@@ -1,4 +1,4 @@
-/* Dhamma-Books shared reader controls v1.3.12 */
+/* Dhamma-Books shared reader controls v1.3.13 */
 :root{
   --db-header-bg:#A8734F;
   --db-header-text:#ffffff;
@@ -270,15 +270,27 @@ body.db-patisambhidamagga-reader-standard .patis-contents .toc-page{font-size:.8
 body.db-patisambhidamagga-reader-standard :is(#contents,.anchor-target,.frontmatter-section,.intro-flow,.section-head,.reading-row,.closing,[id]){scroll-margin-top:calc(var(--db-patisambhidamagga-header-height,66px) + 10px)!important}
 @media(max-width:760px){
   body.db-patisambhidamagga-reader-standard{padding-top:0!important}
+  html.db-patisambhidamagga-root-standard,
+  body.db-patisambhidamagga-reader-standard{
+    width:100%!important;
+    max-width:100%!important;
+    overflow-x:clip!important;
+  }
   body.db-patisambhidamagga-reader-standard .topbar{position:sticky!important;inset:auto!important;top:0!important}
-  body.db-patisambhidamagga-reader-standard .topbar-inner{padding:6px 7px!important;gap:3px!important;flex-wrap:wrap!important;align-content:flex-start!important;overflow:visible!important}
+  body.db-patisambhidamagga-reader-standard .topbar{max-width:100%!important;transform:none!important}
+  body.db-patisambhidamagga-reader-standard .topbar-inner{width:100%!important;max-width:100%!important;min-width:0!important;padding:6px 7px!important;gap:3px!important;flex-wrap:wrap!important;align-content:flex-start!important;overflow-x:hidden!important;overflow-y:visible!important}
   body.db-patisambhidamagga-reader-standard .app-brand{flex:0 1 clamp(70px,30vw,150px)!important;gap:4px!important}
   body.db-patisambhidamagga-reader-standard .app-brand-title{display:block!important;max-width:none!important;font-size:16px!important}
   body.db-patisambhidamagga-reader-standard .topbar button,
   body.db-patisambhidamagga-reader-standard .topbar a:not(.app-home-logo){min-height:32px!important;padding:4px 6px!important;font-size:12px!important}
   body.db-patisambhidamagga-reader-standard .db-searchbox{order:20!important;flex:1 1 100%!important;width:100%!important;max-width:100%!important}
   body.db-patisambhidamagga-reader-standard .db-searchbox input{flex:1 1 auto!important;min-width:0!important;width:auto!important;font-size:15px!important}
-  body.db-patisambhidamagga-reader-standard .db-search-status{flex:0 0 auto!important;font-size:11px!important}
+  body.db-patisambhidamagga-reader-standard .db-search-status{flex:0 1 auto!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-size:11px!important}
+  body.db-patisambhidamagga-reader-standard :is(main,.book-hero,.book-hero-inner,.book-hero-text,.patis-contents,.contents-head,.contents-scroll,.toc-group,.toc-list,.grid,.row,.reading-row,.section-head,.colhead,article,.paragraph-text,.frontmatter-section,.intro-flow){min-width:0!important;max-width:100%!important}
+  body.db-patisambhidamagga-reader-standard :is(.table-wrap,.intro-table-wrap){max-width:100%!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch}
+  body.db-patisambhidamagga-reader-standard .book-hero-inner{display:flex!important;align-items:flex-start!important;gap:14px!important}
+  body.db-patisambhidamagga-reader-standard .book-cover-frame{flex:0 0 94px!important;width:94px!important;max-width:34vw!important;margin:0!important}
+  body.db-patisambhidamagga-reader-standard .book-hero-text{text-align:left!important;padding-top:0!important}
   body.db-patisambhidamagga-reader-standard .patis-contents .contents-head{padding:14px!important}
   body.db-patisambhidamagga-reader-standard .patis-contents .contents-scroll{height:calc(46vh + 3.2em)!important}
   body.db-patisambhidamagga-reader-standard .patis-contents .toc-group h3{padding:10px 14px!important}
