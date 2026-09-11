@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.13 — 2026-09-11 */
+/* PAMC cross-book PCED popup standard v1.3.14 — 2026-09-11 */
 (function () {
   'use strict';
 
@@ -9,6 +9,8 @@
   let lastWordElement = null;
   let livePromise = null;
   const dhammapadaPopupSelections = new Map();
+  const popupStack = [];
+  const POPUP_Z_BASE = 2147483000;
 
   const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -804,20 +806,38 @@
     if (title?.textContent) title.textContent = title.textContent.replace(/^注释/, '註释');
   }
 
-  function updateDhammapadaPopupLayers() {
-    if (!isDhammapada()) return;
-    const note = document.getElementById('noteModal');
-    const nissaya = document.getElementById('nissayaModal');
-    note?.classList.toggle('pamc-nested-note', Boolean(note && nissaya && isOpen(note) && isOpen(nissaya)));
+  function syncPopupStack() {
+    for (let index = popupStack.length - 1; index >= 0; index--) {
+      const modal = popupStack[index];
+      if (!modal?.isConnected || !isOpen(modal)) popupStack.splice(index, 1);
+    }
+    popupStack.forEach((modal, index) => {
+      modal.style.setProperty('z-index', String(POPUP_Z_BASE + index), 'important');
+    });
   }
 
-  function modalOpened(modal) {
+  function bringPopupToFront(modal) {
+    if (!modal) return;
+    const previous = popupStack.indexOf(modal);
+    if (previous >= 0) popupStack.splice(previous, 1);
+    popupStack.push(modal);
+    syncPopupStack();
+  }
+
+  function removePopupFromStack(modal) {
+    const index = popupStack.indexOf(modal);
+    if (index >= 0) popupStack.splice(index, 1);
+    modal?.style.removeProperty('z-index');
+    syncPopupStack();
+  }
+
+  function modalOpened(modal, raise = true) {
     const panel = panelOf(modal);
     if (panel) for (const name of ['left', 'top', 'width', 'margin', 'transform']) panel.style.removeProperty(name);
     positionBelowMobileHeader(modal);
     positionDhammapadaNissaya(modal);
     normalizeFootnoteTitle(modal);
-    updateDhammapadaPopupLayers();
+    if (raise) bringPopupToFront(modal);
     showDhammapadaSelection(modal);
     installMovable(modal);
     normalizeLanguageHeadings(modal);
@@ -828,7 +848,24 @@
   }
 
   function isOpen(modal) {
-    return modal.classList.contains('open') || modal.getAttribute('aria-hidden') === 'false';
+    if (!modal) return false;
+    if (modal.classList.contains('open') || modal.getAttribute('aria-hidden') === 'false') return true;
+    return modal.getAttribute('aria-hidden') !== 'true' && getComputedStyle(modal).display !== 'none';
+  }
+
+  function popupOpenedByTrigger(element) {
+    if (!element?.closest) return null;
+    let selector = '';
+    if (element.closest('.pali-word,.attha-word,[data-word]')) {
+      selector = '#dictModal,#lookupModal,#pced-modal';
+    } else if (element.closest('.fn-marker,.fn-ref,[data-note]')) {
+      selector = '#noteModal,#footnoteModal,#fnModal';
+    } else if (element.closest('.nissaya-button')) {
+      selector = '#nissayaModal';
+    } else if (element.closest('#goBookmark,#bookmarkBtn,#db-bookmark-button,[data-open-bookmarks]')) {
+      selector = '#bookmarkModal,#db-bookmark-overlay';
+    }
+    return selector ? [...document.querySelectorAll(selector)].find(isOpen) || null : null;
   }
 
   function watchModal(modal) {
@@ -844,8 +881,8 @@
         modal.dataset.pamcViewKey = '';
         modal.dataset.pamcTabTouched = '0';
         clearDhammapadaSelection(modal);
+        removePopupFromStack(modal);
       }
-      updateDhammapadaPopupLayers();
       wasOpen = open;
     }).observe(modal, { attributes: true, attributeFilter: ['class', 'style', 'aria-hidden'] });
     if (wasOpen) queueMicrotask(() => modalOpened(modal));
@@ -865,12 +902,22 @@
     new MutationObserver(mutations => mutations.forEach(mutation => mutation.addedNodes.forEach(node => {
       if (node.nodeType === 1) scanModals(node);
     }))).observe(document.documentElement, { childList: true, subtree: true });
-    window.PAMCPopupMovement = Object.freeze({ install: installMovable, scan: scanModals, version: '1.0.0' });
+    window.PAMCPopupMovement = Object.freeze({ install: installMovable, scan: scanModals, version: '1.1.0' });
+    const raiseTriggeredPopup = event => {
+      if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
+      const trigger = event.target;
+      queueMicrotask(() => {
+        const modal = popupOpenedByTrigger(trigger);
+        if (modal) modalOpened(modal);
+      });
+    };
+    document.addEventListener('click', raiseTriggeredPopup, true);
+    document.addEventListener('keydown', raiseTriggeredPopup, true);
     if (!core() || !Object.keys(dictionary()).length) return;
     window.addEventListener('pced-approved-terms-updated', () => {
       livePromise = null;
-      queueMicrotask(() => document.querySelectorAll('.modal,#pced-modal,[data-modal]').forEach(modal => {
-        if (isOpen(modal)) modalOpened(modal);
+      queueMicrotask(() => document.querySelectorAll(MOVABLE_MODAL_SELECTOR).forEach(modal => {
+        if (isOpen(modal)) modalOpened(modal, false);
       }));
     });
     if (!document.getElementById('pamc-pced-standard-style')) {
@@ -892,7 +939,6 @@
           max-height:calc(100dvh - var(--pamc-nissaya-top,0px) - 8px)!important;
           margin:0 auto!important
         }
-        body.pamc-dhammapada-popup-standard #noteModal.pamc-nested-note{z-index:2147483100!important}
         body.pamc-dhammapada-popup-standard .pamc-popup-selection{
           background:#ffe69a!important;color:inherit!important;outline:2px solid #b7791f!important;
           outline-offset:2px;border-radius:3px!important;box-shadow:0 0 0 2px #fff8!important
@@ -1005,14 +1051,10 @@
     // of depending only on attribute-observer timing.
     document.addEventListener('click', event => {
       const word = event.target.closest?.('.pali-word,.attha-word,[data-word]');
-      if (!word) return;
-      if (word.dataset?.word) {
+      if (word?.dataset?.word) {
         lastWord = word.dataset.word;
         lastWordElement = word;
       }
-      queueMicrotask(() => document.querySelectorAll('.modal,#pced-modal,[data-modal]').forEach(modal => {
-        if (isOpen(modal)) modalOpened(modal);
-      }));
     }, true);
     document.addEventListener('keydown', event => {
       if (event.key !== 'Enter' && event.key !== ' ') return;
