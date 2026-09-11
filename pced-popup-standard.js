@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.15 — 2026-09-11 */
+/* PAMC cross-book PCED popup standard v1.3.16 — 2026-09-11 */
 (function () {
   'use strict';
 
@@ -11,6 +11,7 @@
   const dhammapadaPopupSelections = new Map();
   const popupStack = [];
   const POPUP_Z_BASE = 2147483000;
+  let mobileHeaderSnapshot = null;
 
   const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -672,14 +673,52 @@
   function visibleScreenHeaderBottom() {
     const candidates = document.querySelectorAll('body > header,body > nav,.topbar,.appbar');
     let bottom = 0;
+    let fallbackHeight = 0;
     candidates.forEach(header => {
       const rect = header.getBoundingClientRect();
       const position = getComputedStyle(header).position;
-      if ((position === 'fixed' || position === 'sticky') && rect.top <= 2 && rect.bottom > 0) {
-        bottom = Math.max(bottom, Math.min(rect.bottom, window.innerHeight));
+      if (position === 'fixed' || position === 'sticky') {
+        fallbackHeight = Math.max(fallbackHeight, Math.min(rect.height, window.innerHeight));
+        if (rect.top <= 2 && rect.bottom > 0) {
+          bottom = Math.max(bottom, Math.min(rect.bottom, window.innerHeight));
+        }
       }
     });
-    return Math.ceil(bottom);
+    return Math.ceil(bottom || mobileHeaderSnapshot?.height || fallbackHeight);
+  }
+
+  function captureMobileHeader() {
+    if (!window.matchMedia?.('(max-width:600px)')?.matches) return null;
+    const header = document.querySelector('body > header,body > nav.topbar,body > .topbar,.appbar');
+    if (!header) return null;
+    const rect = header.getBoundingClientRect();
+    const height = Math.ceil(rect.height);
+    if (!height) return mobileHeaderSnapshot;
+    const position = getComputedStyle(header).position;
+    const bodyPadding = parseFloat(getComputedStyle(document.body).paddingTop) || 0;
+    mobileHeaderSnapshot = {
+      height,
+      bodyPadding: position === 'sticky' ? height : bodyPadding
+    };
+    return mobileHeaderSnapshot;
+  }
+
+  function setMobilePopupHeaderGuard(modal, enabled) {
+    const isPcedModal = modal?.id === 'dictModal' || modal?.id === 'lookupModal' || modal?.id === 'pced-modal';
+    if (!isPcedModal) return;
+    if (enabled) {
+      if (!window.matchMedia?.('(max-width:600px)')?.matches) return;
+      const snapshot = mobileHeaderSnapshot || captureMobileHeader();
+      if (!snapshot?.height) return;
+      document.documentElement.style.setProperty('--pamc-mobile-popup-body-padding', snapshot.bodyPadding + 'px');
+      document.body.classList.add('pamc-mobile-popup-header-guard');
+      return;
+    }
+    const anotherPcedPopup = [...document.querySelectorAll('#dictModal,#lookupModal,#pced-modal')]
+      .some(candidate => candidate !== modal && isOpen(candidate));
+    if (anotherPcedPopup) return;
+    document.body.classList.remove('pamc-mobile-popup-header-guard');
+    document.documentElement.style.removeProperty('--pamc-mobile-popup-body-padding');
   }
 
   function isDhammapada() {
@@ -785,9 +824,11 @@
     const isPcedModal = modal?.id === 'dictModal' || modal?.id === 'lookupModal' || modal?.id === 'pced-modal';
     const mobile = window.matchMedia?.('(max-width:600px)')?.matches;
     if (!isPcedModal || !mobile) {
+      setMobilePopupHeaderGuard(modal, false);
       modal?.style.removeProperty('--pamc-pced-header-offset');
       return;
     }
+    setMobilePopupHeaderGuard(modal, true);
     modal.style.setProperty('--pamc-pced-header-offset', visibleScreenHeaderBottom() + 'px');
   }
 
@@ -882,6 +923,7 @@
         modal.dataset.pamcTabTouched = '0';
         clearDhammapadaSelection(modal);
         removePopupFromStack(modal);
+        setMobilePopupHeaderGuard(modal, false);
       }
       wasOpen = open;
     }).observe(modal, { attributes: true, attributeFilter: ['class', 'style', 'aria-hidden'] });
@@ -997,6 +1039,13 @@
         .ai-actions button.primary{background:#9a6b49;color:#fff}
         .ai-help,.ai-status{margin:8px 0;color:#75543d;font-size:14px}
         @media(max-width:600px){
+          body.pamc-mobile-popup-header-guard{padding-top:var(--pamc-mobile-popup-body-padding,0px)!important}
+          body.pamc-mobile-popup-header-guard>header:first-of-type,
+          body.pamc-mobile-popup-header-guard>nav.topbar,
+          body.pamc-mobile-popup-header-guard>.topbar{
+            position:fixed!important;inset:0 0 auto 0!important;top:0!important;width:100%!important;
+            z-index:2147483640!important;transform:none!important
+          }
           .modal,#pced-modal{padding:6px!important}
           #dictModal,#lookupModal,#pced-modal{
             top:var(--pamc-pced-header-offset,0px)!important;
@@ -1039,6 +1088,7 @@
       rememberDhammapadaSelection(event.target);
       const word = event.target.closest?.('.pali-word,.attha-word,[data-word]');
       if (word?.dataset?.word) {
+        captureMobileHeader();
         lastWord = word.dataset.word;
         lastWordElement = word;
       }
@@ -1049,6 +1099,7 @@
     document.addEventListener('click', event => {
       const word = event.target.closest?.('.pali-word,.attha-word,[data-word]');
       if (word?.dataset?.word) {
+        captureMobileHeader();
         lastWord = word.dataset.word;
         lastWordElement = word;
       }
@@ -1058,6 +1109,7 @@
       rememberDhammapadaSelection(event.target);
       const word = event.target.closest?.('.pali-word,.attha-word,[data-word]');
       if (word?.dataset?.word) {
+        captureMobileHeader();
         lastWord = word.dataset.word;
         lastWordElement = word;
       }

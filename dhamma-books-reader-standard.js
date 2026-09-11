@@ -1,4 +1,4 @@
-/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.13 */
+/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.14 */
 (function(){
   'use strict';
   const BOOKMARK_KEY='dhamma-books:bookmarks:'+location.pathname;
@@ -13,7 +13,7 @@
   function ensurePopupMovementStandard(){
     if(window.PAMCPopupMovement||document.querySelector('script[src*="pced-popup-standard.js"]')) return;
     const popupScript=document.createElement('script');
-    popupScript.src=new URL('pced-popup-standard.js?v=1.3.15',document.baseURI).href;
+    popupScript.src=new URL('pced-popup-standard.js?v=1.3.16',document.baseURI).href;
     popupScript.dataset.pcedMode='book';
     document.head.append(popupScript);
   }
@@ -501,7 +501,7 @@
     migratePatisambhidamaggaBookmarks(candidates);
     const bookmark=buildBookmarkModal(candidates);
     controls.bookmark.addEventListener('click',bookmark.openModal);
-    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.13'};
+    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.14'};
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();
