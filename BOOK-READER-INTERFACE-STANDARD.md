@@ -253,6 +253,7 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 
 - `dhammapada-pali-chinese.html` is the approved reference implementation.
 - `the-buddhas-twelve-kinds-of-evil-retribution.html` was brought into conformity on 10 September 2026. Its fixed/sticky header, control order, mobile Search row, collapsible fixed-height Contents window, font controls, Search, Book Mark and Last Position follow this standard. Its book content, cover, illustrations, body design, headings, Pāli treatment, footnotes and PCED integration were preserved.
+- `zhiguan-fayao.html` was brought into conformity on 11 September 2026. Its fixed desktop and two-row sticky mobile header, single Book Mark control, Search row, collapsible fixed-height one-column Contents window, font controls and popup integration follow this standard. Its PCED, footnote and bookmark popups use the shared mobile positioning, movement and last-opened-on-top behavior; Chinese footnote titles use `註释`. Its book content, cover, body hierarchy, Pāli treatment, footnotes and PCED data were preserved.
 
 ## 12. Applying this standard in a future chat
 
