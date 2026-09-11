@@ -277,6 +277,8 @@ Last Position, Last Read, Previously Read and equivalent automatic-return contro
 
 `the-buddhas-twelve-kinds-of-evil-retribution.html` now presents the correct final screen header directly in its initial HTML. The desktop header is fixed, full-width, non-wrapping and contains, in order, the logo and book name, `目录`, A−, A+, `书签`, and Search. The complete mobile header remains one sticky two-row unit, with the same controls on the first row and Search on the second. The retired `上次阅读` control and its automatic scroll/unload position tracking are removed; manual bookmark saving still determines the current position only when the reader chooses to save it.
 
+The book-specific header rules keep its established `书签` and Search controls visible after the shared reader script initializes, preventing the desktop controls from disappearing and keeping the same control set on desktop and mobile. The mobile brand area also reserves sufficient width for the complete Chinese book name without displacing Search from its second row.
+
 The one-column `目录` panel keeps its title and `收起` / `展开` control outside the scrolling entries. Its entries now use the standard fixed internal height on both desktop and mobile, so the Contents itself scrolls on either screen size while the main book text continues below it. The book loads shared stylesheet v1.3.8, reader JavaScript v1.3.10 and popup runtime v1.3.15. Popup overlays remain transparent, so the reading text behind a popup is never dimmed. Book wording, cover, illustrations, paragraph order, headings, Pāli treatment, footnotes, search results, saved bookmarks and PCED data are unchanged.
 
 
