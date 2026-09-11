@@ -1,4 +1,4 @@
-/* Dhamma-Books shared reader controls v1.3.1 */
+/* Dhamma-Books shared reader controls v1.3.6 */
 :root{
   --db-header-bg:#A8734F;
   --db-header-text:#ffffff;
@@ -118,9 +118,57 @@ mark.db-search-hit.db-search-current{
 }
 .db-bookmark-overlay{
   position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;
-  padding:18px;background:#0008;font-family:var(--db-header-font);color:var(--db-ink);
+  padding:18px;background:transparent!important;font-family:var(--db-header-font);color:var(--db-ink);
 }
 .db-bookmark-overlay.open{display:flex}
+/* All book-popup overlays remain transparent so the reading text stays visible.
+   Popup panels themselves retain their opaque backgrounds. */
+body>.modal,
+body>.modalbg,
+body>#pced-modal,
+body>[data-modal],
+body>.fn-modal,
+body>.db-bookmark-overlay{background:transparent!important}
+
+/* Mindfulness of Breathing: approved fixed header and scrolling Contents layout. */
+body.db-mindfulness-reader-standard{padding-top:var(--db-mindfulness-header-height,66px)!important;overflow-x:clip!important}
+body.db-mindfulness-reader-standard .topbar{position:fixed!important;inset:0 0 auto 0!important;width:100%!important;z-index:2147482900!important}
+body.db-mindfulness-reader-standard .topbar-inner{width:100%!important;max-width:none!important;margin:0!important;flex-wrap:nowrap!important;overflow:visible!important}
+body.db-mindfulness-reader-standard .topbar .spacer,
+body.db-mindfulness-reader-standard #saveBookmark,
+body.db-mindfulness-reader-standard #goBookmark{display:none!important}
+body.db-mindfulness-reader-standard .app-brand{order:1}
+body.db-mindfulness-reader-standard #contentsBtn{order:2}
+body.db-mindfulness-reader-standard .lang-toggle{order:3}
+body.db-mindfulness-reader-standard #smaller{order:4}
+body.db-mindfulness-reader-standard #larger{order:5}
+body.db-mindfulness-reader-standard .db-bookmark-button{order:6}
+body.db-mindfulness-reader-standard #lastPos{order:7}
+body.db-mindfulness-reader-standard .db-searchbox{order:8}
+body.db-mindfulness-reader-standard .lang-toggle #langZh{order:1}
+body.db-mindfulness-reader-standard .lang-toggle #langEn{order:2}
+body.db-mindfulness-reader-standard .contents{font-size:var(--font)!important;overflow:hidden!important}
+body.db-mindfulness-reader-standard .contents-head{display:flex;align-items:center;gap:12px;margin:0;padding:16px 20px;background:#F4E9DF;color:#66442F}
+body.db-mindfulness-reader-standard .contents-head>h2{flex:1;margin:0!important;padding:0!important;background:transparent!important;color:#66442F!important;font-size:1.15em!important;line-height:1.4!important}
+body.db-mindfulness-reader-standard .contents-toggle{flex:0 0 auto;border:1px solid #DFCBBB;border-radius:7px;background:#FFFDF9;color:#66442F;padding:6px 10px;font:700 .78em/1.2 inherit;cursor:pointer}
+body.db-mindfulness-reader-standard .contents-scroll{height:calc(52vh + 3.2em);overflow-y:auto;overscroll-behavior:contain;background:#FFFDF9}
+body.db-mindfulness-reader-standard .contents.collapsed .contents-scroll{display:none}
+body.db-mindfulness-reader-standard .contents .toc-row{font-size:1em!important}
+body.db-mindfulness-reader-standard .contents .toc-page{font-size:.8em!important}
+body.db-mindfulness-reader-standard :is(.section-heading,.contents,[id]){scroll-margin-top:calc(var(--db-mindfulness-header-height,66px) + 10px)!important}
+@media(max-width:760px){
+  body.db-mindfulness-reader-standard{padding-top:var(--db-mindfulness-header-height,104px)!important}
+  body.db-mindfulness-reader-standard .topbar-inner{flex-wrap:wrap!important;align-content:flex-start!important;gap:3px!important;padding:6px 7px!important}
+  body.db-mindfulness-reader-standard .app-brand-title{display:none!important}
+  body.db-mindfulness-reader-standard .app-brand{margin:0!important}
+  body.db-mindfulness-reader-standard .topbar button,
+  body.db-mindfulness-reader-standard .topbar a:not(.app-home-logo){font-size:11px!important;padding:5px!important;min-height:32px!important}
+  body.db-mindfulness-reader-standard .lang-toggle button{font-size:11px!important;padding:5px!important;min-height:30px!important}
+  body.db-mindfulness-reader-standard .db-searchbox{order:20!important;flex:1 1 calc(100% - 7px)!important;width:100%!important;max-width:100%!important}
+  body.db-mindfulness-reader-standard .db-searchbox input{font-size:15px!important;min-width:0!important;width:auto!important;flex:1 1 auto!important}
+  body.db-mindfulness-reader-standard .contents-head{padding:14px}
+  body.db-mindfulness-reader-standard .contents-scroll{height:calc(46vh + 3.2em)}
+}
 .db-bookmark-panel{width:min(720px,96vw);max-height:86vh;overflow:auto;border-radius:12px;background:var(--db-panel);box-shadow:0 14px 48px #0008}
 .db-bookmark-head{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--db-accent);color:#fff}
 .db-bookmark-title{margin-right:auto;font-size:18px;font-weight:700}

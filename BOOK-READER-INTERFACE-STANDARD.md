@@ -174,6 +174,10 @@ Every Dhamma-Books popup participates in one shared last-opened-on-top stack. Wh
 
 Nested depth is unrestricted. For example, Dhammapada must support Nissaya → footnote → PCED with PCED on top. Closing the top popup removes only that popup from the stack and reveals every earlier popup in its existing position and state. Preserve independent opener highlights, movement, internal scrolling, transparent-overlay rules and default opening positions. Apply the active layer as an inline important value so old book-specific `z-index` declarations cannot override the shared order.
 
+### Popup background
+
+Every popup overlay in every Dhamma-Books reader must be transparent. Opening PCED, footnote, bookmark, Nissaya or another supported popup must not dim, shade or obscure the reading text behind it. The popup panel itself remains opaque and readable, with its established border and shadow. Preserve the popup's close controls, outside-click behaviour, movement, stacking and internal scrolling.
+
 ### Footnote popup wording
 
 Use `註释`, not `注释`, as the title of a Chinese footnote popup. This terminology rule changes the popup title only; do not rewrite ordinary book text containing `注释`.
@@ -184,7 +188,7 @@ Use `註释`, not `注释`, as the title of a Chinese footnote popup. This termi
 
 When a reader selects a footnote superscript inside an open Nissaya popup, the footnote popup must appear above the Nissaya popup. Closing the footnote leaves the Nissaya popup open. If a Pāli word in that footnote is then selected, PCED opens above both earlier popups according to the shared popup-stacking standard.
 
-In Dhammapada, the PCED, footnote, bookmark and Nissaya popup overlays are transparent so the main reading text remains visible; their popup panels remain opaque and readable. Preserve their established close controls, outside-click behaviour, internal scrolling and movement. The no-dimming rule is currently Dhammapada-specific.
+In Dhammapada, preserve the established transparent PCED, footnote, bookmark and Nissaya overlays together with their opaque panels, close controls, outside-click behaviour, internal scrolling and movement.
 
 While a Dhammapada PCED, footnote or Nissaya popup is open, keep the exact word, footnote superscript or Nissaya button that opened it visibly highlighted in the underlying reading surface. Remove that highlight when its popup closes. Nested popup highlights are independent: opening a footnote from Nissaya keeps the Nissaya trigger highlighted, adds a highlight to the selected footnote superscript, and removes only the footnote highlight when the footnote closes. The highlight must not change book wording, PCED matching or normal search highlighting, and this opener-highlight rule is currently Dhammapada-specific.
 
@@ -236,6 +240,7 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 - [ ] On mobile, a PCED popup opens below the complete book header without covering it; its own header and close button remain visible, and long results scroll internally from the beginning.
 - [ ] Every movable popup can be dragged from its title bar with a mouse and with one finger; title-bar dragging does not scroll the book, popup-body scrolling still works, and enough of the title bar remains visible.
 - [ ] The most recently opened or refreshed popup is always on top at every nesting depth; closing it reveals earlier open popups without resetting them.
+- [ ] Every popup overlay is transparent and does not dim the reading text; every popup panel remains opaque and readable.
 - [ ] In Dhammapada, Nissaya opens one body-text line below the complete header, a nested footnote opens above it, and popup overlays do not dim the main text.
 - [ ] In Dhammapada, the exact PCED word, footnote superscript or Nissaya button remains highlighted while its popup is open; nested highlights clear independently when their corresponding popup closes.
 - [ ] On the first Dhammapada Contents selection after entry, the correct target remains aligned below the complete header after the initial layout settles.
@@ -254,6 +259,7 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 - `dhammapada-pali-chinese.html` is the approved reference implementation.
 - `the-buddhas-twelve-kinds-of-evil-retribution.html` was brought into conformity on 10 September 2026. Its fixed/sticky header, control order, mobile Search row, collapsible fixed-height Contents window, font controls, Search, Book Mark and Last Position follow this standard. Its book content, cover, illustrations, body design, headings, Pāli treatment, footnotes and PCED integration were preserved.
 - `zhiguan-fayao.html` was brought into conformity on 11 September 2026. Its fixed desktop and two-row sticky mobile header, single Book Mark control, Search row, collapsible fixed-height one-column Contents window, font controls and popup integration follow this standard. Its PCED, footnote and bookmark popups use the shared mobile positioning, movement and last-opened-on-top behavior; Chinese footnote titles use `註释`. Its book content, cover, body hierarchy, Pāli treatment, footnotes and PCED data were preserved.
+- `mindfulness-of-breathing.html` was brought into conformity on 11 September 2026. Its bilingual English/Chinese reader uses the fixed desktop and complete two-row mobile header, with Chinese listed before English, one Book Mark control, Last Position and active-language Search. Both one-column Contents panels have the standard non-scrolling title row and fixed-height scrolling entries window. Its PCED, footnote and bookmark popups use the shared below-header positioning, movement, internal scrolling and last-opened-on-top behavior. Book content, covers, language correspondence, headings, Pāli treatment, footnotes and PCED data were preserved.
 
 ## 12. Applying this standard in a future chat
 

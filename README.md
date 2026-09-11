@@ -245,7 +245,7 @@ The offset is recalculated when the popup opens and when the layout or visual vi
 
 `pced-popup-standard.js` v1.3.11 adds behaviour gated to `dhammapada-pali-chinese.html`. The Nissaya/依词释 popup opens one rendered body-text line below the measured fixed or sticky screen header on desktop and mobile, uses the remaining viewport space for internal scrolling, and remains movable. A footnote selected inside an open Nissaya popup is raised above it; closing that footnote leaves the Nissaya popup open.
 
-Dhammapada's PCED, footnote, bookmark and Nissaya popup overlays no longer dim the main reading text, while their panels remain opaque and readable. Other books' footnote opening and positioning are unchanged. Across Dhamma-Books, Chinese footnote popup titles are normalised from `注释` to `註释` without changing ordinary book text. Book HTML, translations, footnotes and PCED data are unchanged.
+Dhammapada's PCED, footnote, bookmark and Nissaya popup overlays no longer dim the main reading text, while their panels remain opaque and readable. Across Dhamma-Books, Chinese footnote popup titles are normalised from `注释` to `註释` without changing ordinary book text. Book HTML, translations, footnotes and PCED data are unchanged.
 
 `pced-popup-standard.js` v1.3.12 also keeps the exact Dhammapada popup opener highlighted while its popup is open: the selected Pāli word for PCED, the selected footnote superscript, or the selected Nissaya button. Each popup owns its highlight, so a footnote opened over Nissaya adds a second highlight and closing it restores the still-highlighted Nissaya context underneath. Closing a popup removes only its own highlight. This behaviour is gated to Dhammapada and does not alter other books, search highlighting, popup positioning, dictionary matching, or book content.
 
@@ -264,8 +264,20 @@ The same version makes popup movement a shared Dhamma-Books standard. Movable PC
 The active layer is applied inline with important priority, so legacy book-specific `z-index` rules cannot place a newer popup underneath an older one. The former Dhammapada-only nested-footnote layer is retired. `dhamma-books-reader-standard.js` v1.3.7 requests popup standard v1.3.14 when bootstrapping movement and layering support for readers without their own PCED script. Book HTML, popup content, footnotes and PCED data remain unchanged.
 
 
+### Mindfulness of Breathing reader-interface conformance — 11 September 2026
+
+`mindfulness-of-breathing.html` now follows the approved screen-header, scrolling Contents and popup standards in both its English and Chinese editions. The desktop header is fixed and non-wrapping; the mobile header remains one complete two-row unit, with Search on the second row. Chinese is listed before English, and one Book Mark window replaces the two legacy bookmark buttons while retaining separate multilingual reading positions.
+
+The English `Content` and Chinese `目录` panels use one rounded frame, a non-scrolling title/Expand-Collapse row and the standard fixed-height one-column entries window. PCED, footnote and bookmark popups use the current shared below-header positioning, internal scrolling, mouse and one-finger movement, and last-opened-on-top behavior. Book wording, translations, covers, paragraph order, language correspondence, headings, Pāli treatment, footnotes and PCED data are unchanged.
+
+
 ### 《止观法要》 reader-interface conformance — 11 September 2026
 
 `zhiguan-fayao.html` now follows the approved screen-header, Contents-window and popup standards. Its desktop header is fixed; its mobile header is one sticky two-row unit with the reader controls on the first row and Search on the second. The former separate save/open bookmark buttons are consolidated into one `书签` control, with `在此处保存书签` inside the existing bookmark popup. Search, font-size controls, Last Position and stored bookmark data are preserved.
 
-The existing one-column Contents entries are placed in a fixed-height internal scrolling window below a non-scrolling `目录` / `收起` title row. The standard desktop and mobile heights, Expand/Collapse behavior, font resizing and below-header link offsets are applied without changing any entry, page number or destination. PCED, footnote and bookmark popups load the current versioned shared runtime for mobile below-header positioning, internal scrolling, mouse and one-finger movement, and last-opened-on-top stacking. Footnote popup titles use `註释` and the shared lighter, smaller header treatment. Dhammapada's transparent-overlay exception is not applied. Book text, translations, paragraph order, images, headings, footnotes and PCED data are unchanged.
+The existing one-column Contents entries are placed in a fixed-height internal scrolling window below a non-scrolling `目录` / `收起` title row. The standard desktop and mobile heights, Expand/Collapse behavior, font resizing and below-header link offsets are applied without changing any entry, page number or destination. PCED, footnote and bookmark popups load the current versioned shared runtime for mobile below-header positioning, internal scrolling, mouse and one-finger movement, last-opened-on-top stacking and transparent overlays. Footnote popup titles use `註释` and the shared lighter, smaller header treatment. Book text, translations, paragraph order, images, headings, footnotes and PCED data are unchanged.
+
+
+### Repository-wide popup background standard — 11 September 2026
+
+All Dhamma-Books popup overlays are transparent so opening PCED, footnote, bookmark, Nissaya or another supported popup never dims the reading text behind it. Popup panels remain opaque and readable, retaining their established border, shadow, close behaviour, movement, internal scrolling and last-opened-on-top order. The shared stylesheet is v1.3.6, `pced-popup-standard.js` is v1.3.15, and `dhamma-books-reader-standard.js` is v1.3.8.
