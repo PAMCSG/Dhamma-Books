@@ -158,6 +158,16 @@ Keep each book's existing Contents-entry fonts, hierarchy, colours and styling. 
 - Reopening a popup starts at the beginning of its results.
 - Preserve the established ability to move the popup and preserve all PCED lookup data, matching and display order.
 
+### Popup movement
+
+Every movable Dhamma-Books popup must support both mouse dragging on desktop and one-finger dragging on mobile. This includes PCED, footnote, bookmark and book-specific popup panels. Dragging begins only from the popup title bar; close buttons, links, inputs and other interactive controls in that bar retain their normal action and must not begin a drag.
+
+The title bar uses Pointer Events with pointer capture and `touch-action: none`; provide a non-passive touch fallback for older browsers without Pointer Events. A title-bar drag must not scroll the underlying book page, while the popup body remains independently scrollable. Apply the dragged `position`, `left`, `top`, `width`, `margin` and `transform` with sufficient priority to override book-specific flex or mobile popup layout rules.
+
+`pced-popup-standard.js` supplies the shared movement implementation and watches existing and dynamically created popup panels. A reader that does not otherwise load the PCED popup script must bootstrap its movement-only support through `dhamma-books-reader-standard.js`; this currently covers Daily Chants Burmese without changing its documented layout exception.
+
+Constrain a moved popup so enough of its title bar remains visible to move or close it. On mobile, do not let dragging cover the complete fixed/sticky book header. Reopening the popup clears its dragged coordinates and restores that popup type's documented default position. Shared movement must not alter popup content, stacking, internal scrolling or close behaviour.
+
 ### Footnote popup wording
 
 Use `註释`, not `注释`, as the title of a Chinese footnote popup. This terminology rule changes the popup title only; do not rewrite ordinary book text containing `注释`.
@@ -171,6 +181,10 @@ When a reader selects a footnote superscript inside an open Nissaya popup, the f
 In Dhammapada, the PCED, footnote, bookmark and Nissaya popup overlays are transparent so the main reading text remains visible; their popup panels remain opaque and readable. Preserve their established close controls, outside-click behaviour, internal scrolling and movement. The no-dimming rule is currently Dhammapada-specific.
 
 While a Dhammapada PCED, footnote or Nissaya popup is open, keep the exact word, footnote superscript or Nissaya button that opened it visibly highlighted in the underlying reading surface. Remove that highlight when its popup closes. Nested popup highlights are independent: opening a footnote from Nissaya keeps the Nissaya trigger highlighted, adds a highlight to the selected footnote superscript, and removes only the footnote highlight when the footnote closes. The highlight must not change book wording, PCED matching or normal search highlighting, and this opener-highlight rule is currently Dhammapada-specific.
+
+### Dhammapada Contents navigation
+
+The 37 Dhammapada Contents links retain their existing unique fragment targets. Handle their navigation explicitly so the selected target is aligned 10 px below the measured complete screen header. During the first navigation after entering the book, recheck that alignment while fonts and any preceding embedded images finish loading and while the initial page height settles. Stop automatic realignment after five seconds or immediately when the reader deliberately scrolls or touches outside another Contents link. Preserve the selected URL fragment. This stability correction is Dhammapada-specific and must not change another book's Contents navigation.
 
 ## 7. Book Mark and Last Position
 
@@ -214,8 +228,10 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 - [ ] A− and A+ resize both reading text and Contents text.
 - [ ] Book Mark, Last Position and Search work on mobile.
 - [ ] On mobile, a PCED popup opens below the complete book header without covering it; its own header and close button remain visible, and long results scroll internally from the beginning.
+- [ ] Every movable popup can be dragged from its title bar with a mouse and with one finger; title-bar dragging does not scroll the book, popup-body scrolling still works, and enough of the title bar remains visible.
 - [ ] In Dhammapada, Nissaya opens one body-text line below the complete header, a nested footnote opens above it, and popup overlays do not dim the main text.
 - [ ] In Dhammapada, the exact PCED word, footnote superscript or Nissaya button remains highlighted while its popup is open; nested highlights clear independently when their corresponding popup closes.
+- [ ] On the first Dhammapada Contents selection after entry, the correct target remains aligned below the complete header after the initial layout settles.
 - [ ] Cover remains on the left on mobile without causing horizontal overflow.
 - [ ] Contents uses one outer frame with no inner frame.
 - [ ] Contents title row stays outside the scrolling entries.
