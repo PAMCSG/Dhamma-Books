@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.11 — 2026-09-11 */
+/* PAMC cross-book PCED popup standard v1.3.12 — 2026-09-11 */
 (function () {
   'use strict';
 
@@ -8,6 +8,7 @@
   let lastWord = '';
   let lastWordElement = null;
   let livePromise = null;
+  const dhammapadaPopupSelections = new Map();
 
   const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -626,6 +627,41 @@
     return location.pathname.split('/').pop().toLowerCase() === 'dhammapada-pali-chinese.html';
   }
 
+  function dhammapadaTriggerModal(element) {
+    if (!isDhammapada() || !element) return '';
+    if (element.closest?.('.nissaya-button')) return 'nissayaModal';
+    if (element.closest?.('.fn-marker')) return 'noteModal';
+    if (element.closest?.('.pali-word,.attha-word,[data-word]')) return 'dictModal';
+    return '';
+  }
+
+  function rememberDhammapadaSelection(element) {
+    const modalId = dhammapadaTriggerModal(element);
+    const trigger = modalId === 'nissayaModal'
+      ? element.closest('.nissaya-button')
+      : modalId === 'noteModal'
+        ? element.closest('.fn-marker')
+        : element.closest('.pali-word,.attha-word,[data-word]');
+    if (!modalId || !trigger) return;
+    const previous = dhammapadaPopupSelections.get(modalId);
+    if (previous !== trigger) previous?.classList?.remove('pamc-popup-selection');
+    dhammapadaPopupSelections.set(modalId, trigger);
+  }
+
+  function showDhammapadaSelection(modal) {
+    if (!isDhammapada() || !modal?.id) return;
+    const trigger = dhammapadaPopupSelections.get(modal.id);
+    if (!trigger?.isConnected) return;
+    trigger.classList.add('pamc-popup-selection');
+  }
+
+  function clearDhammapadaSelection(modal) {
+    if (!isDhammapada() || !modal?.id) return;
+    const trigger = dhammapadaPopupSelections.get(modal.id);
+    trigger?.classList?.remove('pamc-popup-selection');
+    dhammapadaPopupSelections.delete(modal.id);
+  }
+
   function positionBelowMobileHeader(modal) {
     const isPcedModal = modal?.id === 'dictModal' || modal?.id === 'lookupModal' || modal?.id === 'pced-modal';
     const mobile = window.matchMedia?.('(max-width:600px)')?.matches;
@@ -665,6 +701,7 @@
     positionDhammapadaNissaya(modal);
     normalizeFootnoteTitle(modal);
     updateDhammapadaPopupLayers();
+    showDhammapadaSelection(modal);
     installMovable(modal);
     normalizeLanguageHeadings(modal);
     if (mode !== 'reader') openFirstView(modal);
@@ -689,6 +726,7 @@
       if (!open && wasOpen) {
         modal.dataset.pamcViewKey = '';
         modal.dataset.pamcTabTouched = '0';
+        clearDhammapadaSelection(modal);
       }
       updateDhammapadaPopupLayers();
       wasOpen = open;
@@ -732,6 +770,10 @@
           margin:0 auto!important
         }
         body.pamc-dhammapada-popup-standard #noteModal.pamc-nested-note{z-index:2147483100!important}
+        body.pamc-dhammapada-popup-standard .pamc-popup-selection{
+          background:#ffe69a!important;color:inherit!important;outline:2px solid #b7791f!important;
+          outline-offset:2px;border-radius:3px!important;box-shadow:0 0 0 2px #fff8!important
+        }
         .modal .panel,.modal .pced-panel,.modal .modalcontent,.modal .modal-content,.modal .lookup-panel,.modal .dictionary-panel,.modal .dialog,
         #pced-modal .panel,#pced-modal .pced-panel,#pced-modal .modalcontent,#pced-modal .modal-content{
           background:var(--pamc-popup-paper)!important;color:var(--pamc-popup-ink)!important;border:1px solid #a97958!important;border-radius:13px!important;box-shadow:0 20px 70px #0006!important;max-height:92vh
@@ -832,6 +874,7 @@
       if (node.nodeType === 1) scanModals(node);
     }))).observe(document.documentElement, { childList: true, subtree: true });
     document.addEventListener('pointerdown', event => {
+      rememberDhammapadaSelection(event.target);
       const word = event.target.closest?.('.pali-word,.attha-word,[data-word]');
       if (word?.dataset?.word) {
         lastWord = word.dataset.word;
@@ -854,6 +897,7 @@
     }, true);
     document.addEventListener('keydown', event => {
       if (event.key !== 'Enter' && event.key !== ' ') return;
+      rememberDhammapadaSelection(event.target);
       const word = event.target.closest?.('.pali-word,.attha-word,[data-word]');
       if (word?.dataset?.word) {
         lastWord = word.dataset.word;

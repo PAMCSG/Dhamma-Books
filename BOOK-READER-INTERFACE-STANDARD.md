@@ -170,6 +170,8 @@ When a reader selects a footnote superscript inside an open Nissaya popup, the f
 
 In Dhammapada, the PCED, footnote, bookmark and Nissaya popup overlays are transparent so the main reading text remains visible; their popup panels remain opaque and readable. Preserve their established close controls, outside-click behaviour, internal scrolling and movement. The no-dimming rule is currently Dhammapada-specific.
 
+While a Dhammapada PCED, footnote or Nissaya popup is open, keep the exact word, footnote superscript or Nissaya button that opened it visibly highlighted in the underlying reading surface. Remove that highlight when its popup closes. Nested popup highlights are independent: opening a footnote from Nissaya keeps the Nissaya trigger highlighted, adds a highlight to the selected footnote superscript, and removes only the footnote highlight when the footnote closes. The highlight must not change book wording, PCED matching or normal search highlighting, and this opener-highlight rule is currently Dhammapada-specific.
+
 ## 7. Book Mark and Last Position
 
 - Provide one Book Mark header button, not duplicate legacy bookmark controls.
@@ -213,6 +215,7 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 - [ ] Book Mark, Last Position and Search work on mobile.
 - [ ] On mobile, a PCED popup opens below the complete book header without covering it; its own header and close button remain visible, and long results scroll internally from the beginning.
 - [ ] In Dhammapada, Nissaya opens one body-text line below the complete header, a nested footnote opens above it, and popup overlays do not dim the main text.
+- [ ] In Dhammapada, the exact PCED word, footnote superscript or Nissaya button remains highlighted while its popup is open; nested highlights clear independently when their corresponding popup closes.
 - [ ] Cover remains on the left on mobile without causing horizontal overflow.
 - [ ] Contents uses one outer frame with no inner frame.
 - [ ] Contents title row stays outside the scrolling entries.
