@@ -133,7 +133,39 @@ Keep each book's existing Contents-entry fonts, hierarchy, colours and styling. 
 - Main text follows the Contents panel continuously on the same page.
 - Contents links land below the sticky/fixed screen header so the destination heading remains visible.
 
-## 5. Book cover
+## 5. Desktop page width
+
+This width classification applies to the reading page on the web/desktop layout. It does not change the rule that every Contents panel uses one column.
+
+### Wider two-column readers
+
+The following books use side-by-side or otherwise two-column reading bodies and retain their existing approved wider desktop page widths:
+
+- `patisambhidamagga.html` — 《辨析道》
+- `daily-chants.html` — Daily Chants, English
+- `paccayaniddeso.html` — Paccayaniddeso, English
+- `paccayaniddeso-chinese.html` — Paccayaniddeso, Chinese
+- `pali-chanting-book.html` — Pāḷi Chanting Book, English
+- `pali-chanting-book-chinese.html` — Pāḷi Chanting Book, Chinese
+- `pali-chanting-book-burmese.html` — Pāḷi Chanting Book, Burmese
+
+Do not narrow these readers to the standard one-column width when applying a general interface correction.
+
+### Standard-width readers
+
+Every other book follows the desktop reading-page width of `the-requisites-of-enlightenment.html` (觉悟资粮):
+
+```css
+width: min(1080px, calc(100% - 28px));
+margin-left: auto;
+margin-right: auto;
+```
+
+The page therefore has a maximum desktop width of 1080 px, remains centred and keeps at least 14 px clearance on each side when the browser is narrower. Apply this rule to every language panel of a multilingual book. Mobile width and containment continue to follow the mobile screen-header and no-sideways-movement requirements in this document.
+
+When a request says to improve or correct the page width according to the standard, first classify the book using this section, then apply the corresponding desktop width without changing its content, columns or mobile layout.
+
+## 6. Book cover
 
 - Display the cover on the left and the title/edition information on the right on both desktop and mobile.
 - Do not centre the cover above the text on mobile.
@@ -141,7 +173,7 @@ Keep each book's existing Contents-entry fonts, hierarchy, colours and styling. 
 - Allow the information column to shrink and wrap naturally; it must not force horizontal page movement.
 - Preserve the original cover image, wording, credits and metadata.
 
-## 6. Search
+## 7. Search
 
 - Search must work with touch and mouse input.
 - Search only the active visible reading text.
@@ -200,7 +232,7 @@ While a Dhammapada PCED, footnote or Nissaya popup is open, keep the exact word,
 
 The 37 Dhammapada Contents links retain their existing unique fragment targets. Handle their navigation explicitly so the selected target is aligned 10 px below the measured complete screen header. During the first navigation after entering the book, recheck that alignment while fonts and any preceding embedded images finish loading and while the initial page height settles. Stop automatic realignment after five seconds or immediately when the reader deliberately scrolls or touches outside another Contents link. Preserve the selected URL fragment. This stability correction is Dhammapada-specific and must not change another book's Contents navigation.
 
-## 7. Book Mark
+## 8. Book Mark
 
 - Provide one Book Mark header button, not duplicate legacy bookmark controls.
 - The bookmark window supports add, list, go and delete, with bookmarks stored separately for each book.
@@ -208,14 +240,14 @@ The 37 Dhammapada Contents links retain their existing unique fragment targets. 
 - Do not run background scroll tracking solely to maintain an automatic last-read position.
 - Book Mark destinations and Contents targets must be offset below the complete header rather than hidden behind it.
 
-## 8. Language editions
+## 9. Language editions
 
 - A multilingual book displays only the language buttons that actually exist.
 - Put Chinese first where Chinese and English buttons are paired.
 - Switching languages should return to the corresponding passage or nearest shared heading, using semantic section identifiers rather than raw page percentages.
 - Header labels, Search feedback and bookmark actions follow the active language.
 
-## 9. Non-regression requirements
+## 10. Non-regression requirements
 
 An interface-standard change must preserve:
 
@@ -229,7 +261,7 @@ An interface-standard change must preserve:
 - search, bookmarks and language navigation not directly being corrected;
 - the book's established body typography, Pāli treatment and actual Contents-entry styling.
 
-## 10. Mandatory full-conformance procedure and acceptance checklist
+## 11. Mandatory full-conformance procedure and acceptance checklist
 
 Whenever a request says to improve, correct or change a book "according to the standard documentation," treat it as a complete conformance task for that book, not as permission to copy only the most visible styling. The following procedure is mandatory:
 
@@ -255,6 +287,7 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 - [ ] All header items and both rows are left-justified.
 - [ ] Every header wording uses the shared multilingual font stack; book-specific fonts do not override it.
 - [ ] Every button and button-like link label is centred vertically and horizontally.
+- [ ] On desktop, the book uses the correct page-width category: the listed two-column readers retain their approved wider width, and every other reader matches the centred 1080 px maximum width of 觉悟资粮.
 - [ ] Normal mobile scrolling does not move the whole page sideways.
 - [ ] Two-finger pinch-to-zoom still works.
 - [ ] A− and A+ resize both reading text and Contents text.
@@ -276,17 +309,17 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 - [ ] Inline scripts compile and no existing reader feature regresses.
 - [ ] Only the intended book interface and documentation changed.
 
-## 11. Implementation status
+## 12. Implementation status
 
 - `dhammapada-pali-chinese.html` is the approved reference implementation. Its former `上次阅读` control and automatic scroll/unload position tracking were removed on 11 September 2026. Book Mark continues to determine the current position only when the reader deliberately saves a bookmark.
 - `the-buddhas-twelve-kinds-of-evil-retribution.html` was brought into full conformity on 11 September 2026. Its final header is present in the initial HTML: fixed and non-wrapping on desktop, and one complete sticky two-row unit on mobile with Search on the second row. The book-specific header rules keep its established `书签` and Search controls visible after shared reader enhancement on both screen sizes, and the mobile first row reserves enough space for the complete Chinese book name. It has no Last Position, Last Read or Previously Read control and performs no automatic last-read scroll tracking. Its one-column Contents uses the standard fixed-height internal scrolling window on desktop and mobile beneath a non-scrolling title row. Search, reader-controlled Book Mark, font controls, transparent popup overlays and current shared popup behavior are preserved. Its book content, cover, illustrations, body design, headings, Pāli treatment, footnotes and PCED integration were not changed.
 - `zhiguan-fayao.html` was brought into full conformity on 11 September 2026. Its final fixed desktop header and complete two-row sticky mobile header are present in the initial HTML, and its book-specific visibility rules keep the established `书签` and Search controls visible after shared reader enhancement on both screen sizes. It has no Last Position, Last Read or Previously Read control and performs no automatic last-read scroll tracking; manual Book Mark saving determines the current position only when the reader chooses to save it. Its collapsible fixed-height one-column Contents window, font controls and popup integration follow this standard. Its PCED, footnote and bookmark popups use the shared mobile positioning, movement, last-opened-on-top and transparent-overlay behavior; Chinese footnote titles use `註释`. Its book content, cover, body hierarchy, Pāli treatment, footnotes and PCED data were preserved.
 - `mindfulness-of-breathing.html` was brought into conformity on 11 September 2026. Its bilingual English/Chinese reader uses the fixed desktop and complete two-row mobile header, with Chinese listed before English, one Book Mark control and active-language Search. It has no Last Position, Last Read or Previously Read control and performs no automatic last-read scroll tracking. The final header and both one-column Contents structures are present in the initial HTML, so neither a legacy header nor a temporary layout can flash before JavaScript enhancement. Both English and Chinese Contents entries scroll inside the standard fixed-height window on desktop and mobile beneath a non-scrolling title row. Its PCED, footnote and bookmark popups use the shared below-header positioning, movement, internal scrolling and last-opened-on-top behavior. Book content, covers, language correspondence, headings, Pāli treatment, footnotes and PCED data were preserved.
-- `the-only-way-for-realization-of-nibbana.html` was brought into source-level conformity on 11 September 2026. Its bilingual English/Chinese reader places the final header in the initial HTML in the required order, with Chinese before English, one Book Mark control, Search and no Last Position, Last Read or automatic last-read tracking. A synchronous saved-language bootstrap makes the correct language header and reading panel visible on first paint instead of briefly showing the other edition while the large self-contained file parses. The desktop header is fixed and non-wrapping; the complete mobile header is one sticky two-row unit with Search on the second row and document-level horizontal containment. Its English `Content` and Chinese `目录` each use one frame, a non-scrolling Expand/Collapse title row and the standard fixed-height one-column entries window on desktop and mobile. Existing deliberate legacy bookmarks are imported into the shared Book Mark window without restoring automatic position tracking. Popup overlays remain transparent and current shared popup positioning, movement, internal scrolling and stacking are preserved. The book wording, translations, covers, paragraph order, heading hierarchy, Pāli treatment, footnotes and PCED data were preserved. Source and structural checks pass; deployed physical-device confirmation remains pending.
+- `the-only-way-for-realization-of-nibbana.html` was brought into source-level conformity on 11 September 2026. Its bilingual English/Chinese reader places the final header in the initial HTML in the required order, with Chinese before English, one Book Mark control, Search and no Last Position, Last Read or automatic last-read tracking. A synchronous saved-language bootstrap makes the correct language header and reading panel visible on first paint instead of briefly showing the other edition while the large self-contained file parses. The desktop header is fixed and non-wrapping; the complete mobile header is one sticky two-row unit with Search on the second row and document-level horizontal containment. Its English `Content` and Chinese `目录` each use one frame, a non-scrolling Expand/Collapse title row and the standard fixed-height one-column entries window on desktop and mobile. Existing deliberate legacy bookmarks are imported into the shared Book Mark window without restoring automatic position tracking. Popup overlays remain transparent and current shared popup positioning, movement, internal scrolling and stacking are preserved. A same-day width correction removed an overly broad desktop `max-width:100%` override and set both language panels to the standard-width-book reference used by 觉悟资粮: centred, with a 1080 px maximum and 14 px minimum clearance on each side. The mobile layout was not changed. The book wording, translations, covers, paragraph order, heading hierarchy, Pāli treatment, footnotes and PCED data were preserved. Source and structural checks pass; deployed physical-device confirmation remains pending.
 - `the-requisites-of-enlightenment.html` was brought into conformity on 11 September 2026. Its bilingual English/Chinese reader places the final header structure in the initial HTML, with Chinese before English, one Book Mark control, active-language Search and no automatic last-read control or tracking. The desktop header is fixed in one non-wrapping row; the complete mobile header stays together as a sticky two-row unit, with Search on the second row. Its English `Content` and Chinese `目录` panels each use one rounded frame, a non-scrolling Expand/Collapse title row and the standard fixed-height one-column entries window on desktop and mobile. Existing legacy bookmark data is imported into the shared Book Mark window without deleting the old stored value. PCED, footnote and bookmark overlays remain transparent, their panels remain opaque, and Chinese footnote titles use `註释`. Book wording, translations, covers, paragraph order, headings, Pāli treatment, footnotes and PCED data were preserved.
 - `patisambhidamagga.html` was brought into conformity on 11 September 2026. Its final Chinese screen header is present in the initial HTML in the required order, with one Book Mark control, Search and no `上次阅读` or automatic last-read tracking. The desktop header is fixed and non-wrapping; the complete mobile header is one sticky two-row unit with Search on the second row. Its single-column `目录` uses one rounded frame, a non-scrolling title and Expand/Collapse row, and the standard fixed-height internally scrolling entries window on desktop and mobile. Existing reader-controlled bookmarks are imported into the shared Book Mark window. Popup overlays remain transparent, popup panels remain opaque and movable, and Chinese note titles use `註释`. Follow-up corrections on the same date added complete document-level mobile width containment and a mobile PCED header guard: the rendered header height is captured before the page lock, the header remains fixed above the popup while it is open, popup opening and dragging stay below it, and the header returns to its normal sticky state after closing. Both root elements are viewport-bounded, the header clips accidental row overflow, reading containers can shrink, genuinely wide tables remain inside their own scrollers, and the cover remains on the left beside its information. The established side-by-side Pāli–Chinese reading body, book wording, cover image, front matter, paragraph alignment, footnotes and PCED data were preserved. The correction is source-validated and awaits deployed physical-device confirmation.
 
-## 12. Applying this standard in a future chat
+## 13. Applying this standard in a future chat
 
 Use this instruction:
 
