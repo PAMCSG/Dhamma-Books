@@ -69,7 +69,7 @@ Use `overflow-x: clip` or an equivalent layout-width correction at the document 
 | Control font size | 14 px desktop; 12 px mobile |
 | Search input and placeholder | At least 15 px on mobile |
 
-Use this same shared font stack for every wording in the screen header, including the book name, Contents, language labels, A−, A+, Book Mark, Search input and Search button. The book name and button labels are bold; Search input text and its placeholder are regular weight. Do not allow book-specific fonts to override the shared header font.
+Use this same shared font stack for every wording in the screen header, including the book name, Contents, language labels, A−, A+, Book Mark, Search input and Search button. Apply it with equal priority to native `<button>` controls and button-like `<a>` links so, for example, a linked Contents control cannot retain a different legacy font. The book name and button labels are bold; Search input text and its placeholder are regular weight. Do not allow book-specific fonts to override the shared header font.
 
 Centre every button label and every button-like header link both vertically and horizontally. Implement this on the control itself with flex alignment (`align-items: center` and `justify-content: center`), centred text and a consistent line height; do not rely on unequal padding to make a label appear centred.
 

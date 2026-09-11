@@ -1,4 +1,4 @@
-/* Dhamma-Books shared reader controls v1.3.9 */
+/* Dhamma-Books shared reader controls v1.3.10 */
 :root{
   --db-header-bg:#A8734F;
   --db-header-text:#ffffff;
@@ -100,6 +100,7 @@ body>.topbar a:not(.app-home-logo):not(.home-logo){
   box-sizing:border-box!important;
   text-align:center!important;
   vertical-align:middle!important;
+  font-family:var(--db-header-font)!important;
   line-height:1.2!important;
   font-weight:700!important;
 }
