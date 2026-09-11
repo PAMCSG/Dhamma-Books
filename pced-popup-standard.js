@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.14 — 2026-09-11 */
+/* PAMC cross-book PCED popup standard v1.3.15 — 2026-09-11 */
 (function () {
   'use strict';
 
@@ -927,10 +927,7 @@
         :root{--pamc-popup-brown:#75482d;--pamc-popup-brown-dark:#603921;--pamc-popup-tan:#ead8c3;--pamc-popup-paper:#fffdf9;--pamc-popup-ink:#2d2924;--pamc-popup-blue:#0b4f8a;--pamc-popup-line:#ddc7b1}
         .modal,#pced-modal,[data-modal]{color:var(--pamc-popup-ink);font-family:Georgia,"Times New Roman","Noto Serif SC","Songti SC",SimSun,serif;font-size:18px}
         #dictModal,#lookupModal,#pced-modal{z-index:2147483000!important}
-        body.pamc-dhammapada-popup-standard #dictModal,
-        body.pamc-dhammapada-popup-standard #noteModal,
-        body.pamc-dhammapada-popup-standard #bookmarkModal,
-        body.pamc-dhammapada-popup-standard #nissayaModal{background:transparent!important}
+        body>.modal,body>.modalbg,body>#pced-modal,body>[data-modal],body>.fn-modal,body>.db-bookmark-overlay{background:transparent!important}
         body.pamc-dhammapada-popup-standard #nissayaModal{
           top:var(--pamc-nissaya-top,0px)!important;bottom:0!important;align-items:flex-start!important;padding-top:0!important
         }

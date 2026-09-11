@@ -1,4 +1,4 @@
-/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.7 */
+/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.8 */
 (function(){
   'use strict';
   const BOOKMARK_KEY='dhamma-books:bookmarks:'+location.pathname;
@@ -13,7 +13,7 @@
   function ensurePopupMovementStandard(){
     if(window.PAMCPopupMovement||document.querySelector('script[src*="pced-popup-standard.js"]')) return;
     const popupScript=document.createElement('script');
-    popupScript.src=new URL('pced-popup-standard.js?v=1.3.14',document.baseURI).href;
+    popupScript.src=new URL('pced-popup-standard.js?v=1.3.15',document.baseURI).href;
     popupScript.dataset.pcedMode='book';
     document.head.append(popupScript);
   }
@@ -368,6 +368,38 @@
       });
     }
   }
+  function installMindfulnessReaderStandard(controls){
+    if(location.pathname.split('/').pop().toLowerCase()!=='mindfulness-of-breathing.html') return;
+    document.body.classList.add('db-mindfulness-reader-standard');
+    const header=screenHeader(),host=headerHost(header),last=document.getElementById('lastPos');
+    const language=document.querySelector('.lang-toggle'),zh=document.getElementById('langZh'),en=document.getElementById('langEn');
+    if(language&&zh&&en&&language.firstElementChild!==zh) language.insertBefore(zh,en);
+    if(host&&controls?.bookmark&&controls?.input&&last){
+      controls.bookmark.classList.add('db-bookmark-button');
+      host.insertBefore(controls.bookmark,last);
+      last.after(controls.input.closest('.db-searchbox'));
+      if(controls.status) controls.input.closest('.db-searchbox').append(controls.status);
+      controls.controls.remove();
+    }
+    document.querySelectorAll('#en-contents,#zh-contents').forEach(contents=>{
+      if(contents.querySelector(':scope > .contents-head')) return;
+      const heading=contents.querySelector(':scope > h2');if(!heading)return;
+      heading.textContent=contents.id==='zh-contents'?'目录':'Content';
+      const head=create('div',{class:'contents-head'}),toggle=create('button',{class:'contents-toggle',type:'button'}),scroll=create('div',{class:'contents-scroll'});
+      [...contents.children].filter(node=>node!==heading).forEach(node=>scroll.append(node));
+      head.append(heading,toggle);contents.append(head,scroll);
+      const setOpen=open=>{contents.classList.toggle('collapsed',!open);toggle.setAttribute('aria-expanded',String(open));toggle.textContent=contents.id==='zh-contents'?(open?'收起':'展开'):(open?'Collapse':'Expand')};
+      toggle.addEventListener('click',()=>setOpen(contents.classList.contains('collapsed')));setOpen(true);
+    });
+    document.getElementById('contentsBtn')?.addEventListener('click',event=>{
+      event.preventDefault();const contents=document.getElementById(currentLanguage()==='zh'?'zh-contents':'en-contents');
+      contents?.classList.remove('collapsed');const toggle=contents?.querySelector('.contents-toggle');
+      if(toggle){toggle.setAttribute('aria-expanded','true');toggle.textContent=currentLanguage()==='zh'?'收起':'Collapse'}
+      contents?.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+    const measure=()=>header&&document.documentElement.style.setProperty('--db-mindfulness-header-height',Math.ceil(header.getBoundingClientRect().height)+'px');
+    measure();addEventListener('resize',measure,{passive:true});if(header&&window.ResizeObserver)new ResizeObserver(measure).observe(header);
+  }
   function init(){
     ensurePopupMovementStandard();
     installCategoryContentsStyle();
@@ -375,6 +407,7 @@
     installContinuousChantingFlow();
     const controls=buildControls();
     if(!controls) return;
+    installMindfulnessReaderStandard(controls);
     function applyLanguage(){
       const text=words();
       controls.bookmark.textContent=text.bookmark;
@@ -391,7 +424,7 @@
     installSearch(controls);
     const bookmark=buildBookmarkModal(allAnchorCandidates());
     controls.bookmark.addEventListener('click',bookmark.openModal);
-    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.7'};
+    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.8'};
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();
