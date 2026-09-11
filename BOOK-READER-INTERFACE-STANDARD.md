@@ -158,6 +158,18 @@ Keep each book's existing Contents-entry fonts, hierarchy, colours and styling. 
 - Reopening a popup starts at the beginning of its results.
 - Preserve the established ability to move the popup and preserve all PCED lookup data, matching and display order.
 
+### Footnote popup wording
+
+Use `註释`, not `注释`, as the title of a Chinese footnote popup. This terminology rule changes the popup title only; do not rewrite ordinary book text containing `注释`.
+
+### Dhammapada nested popups
+
+`dhammapada-pali-chinese.html` has a book-specific Nissaya/依词释 popup. Its default position is one normal body-text line below the complete rendered screen header on desktop and mobile. Measure the actual header height and body-text line height rather than assuming a fixed offset. Long Nissaya content scrolls internally within the remaining dynamic viewport space, and the popup remains movable.
+
+When a reader selects a footnote superscript inside an open Nissaya popup, the footnote popup must appear above the Nissaya popup. Closing the footnote leaves the Nissaya popup open. This layering rule is limited to Dhammapada and must not change another book's footnote opening or positioning.
+
+In Dhammapada, the PCED, footnote, bookmark and Nissaya popup overlays are transparent so the main reading text remains visible; their popup panels remain opaque and readable. Preserve their established close controls, outside-click behaviour, internal scrolling and movement. The no-dimming rule is currently Dhammapada-specific.
+
 ## 7. Book Mark and Last Position
 
 - Provide one Book Mark header button, not duplicate legacy bookmark controls.
@@ -200,6 +212,7 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 - [ ] A− and A+ resize both reading text and Contents text.
 - [ ] Book Mark, Last Position and Search work on mobile.
 - [ ] On mobile, a PCED popup opens below the complete book header without covering it; its own header and close button remain visible, and long results scroll internally from the beginning.
+- [ ] In Dhammapada, Nissaya opens one body-text line below the complete header, a nested footnote opens above it, and popup overlays do not dim the main text.
 - [ ] Cover remains on the left on mobile without causing horizontal overflow.
 - [ ] Contents uses one outer frame with no inner frame.
 - [ ] Contents title row stays outside the scrolling entries.
