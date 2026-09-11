@@ -239,3 +239,10 @@ Validation: reversing the style insertions and these two marker corrections repr
 `pced-popup-standard.js` v1.3.10 keeps PCED dictionary popups clear of fixed or sticky book headers. On mobile, it measures the actual rendered screen-header height and opens the popup immediately below the complete visible header. Long definitions are constrained to internal scrolling within the dynamic viewport space that remains below the header. The selectors are limited to the supported PCED modal IDs: `dictModal`, `lookupModal`, and `pced-modal`.
 
 The offset is recalculated when the popup opens and when the layout or visual viewport resizes. The popup remains movable and continues to reopen at the beginning. Desktop positioning, dictionary data, matching logic, result order, book text, footnotes and reader controls are unchanged. Static validation confirms the dynamic header-offset and remaining-height rules and the existing PCED script reference in 《佛陀的十二种恶报》; live mobile interaction remains to be checked after deployment.
+
+
+### Dhammapada Nissaya and footnote popup interaction — 11 September 2026
+
+`pced-popup-standard.js` v1.3.11 adds behaviour gated to `dhammapada-pali-chinese.html`. The Nissaya/依词释 popup opens one rendered body-text line below the measured fixed or sticky screen header on desktop and mobile, uses the remaining viewport space for internal scrolling, and remains movable. A footnote selected inside an open Nissaya popup is raised above it; closing that footnote leaves the Nissaya popup open.
+
+Dhammapada's PCED, footnote, bookmark and Nissaya popup overlays no longer dim the main reading text, while their panels remain opaque and readable. Other books' footnote opening and positioning are unchanged. Across Dhamma-Books, Chinese footnote popup titles are normalised from `注释` to `註释` without changing ordinary book text. Book HTML, translations, footnotes and PCED data are unchanged.
