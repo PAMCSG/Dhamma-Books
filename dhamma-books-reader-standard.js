@@ -1,4 +1,4 @@
-/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.14 */
+/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.15 */
 (function(){
   'use strict';
   const BOOKMARK_KEY='dhamma-books:bookmarks:'+location.pathname;
@@ -327,7 +327,7 @@
     const stylesheet=document.querySelector('link[rel="stylesheet"][href*="dhamma-books-reader-standard.css"]');
     if(stylesheet){
       const url=new URL(stylesheet.href,document.baseURI);
-      url.searchParams.set('v','1.3.13');
+      url.searchParams.set('v','1.3.14');
       if(stylesheet.href!==url.href) stylesheet.href=url.href;
     }
   }
@@ -424,6 +424,33 @@
     const measure=()=>header&&document.documentElement.style.setProperty('--db-requisites-header-height',Math.ceil(header.getBoundingClientRect().height)+'px');
     measure();addEventListener('resize',measure,{passive:true});if(header&&window.ResizeObserver)new ResizeObserver(measure).observe(header);
   }
+  function installOnlyWayReaderStandard(){
+    if(location.pathname.split('/').pop().toLowerCase()!=='the-only-way-for-realization-of-nibbana.html') return;
+    document.body.classList.add('db-only-way-reader-standard','db-standard-contents');
+    const header=screenHeader();
+    document.querySelectorAll('#en-contents,#zh-contents').forEach(contents=>{
+      const toggle=contents.querySelector(':scope > .contents-head > .contents-toggle');
+      const scroll=contents.querySelector(':scope > .contents-scroll');
+      if(!toggle||!scroll) return;
+      const setOpen=open=>{
+        contents.classList.toggle('collapsed',!open);
+        toggle.setAttribute('aria-expanded',String(open));
+        toggle.textContent=contents.id==='zh-contents'?(open?'收起':'展开'):(open?'Collapse':'Expand');
+      };
+      toggle.addEventListener('click',()=>setOpen(contents.classList.contains('collapsed')));
+      setOpen(true);
+    });
+    document.getElementById('contentsBtn')?.addEventListener('click',event=>{
+      event.preventDefault();
+      const contents=document.getElementById(currentLanguage()==='zh'?'zh-contents':'en-contents');
+      contents?.classList.remove('collapsed');
+      const toggle=contents?.querySelector('.contents-toggle');
+      if(toggle){toggle.setAttribute('aria-expanded','true');toggle.textContent=currentLanguage()==='zh'?'收起':'Collapse'}
+      contents?.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+    const measure=()=>header&&document.documentElement.style.setProperty('--db-only-way-header-height',Math.ceil(header.getBoundingClientRect().height)+'px');
+    measure();addEventListener('resize',measure,{passive:true});if(header&&window.ResizeObserver)new ResizeObserver(measure).observe(header);
+  }
   function installPatisambhidamaggaReaderStandard(){
     if(location.pathname.split('/').pop().toLowerCase()!=='patisambhidamagga.html') return;
     document.body.classList.add('db-patisambhidamagga-reader-standard','db-standard-contents');
@@ -472,6 +499,19 @@
     }).filter(Boolean);
     if(imported.length) saveBookmarks(imported);
   }
+  function migrateOnlyWayBookmarks(candidates){
+    if(location.pathname.split('/').pop().toLowerCase()!=='the-only-way-for-realization-of-nibbana.html') return;
+    if(loadBookmarks().length) return;
+    const imported=[];
+    ['en','zh'].forEach((lang,index)=>{
+      let legacy='';try{legacy=localStorage.getItem('tow-bookmark-'+lang)||''}catch{}
+      const target=legacy&&document.getElementById(legacy);
+      const candidate=target&&(candidates.includes(target)?target:target.closest('.source-page,.page-anchor,.text-block,.pair-row,.reading-row,.source-paragraph,.verse-card,section[id],article[id]'));
+      if(!candidate) return;
+      imported.push({id:'legacy-'+Date.now()+'-'+index,createdAt:new Date().toISOString(),anchor:candidate.dataset.dbBookmarkAnchor||'',offset:0,scrollY:0,lang,label:bookmarkLabel(target)});
+    });
+    if(imported.length) saveBookmarks(imported);
+  }
   function init(){
     ensurePopupMovementStandard();
     installCategoryContentsStyle();
@@ -481,6 +521,7 @@
     if(!controls) return;
     installMindfulnessReaderStandard(controls);
     installRequisitesReaderStandard();
+    installOnlyWayReaderStandard();
     installPatisambhidamaggaReaderStandard();
     function applyLanguage(){
       const text=words();
@@ -499,9 +540,10 @@
     const candidates=allAnchorCandidates();
     migrateRequisitesBookmark(candidates);
     migratePatisambhidamaggaBookmarks(candidates);
+    migrateOnlyWayBookmarks(candidates);
     const bookmark=buildBookmarkModal(candidates);
     controls.bookmark.addEventListener('click',bookmark.openModal);
-    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.14'};
+    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.15'};
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();

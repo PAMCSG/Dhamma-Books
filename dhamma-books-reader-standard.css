@@ -1,4 +1,4 @@
-/* Dhamma-Books shared reader controls v1.3.13 */
+/* Dhamma-Books shared reader controls v1.3.14 */
 :root{
   --db-header-bg:#A8734F;
   --db-header-text:#ffffff;
@@ -239,6 +239,77 @@ body.db-requisites-reader-standard>.modal{background:transparent!important}
   body.db-requisites-reader-standard .contents-head{padding:14px}
   body.db-requisites-reader-standard .contents-scroll{height:calc(46vh + 3.2em)}
   body.db-requisites-reader-standard :is(.section-heading,.contents,[id]){scroll-margin-top:calc(var(--db-requisites-header-height,104px) + 10px)!important}
+}
+
+/* The Only Way for the Realization of Nibbāna: final first-paint bilingual
+   header, viewport containment and independently scrolling Contents. */
+html.db-only-way-root-standard[data-tow-lang="en"] .tow-label-zh,
+html.db-only-way-root-standard[data-tow-lang="zh"] .tow-label-en{display:none!important}
+html.db-only-way-root-standard[data-tow-lang="zh"] #reader-en,
+html.db-only-way-root-standard[data-tow-lang="en"] #reader-zh{display:none!important}
+html.db-only-way-root-standard[data-tow-lang="zh"] #reader-zh,
+html.db-only-way-root-standard[data-tow-lang="en"] #reader-en{display:block!important}
+html.db-only-way-root-standard[data-tow-lang="zh"] #langZh,
+html.db-only-way-root-standard[data-tow-lang="en"] #langEn{background:#fff!important;color:#71472f!important;border-color:#fff!important}
+html.db-only-way-root-standard[data-tow-lang="zh"] #langEn,
+html.db-only-way-root-standard[data-tow-lang="en"] #langZh{background:transparent!important;color:#fff!important}
+body.db-only-way-reader-standard{padding-top:var(--db-only-way-header-height,66px)!important;overflow-x:clip!important}
+body.db-only-way-reader-standard .topbar{position:fixed!important;inset:0 0 auto 0!important;width:100%!important;padding:0!important;z-index:2147482900!important}
+body.db-only-way-reader-standard .topbar-inner{width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;padding:8px 12px!important;display:flex!important;align-items:center!important;gap:8px!important;flex-wrap:nowrap!important;overflow:visible!important}
+body.db-only-way-reader-standard .db-standard-controls{display:contents!important}
+body.db-only-way-reader-standard .app-brand{order:1;display:flex!important;align-items:center!important;gap:8px!important;flex:0 1 auto!important;min-width:0!important;margin:0!important}
+body.db-only-way-reader-standard .app-brand-title{display:block!important;max-width:clamp(145px,23vw,350px)!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+body.db-only-way-reader-standard #contentsBtn{order:2}
+body.db-only-way-reader-standard .lang-toggle{order:3}
+body.db-only-way-reader-standard #smaller{order:4}
+body.db-only-way-reader-standard #larger{order:5}
+body.db-only-way-reader-standard :is(.db-bookmark-button,#db-bookmark-button){order:6}
+body.db-only-way-reader-standard .db-searchbox{order:7;min-width:0!important;flex:0 1 auto!important}
+body.db-only-way-reader-standard .db-searchbox input{width:clamp(105px,17vw,230px)!important}
+body.db-only-way-reader-standard .lang-toggle #langZh{order:1}
+body.db-only-way-reader-standard .lang-toggle #langEn{order:2}
+body.db-only-way-reader-standard :is(.reader,.cover,.cover-text,.contents,.contents-head,.contents-scroll,.text-block,.section-heading,.subheading){min-width:0!important;max-width:100%!important}
+body.db-only-way-reader-standard .contents{font-size:var(--font)!important;overflow:hidden!important;border:1px solid var(--db-line)!important;border-radius:10px!important;background:var(--db-panel)!important}
+body.db-only-way-reader-standard .contents-head{display:flex!important;align-items:center!important;gap:12px!important;margin:0!important;padding:16px 20px!important;background:var(--db-pale)!important;color:#66442F!important}
+body.db-only-way-reader-standard .contents-head>h2{flex:1!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;color:#66442F!important;text-align:left!important;font:700 1.15em/1.4 inherit!important;letter-spacing:normal!important}
+body.db-only-way-reader-standard .contents-toggle{display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;border:1px solid var(--db-line)!important;border-radius:7px!important;background:var(--db-panel)!important;color:#66442F!important;padding:6px 10px!important;font:700 .78em/1.2 inherit!important;cursor:pointer!important}
+body.db-only-way-reader-standard .contents-scroll{height:calc(52vh + 3.2em)!important;overflow-y:auto!important;overscroll-behavior:contain!important;background:var(--db-panel)!important}
+body.db-only-way-reader-standard .contents.collapsed .contents-scroll{display:none!important}
+body.db-only-way-reader-standard .contents .toc-row{font-size:1em!important}
+body.db-only-way-reader-standard .contents .toc-page{font-size:.8em!important}
+body.db-only-way-reader-standard :is(.page-anchor,.section-heading,.subheading,.text-block,.cover,.contents,[id]){scroll-margin-top:calc(var(--db-only-way-header-height,66px) + 10px)!important}
+body.db-only-way-reader-standard>.modal{background:transparent!important}
+@media(min-width:761px) and (max-width:1100px){
+  body.db-only-way-reader-standard .topbar-inner{gap:4px!important;padding:7px!important}
+  body.db-only-way-reader-standard .app-brand-title{max-width:110px!important}
+  body.db-only-way-reader-standard .db-searchbox input{width:90px!important}
+  body.db-only-way-reader-standard .topbar button,
+  body.db-only-way-reader-standard .topbar a:not(.app-home-logo){padding:6px!important}
+}
+@media(max-width:760px){
+  html.db-only-way-root-standard,
+  body.db-only-way-reader-standard{width:100%!important;max-width:100%!important;overflow-x:clip!important}
+  body.db-only-way-reader-standard{padding-top:0!important}
+  body.db-only-way-reader-standard .topbar{position:sticky!important;inset:auto!important;top:0!important;max-width:100%!important;transform:none!important}
+  body.db-only-way-reader-standard .topbar-inner{width:100%!important;max-width:100%!important;min-width:0!important;padding:6px 7px!important;gap:2px!important;flex-wrap:wrap!important;align-content:flex-start!important;overflow-x:hidden!important;overflow-y:visible!important}
+  body.db-only-way-reader-standard .app-brand{flex:0 1 clamp(43px,15vw,70px)!important;gap:3px!important}
+  body.db-only-way-reader-standard .app-brand-title{display:block!important;max-width:none!important;font-size:16px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+  body.db-only-way-reader-standard .app-home-logo{flex:0 0 30px!important;width:30px!important;height:38px!important;padding:2px!important}
+  body.db-only-way-reader-standard .app-home-logo img{width:23px!important;height:32px!important}
+  body.db-only-way-reader-standard .topbar button,
+  body.db-only-way-reader-standard .topbar a:not(.app-home-logo){min-height:32px!important;padding:4px!important;font-size:11px!important}
+  body.db-only-way-reader-standard .lang-toggle button{min-height:30px!important;padding:4px!important;font-size:11px!important}
+  body.db-only-way-reader-standard .db-searchbox{order:20!important;display:flex!important;flex:1 1 100%!important;width:100%!important;max-width:100%!important;min-width:0!important}
+  body.db-only-way-reader-standard .db-searchbox input{flex:1 1 auto!important;min-width:0!important;width:auto!important;max-width:none!important;font-size:15px!important}
+  body.db-only-way-reader-standard .db-search-status{flex:0 1 auto!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-size:11px!important}
+  body.db-only-way-reader-standard :is(main,.reader,.cover,.cover-text,.contents,.contents-head,.contents-scroll,.text-block,.section-heading,.subheading,.table-wrap,table){min-width:0!important;max-width:100%!important}
+  body.db-only-way-reader-standard :is(.table-wrap,.table-scroll){max-width:100%!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch}
+  body.db-only-way-reader-standard .cover{display:flex!important;align-items:flex-start!important;gap:14px!important}
+  body.db-only-way-reader-standard .cover img{order:-1!important;flex:0 0 94px!important;width:94px!important;max-width:34vw!important;margin:0!important}
+  body.db-only-way-reader-standard .cover-text{flex:1 1 auto!important;text-align:left!important}
+  body.db-only-way-reader-standard .contents-head{padding:14px!important}
+  body.db-only-way-reader-standard .contents-scroll{height:calc(46vh + 3.2em)!important}
+  body.db-only-way-reader-standard :is(.page-anchor,.section-heading,.subheading,.text-block,.cover,.contents,[id]){scroll-margin-top:calc(var(--db-only-way-header-height,104px) + 10px)!important}
 }
 
 /* Paṭisambhidāmagga: final static Chinese header and scrolling Contents. */
