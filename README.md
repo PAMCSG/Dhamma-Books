@@ -270,7 +270,7 @@ The English `Content` and Chinese `目录` panels are also present in the initia
 
 ### Automatic last-read control retirement — 11 September 2026
 
-Last Position, Last Read, Previously Read and equivalent automatic-return controls are retired from the Dhamma-Books reader standard for every language and book. Readers must not track page scrolling solely to maintain an automatic last-read position. Book Mark remains the reader-controlled way to save and return to positions. Mindfulness of Breathing is the first reader updated under this decision; the remaining books require a later repository-wide rollout.
+Last Position, Last Read, Previously Read and equivalent automatic-return controls are retired from the Dhamma-Books reader standard for every language and book. Readers must not track page scrolling solely to maintain an automatic last-read position. Book Mark remains the reader-controlled way to save and return to positions. Mindfulness of Breathing and Dhammapada are updated under this decision; the remaining books require a later repository-wide rollout. Dhammapada still determines the current reading position when the reader deliberately saves a bookmark, but it no longer tracks scrolling or unloading in the background.
 
 
 ### 《止观法要》 reader-interface conformance — 11 September 2026
