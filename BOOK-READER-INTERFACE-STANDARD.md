@@ -167,11 +167,17 @@ When a request says to improve or correct the page width according to the standa
 
 ## 6. Book-text heading hierarchy
 
-### Chanting-book sutta-name rows
+### Chanting Book 念诵本 category rules
 
-In every book under **Chanting Book 念诵本**, except `daily-chants-burmese.html`, do not display a separate `Pāli | English`, `Pāli | Chinese`, or equivalent language-label row above the reading text. The Pāli and translated sutta names themselves form the section heading.
+The following requirements apply to the complete **Chanting Book 念诵本** category:
 
-Centre the complete sutta-name row and use the approved primary-heading treatment: pale `#F4E8DF` background, 4 px `#A8734F` top rule, rounded corners and normal brown heading text. Pāli in this heading inherits the heading colour rather than body-text blue. This rule changes only the heading presentation; it does not merge, narrow or otherwise change the book's side-by-side reading columns. Daily Chants Burmese retains its documented source-faithful Burmese heading treatment and is excluded from this chanting-book rule.
+- Every book uses one Contents column on desktop and mobile.
+- The main reading text follows the Contents panel continuously on the same page.
+- A book with an approved side-by-side reading body retains those reading columns and its wider desktop-width classification; the one-column requirement applies to the Contents panel, not to the reading body.
+- Except for `daily-chants-burmese.html`, do not display a separate `Pāli | English`, `Pāli | Chinese`, or equivalent language-label row above the reading text. The Pāli and translated sutta names themselves form the section heading.
+- Except for `daily-chants-burmese.html`, centre the complete sutta-name row and use the approved primary-heading treatment: pale `#F4E8DF` background, 4 px `#A8734F` top rule, rounded corners and normal brown heading text. Pāli in this heading inherits the heading colour rather than body-text blue.
+
+The sutta-name treatment changes only the heading presentation; it does not merge, narrow or otherwise change a book's side-by-side reading columns. Daily Chants Burmese retains its documented source-faithful Burmese heading treatment and is excluded only from the sutta-name-row requirements above. It remains subject to the other applicable Chanting Book, screen-header, Contents, page-width, popup and non-regression standards.
 
 ### General hierarchy
 
