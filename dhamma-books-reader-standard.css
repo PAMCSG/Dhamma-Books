@@ -1,4 +1,4 @@
-/* Dhamma-Books shared reader controls v1.3.19 */
+/* Dhamma-Books shared reader controls v1.3.20 */
 :root{
   --db-header-bg:#A8734F;
   --db-header-text:#ffffff;
@@ -152,11 +152,13 @@ body.db-daily-chants-standard .contents-toggle{
 }
 body.db-daily-chants-standard .toc-wrap{
   display:block!important;
-  column-count:1!important;
-  column-width:auto!important;
-  column-gap:0!important;
+  columns:initial!important;
+  column-count:initial!important;
+  column-width:initial!important;
+  column-gap:normal!important;
   height:calc(52vh + 3.2em)!important;
   overflow-y:auto!important;
+  overflow-x:hidden!important;
   overscroll-behavior:contain;
   margin:0!important;
   padding:0!important;
@@ -177,8 +179,9 @@ body.db-daily-chants-standard .toc-group{
 }
 body.db-daily-chants-standard .toc-group ul{
   display:block!important;
-  column-count:1!important;
-  column-width:auto!important;
+  columns:initial!important;
+  column-count:initial!important;
+  column-width:initial!important;
 }
 body.db-daily-chants-standard .toc-group h2{
   margin:0!important;
