@@ -1,4 +1,4 @@
-/* Pali Chanting Book English/Chinese/Burmese header and Contents standard v1.0.2 */
+/* Pali Chanting Book English/Chinese/Burmese header and Contents standard v1.0.4 */
 
 html.db-pali-chanting-root,
 body.db-pali-chanting-reader-standard{
@@ -46,7 +46,13 @@ body.db-pali-chanting-reader-standard .app-brand-title{
   text-overflow:ellipsis!important;
   white-space:nowrap!important;
 }
-body.db-pali-chanting-reader-standard #btnContents{order:2!important}
+body.db-pali-chanting-reader-standard #btnContents,
+body.db-pali-chanting-reader-standard #btnContents.active{
+  order:2!important;
+  border-color:#ffffff55!important;
+  background:#ffffff14!important;
+  color:#fff!important;
+}
 body.db-pali-chanting-reader-standard #btnReader,
 body.db-pali-chanting-reader-standard #previousRead{display:none!important}
 body.db-pali-chanting-reader-standard #db-language-options{
@@ -76,7 +82,8 @@ body.db-pali-chanting-reader-standard #db-language-options :is(a,button){
   white-space:nowrap!important;
 }
 body.db-pali-chanting-reader-standard #db-language-options :is(a,button).active,
-body.db-pali-chanting-reader-standard #db-language-options :is(a,button)[aria-current="page"]{
+body.db-pali-chanting-reader-standard #db-language-options :is(a,button)[aria-current="page"],
+body.db-pali-chanting-reader-standard #db-language-options :is(a,button)[aria-pressed="true"]{
   border-color:#fff!important;
   background:#fff!important;
   color:#67462f!important;

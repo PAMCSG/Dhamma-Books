@@ -1,4 +1,4 @@
-/* Paccayaniddeso English/Chinese screen-header and Contents standard v1.0.2 */
+/* Paccayaniddeso English/Chinese screen-header and Contents standard v1.0.4 */
 
 html.db-paccayaniddeso-root,
 body.db-paccayaniddeso-reader-standard{
@@ -43,7 +43,13 @@ body.db-paccayaniddeso-reader-standard .app-brand-title{
   text-overflow:ellipsis!important;
   white-space:nowrap!important;
 }
-body.db-paccayaniddeso-reader-standard #btnContents{order:2!important}
+body.db-paccayaniddeso-reader-standard #btnContents,
+body.db-paccayaniddeso-reader-standard #btnContents.active{
+  order:2!important;
+  border-color:#ffffff55!important;
+  background:#ffffff14!important;
+  color:#fff!important;
+}
 body.db-paccayaniddeso-reader-standard #btnReader{display:none!important}
 body.db-paccayaniddeso-reader-standard #db-language-options{
   order:3!important;
@@ -70,6 +76,13 @@ body.db-paccayaniddeso-reader-standard #db-language-options :is(a,button){
   font-weight:700!important;
   line-height:1.2!important;
   white-space:nowrap!important;
+}
+body.db-paccayaniddeso-reader-standard #db-language-options :is(a,button).active,
+body.db-paccayaniddeso-reader-standard #db-language-options :is(a,button)[aria-current="page"],
+body.db-paccayaniddeso-reader-standard #db-language-options :is(a,button)[aria-pressed="true"]{
+  border-color:#fff!important;
+  background:#fff!important;
+  color:#67462f!important;
 }
 body.db-paccayaniddeso-reader-standard #db-language-options :is(a,button)[href$="paccayaniddeso.html"],
 body.db-paccayaniddeso-reader-standard #db-language-options button:first-child{order:1!important}

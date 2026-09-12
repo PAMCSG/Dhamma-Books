@@ -82,6 +82,8 @@ Centre every button label and every button-like header link both vertically and 
 
 Controls must remain large enough to tap. Compact mobile spacing is permitted only when the controls remain legible and functional.
 
+Follow the displayed Daily Chants English state treatment: Contents is a navigation action and must retain the normal translucent header background; it must not remain white after being selected. In every multilingual book, only the button for the edition currently displayed has the white active background with brown text. The other language buttons and the Contents button retain the translucent background. Mark the current language in the initial HTML with `aria-current="page"` and an active class so the correct state is visible on first paint, and preserve the same state when JavaScript enhances links into buttons. An enhanced current-language button must expose `aria-pressed="true"`.
+
 ## 3. Font-size controls
 
 - A− and A+ must work with touch as well as mouse input.
@@ -265,6 +267,7 @@ The 37 Dhammapada Contents links retain their existing unique fragment targets. 
 
 - A multilingual book displays only the language buttons that actually exist.
 - For every current and future multilingual book in Dhamma-Books, order the available language buttons as **English → Chinese → Burmese**. This sequence is mandatory regardless of the active reading language. Omit any language for which the book has no edition.
+- Highlight only the currently displayed language with the white active-control background and brown text. The Contents button is not a selected language or persistent view state and retains the normal translucent header treatment, including after it is clicked. The current-language state must be correct in the initial HTML and after JavaScript enhancement.
 - Switching languages should return to the corresponding passage or nearest shared heading, using semantic section identifiers rather than raw page percentages.
 - Header labels, Search feedback and bookmark actions follow the active language.
 
