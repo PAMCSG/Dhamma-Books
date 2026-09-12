@@ -1,4 +1,4 @@
-/* Pali Chanting Book English/Chinese/Burmese header and Contents standard v1.0.0 */
+/* Pali Chanting Book English/Chinese/Burmese header and Contents standard v1.0.1 */
 
 html.db-pali-chanting-root,
 body.db-pali-chanting-reader-standard{
@@ -81,8 +81,8 @@ body.db-pali-chanting-reader-standard #db-language-options :is(a,button)[aria-cu
   background:#fff!important;
   color:#67462f!important;
 }
-body.db-pali-chanting-reader-standard #db-language-options [data-db-edition="zh"]{order:1!important}
-body.db-pali-chanting-reader-standard #db-language-options [data-db-edition="en"]{order:2!important}
+body.db-pali-chanting-reader-standard #db-language-options [data-db-edition="en"]{order:1!important}
+body.db-pali-chanting-reader-standard #db-language-options [data-db-edition="zh"]{order:2!important}
 body.db-pali-chanting-reader-standard #db-language-options [data-db-edition="my"]{order:3!important}
 body.db-pali-chanting-reader-standard #fontMinus{order:4!important}
 body.db-pali-chanting-reader-standard #fontPlus{order:5!important}

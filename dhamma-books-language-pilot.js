@@ -1,4 +1,4 @@
-/* Language navigation pilot: Mindfulness of Breathing and Pāli Chanting only, v1.0.1. */
+/* Language navigation pilot: Mindfulness of Breathing and Pāli Chanting only, v1.0.2. */
 (function(){
   'use strict';
   const name=location.pathname.split('/').pop();
@@ -36,7 +36,7 @@
     const host=document.querySelector('.topbar-inner');
     const group=document.getElementById('db-language-options')||document.createElement('span');
     group.id='db-language-options';group.setAttribute('role','group');group.setAttribute('aria-label',group.getAttribute('aria-label')||'Book language');
-    [['pali-chanting-book-chinese.html','zh'],['pali-chanting-book.html','en'],['pali-chanting-book-burmese.html','my']].forEach(([file,lang])=>{
+    [['pali-chanting-book.html','en'],['pali-chanting-book-chinese.html','zh'],['pali-chanting-book-burmese.html','my']].forEach(([file,lang])=>{
       let button=group.querySelector('[data-db-edition="'+lang+'"]');
       if(!button){button=document.createElement('a');button.href=file;button.dataset.dbEdition=lang;button.textContent={en:'English',zh:'中文',my:'မြန်မာ'}[lang];group.append(button);}
       button.setAttribute('aria-pressed',String(file===name));button.classList.toggle('active',file===name);

@@ -1,4 +1,4 @@
-/* Paccayaniddeso English/Chinese screen-header and Contents standard v1.0.0 */
+/* Paccayaniddeso English/Chinese screen-header and Contents standard v1.0.1 */
 
 html.db-paccayaniddeso-root,
 body.db-paccayaniddeso-reader-standard{
@@ -71,9 +71,9 @@ body.db-paccayaniddeso-reader-standard #db-language-options :is(a,button){
   line-height:1.2!important;
   white-space:nowrap!important;
 }
-body.db-paccayaniddeso-reader-standard #db-language-options :is(a,button)[href*="chinese"],
-body.db-paccayaniddeso-reader-standard #db-language-options button:first-child{order:1!important}
 body.db-paccayaniddeso-reader-standard #db-language-options :is(a,button)[href$="paccayaniddeso.html"],
+body.db-paccayaniddeso-reader-standard #db-language-options button:first-child{order:1!important}
+body.db-paccayaniddeso-reader-standard #db-language-options :is(a,button)[href*="chinese"],
 body.db-paccayaniddeso-reader-standard #db-language-options button:last-child{order:2!important}
 body.db-paccayaniddeso-reader-standard #fontMinus{order:4!important}
 body.db-paccayaniddeso-reader-standard #fontPlus{order:5!important}

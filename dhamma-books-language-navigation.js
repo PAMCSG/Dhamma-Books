@@ -1,4 +1,4 @@
-/* Approved Dhamma-Books language navigation: remaining three books, v1.0.3. */
+/* Approved Dhamma-Books language navigation: remaining three books, v1.0.4. */
 (function(){
   'use strict';
   const name=location.pathname.split('/').pop();
@@ -6,7 +6,7 @@
     'the-only-way-for-realization-of-nibbana.html':{panels:{en:'reader-en',zh:'reader-zh'},buttons:{en:'langEn',zh:'langZh'}},
     'the-requisites-of-enlightenment.html':{panels:{en:'enPanel',zh:'zhPanel'},buttons:{en:'enBtn',zh:'zhBtn'}}
   };
-  const editions={'paccayaniddeso-chinese.html':'zh','paccayaniddeso.html':'en'};
+  const editions={'paccayaniddeso.html':'en','paccayaniddeso-chinese.html':'zh'};
   function line(){return (document.querySelector('header,.topbar')?.getBoundingClientRect().bottom||70)+16;}
   function current(nodes){
     let found=nodes[0];
