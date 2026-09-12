@@ -259,7 +259,7 @@ The 37 Dhammapada Contents links retain their existing unique fragment targets. 
 ## 10. Language editions
 
 - A multilingual book displays only the language buttons that actually exist.
-- Order available language buttons as English, Chinese, Burmese. Omit any language for which the book has no edition.
+- For every current and future multilingual book in Dhamma-Books, order the available language buttons as **English → Chinese → Burmese**. This sequence is mandatory regardless of the active reading language. Omit any language for which the book has no edition.
 - Switching languages should return to the corresponding passage or nearest shared heading, using semantic section identifiers rather than raw page percentages.
 - Header labels, Search feedback and bookmark actions follow the active language.
 
