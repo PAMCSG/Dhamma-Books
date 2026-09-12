@@ -1,0 +1,119 @@
+/* Dhamma-Books book-cover and desktop-width standard v1.0.0 */
+
+/* The card fills the available width inside each book's classified page. */
+body.db-book-cover-standard .cover-card{
+  overflow:visible!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+body.db-book-cover-standard :is(.cover-main,.cover-block,.cover,.book-hero){
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  margin:10px 0 28px!important;
+  padding:34px 44px!important;
+  overflow:hidden!important;
+  border:1px solid #D8CFC3!important;
+  border-radius:14px!important;
+  background:linear-gradient(135deg,#fffdf8,#f6eddf)!important;
+  box-shadow:0 8px 30px #5A46331C!important;
+  text-align:left!important;
+}
+
+/* Existing cover structures all resolve to cover-left / information-right. */
+body.db-book-cover-standard :is(.cover-main,.cover-block,.cover,.book-hero-inner){
+  display:flex!important;
+  align-items:flex-start!important;
+  gap:34px!important;
+  min-width:0!important;
+  max-width:100%!important;
+}
+body.db-book-cover-standard .book-hero-inner{
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+}
+body.db-book-cover-standard :is(.cover-title,.cover-copy,.cover-text,.book-hero-text){
+  flex:1 1 0!important;
+  order:2!important;
+  min-width:0!important;
+  max-width:100%!important;
+  padding-top:0!important;
+  text-align:left!important;
+  overflow-wrap:anywhere;
+}
+body.db-book-cover-standard :is(.cover-main,.cover-block,.cover,.book-hero) h1{
+  text-align:left!important;
+}
+
+/* Preserve each embedded cover while normalising its place inside the card. */
+body.db-book-cover-standard :is(.cover-main,.cover-block,.cover)>img,
+body.db-book-cover-standard :is(.cover-image,.book-cover-frame){
+  display:block!important;
+  flex:0 0 150px!important;
+  order:1!important;
+  width:150px!important;
+  max-width:34vw!important;
+  min-width:0!important;
+  height:auto!important;
+  margin:0!important;
+  align-self:flex-start!important;
+}
+body.db-book-cover-standard :is(.cover-image,.book-cover-frame)>img{
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  height:auto!important;
+  max-height:none!important;
+  margin:0!important;
+  object-fit:contain!important;
+  border-radius:5px!important;
+  box-shadow:0 5px 16px rgba(0,0,0,.16)!important;
+}
+body.db-book-cover-standard :is(.cover-main,.cover-block,.cover)>img{
+  width:150px!important;
+  max-width:34vw!important;
+  border-radius:5px!important;
+  box-shadow:0 5px 16px rgba(0,0,0,.16)!important;
+}
+
+/* Standard-width books only. Wider two-column books retain their approved width. */
+@media (min-width:761px){
+  body.db-page-standard-width main.reader{
+    box-sizing:border-box!important;
+    width:min(1080px,calc(100% - 28px))!important;
+    max-width:1080px!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+}
+
+@media (max-width:720px){
+  body.db-book-cover-standard :is(.cover-main,.cover-block,.cover,.book-hero){
+    padding:22px 16px!important;
+  }
+  body.db-book-cover-standard :is(.cover-main,.cover-block,.cover,.book-hero-inner){
+    display:flex!important;
+    align-items:flex-start!important;
+    gap:14px!important;
+  }
+  body.db-book-cover-standard :is(.cover-main,.cover-block,.cover)>img,
+  body.db-book-cover-standard :is(.cover-image,.book-cover-frame){
+    flex:0 0 92px!important;
+    width:92px!important;
+    max-width:34vw!important;
+    margin:0!important;
+  }
+  body.db-book-cover-standard :is(.cover-main,.cover-block,.cover)>img{
+    width:92px!important;
+    max-width:34vw!important;
+  }
+  body.db-book-cover-standard :is(.cover-title,.cover-copy,.cover-text,.book-hero-text){
+    flex:1 1 0!important;
+    min-width:0!important;
+    text-align:left!important;
+  }
+}
