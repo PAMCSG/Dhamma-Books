@@ -810,7 +810,7 @@ article.zh,article.zh *{font-family:SimSun,"Noto Serif CJK SC","Songti SC",serif
 }
 </style>
 
-<link rel="stylesheet" href="dhamma-books-reader-standard.css?v=1.3.13">
+<link rel="stylesheet" href="dhamma-books-reader-standard.css?v=1.3.21">
 <style id="patisambhidamagga-standard-cover-card-20260912">
 /* Daily Chants English cover-card treatment; Paṭisambhidāmagga keeps its approved wider reader width. */
 body.db-patisambhidamagga-reader-standard .book-hero{
@@ -2871,7 +2871,7 @@ modal.addEventListener('click',e=>{if(e.target===modal)closePCED()});closeBtn.ad
   window.setReaderFontSize=function(px){
     px=Math.max(13,Math.min(26,Math.round(px)));
     document.documentElement.style.setProperty('--patis-reader-font',px+'px');
-    nodes().forEach(el=>el.style.fontSize=px+'px');
+    nodes().forEach(el=>el.style.setProperty('font-size',px+'px','important'));
     localStorage.setItem(FONT_KEY,String(px));
   };
   window.decreaseReaderFont=function(){window.setReaderFontSize(currentSize()-1);};
