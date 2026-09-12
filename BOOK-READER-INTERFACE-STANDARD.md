@@ -14,7 +14,7 @@ Every reader book must load the current versions of:
 - `dhamma-books-reader-standard.css`
 - `dhamma-books-reader-standard.js`
 
-Every reader using the repository-wide standard cover card or desktop-width classification must also load `dhamma-books-cover-width-standard.css` after its legacy and book-specific style blocks. Use `db-book-cover-standard` on the body together with either `db-page-standard-width` or `db-page-wide-reader`. Loading this final targeted layer prevents a legacy cover rule from overriding the standard on first paint.
+Every reader using the repository-wide standard cover card must also load `dhamma-books-cover-width-standard.css` after its legacy and book-specific style blocks and use `db-book-cover-standard` on the body. Every reader must use `db-page-standard-width`; readers whose legacy or book-specific rules can override the common width must load `dhamma-books-page-width-standard.css` last. The retired `db-page-wide-reader` classification must not be used.
 
 When a shared asset changes, update its versioned URL in each affected HTML file so deployed browsers do not reuse an older cached copy.
 
@@ -137,27 +137,7 @@ Keep each book's existing Contents-entry fonts, hierarchy, colours and styling. 
 
 ## 5. Desktop page width
 
-This width classification applies to the reading page on the web/desktop layout. It does not change the rule that every Contents panel uses one column.
-
-### Wider two-column readers
-
-The following books use side-by-side or otherwise two-column reading bodies and retain their existing approved wider desktop page widths:
-
-- `patisambhidamagga.html` — 《辨析道》
-- `daily-chants.html` — Daily Chants, English
-- `paccayaniddeso.html` — Paccayaniddeso, English
-- `paccayaniddeso-chinese.html` — Paccayaniddeso, Chinese
-- `pali-chanting-book.html` — Pāḷi Chanting Book, English
-- `pali-chanting-book-chinese.html` — Pāḷi Chanting Book, Chinese
-- `pali-chanting-book-burmese.html` — Pāḷi Chanting Book, Burmese
-
-An archival or working copy of a named wider reader follows the same width classification as its canonical counterpart. This currently applies to `pali-chanting-book-burmese-updated.html`; it must not be narrowed merely because it is not linked from the catalogue.
-
-Do not narrow these readers to the standard one-column width when applying a general interface correction.
-
-### Standard-width readers
-
-Every other book follows the desktop reading-page width of `the-requisites-of-enlightenment.html` (觉悟资粮):
+Every Dhamma-Books reader follows the displayed desktop reading-page width of `daily-chants-burmese.html`, including books with side-by-side or otherwise multi-column reading bodies:
 
 ```css
 width: min(1080px, calc(100% - 28px));
@@ -165,9 +145,9 @@ margin-left: auto;
 margin-right: auto;
 ```
 
-The page therefore has a maximum desktop width of 1080 px, remains centred and keeps at least 14 px clearance on each side when the browser is narrower. Apply this rule to every language panel of a multilingual book. Mobile width and containment continue to follow the mobile screen-header and no-sideways-movement requirements in this document.
+The page therefore has a maximum desktop width of 1080 px, remains centred and keeps at least 14 px clearance on each side when the browser is narrower. There are no wider-reader exceptions. Apply this rule to every language panel of a multilingual book and to archival or working copies of reader books.
 
-When a request says to improve or correct the page width according to the standard, first classify the book using this section, then apply the corresponding desktop width without changing its content, columns or mobile layout.
+Page width and reading-column count are separate requirements. Narrowing the page container to this standard must not merge, remove or otherwise change an established Pāli/translation or Pāli/Aṭṭhakathā reading-column layout. The one-column requirement applies to the Contents panel. Mobile width and containment continue to follow the mobile screen-header and no-sideways-movement requirements in this document.
 
 ## 6. Book-text heading hierarchy
 
@@ -177,7 +157,7 @@ The following requirements apply to the complete **Chanting Book 念诵本** cat
 
 - Every book uses one Contents column on desktop and mobile.
 - The main reading text follows the Contents panel continuously on the same page.
-- A book with an approved side-by-side reading body retains those reading columns and its wider desktop-width classification; the one-column requirement applies to the Contents panel, not to the reading body.
+- A book with an approved side-by-side reading body retains those reading columns inside the common Daily Chants Burmese page width; the one-column requirement applies to the Contents panel, not to the reading body.
 - Except for `daily-chants-burmese.html`, do not display a separate `Pāli | English`, `Pāli | Chinese`, or equivalent language-label row above the reading text. The Pāli and translated sutta names themselves form the section heading.
 - Except for `daily-chants-burmese.html`, centre the complete sutta-name row and use the approved primary-heading treatment: pale `#F4E8DF` background, 4 px `#A8734F` top rule, rounded corners and normal brown heading text. Pāli in this heading inherits the heading colour rather than body-text blue.
 
@@ -205,9 +185,9 @@ This is the standard book-text heading hierarchy for every current and future Dh
 - Reduce the cover width and spacing responsively so the side-by-side arrangement fits the viewport.
 - Allow the information column to shrink and wrap naturally; it must not force horizontal page movement.
 - Keep the information left-aligned. The cover image may retain its own light border and shadow inside the card.
-- The cover card fills the width available inside the book's existing classified page container. Applying this cover-card treatment must not change the desktop-width category: approved wider two-column readers retain their wider width, while standard-width readers remain centred at a maximum of 1080 px.
+- The cover card fills the width available inside the common centred page container, which has a desktop maximum of 1080 px.
 - Preserve the original cover image, wording, credits and metadata.
-- Implement this appearance in `dhamma-books-cover-width-standard.css`, loaded after legacy book styles. The body class `db-book-cover-standard` activates only the cover selectors; the separate width-class body marker determines whether the reader uses the standard 1080 px width or preserves its approved wider width.
+- Implement this appearance in `dhamma-books-cover-width-standard.css`, loaded after legacy book styles. The body class `db-book-cover-standard` activates the cover selectors; `db-page-standard-width` activates the common page-width rule. Load `dhamma-books-page-width-standard.css` last wherever a legacy or book-specific width needs a final override.
 
 ## 8. Search
 
@@ -323,7 +303,7 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 - [ ] All header items and both rows are left-justified.
 - [ ] Every header wording uses the shared multilingual font stack; book-specific fonts do not override it.
 - [ ] Every button and button-like link label is centred vertically and horizontally.
-- [ ] On desktop, the book uses the correct page-width category: the listed two-column readers retain their approved wider width, and every other reader matches the centred 1080 px maximum width of 觉悟资粮.
+- [ ] On desktop, every reader matches the displayed Daily Chants Burmese width: centred, with a 1080 px maximum and at least 14 px side clearance, while any established reading columns remain unchanged.
 - [ ] Primary book-text headings use the centred pale panel and top rule; subordinate headings use the simpler left-aligned divider treatment; heading hierarchy follows the source book.
 - [ ] A Chanting Book other than Daily Chants Burmese has no separate language-label row above the reading text, and its sutta-name rows use the centred approved heading treatment.
 - [ ] Normal mobile scrolling does not move the whole page sideways.
@@ -348,6 +328,8 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 - [ ] Only the intended book interface and documentation changed.
 
 ## 13. Implementation status
+
+**Page-width revision, 12 September 2026:** Every width statement in the historical implementation notes below is superseded by Section 5. The former wider-reader exceptions are retired. `patisambhidamagga.html`, `daily-chants.html`, both Paccayaniddeso editions, all three canonical Pāḷi Chanting Book editions, and `pali-chanting-book-burmese-updated.html` now use `db-page-standard-width` and load `dhamma-books-page-width-standard.css?v=1.0.0` last. They match the displayed Daily Chants Burmese width while retaining their established reading columns. All other interface and content-preservation statements below remain current.
 
 - `dhammapada-pali-chinese.html` is the approved reference implementation. Its former `上次阅读` control and automatic scroll/unload position tracking were removed on 11 September 2026. Book Mark continues to determine the current position only when the reader deliberately saves a bookmark.
 - `the-buddhas-twelve-kinds-of-evil-retribution.html` was brought into full conformity on 11 September 2026. Its final header is present in the initial HTML: fixed and non-wrapping on desktop, and one complete sticky two-row unit on mobile with Search on the second row. The book-specific header rules keep its established `书签` and Search controls visible after shared reader enhancement on both screen sizes, and the mobile first row reserves enough space for the complete Chinese book name. It has no Last Position, Last Read or Previously Read control and performs no automatic last-read scroll tracking. Its one-column Contents uses the standard fixed-height internal scrolling window on desktop and mobile beneath a non-scrolling title row. Search, reader-controlled Book Mark, font controls, transparent popup overlays and current shared popup behavior are preserved. Its book content, cover, illustrations, body design, headings, Pāli treatment, footnotes and PCED integration were not changed.

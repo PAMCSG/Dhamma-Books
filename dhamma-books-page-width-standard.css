@@ -1,0 +1,28 @@
+/* Dhamma-Books unified reading-page width standard v1.0.0
+   Reference: the deployed Daily Chants Burmese desktop reader width. */
+
+@media (min-width:761px){
+  html body.db-page-standard-width main,
+  html body.db-page-standard-width main.reader,
+  html body.db-page-standard-width > .reader{
+    box-sizing:border-box!important;
+    width:min(1080px,calc(100% - 28px))!important;
+    max-width:1080px!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+}
+
+@media (max-width:760px){
+  body.db-page-standard-width{
+    width:100%!important;
+    max-width:100%!important;
+    overflow-x:clip!important;
+  }
+  html body.db-page-standard-width main,
+  html body.db-page-standard-width main.reader,
+  html body.db-page-standard-width > .reader{
+    min-width:0!important;
+    max-width:100%!important;
+  }
+}
