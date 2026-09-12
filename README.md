@@ -109,6 +109,14 @@ Use consistent panel borders, rounded corners, row spacing, and heading hierarch
 
 This section records the approved standard, not a claim that every book already implements it. PR #16 enabled continuous reading for Daily Chants English and Paccayaniddeso English/Chinese, alongside the three Pāli Chanting editions. Daily Chants Burmese joined this standard on 11 September 2026. Remaining books still require an implementation audit and any necessary changes.
 
+### Pāli Chanting Book header and Contents conformance — 12 September 2026
+
+The three canonical Pāli Chanting Book editions — `pali-chanting-book.html`, `pali-chanting-book-chinese.html`, and `pali-chanting-book-burmese.html` — now place the complete standard header in the initial HTML. The visible order is logo, book name, Contents, 中文 / English / မြန်မာ, A−, A+, Book Mark, Search field, and Search. The obsolete Reader and automatic Previously Read controls are hidden from the initial interface; deliberate saved bookmarks are retained and imported into the shared bookmark interface.
+
+Their Contents entries now use one vertical scrolling column on desktop and mobile, with the approved title labels, warm palette, single rounded frame, fixed window heights, and Expand/Collapse behaviour. Chinese and Burmese now keep the reading text continuously visible after Contents, matching English. All three retain the approved 1500 px wider-reader classification and their existing paired reading columns. Book wording, images, Contents targets, PCED data, footnotes, language-position navigation, font sizing, search, and deliberate bookmarks are preserved.
+
+Implementation uses `dhamma-books-pali-chanting-standard.css?v=1.0.0`, shared reader JavaScript v1.3.20, and language navigation v1.0.1. The versioned references are present in all three canonical HTML files so the corrected first-paint header and Contents styling do not depend on a stale cached asset.
+
 
 ### Pa-Auk and Mahinda contents styling — 7 September 2026
 

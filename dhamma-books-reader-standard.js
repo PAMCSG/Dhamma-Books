@@ -1,4 +1,4 @@
-/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.19 */
+/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.20 */
 (function(){
   'use strict';
   const BOOKMARK_KEY='dhamma-books:bookmarks:'+location.pathname;
@@ -83,7 +83,6 @@
     }
     window.showView=show;
     if(contentsButton) contentsButton.onclick=()=>{
-      if(typeof window.saveCurrentPosition==='function') window.saveCurrentPosition();
       show('contents');contents.scrollIntoView({behavior:'smooth',block:'start'});
     };
     if(readerButton) readerButton.onclick=()=>{
@@ -145,6 +144,33 @@
     return {bookmark,input,search,status,controls:host};
   }
 
+  function isPaliChantingBook(){
+    return [
+      'pali-chanting-book.html',
+      'pali-chanting-book-chinese.html',
+      'pali-chanting-book-burmese.html'
+    ].includes(location.pathname.split('/').pop().toLowerCase());
+  }
+
+  function adoptPaliChantingControls(){
+    if(!isPaliChantingBook()) return null;
+    const bookmark=document.getElementById('bookmarkBtn');
+    const input=document.getElementById('searchInput');
+    const search=document.getElementById('searchBtn');
+    const host=headerHost(screenHeader());
+    if(!bookmark||!input||!search||!host) return null;
+    document.getElementById('previousRead')?.setAttribute('hidden','');
+    bookmark.onclick=null;
+    input.onkeydown=null;
+    search.onclick=null;
+    let status=document.getElementById('db-search-status');
+    if(!status){
+      status=create('span',{id:'db-search-status',class:'db-search-status db-pali-chanting-search-status','aria-live':'polite'});
+      host.append(status);
+    }
+    return {bookmark,input,search,status,controls:host};
+  }
+
   function installPaccayaniddesoReaderStandard(){
     const name=location.pathname.split('/').pop().toLowerCase();
     if(name!=='paccayaniddeso.html'&&name!=='paccayaniddeso-chinese.html') return;
@@ -163,6 +189,40 @@
     document.getElementById('btnContents')?.addEventListener('click',()=>setOpen(true));
     setOpen(true);
     const measure=()=>header&&document.documentElement.style.setProperty('--db-paccayaniddeso-header-height',Math.ceil(header.getBoundingClientRect().height)+'px');
+    measure();
+    addEventListener('resize',measure,{passive:true});
+    if(header&&window.ResizeObserver)new ResizeObserver(measure).observe(header);
+  }
+
+  function installPaliChantingReaderStandard(){
+    if(!isPaliChantingBook()) return;
+    document.documentElement.classList.add('db-pali-chanting-root');
+    document.body.classList.add('db-pali-chanting-reader-standard');
+    const header=screenHeader();
+    const contents=document.getElementById('contentsView');
+    const title=contents?.querySelector(':scope > .contents-title');
+    let toggle=document.getElementById('paliChantingContentsToggle');
+    const language=currentLanguage();
+    const titleText={en:'Content',zh:'目录',my:'မာတိကာ'}[language];
+    const collapseText={en:'Collapse',zh:'收起',my:'ပိတ်မည်'}[language];
+    const expandText={en:'Expand',zh:'展开',my:'ဖွင့်မည်'}[language];
+    if(title){
+      title.textContent=titleText;
+      if(!toggle){
+        toggle=create('button',{id:'paliChantingContentsToggle',class:'contents-toggle',type:'button','aria-expanded':'true',text:collapseText});
+        title.append(toggle);
+      }
+    }
+    const setOpen=open=>{
+      if(!contents||!toggle) return;
+      contents.classList.toggle('db-contents-collapsed',!open);
+      toggle.setAttribute('aria-expanded',String(open));
+      toggle.textContent=open?collapseText:expandText;
+    };
+    toggle?.addEventListener('click',()=>setOpen(contents.classList.contains('db-contents-collapsed')));
+    document.getElementById('btnContents')?.addEventListener('click',()=>setOpen(true));
+    setOpen(true);
+    const measure=()=>header&&document.documentElement.style.setProperty('--db-pali-chanting-header-height',Math.ceil(header.getBoundingClientRect().height)+'px');
     measure();
     addEventListener('resize',measure,{passive:true});
     if(header&&window.ResizeObserver)new ResizeObserver(measure).observe(header);
@@ -619,6 +679,20 @@
     }).filter(Boolean);
     if(imported.length) saveBookmarks(imported);
   }
+  function migratePaliChantingBookmarks(candidates){
+    if(!isPaliChantingBook()||loadBookmarks().length) return;
+    let legacy=[];
+    try{legacy=JSON.parse(localStorage.getItem('pali-chanting-book-en-v1:bookmarks')||'[]')}catch{}
+    if(!Array.isArray(legacy)) return;
+    const lang=currentLanguage();
+    const imported=legacy.map((item,index)=>{
+      const target=item?.id&&document.getElementById(item.id);
+      const candidate=target&&(candidates.includes(target)?target:target.closest('.pair-row,.section-heading,.subsection-heading,.page-anchor,section[id],article[id]'));
+      if(!candidate) return null;
+      return {id:'legacy-'+Date.now()+'-'+index,createdAt:item.saved||new Date().toISOString(),anchor:candidate.dataset.dbBookmarkAnchor||'',offset:0,scrollY:0,lang,label:item.title||bookmarkLabel(target)};
+    }).filter(Boolean);
+    if(imported.length) saveBookmarks(imported);
+  }
   function init(){
     ensurePopupMovementStandard();
     installCategoryContentsStyle();
@@ -626,7 +700,8 @@
     installContinuousChantingFlow();
     installDailyChantsStandard();
     installPaccayaniddesoReaderStandard();
-    const controls=adoptPaccayaniddesoControls()||buildControls();
+    installPaliChantingReaderStandard();
+    const controls=adoptPaccayaniddesoControls()||adoptPaliChantingControls()||buildControls();
     if(!controls) return;
     installMindfulnessReaderStandard(controls);
     installDailyChantsBurmeseStandard();
@@ -653,9 +728,10 @@
     migratePatisambhidamaggaBookmarks(candidates);
     migrateOnlyWayBookmarks(candidates);
     migratePaccayaniddesoBookmarks(candidates);
+    migratePaliChantingBookmarks(candidates);
     const bookmark=buildBookmarkModal(candidates);
     controls.bookmark.addEventListener('click',bookmark.openModal);
-    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.19'};
+    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.20'};
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();

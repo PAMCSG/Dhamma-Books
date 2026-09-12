@@ -1,0 +1,275 @@
+/* Pali Chanting Book English/Chinese/Burmese header and Contents standard v1.0.0 */
+
+html.db-pali-chanting-root,
+body.db-pali-chanting-reader-standard{
+  width:100%!important;
+  max-width:100%!important;
+  overflow-x:clip!important;
+}
+body.db-pali-chanting-reader-standard{
+  padding-top:var(--db-pali-chanting-header-height,66px)!important;
+}
+body.db-pali-chanting-reader-standard>.topbar{
+  position:fixed!important;
+  inset:0 0 auto 0!important;
+  width:100%!important;
+  max-width:100%!important;
+  z-index:2147482900!important;
+  overflow:hidden!important;
+}
+body.db-pali-chanting-reader-standard>.topbar>.topbar-inner{
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:8px 12px!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:7px!important;
+  flex-wrap:nowrap!important;
+  overflow:hidden!important;
+}
+body.db-pali-chanting-reader-standard .app-brand{
+  order:1!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  flex:0 1 auto!important;
+  min-width:0!important;
+  margin:0!important;
+}
+body.db-pali-chanting-reader-standard .app-brand-title{
+  display:block!important;
+  max-width:clamp(130px,23vw,370px)!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+body.db-pali-chanting-reader-standard #btnContents{order:2!important}
+body.db-pali-chanting-reader-standard #btnReader,
+body.db-pali-chanting-reader-standard #previousRead{display:none!important}
+body.db-pali-chanting-reader-standard #db-language-options{
+  order:3!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:4px!important;
+  flex:0 0 auto!important;
+  flex-wrap:nowrap!important;
+}
+body.db-pali-chanting-reader-standard #db-language-options :is(a,button){
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+  min-height:34px!important;
+  border:1px solid #ffffff55!important;
+  border-radius:7px!important;
+  background:#ffffff14!important;
+  color:#fff!important;
+  padding:6px 9px!important;
+  text-decoration:none!important;
+  font-family:var(--db-header-font)!important;
+  font-size:var(--db-header-control-size)!important;
+  font-weight:700!important;
+  line-height:1.2!important;
+  white-space:nowrap!important;
+}
+body.db-pali-chanting-reader-standard #db-language-options :is(a,button).active,
+body.db-pali-chanting-reader-standard #db-language-options :is(a,button)[aria-current="page"]{
+  border-color:#fff!important;
+  background:#fff!important;
+  color:#67462f!important;
+}
+body.db-pali-chanting-reader-standard #db-language-options [data-db-edition="zh"]{order:1!important}
+body.db-pali-chanting-reader-standard #db-language-options [data-db-edition="en"]{order:2!important}
+body.db-pali-chanting-reader-standard #db-language-options [data-db-edition="my"]{order:3!important}
+body.db-pali-chanting-reader-standard #fontMinus{order:4!important}
+body.db-pali-chanting-reader-standard #fontPlus{order:5!important}
+body.db-pali-chanting-reader-standard #bookmarkBtn{order:6!important}
+body.db-pali-chanting-reader-standard>.topbar .searchbox{
+  order:7!important;
+  width:auto!important;
+  max-width:310px!important;
+  min-width:0!important;
+  flex:0 1 auto!important;
+}
+body.db-pali-chanting-reader-standard>.topbar .searchbox input{
+  width:clamp(115px,18vw,245px)!important;
+}
+body.db-pali-chanting-reader-standard .db-pali-chanting-search-status{
+  position:absolute!important;
+  width:1px!important;
+  height:1px!important;
+  padding:0!important;
+  margin:-1px!important;
+  overflow:hidden!important;
+  clip:rect(0,0,0,0)!important;
+  white-space:nowrap!important;
+  border:0!important;
+}
+
+body.db-pali-chanting-reader-standard main,
+body.db-pali-chanting-reader-standard :is(#contentsView,#readerView,.cover-card,.contents-title,.toc-wrap,.toc-group,.reader-shell,.reader-body,.pair-row,.cell){
+  min-width:0!important;
+  max-width:100%!important;
+}
+body.db-pali-chanting-reader-standard main{
+  width:auto!important;
+  max-width:1500px!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+body.db-pali-chanting-reader-standard :is(#contentsView,#readerView,.section-heading,.subsection-heading,.pair-row,.page-anchor,[id]){
+  scroll-margin-top:calc(var(--db-pali-chanting-header-height,66px) + 10px)!important;
+}
+body.db-pali-chanting-reader-standard #readerView.hidden{display:block!important}
+
+body.db-pali-chanting-reader-standard .contents-title{
+  display:flex!important;
+  align-items:center!important;
+  gap:12px!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  margin:28px 0 0!important;
+  padding:16px 20px!important;
+  overflow:hidden!important;
+  border:1px solid #DFCBBB!important;
+  border-bottom:0!important;
+  border-radius:10px 10px 0 0!important;
+  background:#F4E9DF!important;
+  color:#66442F!important;
+  font-size:var(--reading-size)!important;
+  line-height:1.4!important;
+  font-weight:700!important;
+}
+body.db-pali-chanting-reader-standard .contents-toggle{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 auto!important;
+  margin-left:auto!important;
+  border:1px solid #DFCBBB!important;
+  border-radius:7px!important;
+  background:#FFFDF9!important;
+  color:#66442F!important;
+  padding:6px 10px!important;
+  font:700 .78em/1.2 inherit!important;
+  cursor:pointer!important;
+}
+body.db-pali-chanting-reader-standard .toc-wrap{
+  display:block!important;
+  columns:initial!important;
+  column-count:initial!important;
+  column-width:initial!important;
+  column-gap:normal!important;
+  height:calc(52vh + 3.2em)!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior:contain!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  margin:0 0 28px!important;
+  padding:0!important;
+  border:1px solid #DFCBBB!important;
+  border-top:0!important;
+  border-radius:0 0 10px 10px!important;
+  background:#FFFDF9!important;
+  font-size:var(--reading-size)!important;
+}
+body.db-pali-chanting-reader-standard #contentsView.db-contents-collapsed .toc-wrap{display:none!important}
+body.db-pali-chanting-reader-standard #contentsView.db-contents-collapsed .contents-title{
+  border-bottom:1px solid #DFCBBB!important;
+  border-radius:10px!important;
+}
+body.db-pali-chanting-reader-standard .toc-group{
+  display:block!important;
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  break-inside:auto!important;
+  border:0!important;
+  border-radius:0!important;
+  overflow:visible!important;
+  background:#FFFDF9!important;
+}
+body.db-pali-chanting-reader-standard .toc-group ul{
+  display:block!important;
+  columns:initial!important;
+  column-count:initial!important;
+  column-width:initial!important;
+  margin:0!important;
+  padding:0!important;
+}
+body.db-pali-chanting-reader-standard .toc-group h2{
+  margin:0!important;
+  padding:11px 18px!important;
+  border-top:1px solid #DFCBBB!important;
+  background:#F4E8DF!important;
+  color:#8F5D3B!important;
+  font-size:1em!important;
+  line-height:1.4!important;
+}
+body.db-pali-chanting-reader-standard .toc-group:first-child h2{border-top:0!important}
+body.db-pali-chanting-reader-standard .toc-group li{border-top:1px solid #DFCBBB!important}
+body.db-pali-chanting-reader-standard .toc-link{font-size:.84em!important}
+body.db-pali-chanting-reader-standard .toc-page{font-size:.8em!important;color:#7B685A!important}
+
+@media (min-width:761px) and (max-width:1180px){
+  body.db-pali-chanting-reader-standard>.topbar>.topbar-inner{gap:3px!important;padding:7px!important}
+  body.db-pali-chanting-reader-standard .app-brand{gap:3px!important}
+  body.db-pali-chanting-reader-standard .app-brand-title{max-width:72px!important}
+  body.db-pali-chanting-reader-standard>.topbar :is(button,a:not(.app-home-logo)){padding-left:5px!important;padding-right:5px!important;font-size:11px!important}
+  body.db-pali-chanting-reader-standard #db-language-options{gap:2px!important}
+  body.db-pali-chanting-reader-standard #db-language-options :is(a,button){padding-left:4px!important;padding-right:4px!important;font-size:10px!important}
+  body.db-pali-chanting-reader-standard>.topbar .searchbox input{width:80px!important}
+}
+
+@media (max-width:760px){
+  html.db-pali-chanting-root,
+  body.db-pali-chanting-reader-standard{overflow-x:clip!important}
+  body.db-pali-chanting-reader-standard{padding-top:0!important}
+  body.db-pali-chanting-reader-standard>.topbar{
+    position:sticky!important;
+    inset:auto!important;
+    top:0!important;
+  }
+  body.db-pali-chanting-reader-standard>.topbar>.topbar-inner{
+    width:100%!important;
+    max-width:100%!important;
+    padding:6px 7px!important;
+    gap:2px!important;
+    flex-wrap:wrap!important;
+    align-content:flex-start!important;
+    overflow:hidden!important;
+  }
+  body.db-pali-chanting-reader-standard .app-brand{flex:0 1 clamp(40px,14vw,66px)!important;gap:2px!important}
+  body.db-pali-chanting-reader-standard .app-home-logo{width:28px!important;height:36px!important;flex-basis:28px!important;padding:2px!important}
+  body.db-pali-chanting-reader-standard .app-home-logo img{width:21px!important;height:30px!important}
+  body.db-pali-chanting-reader-standard .app-brand-title{max-width:none!important;font-size:16px!important}
+  body.db-pali-chanting-reader-standard>.topbar :is(button,a:not(.app-home-logo)){
+    min-height:30px!important;
+    padding:3px 4px!important;
+    font-size:10px!important;
+  }
+  body.db-pali-chanting-reader-standard #db-language-options{gap:1px!important}
+  body.db-pali-chanting-reader-standard #db-language-options :is(a,button){min-height:30px!important;padding:3px!important;font-size:9px!important}
+  body.db-pali-chanting-reader-standard>.topbar .searchbox{
+    order:20!important;
+    display:flex!important;
+    flex:1 1 100%!important;
+    width:100%!important;
+    max-width:100%!important;
+  }
+  body.db-pali-chanting-reader-standard>.topbar .searchbox input{
+    flex:1 1 auto!important;
+    width:auto!important;
+    max-width:none!important;
+    min-width:0!important;
+    font-size:15px!important;
+  }
+  body.db-pali-chanting-reader-standard main{width:100%!important;max-width:100%!important;margin:12px auto!important;padding-left:8px!important;padding-right:8px!important}
+  body.db-pali-chanting-reader-standard .contents-title{padding:14px!important}
+  body.db-pali-chanting-reader-standard .toc-wrap{height:calc(46vh + 3.2em)!important}
+  body.db-pali-chanting-reader-standard :is(#contentsView,#readerView,.section-heading,.subsection-heading,.pair-row,.page-anchor,[id]){scroll-margin-top:calc(var(--db-pali-chanting-header-height,104px) + 10px)!important}
+}

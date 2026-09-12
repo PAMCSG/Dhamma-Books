@@ -1,4 +1,4 @@
-/* Language navigation pilot: Mindfulness of Breathing and Pāli Chanting only. */
+/* Language navigation pilot: Mindfulness of Breathing and Pāli Chanting only, v1.0.1. */
 (function(){
   'use strict';
   const name=location.pathname.split('/').pop();
@@ -34,21 +34,23 @@
     }
     if(!editions[name])return;
     const host=document.querySelector('.topbar-inner');
-    const group=document.createElement('span');group.id='db-language-options';group.setAttribute('role','group');group.setAttribute('aria-label','Book language');
-    group.style.cssText='display:inline-flex;gap:4px;flex-wrap:wrap;align-items:center';
-    Object.entries(editions).forEach(([file,lang])=>{
-      const button=document.createElement('button');button.type='button';button.textContent={en:'English',zh:'中文',my:'မြန်မာ'}[lang];
+    const group=document.getElementById('db-language-options')||document.createElement('span');
+    group.id='db-language-options';group.setAttribute('role','group');group.setAttribute('aria-label',group.getAttribute('aria-label')||'Book language');
+    [['pali-chanting-book-chinese.html','zh'],['pali-chanting-book.html','en'],['pali-chanting-book-burmese.html','my']].forEach(([file,lang])=>{
+      let button=group.querySelector('[data-db-edition="'+lang+'"]');
+      if(!button){button=document.createElement('a');button.href=file;button.dataset.dbEdition=lang;button.textContent={en:'English',zh:'中文',my:'မြန်မာ'}[lang];group.append(button);}
       button.setAttribute('aria-pressed',String(file===name));button.classList.toggle('active',file===name);
-      button.onclick=()=>{
+      if(file===name)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');
+      button.addEventListener('click',event=>{
+        event.preventDefault();
         if(file===name)return;
         const nodes=[...document.querySelectorAll('#readerView .pair-row[id],#readerView .section-heading[id],#readerView .page-anchor[id]')].filter(n=>n.getClientRects().length);
         const reader=document.getElementById('readerView');
         const anchor=reader.getBoundingClientRect().top>line()?null:current(nodes);
         const url=new URL(file,location.href);url.hash=anchor?anchor.id:'contentsView';location.assign(url.href);
-      };
-      group.append(button);
+      });
     });
-    host.insertBefore(group,document.getElementById('previousRead'));
+    if(!group.parentElement)host.insertBefore(group,document.getElementById('fontMinus'));
     function restore(){
       let id;try{id=decodeURIComponent(location.hash.slice(1));}catch(_){return;}
       const target=document.getElementById(id);
