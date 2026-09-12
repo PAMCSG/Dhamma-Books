@@ -33,6 +33,8 @@ See `PCED-LOOKUP-UPDATE-REPORT.md` for rollout details and tests.
 
 Every current and future reader book must load `dhamma-books-reader-standard.css` and `dhamma-books-reader-standard.js` using the current cache version. Shared CSS v1.3.20 and reader runtime v1.3.18 include the Daily Chants English conformance rules below. The shared reader standard retires legacy save/go and automatic last-read controls so a book displays only the common bookmark control, and provides the continuous contents-to-reader behavior described below.
 
+Readers using the repository-wide book-cover and width treatment also load `dhamma-books-cover-width-standard.css?v=1.0.0` after their legacy book styles. `db-book-cover-standard` applies the Daily Chants English rounded cream cover card while `db-page-standard-width` applies the centred 1080 px desktop container; `db-page-wide-reader` records that a named two-column reader retains its approved wider width.
+
 The shared contract provides:
 
 - **Book Mark:** one header button and one modal supporting add, list, go and delete, stored separately for each book in the browser.
