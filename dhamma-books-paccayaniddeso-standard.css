@@ -1,4 +1,4 @@
-/* Paccayaniddeso English/Chinese screen-header and Contents standard v1.0.1 */
+/* Paccayaniddeso English/Chinese screen-header and Contents standard v1.0.2 */
 
 html.db-paccayaniddeso-root,
 body.db-paccayaniddeso-reader-standard{
@@ -15,7 +15,7 @@ body.db-paccayaniddeso-reader-standard>.topbar{
   width:100%!important;
   max-width:100%!important;
   z-index:2147482900!important;
-  overflow:hidden!important;
+  overflow:visible!important;
 }
 body.db-paccayaniddeso-reader-standard>.topbar>.topbar-inner{
   width:100%!important;
@@ -25,9 +25,9 @@ body.db-paccayaniddeso-reader-standard>.topbar>.topbar-inner{
   padding:8px 12px!important;
   display:flex!important;
   align-items:center!important;
-  gap:7px!important;
+  gap:8px!important;
   flex-wrap:nowrap!important;
-  overflow:hidden!important;
+  overflow:visible!important;
 }
 body.db-paccayaniddeso-reader-standard .app-brand{
   order:1!important;
@@ -37,7 +37,7 @@ body.db-paccayaniddeso-reader-standard .app-brand{
 }
 body.db-paccayaniddeso-reader-standard .app-brand-title{
   display:block!important;
-  max-width:clamp(145px,24vw,370px)!important;
+  max-width:340px!important;
   min-width:0!important;
   overflow:hidden!important;
   text-overflow:ellipsis!important;
@@ -49,7 +49,7 @@ body.db-paccayaniddeso-reader-standard #db-language-options{
   order:3!important;
   display:inline-flex!important;
   align-items:center!important;
-  gap:4px!important;
+  gap:8px!important;
   flex:0 0 auto!important;
   flex-wrap:nowrap!important;
 }
@@ -58,12 +58,12 @@ body.db-paccayaniddeso-reader-standard #db-language-options :is(a,button){
   align-items:center!important;
   justify-content:center!important;
   box-sizing:border-box!important;
-  min-height:34px!important;
+  min-height:40px!important;
   border:1px solid #ffffff55!important;
-  border-radius:7px!important;
+  border-radius:9px!important;
   background:#ffffff14!important;
   color:#fff!important;
-  padding:6px 9px!important;
+  padding:8px 12px!important;
   text-decoration:none!important;
   font-family:var(--db-header-font)!important;
   font-size:var(--db-header-control-size)!important;
@@ -202,7 +202,7 @@ body.db-paccayaniddeso-reader-standard .toc-page{font-size:.8em!important;color:
 
 @media (min-width:761px) and (max-width:1180px){
   body.db-paccayaniddeso-reader-standard>.topbar>.topbar-inner{gap:4px!important;padding:7px!important}
-  body.db-paccayaniddeso-reader-standard .app-brand-title{max-width:105px!important}
+  body.db-paccayaniddeso-reader-standard .app-brand-title{display:none!important}
   body.db-paccayaniddeso-reader-standard>.topbar :is(button,a){padding-left:6px!important;padding-right:6px!important}
   body.db-paccayaniddeso-reader-standard>.topbar .searchbox input{width:90px!important}
 }
@@ -215,6 +215,7 @@ body.db-paccayaniddeso-reader-standard .toc-page{font-size:.8em!important;color:
     position:sticky!important;
     inset:auto!important;
     top:0!important;
+    overflow:hidden!important;
   }
   body.db-paccayaniddeso-reader-standard>.topbar>.topbar-inner{
     width:100%!important;
@@ -254,4 +255,10 @@ body.db-paccayaniddeso-reader-standard .toc-page{font-size:.8em!important;color:
   body.db-paccayaniddeso-reader-standard .contents-head{padding:14px!important}
   body.db-paccayaniddeso-reader-standard .toc-wrap{height:calc(46vh + 3.2em)!important}
   body.db-paccayaniddeso-reader-standard :is(#contentsView,#readerView,.section-heading,.pair-row,[id]){scroll-margin-top:calc(var(--db-paccayaniddeso-header-height,104px) + 10px)!important}
+}
+
+/* Mobile analysis cards omit the Paccayuddesa block only when it has no text. */
+@media (max-width:900px){
+  body.db-paccayaniddeso-reader-standard .analysis-row .condition-cell:empty{display:none!important}
+  body.db-paccayaniddeso-reader-standard .analysis-row .condition-cell:empty + .analysis-cell{border-top:0!important}
 }
