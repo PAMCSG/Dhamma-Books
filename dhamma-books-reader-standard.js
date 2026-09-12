@@ -1,4 +1,4 @@
-/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.17 */
+/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.18 */
 (function(){
   'use strict';
   const BOOKMARK_KEY='dhamma-books:bookmarks:'+location.pathname;
@@ -331,6 +331,25 @@
       if(stylesheet.href!==url.href) stylesheet.href=url.href;
     }
   }
+  function installDailyChantsStandard(){
+    if(location.pathname.split('/').pop().toLowerCase()!=='daily-chants.html') return;
+    document.documentElement.classList.add('db-daily-chants-root');
+    document.body.classList.add('db-daily-chants-standard');
+    const header=screenHeader();
+    const contents=document.getElementById('dailyChantsContents');
+    const toggle=document.getElementById('contentsToggle');
+    const setOpen=open=>{
+      if(!contents||!toggle) return;
+      contents.classList.toggle('collapsed',!open);
+      toggle.setAttribute('aria-expanded',String(open));
+      toggle.textContent=open?'Collapse':'Expand';
+    };
+    toggle?.addEventListener('click',()=>setOpen(contents.classList.contains('collapsed')));
+    document.getElementById('btnContents')?.addEventListener('click',()=>setOpen(true));
+    setOpen(true);
+    const measure=()=>header&&document.documentElement.style.setProperty('--db-daily-chants-header-height',Math.ceil(header.getBoundingClientRect().height)+'px');
+    measure();addEventListener('resize',measure,{passive:true});if(header&&window.ResizeObserver)new ResizeObserver(measure).observe(header);
+  }
   function installApprovedHeadingHierarchy(){
     const name=location.pathname.split('/').pop().toLowerCase();
     const setLevel=(heading,isSubheading)=>{
@@ -547,6 +566,7 @@
     installCategoryContentsStyle();
     installApprovedHeadingHierarchy();
     installContinuousChantingFlow();
+    installDailyChantsStandard();
     const controls=buildControls();
     if(!controls) return;
     installMindfulnessReaderStandard(controls);
@@ -575,7 +595,7 @@
     migrateOnlyWayBookmarks(candidates);
     const bookmark=buildBookmarkModal(candidates);
     controls.bookmark.addEventListener('click',bookmark.openModal);
-    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.17'};
+    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.18'};
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();

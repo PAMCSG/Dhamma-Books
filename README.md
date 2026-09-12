@@ -2,6 +2,10 @@
 
 The `main` branch is the authoritative source for the current Dhamma Books website.
 
+## Standard maintenance workflow
+
+Begin every change from the latest GitHub `main` and read the current repository documentation before editing. Do not use an older local copy or memory as the authoritative input. Unless the user explicitly authorizes repository writes for that individual task, make and validate the changes locally and return only the changed output files for manual upload; also provide one ZIP archive containing those same changed files. Do not push, open a pull request, merge or deploy. Preserve unrelated files, book content and established reader functions.
+
 ## Reader interface standard
 
 `BOOK-READER-INTERFACE-STANDARD.md` is the authoritative, reusable standard for improving an existing reader book or creating a new one. It consolidates the approved requirements for the screen header, mobile behaviour, Contents panel, cover layout, font controls, Search, Book Mark, language editions, non-regression protection and acceptance testing. Use Dhammapada as the approved implementation example and Daily Chants Burmese as the mobile sticky-header and Contents-window behaviour reference.
@@ -27,7 +31,7 @@ See `PCED-LOOKUP-UPDATE-REPORT.md` for rollout details and tests.
 
 ## Shared reader controls and screen header — 7 September 2026
 
-Every current and future reader book must load `dhamma-books-reader-standard.css` and `dhamma-books-reader-standard.js` using the current cache version. Shared CSS v1.3.16 includes the footnote/endnote popup, responsive page-width and book-heading standards below. Shared reader standard v1.3.17 retires legacy save/go and automatic last-read controls so a book displays only the common bookmark control, and provides the continuous contents-to-reader behavior described below.
+Every current and future reader book must load `dhamma-books-reader-standard.css` and `dhamma-books-reader-standard.js` using the current cache version. Shared CSS and reader runtime v1.3.18 include the Daily Chants English conformance rules below. The shared reader standard retires legacy save/go and automatic last-read controls so a book displays only the common bookmark control, and provides the continuous contents-to-reader behavior described below.
 
 The shared contract provides:
 
@@ -298,7 +302,7 @@ The existing one-column Contents entries are placed in a fixed-height internal s
 
 ### Repository-wide popup background standard — 11 September 2026
 
-All Dhamma-Books popup overlays are transparent so opening PCED, footnote, bookmark, Nissaya or another supported popup never dims the reading text behind it. Popup panels remain opaque and readable, retaining their established border, shadow, close behaviour, movement, internal scrolling and last-opened-on-top order. The current shared stylesheet is v1.3.16, `pced-popup-standard.js` is v1.3.16, and `dhamma-books-reader-standard.js` is v1.3.17.
+All Dhamma-Books popup overlays are transparent so opening PCED, footnote, bookmark, Nissaya or another supported popup never dims the reading text behind it. Popup panels remain opaque and readable, retaining their established border, shadow, close behaviour, movement, internal scrolling and last-opened-on-top order. The current shared stylesheet and reader runtime are v1.3.18, and `pced-popup-standard.js` is v1.3.16.
 
 
 ### 《觉悟资粮》 bilingual reader-interface conformance — 11 September 2026
@@ -341,3 +345,11 @@ The standard now includes a mandatory full-conformance procedure. A request to c
 Daily Chants Burmese is not one of the documented two-column wide-page exceptions. Its desktop reader therefore follows 觉悟资粮 at a centred 1080 px maximum with at least 14 px side clearance. Its Burmese-only Contents title remains fixed above the internally scrolling list, and A−/A+ resize both Contents and reading text.
 
 The Mindfulness of Breathing `INTRODUCTION` treatment is now the documented book-text heading standard: primary chapter and major-section headings use centred text on a pale `#F4E8DF` panel with a 4 px `#A8734F` top rule and rounded corners; subordinate headings are left aligned with secondary-brown text and a thin bottom divider. Hierarchy follows the source Contents and typography, Pāli inside headings inherits the heading colour, and exceptional source-faithful illustrated title layouts remain unchanged. Daily Chants Burmese applies this hierarchy to its `h2` and `h3` section headings while preserving its printed-page exceptions, wording, images, source-page order and footnotes. It loads shared stylesheet v1.3.16 and reader runtime v1.3.17.
+
+### Daily Chants English conformance and Chanting Book title-row standard — 12 September 2026
+
+`daily-chants.html` now contains its final English screen header directly in the initial HTML. It retains Contents and English navigation and follows the approved order with A−, A+, one Book Mark control, Search field and Search button. The desktop header remains fixed in one row; the complete mobile header remains one sticky two-row unit with Search on the second row and no sideways document movement. The retired Previously Read control is hidden from the initial layout and automatic last-read tracking is removed.
+
+The approved wider 1500 px desktop page width and the side-by-side Pāli–English reading body are unchanged. The `Content` panel now has one rounded outer frame, a non-scrolling Collapse/Expand title row and one internally scrolling Contents column at the standard desktop and mobile heights. A− and A+ resize the Contents as well as the reading text.
+
+For every book in **Chanting Book 念诵本**, except Daily Chants Burmese, a separate `Pāli | English`, `Pāli | Chinese` or equivalent language-label row is not displayed above the main text. The sutta-name row is centred and uses the approved pale `#F4E8DF` panel, 4 px `#A8734F` top rule, rounded corners and brown heading text. This heading rule does not change the language columns in the reading body. Daily Chants English implements the rule; the other Chanting Books adopt it when they are next audited. It loads shared stylesheet and reader runtime v1.3.18 and popup runtime v1.3.16. Book wording, translations, cover, Contents destinations, paragraph order, footnotes and PCED data remain unchanged.
