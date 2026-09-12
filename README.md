@@ -31,7 +31,7 @@ See `PCED-LOOKUP-UPDATE-REPORT.md` for rollout details and tests.
 
 ## Shared reader controls and screen header — 7 September 2026
 
-Every current and future reader book must load `dhamma-books-reader-standard.css` and `dhamma-books-reader-standard.js` using the current cache version. Shared CSS and reader runtime v1.3.18 include the Daily Chants English conformance rules below. The shared reader standard retires legacy save/go and automatic last-read controls so a book displays only the common bookmark control, and provides the continuous contents-to-reader behavior described below.
+Every current and future reader book must load `dhamma-books-reader-standard.css` and `dhamma-books-reader-standard.js` using the current cache version. Shared CSS v1.3.19 and reader runtime v1.3.18 include the Daily Chants English conformance rules below. The shared reader standard retires legacy save/go and automatic last-read controls so a book displays only the common bookmark control, and provides the continuous contents-to-reader behavior described below.
 
 The shared contract provides:
 
@@ -302,7 +302,7 @@ The existing one-column Contents entries are placed in a fixed-height internal s
 
 ### Repository-wide popup background standard — 11 September 2026
 
-All Dhamma-Books popup overlays are transparent so opening PCED, footnote, bookmark, Nissaya or another supported popup never dims the reading text behind it. Popup panels remain opaque and readable, retaining their established border, shadow, close behaviour, movement, internal scrolling and last-opened-on-top order. The current shared stylesheet and reader runtime are v1.3.18, and `pced-popup-standard.js` is v1.3.16.
+All Dhamma-Books popup overlays are transparent so opening PCED, footnote, bookmark, Nissaya or another supported popup never dims the reading text behind it. Popup panels remain opaque and readable, retaining their established border, shadow, close behaviour, movement, internal scrolling and last-opened-on-top order. The current shared stylesheet is v1.3.19, the reader runtime is v1.3.18, and `pced-popup-standard.js` is v1.3.16.
 
 
 ### 《觉悟资粮》 bilingual reader-interface conformance — 11 September 2026
@@ -352,4 +352,4 @@ The Mindfulness of Breathing `INTRODUCTION` treatment is now the documented book
 
 The approved wider 1500 px desktop page width and the side-by-side Pāli–English reading body are unchanged. The `Content` panel now has one rounded outer frame, a non-scrolling Collapse/Expand title row and one internally scrolling Contents column at the standard desktop and mobile heights. A− and A+ resize the Contents as well as the reading text.
 
-For every book in **Chanting Book 念诵本**, except Daily Chants Burmese, a separate `Pāli | English`, `Pāli | Chinese` or equivalent language-label row is not displayed above the main text. The sutta-name row is centred and uses the approved pale `#F4E8DF` panel, 4 px `#A8734F` top rule, rounded corners and brown heading text. This heading rule does not change the language columns in the reading body. Daily Chants English implements the rule; the other Chanting Books adopt it when they are next audited. It loads shared stylesheet and reader runtime v1.3.18 and popup runtime v1.3.16. Book wording, translations, cover, Contents destinations, paragraph order, footnotes and PCED data remain unchanged.
+For every book in **Chanting Book 念诵本**, except Daily Chants Burmese, a separate `Pāli | English`, `Pāli | Chinese` or equivalent language-label row is not displayed above the main text. The sutta-name row is centred and uses the approved pale `#F4E8DF` panel, 4 px `#A8734F` top rule, rounded corners and brown heading text. This heading rule does not change the language columns in the reading body. Daily Chants English implements the rule; the other Chanting Books adopt it when they are next audited. Daily Chants English uses explicit one-column declarations for the complete Contents list, every Contents group and each group list, while its Pāli–English reading body remains two columns. It loads shared stylesheet v1.3.19, reader runtime v1.3.18 and popup runtime v1.3.16. Book wording, translations, cover, Contents destinations, paragraph order, footnotes and PCED data remain unchanged.
