@@ -1,4 +1,4 @@
-/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.18 */
+/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.19 */
 (function(){
   'use strict';
   const BOOKMARK_KEY='dhamma-books:bookmarks:'+location.pathname;
@@ -123,6 +123,49 @@
     const spacer=[...host.children].find(node=>node.classList?.contains('spacer'));
     if(spacer) host.insertBefore(controls,spacer); else host.append(controls);
     return {bookmark,input,search,status,controls};
+  }
+
+  function adoptPaccayaniddesoControls(){
+    const name=location.pathname.split('/').pop().toLowerCase();
+    if(name!=='paccayaniddeso.html'&&name!=='paccayaniddeso-chinese.html') return null;
+    const bookmark=document.getElementById('bookmarkBtn');
+    const input=document.getElementById('searchInput');
+    const search=document.getElementById('searchBtn');
+    const host=headerHost(screenHeader());
+    if(!bookmark||!input||!search||!host) return null;
+    document.getElementById('previousRead')?.setAttribute('hidden','');
+    bookmark.onclick=null;
+    input.onkeydown=null;
+    search.onclick=null;
+    let status=document.getElementById('db-search-status');
+    if(!status){
+      status=create('span',{id:'db-search-status',class:'db-search-status db-paccayaniddeso-search-status','aria-live':'polite'});
+      host.append(status);
+    }
+    return {bookmark,input,search,status,controls:host};
+  }
+
+  function installPaccayaniddesoReaderStandard(){
+    const name=location.pathname.split('/').pop().toLowerCase();
+    if(name!=='paccayaniddeso.html'&&name!=='paccayaniddeso-chinese.html') return;
+    document.documentElement.classList.add('db-paccayaniddeso-root');
+    document.body.classList.add('db-paccayaniddeso-reader-standard');
+    const header=screenHeader();
+    const panel=document.getElementById('paccayaniddesoContents');
+    const toggle=document.getElementById('paccayaniddesoContentsToggle');
+    const setOpen=open=>{
+      if(!panel||!toggle) return;
+      panel.classList.toggle('collapsed',!open);
+      toggle.setAttribute('aria-expanded',String(open));
+      toggle.textContent=open?(name.includes('chinese')?'收起':'Collapse'):(name.includes('chinese')?'展开':'Expand');
+    };
+    toggle?.addEventListener('click',()=>setOpen(panel.classList.contains('collapsed')));
+    document.getElementById('btnContents')?.addEventListener('click',()=>setOpen(true));
+    setOpen(true);
+    const measure=()=>header&&document.documentElement.style.setProperty('--db-paccayaniddeso-header-height',Math.ceil(header.getBoundingClientRect().height)+'px');
+    measure();
+    addEventListener('resize',measure,{passive:true});
+    if(header&&window.ResizeObserver)new ResizeObserver(measure).observe(header);
   }
 
   function normalize(value){
@@ -561,13 +604,29 @@
     });
     if(imported.length) saveBookmarks(imported);
   }
+  function migratePaccayaniddesoBookmarks(candidates){
+    const name=location.pathname.split('/').pop().toLowerCase();
+    if((name!=='paccayaniddeso.html'&&name!=='paccayaniddeso-chinese.html')||loadBookmarks().length) return;
+    let legacy=[];
+    try{legacy=JSON.parse(localStorage.getItem('paccayaniddeso-reader-v1:bookmarks')||'[]')}catch{}
+    if(!Array.isArray(legacy)) return;
+    const lang=name.includes('chinese')?'zh':'en';
+    const imported=legacy.map((item,index)=>{
+      const target=item?.id&&document.getElementById(item.id);
+      const candidate=target&&(candidates.includes(target)?target:target.closest('.pair-row,.section-heading,.page-anchor,section[id],article[id]'));
+      if(!candidate) return null;
+      return {id:'legacy-'+Date.now()+'-'+index,createdAt:item.saved||new Date().toISOString(),anchor:candidate.dataset.dbBookmarkAnchor||'',offset:0,scrollY:0,lang,label:item.title||bookmarkLabel(target)};
+    }).filter(Boolean);
+    if(imported.length) saveBookmarks(imported);
+  }
   function init(){
     ensurePopupMovementStandard();
     installCategoryContentsStyle();
     installApprovedHeadingHierarchy();
     installContinuousChantingFlow();
     installDailyChantsStandard();
-    const controls=buildControls();
+    installPaccayaniddesoReaderStandard();
+    const controls=adoptPaccayaniddesoControls()||buildControls();
     if(!controls) return;
     installMindfulnessReaderStandard(controls);
     installDailyChantsBurmeseStandard();
@@ -593,9 +652,10 @@
     migrateRequisitesBookmark(candidates);
     migratePatisambhidamaggaBookmarks(candidates);
     migrateOnlyWayBookmarks(candidates);
+    migratePaccayaniddesoBookmarks(candidates);
     const bookmark=buildBookmarkModal(candidates);
     controls.bookmark.addEventListener('click',bookmark.openModal);
-    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.18'};
+    window.DhammaBooksReaderStandard={runSearch,clearSearch,openBookmarks:bookmark.openModal,applyLanguage,version:'1.3.19'};
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();
