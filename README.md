@@ -81,7 +81,7 @@ Keep entries in the book's original reading order. Titles may wrap naturally; pa
 
 #### Fixed contents window
 
-Use the Daily Chants Burmese contents panel as the structural reference. Each contents panel has one rounded outer frame, with no separate inner frames around its groups. Its title sits in the original pale pink-brown header strip using background `#F4E9DF` and title text `#66442F`, and remains outside the scrolling entries so it never covers an entry. A button in the same header strip opens and collapses the entries; the screen-header Contents button always opens the panel before scrolling to it.
+Use the Daily Chants Burmese contents panel as the structural reference. Each contents panel has one rounded outer frame, with no separate inner frames around its groups. Its title sits in the original pale pink-brown header strip using background `#F4E9DF` and title text `#66442F`, remains outside the scrolling entries so it never covers an entry, and is horizontally centred in the full panel independently of the right-side Expand/Collapse button. A button in the same header strip opens and collapses the entries; the screen-header Contents button always opens the panel before scrolling to it.
 
 Use only `目录` as the contents-panel title in a Chinese book and only `Content` in an English book. The scrolling entries retain each book's existing colours, fonts and styles, apart from removing inner group frames.
 
@@ -106,6 +106,8 @@ Use the repository's shared warm-brown reader palette consistently:
 | Pāli emphasis, where used | `#155CA8`, darker `#0D477F` |
 
 Use consistent panel borders, rounded corners, row spacing, and heading hierarchy across contents pages. Keep language-appropriate fonts and readable sizes, with clear links and no clipped or overlapping labels. The screen-header font and size rules above remain in force.
+
+Every non-clickable section/group heading inside the scrolling Contents entries uses the shared `#EEE1CF` highlight bar with `#633919` text. Its coloured background begins exactly one character-space (`1em`) from the left edge of the scrolling Contents window and fills the remaining width to the right. This inset and the truly centred Contents title apply to every current and future Dhamma-Books reader.
 
 #### Implementation status
 
