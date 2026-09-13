@@ -1,4 +1,4 @@
-/* Dhamma-Books shared reader controls v1.3.22 */
+/* Dhamma-Books shared reader controls v1.3.23 */
 :root{
   --db-header-bg:#A8734F;
   --db-header-text:#ffffff;
@@ -879,14 +879,39 @@ body.db-standard-contents :is(.contents,.toc) .toc-row:focus-visible{
   :is(#noteModal,#footnoteModal) .panel-title{font-size:16px!important}
 }
 
-/* Standard full-width section-heading highlight bar inside Contents windows. */
+/* Standard Contents-window title alignment and inset section-heading bars. */
+html body[class] .contents-head{
+  position:relative!important;
+}
+html body[class] .contents-head > :is(h2,.contents-title){
+  box-sizing:border-box!important;
+  width:100%!important;
+  flex:1 1 100%!important;
+  text-align:center!important;
+}
+html body[class] .contents-head > .contents-toggle,
+html body.db-pali-chanting-reader-standard .contents-title > .contents-toggle{
+  position:absolute!important;
+  top:50%!important;
+  right:20px!important;
+  margin:0!important;
+  transform:translateY(-50%)!important;
+}
+html body.db-pali-chanting-reader-standard .contents-title{
+  position:relative!important;
+  justify-content:center!important;
+  text-align:center!important;
+}
+html body.db-standard-contents :is(.contents,.toc) > h2{
+  text-align:center!important;
+}
 html body[class] :is(.contents-scroll,.contents-list,.toc-wrap) > .toc-group > :is(h2,h3),
 html body.db-daily-chants-burmese-standard .contents-list > .toc-group,
 html body.db-only-way-reader-standard .contents-scroll > .toc-group{
   display:block!important;
-  width:100%!important;
+  width:calc(100% - 1em)!important;
   box-sizing:border-box!important;
-  margin:0!important;
+  margin:0 0 0 1em!important;
   padding:10px 16px!important;
   border:0!important;
   border-radius:0!important;
@@ -900,6 +925,10 @@ html body.db-only-way-reader-standard .contents-scroll > .toc-group{
   letter-spacing:normal!important;
 }
 @media(max-width:760px){
+  html body[class] .contents-head > .contents-toggle,
+  html body.db-pali-chanting-reader-standard .contents-title > .contents-toggle{
+    right:14px!important;
+  }
   html body[class] :is(.contents-scroll,.contents-list,.toc-wrap) > .toc-group > :is(h2,h3),
   html body.db-daily-chants-burmese-standard .contents-list > .toc-group,
   html body.db-only-way-reader-standard .contents-scroll > .toc-group{

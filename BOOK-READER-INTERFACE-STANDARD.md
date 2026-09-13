@@ -102,6 +102,7 @@ Use Daily Chants Burmese as the structural reference.
 - Do not place a second frame around the list or around individual Contents groups.
 - Put the Contents title row outside and above the scrolling entries window.
 - The title row must never cover an entry as the Contents list scrolls.
+- Centre the Contents title horizontally in the full width of the panel. The title must remain truly centred independently of the Expand/Collapse button at the right; do not centre it only within the space left over beside that button.
 - Place an Expand/Collapse button in the title row.
 - The screen-header Contents button must expand the panel when necessary and then move to it.
 - Only the entries scroll inside the fixed-height window; the Contents title row stays visible above them.
@@ -135,7 +136,7 @@ The entries window uses the Daily Chants Burmese height plus approximately one n
 | Muted text and page numbers | `#7B685A` |
 | Section/group highlight bar | background `#EEE1CF`; text `#633919` |
 
-Every non-clickable section or group heading inside the scrolling Contents entries uses the Dhammapada highlight-bar treatment: a full-width rectangular `#EEE1CF` bar with bold, left-aligned `#633919` text, no rounded corners or separate frame, and `10px 16px` padding (`10px 14px` on mobile). Its font size must remain relative to the Contents font size so A− and A+ resize it. This group-heading bar is distinct from the fixed Contents title row.
+Every non-clickable section or group heading inside the scrolling Contents entries uses the Dhammapada highlight-bar treatment: a rectangular `#EEE1CF` bar beginning exactly one character-space (`1em`) from the left edge of the scrolling Contents window, with bold, left-aligned `#633919` text, no rounded corners or separate frame, and `10px 16px` internal padding (`10px 14px` on mobile). The bar fills the remaining width to the right after that `1em` inset. Its font size must remain relative to the Contents font size so A− and A+ resize it. This group-heading bar is distinct from the fixed Contents title row.
 
 Keep each book's existing clickable Contents-entry fonts, hierarchy, colours and styling. Apart from the title row, section/group highlight bar, fixed scrolling window and removal of inner frames, do not restyle the actual entries merely for standardisation.
 
