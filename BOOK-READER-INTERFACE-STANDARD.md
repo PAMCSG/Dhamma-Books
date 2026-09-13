@@ -133,8 +133,11 @@ The entries window uses the Daily Chants Burmese height plus approximately one n
 | Main entry text | `#302A26` |
 | Borders and row separators | `#DFCBBB` |
 | Muted text and page numbers | `#7B685A` |
+| Section/group highlight bar | background `#EEE1CF`; text `#633919` |
 
-Keep each book's existing Contents-entry fonts, hierarchy, colours and styling. Apart from the title row, fixed scrolling window and removal of inner frames, do not restyle the actual entries merely for standardisation.
+Every non-clickable section or group heading inside the scrolling Contents entries uses the Dhammapada highlight-bar treatment: a full-width rectangular `#EEE1CF` bar with bold, left-aligned `#633919` text, no rounded corners or separate frame, and `10px 16px` padding (`10px 14px` on mobile). Its font size must remain relative to the Contents font size so A− and A+ resize it. This group-heading bar is distinct from the fixed Contents title row.
+
+Keep each book's existing clickable Contents-entry fonts, hierarchy, colours and styling. Apart from the title row, section/group highlight bar, fixed scrolling window and removal of inner frames, do not restyle the actual entries merely for standardisation.
 
 ### Columns and reading flow
 
@@ -329,6 +332,7 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 - [ ] Contents uses one outer frame with no inner frame.
 - [ ] Contents title row stays outside the scrolling entries.
 - [ ] Contents title wording and pinkish colour pair are correct.
+- [ ] Every Contents section/group heading uses the standard full-width rectangular highlight bar on desktop and mobile.
 - [ ] Contents height matches the standard.
 - [ ] Main text follows Contents continuously.
 - [ ] Contents targets and restored positions are not hidden behind the header.

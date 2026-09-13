@@ -1,4 +1,4 @@
-/* Dhamma-Books shared reader controls v1.3.21 */
+/* Dhamma-Books shared reader controls v1.3.22 */
 :root{
   --db-header-bg:#A8734F;
   --db-header-text:#ffffff;
@@ -877,4 +877,32 @@ body.db-standard-contents :is(.contents,.toc) .toc-row:focus-visible{
 }
 @media(max-width:650px){
   :is(#noteModal,#footnoteModal) .panel-title{font-size:16px!important}
+}
+
+/* Standard full-width section-heading highlight bar inside Contents windows. */
+html body[class] :is(.contents-scroll,.contents-list,.toc-wrap) > .toc-group > :is(h2,h3),
+html body.db-daily-chants-burmese-standard .contents-list > .toc-group,
+html body.db-only-way-reader-standard .contents-scroll > .toc-group{
+  display:block!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+  margin:0!important;
+  padding:10px 16px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:#EEE1CF!important;
+  color:#633919!important;
+  font-family:inherit!important;
+  font-size:1.05em!important;
+  font-weight:700!important;
+  line-height:1.4!important;
+  text-align:left!important;
+  letter-spacing:normal!important;
+}
+@media(max-width:760px){
+  html body[class] :is(.contents-scroll,.contents-list,.toc-wrap) > .toc-group > :is(h2,h3),
+  html body.db-daily-chants-burmese-standard .contents-list > .toc-group,
+  html body.db-only-way-reader-standard .contents-scroll > .toc-group{
+    padding:10px 14px!important;
+  }
 }
