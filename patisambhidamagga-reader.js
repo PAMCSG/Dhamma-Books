@@ -115,6 +115,9 @@
     if (!overlay) return;
     const title = document.getElementById('noteTitle');
     const body = document.getElementById('noteBody');
+    // Source Word typography: Aṭṭhakathā notes are Kaiti, translator notes are
+    // FangSong, and the exceptional canonical quotation in note 15 is Songti.
+    const fangSongNotes = new Set([1,2,3,4,5,6,7,8,9,11,12,13,15,16,17,18,19,20,21,22,23,25,32,35,38,39,47,55,70,71,74,89,119,126,128,132,258,259,260,261,262,267,271,272,274,275,294,302,303,308,320,322,326,330,332,335,346,348,364,375,378,386,390,394,396,400,405,406,410,413,415,420,430,431,432,433,434,435,436,437,438,440,441,442,446,447,448,449,455,468,471,476,477,479,481,483,486,487]);
     let returnY = 0;
     const close = () => {
       overlay.classList.remove('open');
@@ -130,6 +133,10 @@
       if (!source) return;
       returnY = scrollY;
       title.textContent = '註释 ' + number;
+      const sourceFontClass = Number(number) === 14
+        ? 'source-font-songti'
+        : (fangSongNotes.has(Number(number)) ? 'source-font-fangsong' : 'source-font-kaiti');
+      body.className = 'modal-body ' + sourceFontClass;
       body.innerHTML = source.innerHTML;
       overlay.classList.add('open');
       overlay.setAttribute('aria-hidden', 'false');

@@ -389,12 +389,19 @@ article.pali .pali-clickable-text{
 #samadhibhavana-end .paragraph-text{ text-align:center; }
 </style>
 <style id="pamc-standard-font">
-html, body, body * {
-  font-family: "Times New Roman", "Microsoft YaHei", "Noto Sans CJK SC", "PingFang SC", serif !important;
+/* Reader chrome uses the shared sans stack; book typography remains source-faithful. */
+.topbar,.topbar *,.toc-toggle,.toc-toggle * {
+  font-family: Arial, "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif !important;
 }
 code, pre, kbd, samp {
   font-family: Consolas, "Courier New", monospace !important;
 }
+.source-font-songti{font-family:SimSun,"Songti SC","Noto Serif CJK SC",serif!important}
+.source-font-kaiti{font-family:KaiTi,"STKaiti","Kaiti SC","Noto Serif CJK SC",serif!important}
+.source-font-fangsong{font-family:FangSong,"STFangsong","FangSong SC","Noto Serif CJK SC",serif!important}
+.source-font-heiti{font-family:SimHei,"Heiti SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif!important}
+.pali-word,.intro-pali{font-family:"Times New Roman","Noto Serif",serif!important}
+.modal-body{font-family:KaiTi,"STKaiti","Kaiti SC","Noto Serif CJK SC",serif}
 </style>
 <style id="patisambhidamagga-standard-topbar">
 /* PAMC Online-Books standardized top reader bar, adapted for the bilingual Paṭisambhidāmagga reader. */
@@ -576,7 +583,7 @@ main{max-width:1180px!important;margin:0 auto!important;padding:18px 20px 80px!i
 .book-cover-frame img{display:block!important;width:100%!important;height:auto!important;object-fit:contain!important;border:1px solid #d8cfc6!important;box-shadow:0 6px 18px rgba(0,0,0,.08)!important;background:#fff!important;}
 .book-hero-text{flex:1 1 auto!important;min-width:0!important;padding-top:4px!important;}
 .book-series{font-family:SimSun,"Noto Serif CJK SC","Songti SC",serif!important;font-size:19px!important;line-height:1.5!important;color:#6f4a31!important;margin-bottom:12px!important;}
-.book-title-zh{font-family:SimSun,"Noto Serif CJK SC","Songti SC",serif!important;font-size:36px!important;line-height:1.15!important;color:#2e241e!important;}
+.book-title-zh{font-family:"FZDaBiaoSong-B06S",SimSun,"Songti SC","Noto Serif CJK SC",serif!important;font-size:36px!important;line-height:1.15!important;color:#2e241e!important;}
 .book-title-pali{font:italic 24px/1.32 "Times New Roman",serif!important;color:#155ca8!important;}
 .book-hero-meta{font-family:SimSun,"Noto Serif CJK SC","Songti SC",serif!important;font-size:18px!important;line-height:1.5!important;color:#3b342f!important;}
 .book-hero-meta.pali-meta{font:16px/1.4 "Times New Roman",serif!important;color:#3b342f!important;}
@@ -678,13 +685,14 @@ article.zh,article.zh *{font-family:SimSun,"Noto Serif CJK SC","Songti SC",serif
 .frontmatter-section,.intro-flow{margin:34px auto 52px;max-width:940px;color:#2d2924}
 .frontmatter-title,.intro-main-title{text-align:center;margin:42px 0 26px;color:#2f2924;font:700 28px/1.3 SimHei,"Microsoft YaHei",sans-serif;scroll-margin-top:78px}
 .source-paragraph{font-size:19px;line-height:1.88;margin:.8em 0;text-align:justify;text-indent:2em}
-.intro-narrative{font-family:KaiTi,"STKaiti","Noto Serif SC",serif}.intro-quote{font-family:SimSun,"Noto Serif SC",serif}.intro-explainer-paragraph,.intro-explainer{font-family:FangSong,"STFangsong","Noto Serif SC",serif}
-.intro-canonical{font-family:SimSun,"Noto Serif SC",serif}.intro-pali{font-family:"Times New Roman",serif;font-style:italic;color:#155ca8;text-indent:2em;line-height:1.68}
+.intro-narrative{font-family:KaiTi,"STKaiti","Kaiti SC","Noto Serif CJK SC",serif!important}.intro-quote{font-family:SimSun,"Songti SC","Noto Serif CJK SC",serif!important}.intro-explainer-paragraph,.intro-explainer{font-family:FangSong,"STFangsong","FangSong SC","Noto Serif CJK SC",serif!important}
+.intro-canonical{font-family:SimSun,"Songti SC","Noto Serif CJK SC",serif!important}.intro-pali{font-family:"Times New Roman","Noto Serif",serif!important;font-style:italic;color:#155ca8;text-indent:2em;line-height:1.68}
 .intro-section-heading{scroll-margin-top:78px;margin:38px 0 20px;padding:14px 18px;text-align:center;background:linear-gradient(135deg,#f7ede2,#fffaf4);border-top:4px solid #a8734f;border-radius:9px;color:#2f2924;font:700 21px/1.35 SimHei,"Microsoft YaHei",sans-serif}
 .intro-minor-heading,.intro-guide-chapter{scroll-margin-top:78px;margin:28px 0 13px;padding:0 0 7px;border-bottom:1px solid #dfcbbb;color:#65452f;font:700 19px/1.45 SimHei,"Microsoft YaHei",sans-serif}
 .intro-guide-chapter{font-size:18px;text-align:left}.intro-guide-chapter .pali-word{font-size:1em}
 .intro-signoff{text-align:right!important;text-indent:0!important;margin:.18em 0}
 .frontmatter-section .table-wrap{overflow-x:auto;margin:24px 0 8px}.frontmatter-section .source-table{border-collapse:collapse;width:100%;font-size:17px;background:#fff}.frontmatter-section .source-table td{border:1px solid #705c4e;padding:8px 10px;vertical-align:top;line-height:1.55}.frontmatter-section .fanli-table td:first-child{white-space:nowrap;width:16%}.frontmatter-section .fanli-table td:nth-child(2){width:38%}.frontmatter-section .fanli-table td:nth-child(3){font-family:"Times New Roman",serif;color:#155ca8}
+.frontmatter-section .source-table{font-family:KaiTi,"STKaiti","Kaiti SC","Noto Serif CJK SC",serif!important}.frontmatter-section .source-table th{font-family:"STXihei","Microsoft YaHei","Noto Sans CJK SC",sans-serif!important}
 .frontmatter-section .pali-word,.intro-flow .pali-word{font-family:"Times New Roman",serif;font-style:italic;color:#155ca8}
 .frontmatter-section .pali-word:hover,.intro-flow .pali-word:hover,.frontmatter-section .pali-word:focus,.intro-flow .pali-word:focus{background:#e7f0fa!important;border-bottom-color:#9bbcdf!important;outline:none}
 .frontmatter-section sup.fn-link,.intro-flow sup.fn-link{display:inline!important;font-size:.72em!important;line-height:0!important;vertical-align:super!important;color:#9b4e2c!important;cursor:pointer!important;font-weight:700!important;margin-left:1px;text-decoration:none!important}
@@ -697,7 +705,7 @@ article.zh,article.zh *{font-family:SimSun,"Noto Serif CJK SC","Songti SC",serif
 <style id="patisambhidamagga-intro-source-tables-20260903">
 /* Source-faithful tables from the printed Introduction. Scoped to the newly added front matter only. */
 .intro-flow .intro-table-wrap{overflow-x:auto;margin:22px 0 26px;-webkit-overflow-scrolling:touch}
-.intro-flow table.intro-source-table{width:100%;border-collapse:collapse;background:#fff;font-family:SimSun,"Noto Serif SC","Songti SC",serif;font-size:16px;line-height:1.45;color:#2d2924}
+.intro-flow table.intro-source-table{width:100%;border-collapse:collapse;background:#fff;font-family:KaiTi,"STKaiti","Kaiti SC","Noto Serif CJK SC",serif!important;font-size:16px;line-height:1.45;color:#2d2924}.intro-flow table.intro-source-table th{font-family:"STXihei","Microsoft YaHei","Noto Sans CJK SC",sans-serif!important}
 .intro-flow .intro-source-table th,.intro-flow .intro-source-table td{border:1px solid #705c4e;padding:7px 9px;vertical-align:middle;text-align:left;font-weight:400}
 .intro-flow .intro-source-table thead th{background:#f3e5d8;text-align:center;font-weight:700;color:#4a3528}
 .intro-flow .intro-source-table .num{text-align:center;width:7%;font-variant-numeric:tabular-nums;color:#2d2924;font-size:inherit}
