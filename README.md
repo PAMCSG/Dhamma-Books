@@ -10,6 +10,8 @@ Begin every change from the latest GitHub `main` and read the current repository
 
 `BOOK-READER-INTERFACE-STANDARD.md` is the authoritative, reusable standard for improving an existing reader book or creating a new one. It consolidates the approved requirements for the screen header, mobile behaviour, Contents panel, cover layout, font controls, Search, Book Mark, language editions, non-regression protection and acceptance testing. Use Dhammapada as the approved implementation example and Daily Chants Burmese as the mobile sticky-header and Contents-window behaviour reference.
 
+Book-content fonts follow the source file. Preserve distinct source fonts for body text, quotations, headings, notes and other semantic roles; the shared sans-serif reader font is for interface controls only. When a source font is non-Unicode, or an explicit conversion is requested, convert the text to Unicode and use a suitable Unicode font instead (for example, Sangayana-encoded Pāli becomes Unicode Pāli displayed with Times New Roman or another Unicode Pāli serif). See “Source-faithful book fonts” in the interface standard for the normative rules and checks.
+
 ## Shared PCED files
 
 - `pced-lookup-core.js` — exact and verified-form resolver
