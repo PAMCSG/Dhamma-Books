@@ -403,5 +403,19 @@ code, pre, kbd, samp {
     当前为审阅版本，内容及阅读功能仍可能继续校对与完善。
   </footer>
 </div>
+<script>
+(function(){
+  const link=document.querySelector('a[href="patisambhidamagga.html"]');
+  if(!link)return;
+  const text=link.closest('.book-text');
+  const description=text?.querySelector('.desc');
+  if(description)description.textContent='Pāli–Chinese and Chinese readers / 巴利文—中文对照及中文阅读';
+  const options=document.createElement('div');
+  options.className='reader-options';
+  options.setAttribute('aria-label','选择《辨析道》版本');
+  options.innerHTML='<a class="open" href="patisambhidamagga.html">巴利－中文</a><a class="open" href="patisambhidamagga-chinese.html">中文</a>';
+  link.replaceWith(options);
+})();
+</script>
 </body>
 </html>

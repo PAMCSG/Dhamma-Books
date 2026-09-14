@@ -332,6 +332,12 @@ The English `Content` and Chinese `目录` panels now each have one rounded oute
 
 ### 《辨析道》 reader-interface conformance — 11 September 2026
 
+#### Full-Chinese edition and synchronized edition switching — 14 September 2026
+
+`patisambhidamagga-chinese.html` is the complete Chinese edition converted from the supplied 508-page Word source. It contains all three divisions through `第三品 慧品`, the reference list, 489 linked Chinese notes, Unicode Pāli terms with PCED lookup, the shared Contents, Search, font-size and Book Mark controls, and the standard fixed-desktop/sticky-mobile interface. The four legacy WinTaunggyi bibliography titles were converted to Unicode Burmese, and the legacy romanized Pāli font encoding was converted to Unicode without changing the Chinese source text.
+
+The home-page 《辨析道》 card now offers `巴利－中文` and `中文`. Both readers carry the same two edition controls. `patisambhidamagga-reader.js` records the nearest shared semantic section and the reader's relative position inside it only when an edition button is deliberately selected, then opens the other edition at the corresponding position. Because the current Pāli–Chinese reader remains under construction and presently ends after `第二品 双运品`, a switch made from the Chinese-only third division lands at the nearest available shared section instead of inventing an unavailable parallel passage. Ordinary reading does not create automatic last-position tracking.
+
 `patisambhidamagga.html` now presents the final standard screen header directly in its initial HTML, preventing a legacy or duplicate control set from flashing while JavaScript loads. The desktop header is fixed, full-width and non-wrapping; the complete mobile header remains one sticky two-row unit. Its order is logo and book name, `目录`, A−, A+, one `书签` control, Search field and Search button. All header wording uses the shared multilingual sans-serif font, and every button label is centred vertically and horizontally.
 
 Its cover card now uses the Daily Chants English visual standard: a warm cream gradient, light brown border, 14 px rounded corners, soft shadow and balanced padding. The original 《辨析道》 cover remains on the left and its original title, edition, translator, publisher and credits remain on the right on desktop and mobile. Its side-by-side Pāli–Chinese reading body remains intact inside the common centred 1080 px maximum page width.

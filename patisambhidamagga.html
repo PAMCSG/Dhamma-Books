@@ -880,6 +880,7 @@ body.db-patisambhidamagga-reader-standard .book-hero-text{
 <span class="app-brand-title">辨析道 · Paṭisambhidāmagga</span>
 </div>
 <button id="contentsBtn" onclick="gotoContents()" type="button">目录</button>
+<span class="edition-toggle" role="group" aria-label="选择版本"><a class="header-control active" id="editionParallel" href="patisambhidamagga.html" aria-current="page">巴利－中文</a><a class="header-control" id="editionChinese" href="patisambhidamagga-chinese.html">中文</a></span>
 <button id="fontMinus" onclick="decreaseReaderFont()" type="button">A−</button>
 <button id="fontPlus" onclick="increaseReaderFont()" type="button">A+</button>
 <div class="db-standard-controls" id="db-standard-controls">
@@ -892,6 +893,7 @@ body.db-patisambhidamagga-reader-standard .book-hero-text{
 </div>
 </div>
 </nav>
+<style id="patisambhidamagga-edition-switch-style">.edition-toggle{display:flex;gap:5px;order:3}.edition-toggle .header-control.active{background:#fff!important;color:#75482d!important}body.db-patisambhidamagga-reader-standard #fontMinus{order:4}body.db-patisambhidamagga-reader-standard #fontPlus{order:5}body.db-patisambhidamagga-reader-standard .db-standard-controls{display:contents!important}body.db-patisambhidamagga-reader-standard .db-bookmark-button{order:6}body.db-patisambhidamagga-reader-standard .db-searchbox{order:7}@media(max-width:720px){body.db-patisambhidamagga-reader-standard .topbar .app-brand{flex:0 1 66px!important}body.db-patisambhidamagga-reader-standard .topbar .app-brand-title{font-size:12px!important}.edition-toggle{gap:2px}.edition-toggle .header-control,body.db-patisambhidamagga-reader-standard .topbar #contentsBtn,body.db-patisambhidamagga-reader-standard .topbar #fontMinus,body.db-patisambhidamagga-reader-standard .topbar #fontPlus,body.db-patisambhidamagga-reader-standard .topbar #db-bookmark-button{min-height:30px!important;padding:3px!important;font-size:11px!important}}</style>
 <main>
 <section class="book-hero" id="top">
 <div class="book-hero-inner">
@@ -3033,6 +3035,7 @@ document.addEventListener('click',function(e){
 <script src="pced-lookup-core.js"></script>
 <script src="pced-standard-data.js"></script>
 <script src="pced-approved-terms.js"></script>
+<script src="patisambhidamagga-reader.js?v=1.0.0"></script>
 <script src="pced-popup-standard.js?v=1.3.16" data-pced-mode="book"></script>
 <script src="dhamma-books-reader-standard.js?v=1.3.14"></script>
 </body>
