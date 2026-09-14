@@ -266,6 +266,18 @@ code, pre, kbd, samp {
   object-fit:contain;
   margin:0 !important;
 }
+.book-main .book-cover-row.pair{
+  flex:0 0 174px;
+  width:174px;
+  display:grid;
+  grid-template-columns:repeat(2,82px);
+  gap:10px;
+  overflow:hidden;
+}
+.book-main .book-cover-row.pair .book-cover-img{
+  width:82px !important;
+  max-width:82px !important;
+}
 .book-main .book-info{
   flex:1;
   min-width:0;
@@ -277,6 +289,8 @@ code, pre, kbd, samp {
   .book-main{gap:11px;}
   .book-main .book-cover-row{flex-basis:70px;width:70px;}
   .book-main .book-cover-img{width:70px !important;max-width:70px !important;max-height:106px !important;}
+  .book-main .book-cover-row.pair{flex-basis:148px;width:148px;grid-template-columns:repeat(2,70px);gap:8px;}
+  .book-main .book-cover-row.pair .book-cover-img{width:70px !important;max-width:70px !important;}
 }
 </style><style id="pamc-patis-cover-v4">
 
