@@ -621,14 +621,44 @@ body>header input, .topbar input{
   padding-left:1.55em !important;
   text-indent:-1.55em !important;
   margin:.08em 0;
+  overflow-wrap:anywhere;
+  word-break:normal;
 }
 @media (max-width:700px) {
   #reader-en { line-height:1.54; }
   #reader-en p.text-block { margin-bottom:.68em; }
   #reader-en > .section-heading.db-main-heading { font-size:20px; }
   #reader-en > .section-heading.db-subheading { font-size:17px; }
-  #reader-en .db-word-two-column-wrap { margin-left:-2px; margin-right:-2px; padding:6px; }
-  #reader-en .db-word-two-column-table { min-width:640px; }
+  #reader-en .db-word-two-column-wrap {
+    margin-left:-2px;
+    margin-right:-2px;
+    padding:6px;
+    overflow-x:hidden;
+  }
+  #reader-en .db-word-two-column-table,
+  #reader-en .db-word-two-column-table tbody,
+  #reader-en .db-word-two-column-table tr {
+    display:block;
+    width:100%;
+    min-width:0;
+  }
+  #reader-en .db-word-two-column-table {
+    border-collapse:separate;
+    border-spacing:0;
+  }
+  #reader-en .db-word-two-column-table td {
+    display:block;
+    width:100%;
+    min-width:0;
+    padding:7px 10px;
+  }
+  #reader-en .db-word-two-column-table td + td {
+    margin-top:-1px;
+  }
+  #reader-en .db-word-two-column-table .pali-word {
+    overflow-wrap:anywhere;
+    word-break:break-word;
+  }
 }
 </style>
 </head><body class="db-only-way-reader-standard db-standard-contents db-book-cover-standard db-page-standard-width">
