@@ -439,3 +439,18 @@ Shared stylesheet v1.3.22 applies the standard to Daily Chants English and Burme
 The English edition of `the-only-way-for-realization-of-nibbana.html` was audited against the complete 85-page source PDF. PDF line fragments are rejoined into continuous sentences, broken words at printed-page boundaries are completed, and numbered or bracket-numbered passages remain separate indented lines. The *Samatha (Body Contemplation)* sequence is restored as `1)`, `2)`, `3)`, and `4-12)`. Footnote `16` and endnotes `D` and `E` are separate working popup markers; the clipped end of endnote `I` and the omitted visible endnotes `J` and `K` are restored from the book's existing note data.
 
 The book-specific Pāli convention is retained: middle-dot separators from the source PDF are removed in the English reader, including compounds that crossed printed line boundaries. The Chinese edition, embedded images, page anchors, Contents destinations, search, bookmarks, language-position mapping, PCED data, and existing note definitions remain unchanged.
+
+
+### 觉悟资粮 Word source update — 16 September 2026
+
+The Chinese edition of `the-requisites-of-enlightenment.html` now follows `觉悟资粮 YFL FOR CHATGPT.docx`. It restores source wording, paragraph boundaries, Chinese font roles and Word indentation; converts legacy Sangayana Pāli to Unicode; and provides complete clickable Pāli tokens in body text, headings and all 146 footnotes. The English edition and embedded PCED dictionary remain unchanged.
+
+The publisher is updated to 西双版纳州佛教协会. The publisher logo and QR code are small and side by side. The Ledi Sayadaw portrait and monastery stone-inscription photograph appear with their source captions before the Chinese preface; the ending leaf illustration is restored. These five images are embedded in the HTML. The existing cover image is retained.
+
+Primary headings use the approved pale #F4E8DF panel, #A8734F top border and brown #8F5D3B text. Subheadings use left alignment and a thin divider. Pāli inside headings inherits the heading colour. 目录 is centred and the scrolling Contents list has horizontal padding. Original Chinese page-anchor IDs and the 15 Contents targets are retained.
+
+`REQUISITES-WORD-COMPARISON.html` records all detected non-whitespace text-difference groups and changed footnotes against main commit `91d203aa2ecc8aa67f912393de55900b70772c50`, with formatting and validation notes.
+
+Upload instructions: extract `requisites-word-update.zip`; upload its three files to the repository root, replacing this book HTML and README.md and adding the comparison report. Keep all existing shared CSS, JavaScript and assets. If README.md changed after the base commit, merge this new section into the latest README instead of overwriting newer entries. This ZIP is an update package for the existing repository, not a standalone copy of the complete site. No GitHub push or commit was made.
+
+Validation: source-text, note-reference, Contents-link, unique-ID, preserved-English/dictionary and JavaScript syntax checks pass. Desktop/mobile visual and interactive checks remain pending. Source fonts use fallbacks when unavailable on the reader's device.
