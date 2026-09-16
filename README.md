@@ -1,5 +1,13 @@
 # PAMC Dhamma Books
 
+## Landing-page PCED dictionary search — 16 September 2026
+
+The top-level `index.html` now has one compact PCED search row above the book catalogue. It accepts Pāli, Chinese, English, Burmese and other dictionary languages, and displays results in the established movable, non-dimming Dhamma-Books PCED popup. The catalogue cards and book links are unchanged.
+
+Pāli entered with diacritics is matched according to those exact diacritics before the shared verified inflection and headword rules are applied. Pāli entered without diacritics is compared against every exact PCED headword and verified inflected form with the corresponding possible Pāli diacritics. Definition-language searches return matching dictionary entries without changing the shared resolver's prohibition on loose Pāli prefix, suffix or fuzzy matching.
+
+The landing page loads `pced-lookup-core.js`, `pced-standard-data.js`, `pced-books-popup.css`, `pced-index-search.js` and `pced-popup-standard.js`; it does not contain a separate copy of the dictionary or modify individual book readers. Shared popup v1.3.17 adds an `index-search` host mode so its movement, stacking and non-dimming presentation remain active without replacing the landing page's multi-result rendering; existing book and reader modes are unchanged.
+
 ## 佛陀的十二种恶报 Word-source update — 16 September 2026
 
 `the-buddhas-twelve-kinds-of-evil-retribution.html` is updated from the supplied `佛陀的十二种恶报.doc`, printed edition 2022.7, starting at main commit `d22721e43f587209fbad3ba520889c5b0e22fdcb`. `TWELVE-RETRIBUTIONS-WORD-COMPARISON.html` records 146 groups of non-whitespace body differences, the source Contents page numbers, and all footnote comparisons. Difference groups include wording, punctuation, paragraph boundaries, restored table text and reference-list repairs; they are not a count of independent author revisions.

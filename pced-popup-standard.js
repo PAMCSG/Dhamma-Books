@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.16 — 2026-09-11 */
+/* PAMC cross-book PCED popup standard v1.3.17 — 2026-09-16 */
 (function () {
   'use strict';
 
@@ -884,7 +884,8 @@
     normalizeLanguageHeadings(modal);
     if (mode !== 'reader') openFirstView(modal);
     if (mode === 'reader' && modal.id === 'lookupModal') enhanceReader(modal);
-    else if (modal.id === 'dictModal' || modal.id === 'lookupModal' || modal.id === 'pced-modal') enhanceBook(modal);
+    else if (mode !== 'index-search' &&
+      (modal.id === 'dictModal' || modal.id === 'lookupModal' || modal.id === 'pced-modal')) enhanceBook(modal);
     else resetTop(modal);
   }
 
