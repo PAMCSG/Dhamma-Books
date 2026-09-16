@@ -1,74 +1,470 @@
-# Chinese-Tipitaka approved terminology feed
+# PAMC Dhamma Books
 
-## Batch import dialog layout
+## Landing-page Pāli Lexicon search — 16 September 2026
 
-- The action row in the **批量导入词句** dialog remains visible at the bottom while the dialog content scrolls, so **确认导入** cannot move outside the screen.
-- On narrow/mobile screens, the dialog fits within the dynamic viewport and its action buttons wrap to accessible rows.
+Chinese-Tipitaka terminology display preserves Enter/newline characters stored in the database. Shared popup v1.3.18 applies `white-space: pre-wrap` only to the standardized-terminology definition block, so paragraph and line separation appears as entered without changing database text or ordinary PCED entries.
 
-This is a one-time addition to `PAMCSG/Chinese-tipitaka`.
+The top-level `index.html` now has one compact **Pāli Lexicon / 巴利语词典** search row above the book catalogue. It accepts Pāli, Chinese, English, Burmese and other dictionary languages, and displays results in the established movable, non-dimming Dhamma-Books PCED popup. Its bilingual source note identifies PCED 2.0.5.0 and Bhante Mahinda's standardized terminology. The catalogue cards and book links are unchanged.
 
-Upload `functions/api/approved-terms.js` using the same path. Do not replace `index.html` or other files.
+The display-priority selector offers English, Chinese and Burmese. English priority orders ordinary PCED as English, Chinese, Burmese, then other languages. Burmese priority orders Burmese, Chinese, English, then other languages. Only Chinese priority searches and displays eligible single-word Chinese-Tipitaka terminology; those results appear first, followed by PCED Chinese, English, Burmese and other languages. Chinese-Tipitaka status values remain hidden in the book popup, and only `规范` and `已确认` terminology is included there.
 
-The endpoint reads only non-deleted database rows whose status is `已确认` or `规范`. Each public record exposes `id`, `pali`, `chinese`, `type`, `source`, `page`, and `status`. The `source` and `page` fields allow Dhamma-Books and Tipitaka-reader to display each approved Chinese meaning together with its 出处. The consumers refresh this terminology quietly in the background.
+The priority selector is positioned before the search-entry field. In the bilingual label, “Pāli Lexicon” is enlarged to balance visually with “巴利语词典”. On narrow screens the selector occupies the first row, followed by the entry field and Search button.
 
-The Chinese-Tipitaka Cloudflare Pages project must retain its existing D1 binding named `DB` pointing to `chinese-tipitaka-db`.
+Pāli entered with diacritics is matched according to those exact diacritics before the shared verified inflection and headword rules are applied. Pāli entered without diacritics is compared against every exact PCED headword and verified inflected form with the corresponding possible Pāli diacritics. Definition-language searches return matching dictionary entries without changing the shared resolver's prohibition on loose Pāli prefix, suffix or fuzzy matching.
 
-## PCED popup consumer rules
+The landing page loads the complete PCED base from `patisambhidamagga-pced-data.js`, applies `pced-standard-data.js`, and resolves through `pced-lookup-core.js`, matching the dictionary data and shared linguistic resolver used by reader word-clicks. It loads `pced-approved-terms.js` for Chinese-priority terminology, plus `pced-books-popup.css`, `pced-index-search.js` and `pced-popup-standard.js`; it does not contain a separate copy of the dictionary or modify individual book readers. The search-module query is versioned as `v=1.2.0` to prevent browsers from retaining the earlier incomplete-dictionary module. Shared popup v1.3.17 adds an `index-search` host mode so its movement, stacking and non-dimming presentation remain active without replacing the landing page's multi-result rendering; existing book and reader modes are unchanged.
 
-- Use this feed only for exact or verified whole-word Pāli matches during a single-word lookup.
-- Omit sentence records from the single-word Chinese-Tipiṭaka group.
-- Place matches under the popup language heading `中文`.
-- Combine multiple meanings inside one unshaded bordered group headed `《汉译巴利三藏》玛欣德尊者和译藏团队`.
-- Show each Chinese meaning with its `出处` inline beside it, combining `source` and `page` when available; do not repeat the language heading or team subheader.
-- The reader and book repositories remain responsible for popup presentation and movement.
+## 佛陀的十二种恶报 Word-source update — 16 September 2026
 
-## Current handoff checkpoint — 6 September 2026
+`the-buddhas-twelve-kinds-of-evil-retribution.html` is updated from the supplied `佛陀的十二种恶报.doc`, printed edition 2022.7, starting at main commit `d22721e43f587209fbad3ba520889c5b0e22fdcb`. `TWELVE-RETRIBUTIONS-WORD-COMPARISON.html` records 146 groups of non-whitespace body differences, the source Contents page numbers, and all footnote comparisons. Difference groups include wording, punctuation, paragraph boundaries, restored table text and reference-list repairs; they are not a count of independent author revisions.
 
-The feed update is committed as [`6b87e86`](https://github.com/PAMCSG/Chinese-tipitaka/commit/6b87e865ec64445d02c2187b4aa323c3b91ae490). Static integration tests passed. Final live visual verification must be performed in an authenticated Cloudflare Access session.
+The book retains source Chinese font roles at run level, including Songti, Kaiti, Heiti, YouYuan, Zhongsong, Xinwei and Xihei. Sangayana Pāli is converted to Unicode serif text. Paragraph-style inheritance is distinguished from paragraph-mark formatting, and Pāli tokens span Word run boundaries so a single word opens one lookup. The WinTaungyi Burmese title in reference 11 is converted to Unicode using the original reference image in the existing HTML as visual confirmation. Device font availability can change the actual displayed typeface.
 
-## Consumer data preservation
+First-line, hanging and side indentation follows Word measurements using relative units. The four source tables retain their merged-cell structure and scroll internally on narrow screens. All 35 body illustrations are preserved in source order; large JPEGs are optimized to at most 1400px on their longest side at quality 85. The publication logo and QR code are displayed in one centred row at 88px each on desktop and 76px on mobile. Current copyright and publication information replace the obsolete front matter rather than appearing twice.
 
-Book-side snapshots and caches must preserve `type`, `source`, and `page` when normalizing API records. Dropping these fields prevents the popup from rendering `出处`. On 6 September 2026, both book repositories advanced their approved-term cache to version 2 and enriched 244 bundled fallback records from this repository's authoritative standard and seed records.
-When duplicate Pāli/Chinese records are merged, consumers must retain non-empty provenance field-by-field; an empty live `source` or `page` must not overwrite a populated bundled value. This is required for inflected lookups such as `Gotamo → Gotama → 果德玛`.
+The 18 primary headings use the standard pale `#F4E8DF` panel, 4px `#A8734F` top border, 12px rounded corners and brown text. Nine secondary headings, including the three introductory law headings, are left-aligned with brown text and a thin divider. The Contents title is centred independently of the Collapse button, and entries have 18px desktop / 14px mobile horizontal padding. These scoped styles are embedded in the HTML for local preview as well as repository use. Source font roles remain on heading text; Pāli inside headings inherits the heading colour.
 
-## Generic source fallback
+The 18 Contents destinations and old body IDs remain available. All 25 Word footnotes are rebuilt and matched to existing note identities by content; the added note explains the senses of `sāko`. The embedded PCED dictionary and established reader controls are retained. Source validation verifies 1,190 body blocks, unique IDs, Contents targets, 25 note references, image and table counts, Unicode Pāli markers, byte-identical PCED dictionary data and inline JavaScript syntax. Browser visual and interaction tests were not available in this environment and remain pending. This is a manual-upload package; no repository push, PR, merge or deployment has been performed.
 
-For approved terms whose database record has no `source`, book snapshots may derive a citation from `source-data.js`. Accept exact Pāli token matches directly. Accept an inflected token only through the shared verified inflection rules and only when the aligned Chinese text agrees with the term's Chinese wording. Preserve an existing non-empty database or standard-record source in preference to a derived citation.
+## 止观法要 Word-source update — 16 September 2026
 
-The 6 September 2026 snapshot indexed 559 aligned records and 14,884 exact or verified-inflection forms, adding conservative provenance to 344 previously source-less terms. For example, `purohito → purohita` is cited to `巴利三藏 > 经藏 > 长部 > 戒蕴品 > 《古德丹德经》，134`.
+Preview correction before upload: the publication logo and QR code now share a centred row, capped at 88px each on desktop and 76px on mobile. The Contents title is centred independently of its Collapse button; the scrolling entries have 18px desktop / 14px mobile horizontal padding. All ten primary headings use the standard pale `#F4E8DF` panel, `#A8734F` top rule, 12px corners and brown text. The 18 secondary headings use brown text and a thin divider; 48 minor headings retain a smaller left-aligned brown treatment. These scoped rules are embedded directly in the HTML so local previews do not depend on shared files for these styles. Word-source content and typography remain intact. Source checks pass; browser visual verification remains pending.
 
-## Final centralized publication rule — 6 September 2026 (master v1.11)
+`zhiguan-fayao.html` follows the supplied `止观法要.doc` (printed edition 2023.12), compared with main commit `f3db4ce18526886f9027fe89c6eedb45873b7795`. `ZHIGUAN-WORD-COMPARISON.html` records 109 groups of non-whitespace body differences, plus publication and footnote comparisons. These include paragraph-boundary changes, punctuation, character variants, revised translations, and text formerly present only in table images; the group count is not a count of independent author revisions.
 
-- **发布词库更新** publishes every non-deleted record to the centralized versioned snapshot, including `待核对`, `规范`, `已确认`, and `有异译`. Deleted records are excluded.
-- The **PCED Dictionary** in Dhamma-Books and Tipitaka-reader shows only matching non-deleted single-word records whose status is exactly `规范` or `已确认`.
-- Tipitaka-reader's separate **汉译巴利三藏** tab shows every related matching non-deleted record, regardless of status. It must never show unrelated rows.
-- AI terminology priority uses only `规范` and `已确认`.
-- Status and internal page data remain in the snapshot but are not displayed. The popup displays the database's actual `出处` and hides the numeric internal page.
-- Source precedence is: latest validated publication, previous validated browser cache, then bundled fallback. An older bundled or inferred source must never merge into or override a newer published record.
-- The 2,207-record publication at `2026-09-06T06:42:11.667Z` succeeded, but the consumer feed was intercepted by Cloudflare Access. The read-only GET/OPTIONS feed must be reachable by both book sites while editor and POST publication access remain protected.
-- Regression cases: `accayena` and `uppādo → uppāda` must both display the actual current database source `巴汉翻译语料库`; `evaṃvaṇṇo` must render independently of PCED headword success; every new word popup opens on PCED Dictionary at scroll position zero.
+The source's Chinese and Latin font runs are handled separately. Song, Kai, Hei, YouYuan, LiSu, Weibei, Xihei, Xinwei, Zhongsong and MingLiU roles retain source-first Unicode font stacks with category-appropriate fallbacks. Sangayana is converted to Unicode Pāli and shown in Times New Roman/Noto Serif; twelve Wingdings list symbols become Unicode circled numbers. Actual glyph appearance depends on installed fonts. Word first-line, hanging, left and right indentation follows character measures or point-to-em conversion. The 29 single-cell quotation boxes become indented quotations; the two analytical tables retain merged rows/columns as searchable HTML inside contained horizontal scrollers. Publication metadata, copyright notices and QR images follow the supplied source. The existing cover artwork remains.
 
-## Standard-file import and rollback — 7 September 2026
+All 76 heading/Contents targets and old body paragraph IDs are retained; merged paragraph IDs become aliases at the corresponding source paragraph. Five footnote popups carry current Word text and source font roles. Reader controls, header, shared assets and embedded PCED dictionary data remain unchanged. The Word passage in 大马伦迦经 containing two occurrences of `有这可能` is preserved and flagged for author/source review in the comparison report.
 
-- **批量导入词句**（原“导入规范词句”）reads `状态` from the uploaded Excel/CSV/Word table. Supported values are `待核对`, `规范`, `已确认`, and `有异译`.
-- If a file has no status column, or an individual row is blank, the proofreader chooses the fallback status in the import screen; the default is `待核对`.
-- Excel uploads may include a `修改者` column. Its value is stored row by row in `records.modified_by`; a missing column or blank cell falls back to the authenticated user. Audit history `changed_by` and batch `imported_by` continue to record the authenticated user rather than the file-provided display value.
-- An unfamiliar nonblank status blocks confirmation and must never be silently converted to `规范`.
-- Uploaded standard files are append-only. Every valid row is inserted as a new record; the importer must never modify, replace, merge, skip, or delete an existing database entry, even when both Pāli and Chinese are identical.
-- Same-Pāli imports receive the next available `.1/.2/.3…` sub-number. Repeated rows inside the uploaded file are also retained independently.
-- The preview shows the status distribution, reports every valid row under **预计新增**, and must always show **预计替换：0**.
-- Every successful uploaded-standard batch stores its timestamp, file name, counts, actor, batch tag, and pre-change record history.
-- **撤销上一次导入** applies only to the latest successful **导入规范词句** file batch: newly created rows are soft-deleted, replaced rows are restored from history, and manual changes, older imports, and automatic-match batches are left untouched. The action is previewed, confirmed, audited, and cannot be applied twice to the same batch.
-- Soft-deleted rows retain their permanent `dbid` and visible `id`; every later import must treat both identifiers as reserved. Duplicate sub-number allocation skips identifiers held by deleted rows, preventing `records.id` unique-constraint failures after rollback and re-import.
-- Rollback changes the database only. The proofreader must inspect the result and then use **检查发布内容 / 发布词库更新** when ready.
+Validation: all 916 generated body text blocks match the converted source, IDs are unique, Contents targets and footnote references resolve, embedded PCED data is byte-identical, and inline JavaScript passes syntax checking. Browser download timed out, so desktop/mobile visual and interaction verification remains pending. This is a local manual-upload package; no push, PR, merge or deployment was performed.
 
-### Live verification and 《阿毗达摩讲要》 import checkpoint
+The `main` branch is the authoritative source for the current Dhamma Books website.
 
-- A database backup was exported before this work with 3,383 existing records: `汉译巴利三藏校稿-数据库导出-20260907.xlsx`.
-- The previously imported combined batch was successfully reversed with **撤销上一次导入**. This confirmed that the rollback restored replaced rows and removed newly imported rows without reversing unrelated database work.
-- The first re-import attempt exposed `UNIQUE constraint failed: records.id` because soft-deleted duplicate sub-numbers were still permanently reserved in D1. PR [#4](https://github.com/PAMCSG/Chinese-tipitaka/pull/4) fixed allocation so active and deleted IDs/`dbid` values are both reserved, while only active records participate in Pāli replacement matching.
-- After that fix, the combined workbook `阿毗达摩讲要上中下集_规范词句合并导入表(1).xlsx` was previewed and imported, but the preview exposed a second design error: 120 rows were classified as replacements and overwrote existing records, including `巴汉翻译语料库`. That batch must not be treated as the accepted final import and requires rollback followed by **发布词库更新** to republish the restored database.
-- The corrected append-only preview for this workbook must show 1,295 valid records, 1,295 expected additions, and 0 expected replacements. Its status distribution remains 1,212 `规范` and 83 `待核对`; same-Pāli rows may additionally be reported as the subset that will receive sub-numbers.
-- The workbook contained 48 repeated-Pāli groups covering 101 rows. Repetition is intentional: identical Pāli + Chinese translations were merged, while genuinely different Chinese translations for the same Pāli remain separate entries.
-- Combined provenance follows the fixed volume order 上、中、下; for example, a term found in the upper and lower volumes uses `《阿毗达摩讲要》上、下集`. Page references are stored in `查备注`, and the modifier is `YFL`.
-- Append-only uploaded-standard import is the accepted continuation baseline. Before any future large import, export a fresh database backup and verify that the preview shows the expected total and status distribution with **预计替换：0** before confirmation.
+## Standard maintenance workflow
+
+Begin every change from the latest GitHub `main` and read the current repository documentation before editing. Do not use an older local copy or memory as the authoritative input. Unless the user explicitly authorizes repository writes for that individual task, make and validate the changes locally and return only the changed output files for manual upload; also provide one ZIP archive containing those same changed files. Do not push, open a pull request, merge or deploy. Preserve unrelated files, book content and established reader functions.
+
+## Reader interface standard
+
+`BOOK-READER-INTERFACE-STANDARD.md` is the authoritative, reusable standard for improving an existing reader book or creating a new one. It consolidates the approved requirements for the screen header, mobile behaviour, Contents panel, cover layout, font controls, Search, Book Mark, language editions, non-regression protection and acceptance testing. Use Dhammapada as the approved implementation example and Daily Chants Burmese as the mobile sticky-header and Contents-window behaviour reference.
+
+Book-content fonts follow the source file. Preserve distinct source fonts for body text, quotations, headings, notes and other semantic roles; the shared sans-serif reader font is for interface controls only. When a source font is non-Unicode, or an explicit conversion is requested, convert the text to Unicode and use a suitable Unicode font instead (for example, Sangayana-encoded Pāli becomes Unicode Pāli displayed with Times New Roman or another Unicode Pāli serif). See “Source-faithful book fonts” in the interface standard for the normative rules and checks.
+
+## Shared PCED files
+
+- `pced-lookup-core.js` — exact and verified-form resolver
+- `pced-standard-data.js` — maintained inflections, aliases, compounds, and sandhi
+- `pced-approved-terms.js` — approved Chinese-Tipiṭaka terminology snapshot
+- `pced-popup-standard.js` — cross-book popup display, reset, and movement behavior
+
+PCED-enabled books use the Daily-Chants standard:
+
+1. Approved Chinese-Tipiṭaka entry, when precisely matched
+2. Chinese PCED entries
+3. English
+4. Burmese
+5. Other correctly identified languages
+
+Popups reopen at the beginning and remain movable within the visible screen. On mobile, they open below the complete visible book header, keep both the book header and their own header and close button visible, and scroll long results internally within the remaining viewport. Prefix, substring, and fuzzy dictionary fallbacks are not allowed.
+
+See `PCED-LOOKUP-UPDATE-REPORT.md` for rollout details and tests.
+
+## Shared reader controls and screen header — 7 September 2026
+
+Every current and future reader book must load `dhamma-books-reader-standard.css` and `dhamma-books-reader-standard.js` using the current cache version. Shared CSS v1.3.22 and reader runtime v1.3.19 include the Daily Chants English and Paccayaniddeso conformance rules below. The shared reader standard retires legacy save/go and automatic last-read controls so a book displays only the common bookmark control, and provides the continuous contents-to-reader behavior described below.
+
+Readers using the repository-wide book-cover treatment load `dhamma-books-cover-width-standard.css?v=1.0.0` after their legacy book styles. `db-book-cover-standard` applies the Daily Chants English rounded cream cover card. Every reader uses `db-page-standard-width`; readers with conflicting legacy widths load `dhamma-books-page-width-standard.css?v=1.0.0` last to enforce the displayed Daily Chants Burmese width. The former `db-page-wide-reader` classification is retired.
+
+The shared contract provides:
+
+- **Book Mark:** one header button and one modal supporting add, list, go and delete, stored separately for each book in the browser.
+- **Search:** searches the active visible reading text, filters native reading blocks, highlights all matches, moves to the first match, reports no results, and restores the pre-search display and position when cleared.
+- **Screen header:** background `#A8734F`, white text, system UI font, 18 px desktop title / 16 px mobile title, and 14 px desktop controls / 12 px mobile controls.
+
+Book-specific content, body typography, language switching, PCED language profiles, dictionary/terminology data and AI behavior remain outside this shared standard.
+
+### Shared colour, language and layout correction
+
+Every reader book uses the same visual palette: primary/header brown `#A8734F`, secondary brown `#8F5D3B`, body `#F2EEE9`, paper/panel `#FFFDF9`, main text `#302A26`, pale area `#F4E8DF`, border `#DFCBBB`, muted text `#7B685A`, Pāli blue `#155CA8`, and dark Pāli blue `#0D477F`. Header text is white and header controls use translucent white.
+
+The shared controls use English, Chinese or Burmese according to the active reading language, including bookmark-modal actions and search feedback. Bilingual books update these labels when the reading language changes. For every current and future multilingual book in Dhamma-Books, display only the language buttons for editions that exist and always order them **English → Chinese → Burmese**, regardless of the active reading language.
+
+On desktop, the complete screen header stays fixed at the top in one non-wrapping row. On mobile, follow the Pāli Chanting Burmese pattern: use one sticky, naturally sized two-row header that remains together at the top during page scrolling. The first row contains the logo, book name, Contents, language button (when present), A−, A+ and Book Mark; the second row contains the search input followed by Search. Both rows are always left-justified and remain fully visible. The page, header and book body must fit the layout viewport and must not slide sideways during normal unzoomed scrolling. Preserve the browser's native two-finger pinch-to-zoom; do not use `user-scalable=no`, a restrictive `maximum-scale`, or touch rules that disable zooming. Search input and placeholder text must remain clearly readable and no smaller than 15 px on mobile.
+
+The displayed Daily Chants English header is the visual reference for every current and future Dhamma-Books reader. Its desktop form uses a full-width `#A8734F` bar, 8 px × 12 px inner padding, an 8 px control gap, a white 44 × 50 px rounded logo tile with a contained 31 × 42 px emblem, and rounded controls at least 40 px high. Book-specific titles, available language buttons and translated labels remain unchanged; responsive compaction may be used only to keep the complete control set visible. Follow its state treatment: Contents is a navigation action and retains the normal translucent background, while only the language edition currently displayed is white with brown text. The current language is marked in the initial HTML and retained after JavaScript enhancement; all other language buttons remain translucent.
+
+The repository landing page is not a reader book and is outside this reader-interface contract.
+
+#### Footnote and endnote popup
+
+Every Dhamma-Books footnote or endnote popup uses a smaller, quieter header than the book screen header: 18 px on desktop and 16 px on mobile. Its header background is the shared lighter brown `#A8734F`, with white title and close-button text. The note body retains the book's normal text sizing and Pāli treatment. Shared CSS v1.3.5 applies this rule to both existing popup IDs, `noteModal` and `footnoteModal`.
+
+### Contents-page and continuous-reading standard — Dhamma-Books only
+
+This standard applies only to current and future books in the **PAMCSG/Dhamma-Books repository**. It does not apply to Tipitaka-reader, Chinese-tipitaka, Meditation-App, or the repository landing page.
+
+Daily Chants Burmese (`daily-chants-burmese.html`) originally served as the behaviour reference and was excluded from the early rollout. Its 11 September 2026 conformance update now applies the same Contents-window and continuous-reading requirements while preserving its Burmese content and source-faithful printed-page layouts.
+
+#### Continuous reading
+
+For every book, **main text follows contents continuously** in the same page. Contents and Reader controls scroll to their respective positions without hiding either section. Contents links must reach the corresponding heading without a screen header or column-label row covering it.
+
+Preserve all book wording, paragraph order, translations, footnotes, PCED lookup functions, bookmarks and search. Contents-page column rules do not change side-by-side language columns in the main text. Preserve the existing Pāli Chanting English paired `VANDANĀ | Homage` heading and the fix that keeps its column-label row from covering the title.
+
+#### Contents-page columns
+
+| Book category | Contents layout |
+| --- | --- |
+| Every Dhamma-Books category, including Chanting Book 念诵本 | One column only on desktop and mobile. |
+
+Keep entries in the book's original reading order. Titles may wrap naturally; page numbers, where present, remain aligned and readable. Preserve all contents links and section hierarchy.
+
+#### Fixed contents window
+
+Use the Daily Chants Burmese contents panel as the structural reference. Each contents panel has one rounded outer frame, with no separate inner frames around its groups. Its title sits in the original pale pink-brown header strip using background `#F4E9DF` and title text `#66442F`, remains outside the scrolling entries so it never covers an entry, and is horizontally centred in the full panel independently of the right-side Expand/Collapse button. A button in the same header strip opens and collapses the entries; the screen-header Contents button always opens the panel before scrolling to it.
+
+Use only `目录` as the contents-panel title in a Chinese book and only `Content` in an English book. The scrolling entries retain each book's existing colours, fonts and styles, apart from removing inner group frames.
+
+The entries window uses the Daily Chants Burmese height plus approximately one normal entry row: `calc(52vh + 3.2em)` on desktop and `calc(46vh + 3.2em)` on mobile. A− and A+ must resize both the book's reading text and its contents headings, entries and page numbers.
+
+#### Contents-page colours and style
+
+Use the repository's shared warm-brown reader palette consistently:
+
+| Element | Colour |
+| --- | --- |
+| Surrounding page | `#F2EEE9` |
+| Contents panel | `#FFFDF9` |
+| Main entry text | `#302A26` |
+| Primary headings / accents | `#A8734F` |
+| Secondary accents | `#8F5D3B` |
+| Pale section backgrounds | `#F4E8DF` |
+| Contents title-strip background | `#F4E9DF` |
+| Contents title text | `#66442F` |
+| Panel borders and row separators | `#DFCBBB` |
+| Muted text / page numbers | `#7B685A` |
+| Pāli emphasis, where used | `#155CA8`, darker `#0D477F` |
+
+Use consistent panel borders, rounded corners, row spacing, and heading hierarchy across contents pages. Keep language-appropriate fonts and readable sizes, with clear links and no clipped or overlapping labels. The screen-header font and size rules above remain in force.
+
+Every non-clickable section/group heading inside the scrolling Contents entries uses the shared `#EEE1CF` highlight bar with `#633919` text. Its coloured background begins exactly one character-space (`1em`) from the left edge of the scrolling Contents window and fills the remaining width to the right. This inset and the truly centred Contents title apply to every current and future Dhamma-Books reader.
+
+#### Implementation status
+
+This section records the approved standard, not a claim that every book already implements it. PR #16 enabled continuous reading for Daily Chants English and Paccayaniddeso English/Chinese, alongside the three Pāli Chanting editions. Daily Chants Burmese joined this standard on 11 September 2026. Remaining books still require an implementation audit and any necessary changes.
+
+### Pāli Chanting Book header and Contents conformance — 12 September 2026
+
+The three canonical Pāli Chanting Book editions — `pali-chanting-book.html`, `pali-chanting-book-chinese.html`, and `pali-chanting-book-burmese.html` — now place the complete standard header in the initial HTML. The visible order is logo, book name, Contents, English / 中文 / မြန်မာ, A−, A+, Book Mark, Search field, and Search. The obsolete Reader and automatic Previously Read controls are hidden from the initial interface; deliberate saved bookmarks are retained and imported into the shared bookmark interface.
+
+Their Contents entries now use one vertical scrolling column on desktop and mobile, with the approved title labels, warm palette, single rounded frame, fixed window heights, and Expand/Collapse behaviour. Chinese and Burmese now keep the reading text continuously visible after Contents, matching English. All three retain their existing paired reading columns inside the common centred 1080 px maximum page width. Book wording, images, Contents targets, PCED data, footnotes, language-position navigation, font sizing, search, and deliberate bookmarks are preserved.
+
+Implementation uses `dhamma-books-pali-chanting-standard.css?v=1.0.4`, shared reader JavaScript v1.3.20, and language navigation v1.0.2. The three editions use the Daily Chants English desktop header dimensions, styling and current-language-only state treatment while retaining compact responsive sizing needed to keep all three language buttons visible. The versioned references are present in all three canonical HTML files so the corrected first-paint header, current-language highlight and Contents styling do not depend on a stale cached asset.
+
+### Current-language-only header highlight — 12 September 2026
+
+Paccayaniddeso English/Chinese and all three Pāli Chanting Book editions follow the displayed Daily Chants English state treatment: Contents remains translucent because it is a navigation action, while only the language edition currently displayed is white with brown text. Paccayaniddeso marks its current language in the initial HTML and its enhanced language buttons recognise `active`, `aria-current="page"`, and `aria-pressed="true"`. The Pāli Chanting rule accepts the same three markers. Both specialised stylesheets explicitly prevent a legacy Contents `active` class from changing its appearance, and all five HTML cache-version references are updated to v1.0.4 so deployed browsers do not reuse the older header styling.
+
+
+### Pa-Auk and Mahinda contents styling — 7 September 2026
+
+Implemented shared contents styling (CSS v1.3.1) for all five books currently listed in these two landing-page categories:
+
+- **Books by The Most Venerable Pa-Auk Tawya Sayadawgyi:** `mindfulness-of-breathing.html`, `the-only-way-for-realization-of-nibbana.html`.
+- **玛欣德尊者译著 / Dhamma Books authored or translated by Venerable Mahinda:** `the-requisites-of-enlightenment.html`, `zhiguan-fayao.html`, `the-buddhas-twelve-kinds-of-evil-retribution.html`.
+
+The shared reader JavaScript v1.3.1 identifies these five filenames, adds `body.db-standard-contents`, and refreshes their existing shared CSS link to `?v=1.3.1`. Book HTML files remain byte-for-byte unchanged. Both language editions use the same cream panel, pale heading/group backgrounds, brown headings, solid warm borders, 10 px panel corners, and consistent row spacing. Contents headings are 22 px desktop / 20 px mobile; entries 18 px / 17 px; page numbers 14 px. Language fonts, natural title wrapping, subsection indentation, and right-aligned page numbers are retained. All contents remain one column; the title/page-number cells inside each row do not represent two contents columns.
+
+This change is styling only: original contents entries/targets, book wording, reading flow, language switching, main-text styles, PCED, screen headers, bookmarks and search are retained. The opt-in does not affect other categories or Daily Chants Burmese. Continuous-reading implementation status remains a separate audit item.
+
+
+### Contents asset-loading correction — 7 September 2026
+
+After PR #18 deployed, a user screenshot still showed the old Mindfulness of Breathing contents. The five category books still referenced shared JavaScript/CSS v1.1.0; the styling marker depended on the new JavaScript arriving through that old URL. Deployment success alone does not verify visible styling.
+
+All five book HTML files now declare `body.db-standard-contents` directly and request both shared assets with `?v=1.3.1`. Contents styling therefore no longer depends on JavaScript initialization, and the changed URLs avoid reuse of v1.1.0 asset caches. The existing shared-JavaScript opt-in remains idempotent. For future shared-asset changes, update affected book asset URLs in the HTML, not only from inside the changed JavaScript.
+
+Only the body class and two asset versions change in each book. Book text, all links, embedded dictionaries, PCED scripts, language controls and reader logic are preserved.
+
+
+Coverage is **eight language contents pages across five HTML files**: Mindfulness of Breathing (English/Chinese), The Only Way for the Realization of Nibbāna (English/Chinese), The Requisites of Enlightenment (English/Chinese), 止观法要 (Chinese), and 佛陀的十二种恶报 (Chinese). Both `.contents` (including `.contents.zh-text`) and `.toc` panels are covered by the shared selectors, including initially hidden language panels.
+
+
+### Language navigation pilot — 7 September 2026
+
+Scope: Mindfulness of Breathing and the three Pāli Chanting Book editions only. `dhamma-books-language-pilot.js?v=1.0.0` is loaded after the existing reader standard in these four HTML files. Other books, including Daily Chants Burmese, are excluded.
+
+Mindfulness index buttons open the existing combined HTML with `?lang=en` or `?lang=zh`, overriding the saved language. In-book toggles use the current section at the reading line and matching `data-section`; English endnotes have no Chinese counterpart and fall back to the conclusion. Entry links start at the cover. Book content and the combined-file structure are retained.
+
+Each chanting edition has English / 中文 / မြန်မာ buttons. Switching carries the current passage or heading ID in the destination URL fragment. Above the reader, switching opens contents. Restoration runs after page load and offsets the target below the header. Shared IDs, rather than translation page numbers or whole-book scroll percentages, determine the position.
+
+Validation: JavaScript syntax passed; every chanting passage/section candidate exists in all three editions. HTML changes are limited to the index buttons and one versioned script include per reader; existing text and PCED code are retained. Automated browser verification could not run because this workspace has no installed Chromium executable. Visual and live PCED checks remain required before wider rollout.
+
+
+### Approved language navigation and remaining-book rollout — 7 September 2026
+
+The user tested the merged PR #20 pilot (Mindfulness of Breathing and all three Pāli Chanting editions) and confirmed: “they are nicely done.” This is the approved Dhamma-Books language-navigation behavior.
+
+Requirements:
+- The index offers a separate button for every available reading language before entering a multilingual book.
+- Combined English/Chinese readers remain one HTML file; index links select the initial language.
+- Inside each multilingual book, provide buttons for all available editions. Switching goes to the corresponding passage or current section, not the cover.
+- Use shared passage IDs or semantic section keys; do not equate printed page numbers across translations.
+- Keep book text, language-specific typography, contents styling, PCED, search and bookmarks.
+- Scope remains Dhamma-Books only. Daily Chants Burmese retains its existing exception.
+
+This rollout adds The Only Way for the Realization of Nibbāna, Paccayaniddeso (English/Chinese), and The Requisites of Enlightenment / 《觉悟资粮——菩提分手册》. The approved pilot files remain unchanged.
+
+Implementation: these four reader files load `dhamma-books-language-navigation.js?v=1.0.0` after their existing scripts. The two combined readers receive English / 中文 index links using `?lang=en` and `?lang=zh`; explicit entry selection overrides the saved language and opens the cover. Their existing in-book buttons preserve the current semantic section. Cover and contents also match across languages. Where Requisites has edition-specific material, use the nearest preceding shared section (or nearest following shared section when none precedes it). These are section-level matches, not claims of sentence-level alignment.
+
+Paccayaniddeso receives English / 中文 header buttons. Switching transfers the current visible passage or section ID through the URL fragment and restores it below the header after load. Above the main reader, switching opens contents.
+
+Validation and deployment status are recorded with the rollout pull request. The user's pilot approval is separate from validation of these newly added books.
+
+
+Rollout validation: JavaScript syntax passed; all 39 Paccayaniddeso navigation candidates exist in both editions; 354 semantic-section positions across both combined readers resolve in both directions, including cover, contents and edition-only fallback. Every existing reader HTML byte is retained apart from the added script include. Chromium is still unavailable in this workspace, so these new books require live visual checks after deployment.
+
+
+
+### Language-navigation corrections — 7 September 2026
+
+Follow-up to PR #21: The Only Way now uses 49 explicitly paired English/Chinese headings rather than broad chapter/page labels. The final position restoration runs after the original language handler's deferred scrolling. Switching returns to the corresponding shared subsection heading; edition-specific subsections use the preceding shared heading. This is not sentence-level alignment.
+
+Both Paccayaniddeso headers contain English and 中文 links in the HTML, enhanced to passage-preserving buttons by the navigation script. Hide the redundant Reader / 阅读 control while retaining its element for existing reader code. Insert the language group beside the existing reader controls. Requisites index choices place English before 中文. All four affected readers use navigation version 1.0.4.
+
+Validation: JavaScript syntax and all 49 unique heading pairs checked; both static edition-link groups and hidden Reader controls verified. Browser rendering and live interaction remain unverified because Chromium is unavailable. Book text and PCED scripts are unchanged.
+
+
+### The Only Way English structure and position-preserving language toggle — 8 September 2026
+
+The English edition follows the hierarchy printed in the authoritative PAMC 07/2014 PDF. Top-level headings listed in bold in the English contents — Preface, The Great Mindfulness-Foundation Sutta, Introduction, Samatha Meditation, Vipassanā Meditation and Endnotes — use the standard prominent heading treatment: centred text on a pale panel, a lighter-brown top rule, rounded corners and the normal heading colour. Lower-level headings use a simpler left-aligned treatment with brown text and a thin divider. Pāli inside either heading inherits the heading colour.
+
+This hierarchy is the standard for current and future Dhamma-Books text: top-level headings are prominent and centred; subheadings are simpler and left aligned. Determine hierarchy from the source book's contents and typography rather than treating every bold line as the same heading level.
+
+Numbered and bracket-numbered passages in the English body display each printed point as a separate indented line. The implementation adds structural wrappers around the existing text and existing PCED elements; it does not rewrite the wording.
+
+The Only Way retains its 49 explicit English/Chinese heading pairs. Navigation v1.0.2 additionally records the reader's proportional position between the surrounding paired headings before changing language, then restores the same position within the corresponding translated interval after the original language handler finishes. This makes English-to-Chinese and Chinese-to-English switching reversible within long sections instead of returning only to the beginning of a broad subsection.
+
+Validation uses the PAMC 07/2014, 85-page printed edition (88 PDF pages including covers/front matter). The six bold top-level contents entries correspond to six centred headings; the remaining 114 English body headings use the subheading treatment. All 424 numeric or bracketed point markers found across 314 English paragraphs have structural list-item presentation, including continuations split by the source layout. English and Chinese visible reader text and all Pāli `data-word` markers are unchanged. JavaScript syntax and a simulated mid-section English/Chinese round trip passed. All fifteen readers request shared CSS and JavaScript v1.3.2; the footnote selector covers both popup structures used by the thirteen readers that currently contain notes. Automated browser rendering remains unavailable in this workspace, so deployed visual and interaction checks remain required.
+
+### Approved heading hierarchy rollout — 8 September 2026
+
+The approved The Only Way heading treatment now also applies to 《证悟涅槃的唯一之道》 and to both the English and Chinese editions of Mindfulness of Breathing / 《入出息念》. Major entries in each edition's contents hierarchy use the prominent centred pale-panel heading; subordinate contents entries use the simpler left-aligned heading with a thin divider. Heading Pāli inherits the heading colour, while body Pāli remains blue `#155CA8`.
+
+Shared reader standard v1.3.3 derives the Mindfulness heading levels from its existing `toc-row sub` markers and assigns the Chinese Only Way hierarchy from the printed contents: 中译序, Chapters 1–5, and 尾注 are major headings. This changes presentation only; reader wording, contents links, language switching, bookmarks, search, notes and PCED behavior remain unchanged.
+
+Shared reader standard v1.3.4 extends the same treatment to The Requisites of Enlightenment / 《觉悟资粮——菩提分手册》. In English, the three prefaces, Introduction, Chapters I–X and Glossary are major headings; the other 11 headings are subordinate. In Chinese, the 15 existing contents-level headings are major and the 31 existing lower-level headings are subordinate. The classification uses the book's existing elements at runtime, without rewriting its HTML or wording.
+
+Shared reader standard v1.3.5 extends the approved hierarchy to 《止观法要》 and 《佛陀的十二种恶报》. 《止观法要》 has 10 major headings and 18 subordinate headings; its 48 third-level minor headings retain their existing smaller left-aligned treatment. 《佛陀的十二种恶报》 has 18 major headings and 6 subordinate headings. The update assigns presentation classes at runtime and does not rewrite either book's HTML or wording.
+
+
+### Pāli text colour standard and staged rollout — 7 September 2026
+
+All Pāli wording in current and future Dhamma-Books readers must be blue `#155CA8`, including embedded Pāli words and Pāli punctuation in Chinese and English body text. **Headings are an exception:** all heading wording, including Pāli terms and titles, must retain the heading’s normal colour (for example, white on brown section bars), never the body-text Pāli blue. Preserve surrounding translation colours, language fonts, text, and PCED lookup behavior. This requirement is scoped to Dhamma-Books; the Daily Chants Burmese layout exception does not create a Pāli-colour exception.
+
+Batch 1 implements this in `mindfulness-of-breathing.html` and `the-only-way-for-realization-of-nibbana.html` (four language panels across two combined files). Each file adds a small `db-pali-blue-standard` style to its head, targeting existing `.pali-word`, `.pali-title`, and `.pali-punct` markers. Explicit colour prevents inheritance from black paragraph text. No script or shared-asset cache change is required.
+
+Validation: removing the added style exactly reproduces each original file. Existing Pāli markers, text, data-word attributes, PCED scripts, and language-navigation fixes are unchanged. Marker styles were inspected for inline colour conflicts. Live rendered colour and interaction still require visual verification; no browser verification is claimed.
+
+Batches 2 and 3 are implemented below. The five-book Pāli-colour rollout is complete in source; live-site appearance remains to be verified. Each batch is recorded in its own pull request.
+
+
+### Pāli heading exception and complete-word correction — 7 September 2026
+
+Follow-up to PR #23: both Batch 1 books now let Pāli markers inside headings inherit the heading colour. This covers all heading levels in both language panels and the screen header. Apply this exception in every future Pāli-colour batch. Body Pāli remains blue `#155CA8`.
+
+In The Only Way English body text, the split `Pari` + marked `nibbāna` is now one `Parinibbāna` marker with `data-word="parinibbāna"`, preserving the visible wording and existing PCED interaction attributes.
+
+Validation: book text and all scripts remain unchanged. Mindfulness changes only by the heading CSS rule; The Only Way additionally corrects one complete-word marker. Live browser appearance has not been verified.
+
+
+### Batch 2: Requisites Pāli colour — 7 September 2026
+
+`the-requisites-of-enlightenment.html` now applies blue `#155CA8` to existing Pāli word, title and punctuation markers in both English and Chinese body text. Headings (including section and subsection headings), screen headers and cover titles retain their normal colours. The heading exception covers markers nested inside headings and markers on heading elements themselves.
+
+The change is one inline style block, covering 3,457 existing Pāli word markers across both editions. Removing the inserted block reproduces the original file exactly: book text, scripts, PCED attributes, language navigation, bookmarks and search remain unchanged. No shared asset version change is needed. Source preservation and uploaded content are checked; live browser rendering and deployment are not verified in this session.
+
+
+### Batch 3: 止观法要 and 佛陀的十二种恶报 Pāli colour — 7 September 2026
+
+`zhiguan-fayao.html` and `the-buddhas-twelve-kinds-of-evil-retribution.html` apply blue `#155CA8` to body Pāli markers and Pāli-only blocks, including their punctuation. Headings at every level, screen headers and cover titles retain their standard colours. The local inline styles also cover minor headings; no shared asset cache update is required.
+
+The two Chinese books contain 373 and 1,006 Pāli word markers respectively after correction. In the Twelve Retributions paragraph `row-vipaka12-227`, the previously split `Anom` + marked `ā` is one complete `Anomā` marker, and previously unmarked `Uruvela` receives the existing keyboard/click PCED attributes. Visible wording and spelling are unchanged. Source-reference abbreviations remain unchanged.
+
+Validation: reversing the style insertions and these two marker corrections reproduces both original HTML files byte-for-byte. Visible text, all scripts, navigation targets and search attributes are preserved. No shared PCED files, dictionary data, other books or catalogue files change. Browser rendering and live PCED interaction are not verified because Chromium is unavailable in this workspace; live-site appearance remains an explicit follow-up.
+
+
+### Mobile PCED popup visibility — 10 September 2026
+
+`pced-popup-standard.js` v1.3.10 keeps PCED dictionary popups clear of fixed or sticky book headers. On mobile, it measures the actual rendered screen-header height and opens the popup immediately below the complete visible header. Long definitions are constrained to internal scrolling within the dynamic viewport space that remains below the header. The selectors are limited to the supported PCED modal IDs: `dictModal`, `lookupModal`, and `pced-modal`.
+
+The offset is recalculated when the popup opens and when the layout or visual viewport resizes. The popup remains movable and continues to reopen at the beginning. Desktop positioning, dictionary data, matching logic, result order, book text, footnotes and reader controls are unchanged. Static validation confirms the dynamic header-offset and remaining-height rules and the existing PCED script reference in 《佛陀的十二种恶报》; live mobile interaction remains to be checked after deployment.
+
+
+### Dhammapada Nissaya and footnote popup interaction — 11 September 2026
+
+`pced-popup-standard.js` v1.3.11 adds behaviour gated to `dhammapada-pali-chinese.html`. The Nissaya/依词释 popup opens one rendered body-text line below the measured fixed or sticky screen header on desktop and mobile, uses the remaining viewport space for internal scrolling, and remains movable. A footnote selected inside an open Nissaya popup is raised above it; closing that footnote leaves the Nissaya popup open.
+
+Dhammapada's PCED, footnote, bookmark and Nissaya popup overlays no longer dim the main reading text, while their panels remain opaque and readable. Across Dhamma-Books, Chinese footnote popup titles are normalised from `注释` to `註释` without changing ordinary book text. Book HTML, translations, footnotes and PCED data are unchanged.
+
+`pced-popup-standard.js` v1.3.12 also keeps the exact Dhammapada popup opener highlighted while its popup is open: the selected Pāli word for PCED, the selected footnote superscript, or the selected Nissaya button. Each popup owns its highlight, so a footnote opened over Nissaya adds a second highlight and closing it restores the still-highlighted Nissaya context underneath. Closing a popup removes only its own highlight. This behaviour is gated to Dhammapada and does not alter other books, search highlighting, popup positioning, dictionary matching, or book content.
+
+
+### Stable Dhammapada Contents navigation and shared mobile popup dragging — 11 September 2026
+
+`pced-popup-standard.js` v1.3.13 explicitly handles the 37 existing Dhammapada Contents links. Each valid fragment target is aligned below the measured complete screen header, then briefly realigned while initial fonts, preceding lazy embedded images and the page height settle. Automatic correction stops after five seconds or as soon as the reader deliberately scrolls or touches elsewhere. The link targets and book HTML remain unchanged.
+
+The same version makes popup movement a shared Dhamma-Books standard. Movable PCED, footnote, bookmark and book-specific popups use pointer capture for mouse and one-finger dragging, plus a touch fallback for older browsers. Title-bar dragging suppresses page movement; popup-body scrolling remains available. Dragged coordinates override book-specific mobile centring rules, preserve the complete mobile book header, and keep enough title bar visible to recover or close the popup. Reopening restores the popup's documented default position. `dhamma-books-reader-standard.js` v1.3.6 first bootstrapped this movement-only support for Daily Chants Burmese because that reader has no PCED popup script; the bootstrap remains in use after its later interface conformance update. Popup content, lookup logic, stacking and other books' navigation remain unchanged.
+
+
+### Shared last-opened-on-top popup stacking — 11 September 2026
+
+`pced-popup-standard.js` v1.3.14 replaces fixed popup-type priority with one shared runtime stack across Dhamma-Books. Every newly opened or content-refreshed PCED, footnote, bookmark, Nissaya or supported book-specific popup receives the top active layer. Closing it removes only that popup and reveals earlier popups without changing their positions or state. This supports arbitrary nesting, including Dhammapada Nissaya → footnote → PCED, and preserves each popup's independent selection highlight, dragging, scrolling, default placement and overlay treatment.
+
+The active layer is applied inline with important priority, so legacy book-specific `z-index` rules cannot place a newer popup underneath an older one. The former Dhammapada-only nested-footnote layer is retired. `dhamma-books-reader-standard.js` v1.3.7 requests popup standard v1.3.14 when bootstrapping movement and layering support for readers without their own PCED script. Book HTML, popup content, footnotes and PCED data remain unchanged.
+
+
+### Mindfulness of Breathing reader-interface conformance — 11 September 2026
+
+`mindfulness-of-breathing.html` now follows the approved screen-header, scrolling Contents and popup standards in both its English and Chinese editions. The final header is present in the initial HTML, so an old header, duplicate controls, incorrect order or temporary desktop layout cannot appear while JavaScript loads. The desktop header is fixed and non-wrapping; the mobile header remains one complete two-row unit, with Search on the second row. English is listed before Chinese, and one Book Mark window replaces the two legacy bookmark buttons while retaining separate multilingual reading positions.
+
+The English `Content` and Chinese `目录` panels are also present in the initial HTML. Each uses one rounded frame, a non-scrolling title/Expand-Collapse row and the standard fixed-height one-column entries window, with internal scrolling on both desktop and mobile. PCED, footnote and bookmark popups use the current shared below-header positioning, internal scrolling, mouse and one-finger movement, and last-opened-on-top behavior. Book wording, translations, covers, paragraph order, language correspondence, headings, Pāli treatment, footnotes and PCED data are unchanged. The book now loads shared stylesheet v1.3.21 and reader JavaScript v1.3.10; the popup runtime remains v1.3.15.
+
+### Automatic last-read control retirement — 11 September 2026
+
+Last Position, Last Read, Previously Read and equivalent automatic-return controls are retired from the Dhamma-Books reader standard for every language and book. Readers must not track page scrolling solely to maintain an automatic last-read position. Book Mark remains the reader-controlled way to save and return to positions. Mindfulness of Breathing, Dhammapada, 《佛陀的十二种恶报》, 《止观法要》, 《辨析道》 and both language editions of 《觉悟资粮》 are updated under this decision; the remaining books require a later repository-wide rollout. Dhammapada, 《佛陀的十二种恶报》 and 《止观法要》 still determine the current reading position when the reader deliberately saves a bookmark, but they no longer track scrolling or unloading in the background.
+
+
+### 《佛陀的十二种恶报》 reader-interface correction — 11 September 2026
+
+`the-buddhas-twelve-kinds-of-evil-retribution.html` now presents the correct final screen header directly in its initial HTML. The desktop header is fixed, full-width, non-wrapping and contains, in order, the logo and book name, `目录`, A−, A+, `书签`, and Search. The complete mobile header remains one sticky two-row unit, with the same controls on the first row and Search on the second. The retired `上次阅读` control and its automatic scroll/unload position tracking are removed; manual bookmark saving still determines the current position only when the reader chooses to save it.
+
+The book-specific header rules keep its established `书签` and Search controls visible after the shared reader script initializes, preventing the desktop controls from disappearing and keeping the same control set on desktop and mobile. The mobile brand area also reserves sufficient width for the complete Chinese book name without displacing Search from its second row.
+
+The one-column `目录` panel keeps its title and `收起` / `展开` control outside the scrolling entries. Its entries now use the standard fixed internal height on both desktop and mobile, so the Contents itself scrolls on either screen size while the main book text continues below it. The book loads shared stylesheet v1.3.10, reader JavaScript v1.3.10 and popup runtime v1.3.15. Popup overlays remain transparent, so the reading text behind a popup is never dimmed. Book wording, cover, illustrations, paragraph order, headings, Pāli treatment, footnotes, search results, saved bookmarks and PCED data are unchanged.
+
+
+### Repository-wide screen-header typography and button alignment — 11 September 2026
+
+All reader screen headers use one shared multilingual sans-serif font stack for the book name, Contents and language labels, font-size controls, Book Mark, Search field and Search button. Book names and button labels retain a consistent bold treatment, while Search input text and placeholders use regular weight. This prevents book-specific body fonts from changing the screen-header wording.
+
+Every header button and button-like link now centres its wording vertically and horizontally through shared flex alignment, centred text and a consistent line height. Shared stylesheet v1.3.10 also declares the font directly on the higher-priority button/link rule, preventing linked controls such as `目录` from retaining a different legacy serif font while native buttons use the shared sans-serif font. The rule applies to all 15 reader HTML files; each file uses the new versioned stylesheet URL so deployed browsers request the update instead of retaining an older cached copy.
+
+
+### 《止观法要》 reader-interface conformance — 11 September 2026
+
+`zhiguan-fayao.html` now follows the approved screen-header, Contents-window and popup standards. Its desktop header is fixed and shows the complete required control sequence; its mobile header is one sticky two-row unit with the reader controls on the first row and Search on the second. Book-specific visibility rules prevent the shared enhancement from hiding the established `书签` or desktop Search controls. The former separate save/open bookmark buttons are consolidated into one `书签` control, with `在此处保存书签` inside the existing bookmark popup. The retired `上次阅读` control and its automatic scroll/unload position tracking are removed on desktop and mobile. Manual bookmark saving, Search, font-size controls and stored bookmark data are preserved.
+
+The existing one-column Contents entries are placed in a fixed-height internal scrolling window below a non-scrolling `目录` / `收起` title row. The standard desktop and mobile heights, Expand/Collapse behavior, font resizing and below-header link offsets are applied without changing any entry, page number or destination. PCED, footnote and bookmark popups load the current versioned shared runtime for mobile below-header positioning, internal scrolling, mouse and one-finger movement, last-opened-on-top stacking and transparent overlays. Footnote popup titles use `註释` and the shared lighter, smaller header treatment. Book text, translations, paragraph order, images, headings, footnotes and PCED data are unchanged.
+
+
+### Repository-wide popup background standard — 11 September 2026
+
+All Dhamma-Books popup overlays are transparent so opening PCED, footnote, bookmark, Nissaya or another supported popup never dims the reading text behind it. Popup panels remain opaque and readable, retaining their established border, shadow, close behaviour, movement, internal scrolling and last-opened-on-top order. The current shared stylesheet is v1.3.22, the reader runtime is v1.3.19, and `pced-popup-standard.js` is v1.3.16.
+
+
+### 《觉悟资粮》 bilingual reader-interface conformance — 11 September 2026
+
+`the-requisites-of-enlightenment.html` now follows the approved screen-header and content-page standard in both English and Chinese. The final header is present in the initial HTML in the required order: logo and active-language book name, Contents, English then Chinese, A−, A+, one Book Mark control, Search field and Search button. It is fixed and non-wrapping on desktop and remains one complete sticky two-row unit on mobile. A synchronous header bootstrap applies the previously selected language before the large self-contained book finishes parsing, preventing the legacy header, duplicate controls, incorrect order or temporary desktop layout from flashing. The former two legacy bookmark buttons and `上次阅读` / Last Position control are removed, and automatic scroll-position tracking is retired. Existing reader-controlled legacy bookmark data is imported into the shared Book Mark window when needed.
+
+The English `Content` and Chinese `目录` panels now each have one rounded outer frame, a non-scrolling title and Expand/Collapse row, and a one-column internal entries window using the standard desktop and mobile heights. The screen-header Contents button expands the active panel before moving to it, and the measured header height keeps Contents destinations visible. Search and font controls follow the active language, and font changes resize Contents as well as reading text. PCED, footnote and bookmark overlays remain transparent while their panels remain opaque, movable and internally scrollable; Chinese footnote titles use `註释`. Book wording, translations, covers, paragraph order, headings, Pāli treatment, footnotes and PCED data are unchanged. The book loads shared stylesheet v1.3.21 and reader JavaScript v1.3.11 and popup runtime v1.3.15.
+
+
+### 《辨析道》 reader-interface conformance — 11 September 2026
+
+#### Full-Chinese edition and synchronized edition switching — 14 September 2026
+
+`patisambhidamagga-chinese.html` is the complete Chinese edition converted from the supplied 508-page Word source. It contains all three divisions through `第三品 慧品`, the reference list, 489 linked Chinese notes, Unicode Pāli terms with PCED lookup, the shared Contents, Search, font-size and Book Mark controls, and the standard fixed-desktop/sticky-mobile interface. The four legacy WinTaunggyi bibliography titles were converted to Unicode Burmese, and the legacy romanized Pāli font encoding was converted to Unicode without changing the Chinese source text.
+
+A deployed first-paint correction on 14 September 2026 adds the complete compact-header styling directly to the full-Chinese HTML. This constrains the embedded emblem to the standard white 44 × 50 px desktop tile (34 × 40 px on mobile), keeps every control styled and aligned before the shared JavaScript loads, and prevents the emblem's intrinsic dimensions from expanding the brown header. The book text and reader functions are unchanged.
+
+The full-Chinese conversion also preserves the Word source's linked stanza formatting. Every source paragraph that belongs to a deliberately continuous stanza or quotation group carries source-derived tight-line classes: each line retains a two-character first-line indentation, intermediate lines have no artificial paragraph gap, and only the final line restores the small inter-stanza space. The mobile line spacing is compacted proportionally. Identification comes from the original DOCX paragraph-spacing metadata rather than punctuation or wording guesses, and does not alter text or footnote placement.
+
+The home-page 《辨析道》 card now offers `巴利－中文` and `中文`. Both readers carry the same two edition controls. `patisambhidamagga-reader.js` records the nearest shared semantic section and the reader's relative position inside it only when an edition button is deliberately selected, then opens the other edition at the corresponding position. Because the current Pāli–Chinese reader remains under construction and presently ends after `第二品 双运品`, a switch made from the Chinese-only third division lands at the nearest available shared section instead of inventing an unavailable parallel passage. Ordinary reading does not create automatic last-position tracking.
+
+`patisambhidamagga.html` now presents the final standard screen header directly in its initial HTML, preventing a legacy or duplicate control set from flashing while JavaScript loads. The desktop header is fixed, full-width and non-wrapping; the complete mobile header remains one sticky two-row unit. Its order is logo and book name, `目录`, A−, A+, one `书签` control, Search field and Search button. All header wording uses the shared multilingual sans-serif font, and every button label is centred vertically and horizontally.
+
+Its cover card now uses the Daily Chants English visual standard: a warm cream gradient, light brown border, 14 px rounded corners, soft shadow and balanced padding. The original 《辨析道》 cover remains on the left and its original title, edition, translator, publisher and credits remain on the right on desktop and mobile. Its side-by-side Pāli–Chinese reading body remains intact inside the common centred 1080 px maximum page width.
+
+The retired `上次阅读` control and background scroll tracking are removed. The shared Book Mark window supports add, list, go and delete, and imports existing reader-controlled 《辨析道》 bookmarks without deleting their legacy stored values. The `目录` title now uses Chinese only and stays visible with its `收起` / `展开` control above a one-column entries window. Entries scroll internally at the standard desktop and mobile heights, while the main text continues immediately below the Contents panel. A− and A+ now apply the shared reader size with sufficient priority to override the legacy important font rules, so the Contents and reading text resize correctly.
+
+Footnote, PCED and bookmark overlays remain transparent so they never dim the book text, while their panels remain opaque, movable, independently scrollable and last-opened-on-top. Chinese note titles use `註释`. The book loads shared stylesheet v1.3.21, reader JavaScript v1.3.14 and popup runtime v1.3.16. Its established side-by-side Pāli–Chinese reading body, wording, cover image, front matter, paragraph order and alignment, footnotes, Pāli treatment and PCED data are unchanged.
+
+Deployed mobile testing exposed that the first conformance pass had constrained only `<body>` and had left the mobile header row with visible horizontal overflow. The v1.3.13 correction applies the complete approved containment pattern: both `<html>` and `<body>` are bounded to the layout viewport; the sticky header and its inner row cannot widen or scroll sideways; main, reading and Contents containers may shrink within the viewport; and genuinely wide tables remain inside their own horizontal scrollers. The mobile cover is also kept on the left beside its title and edition information as required by the cover standard. Source checks confirm these rules and preserved content; physical-device confirmation remains pending after deployment.
+
+### The Only Way reader-interface conformance — 11 September 2026
+
+`the-only-way-for-realization-of-nibbana.html` now carries the final bilingual screen header in its initial HTML: logo and title, Contents, English then Chinese, A−, A+, one Book Mark, and Search. The saved English or Chinese state is applied synchronously before the large self-contained file finishes parsing, preventing an old-language header or reading panel from flashing on entry. The desktop header is fixed in one non-wrapping row; the complete mobile header stays together as one sticky two-row unit, with Search on the second row and root-level width containment.
+
+Both the English `Content` and Chinese `目录` are one-column panels with one outer frame, a fixed title and Collapse/Expand row, and independently scrolling entries at the standard desktop and mobile heights. Legacy Save Bookmark, Go Bookmark and Last position controls and automatic last-read tracking were removed. Existing deliberate legacy bookmarks can be imported into the shared Book Mark window. Search, language correspondence, font controls, transparent popup overlays, popup movement and stacking, footnotes and PCED lookup remain available. The shared stylesheet is v1.3.21, the reader runtime is v1.3.16 and the popup runtime is v1.3.16. Book text, translations, embedded images, paragraph order, heading hierarchy, Pāli treatment, footnotes and PCED data were preserved. Source validation passes; deployed physical-device verification remains pending.
+
+#### Chinese Word-source rebuild — 14 September 2026
+
+The Chinese 《证悟涅槃的唯一之道》 reading panel was rebuilt from the supplied 2023.11 Word source. Its logical Word paragraphs replace the former printed-page fragments, eliminating running headers and mid-sentence page-break splits. The current source wording, 105-entry Contents, 44 linked numeric footnotes, 11 linked lettered endnotes and 30 native tables are represented directly in HTML. Wide analytical tables use a larger readable layout inside their own horizontal scrollers, so they do not widen the page on mobile. The index card displays the distinct English and Chinese covers side by side.
+
+The source-to-HTML font map is: 宋体 → Songti/SimSun body text; 黑体 → Heiti/SimHei; 幼圆 → YouYuan; 隶书 → LiSu; 方正魏碑_GBK → Fangzheng Weibei with Kai fallback; 华文楷体 → STKaiti/KaiTi; 华文细黑 → STXihei; 华文中宋 → STZhongsong; and Times New Roman/Times_CSX+ → Unicode serif. Sangayana-encoded Pāli is converted to Unicode and displayed with Times New Roman/Noto Serif. Word left, first-line and hanging indents are converted from the source paragraph measurements rather than guessed from a numbering marker. Consecutive numbered items of the same kind use the first item as their common visual model, correcting isolated zero-indent anomalies while keeping continuation lines aligned after the number. Native HTML list items align every wrapped line with the item text. All 145 Word paragraphs that carry drawn-box borders retain an additional left offset in HTML without reproducing the box. All source Heading 1 chapter/title paragraphs are prominent centred headings, while lower levels retain the documented hierarchy. Verse and multi-paragraph quotation lines retain their source indentation and have no artificial inter-line paragraph gap or added left rule. Word's distinct endnotes are restored visibly under `尾注` as `尾注A`–`尾注K`; each label links back to its corresponding lettered superscript, and the visible and popup contents share the same source text. Rebuilding is idempotent, so the `2023.11` edition date appears exactly once. The paired index covers occupy a reserved cover column and cannot overlap the title. The former unscoped important font override is restricted to interface chrome, and Chinese note popups retain their source font role. Source-text equality, Contents targets, note links, table counts and inline-script syntax pass structural validation; rendered browser and deployed physical-device confirmation remain pending.
+
+#### English Word-source formatting — 15 September 2026
+
+The English reading panel now follows the supplied `TOW for Realization of Nibbā_na - pamc.docx` typography and layout: body and Unicode Pāli use Tahoma (Pāli italic), paragraphs retain the Word first-line and hanging-indent relationships, and headings retain the source small-cap character. All 35 Word tables were audited. The source columns are restored for the Noble Eightfold Path, five aggregates' origination and extinction, six bodies of feeling, four foundations of mindfulness, five hindrances, six opposite characteristic pairs, four-elements analyses, body-parts, six wind-element parts, nine kamma-born kalāpas, five jhāna factors and five-causes/five-effects tables. The Noble Eightfold Path retains three source-sized columns on desktop without premature line wrapping and stacks cleanly on mobile. The Fifty-Two Mental Factors and Mental/Material Phenomena at the Arising of Jhāna Consciousness are rebuilt as source-derived semantic HTML tables instead of overlapping fixed-position text. Table headings retain the source's unfilled background. The Jhāna-Attainment and Five-Door Process diagrams are displayed horizontally, while the large “Only Way” classification diagram is displayed vertically. Desktop retains the Word column arrangement. On mobile, ordinary list columns stack as full-width sections and genuinely wide analytical structures remain readable inside their own horizontal scrollers without widening the page or allowing cell text to overlap. Numbered lines use their Word hanging indents without an added parent offset or artificial inter-item gap; list continuations split by a printed-page anchor—including both `[12]` dependent-origination lines—align with the preceding items. Repeated extraction artefacts `xx1)`, `xx2)` and `xx3)` beneath the four classification tables are corrected to source-aligned hanging lists. The Chinese panel, index, non-table English passages, Contents, language switching, notes, IDs and shared reader controls are unchanged. Structural validation confirms the repaired table structures, orientation metadata, internal English links, reference counts and inline-script syntax; deployed physical-device confirmation remains pending.
+
+### Desktop reading-page width standard — revised 12 September 2026
+
+Every Dhamma-Books reader now uses the displayed Daily Chants Burmese width: a centred reading page with a maximum width of 1080 px and at least 14 px clearance on each side of a narrower browser. The former wider-reader exceptions are retired, including 《辨析道》, Daily Chants English, Paccayaniddeso English and Chinese, Pāḷi Chanting Book English, Chinese and Burmese, and the archival Burmese Chanting Book copy.
+
+This change concerns only the outer reading-page width. Established side-by-side Pāli/translation reading columns remain intact, and every Contents panel remains one column under the Contents standard. Mobile sizing, containment, screen headers, Contents behaviour and popup behaviour are unchanged.
+
+Further mobile testing found that the browser could remove the sticky header from view when PCED locked the book page. Popup runtime v1.3.16 now records the complete rendered header height before the Pāli-word action, holds that header fixed above the popup for the duration of the page lock, positions and constrains the movable popup below it, and restores the normal sticky header after the last PCED popup closes. The overlay remains transparent and the popup panel remains opaque and independently scrollable.
+
+The standard now includes a mandatory full-conformance procedure. A request to change a book according to the standard requires an audit of the initial HTML, shared assets and conflicting legacy rules; viewport testing at 320, 360 and 412 CSS pixels plus desktop; explicit root/body `scrollWidth` checks and an actual swipe test; feature and content-integrity validation; cache-version updates; and honest reporting when rendered or physical-device verification is unavailable. Source-only checks must not be reported as proof of complete visual conformance.
+
+### Daily Chants Burmese conformance and book-heading standard — 11 September 2026
+
+`daily-chants-burmese.html` now contains its final Burmese screen header directly in the initial HTML: logo, book name, `မာတိကာ`, A−, A+, one `စာညှပ်`, Search field and Search button. The desktop header is fixed in one row; the complete mobile header is one sticky two-row unit with Search on the second row. The former separate Save/Go bookmark buttons, Last Read control, and automatic last-read tracking are removed. If the reader previously saved a deliberate legacy bookmark, it is imported into the shared Book Mark window.
+
+Daily Chants Burmese is the width reference. Its desktop reader is centred at a 1080 px maximum with at least 14 px side clearance. Its Burmese-only Contents title remains fixed above the internally scrolling list, and A−/A+ resize both Contents and reading text.
+
+The Mindfulness of Breathing `INTRODUCTION` treatment is now the documented book-text heading standard: primary chapter and major-section headings use centred text on a pale `#F4E8DF` panel with a 4 px `#A8734F` top rule and rounded corners; subordinate headings are left aligned with secondary-brown text and a thin bottom divider. Hierarchy follows the source Contents and typography, Pāli inside headings inherits the heading colour, and exceptional source-faithful illustrated title layouts remain unchanged. Daily Chants Burmese applies this hierarchy to its `h2` and `h3` section headings while preserving its printed-page exceptions, wording, images, source-page order and footnotes. It loads shared stylesheet v1.3.16 and reader runtime v1.3.17.
+
+### Daily Chants English conformance and Chanting Book title-row standard — 12 September 2026
+
+`daily-chants.html` now contains its final English screen header directly in the initial HTML. It retains Contents and English navigation and follows the approved order with A−, A+, one Book Mark control, Search field and Search button. The desktop header remains fixed in one row; the complete mobile header remains one sticky two-row unit with Search on the second row and no sideways document movement. The retired Previously Read control is hidden from the initial layout and automatic last-read tracking is removed.
+
+The side-by-side Pāli–English reading body remains unchanged inside the common centred 1080 px maximum page width. The `Content` panel now has one rounded outer frame, a non-scrolling Collapse/Expand title row and one internally scrolling Contents column at the standard desktop and mobile heights. A− and A+ resize the Contents as well as the reading text.
+
+For every book in **Chanting Book 念诵本**, except Daily Chants Burmese, a separate `Pāli | English`, `Pāli | Chinese` or equivalent language-label row is not displayed above the main text. The sutta-name row is centred and uses the approved pale `#F4E8DF` panel, 4 px `#A8734F` top rule, rounded corners and brown heading text. This heading rule does not change the language columns in the reading body. Daily Chants English implements the rule; the other Chanting Books adopt it when they are next audited. Daily Chants English disables CSS multi-column flow for the complete Contents list, every Contents group and each group list, using normal full-width block flow so entries scroll vertically without creating overflow columns or a horizontal scrollbar; its Pāli–English reading body remains two columns. It loads shared stylesheet v1.3.20, reader runtime v1.3.18 and popup runtime v1.3.16. Book wording, translations, cover, Contents destinations, paragraph order, footnotes and PCED data remain unchanged.
+
+### Paccayaniddeso English and Chinese conformance — 12 September 2026
+
+`paccayaniddeso.html` and `paccayaniddeso-chinese.html` now follow the complete screen-header and Contents-page standards. Each final header is present in the initial HTML and styled on first paint. Desktop uses one fixed, non-wrapping row; mobile keeps the complete header as one sticky two-row unit with Search on the second row and document-level horizontal containment. The order is logo and book name, Contents, English then 中文, A−, A+, one Book Mark / 书签 control, and Search. The redundant Reader / 阅读 control remains hidden for legacy script compatibility. Previously Read / 上次阅读 is retired, automatic scroll and unload tracking is removed, and existing deliberately saved legacy bookmarks are imported into the shared Book Mark window when needed.
+
+The English panel title is exactly `Content` and the Chinese title is exactly `目录`. Each panel has one rounded outer frame, a non-scrolling Collapse/Expand row, and one normal-flow vertical Contents column. The former CSS multi-column layout is disabled at the complete list, group and group-list levels so entries continue downward within the standard fixed-height scrolling window without producing columns to the right. The header Contents control expands the panel before moving to it, A− and A+ resize both Contents and reading text, and the main paired text follows continuously below the Contents panel. Both editions use the Daily Chants English desktop header dimensions and styling. The Paccayuddesa enumeration of the 24 conditions is one vertical column on desktop and mobile in both editions; the later four-part Paccayaniddesa analytical layout is unchanged. On mobile analysis cards, a blank `Paccayuddesa` block is hidden while every nonblank `Paccayuddesa` block remains visible.
+
+Both readers retain their established side-by-side Pāli/translation reading body inside the common centred 1080 px maximum page width. Their existing cover images and wording, book text, translations, paragraph order, Contents entries and destinations, footnotes, PCED data, Search and passage-preserving language navigation are preserved. The Chinese wording for `Yaṃ yaṃ dhammaṃ garuṃ katvā…` now uses `看重` in place of `尊重`, including its Search data. They load shared stylesheet v1.3.20, reader runtime v1.3.19, Paccayaniddeso interface stylesheet v1.0.4, language navigation v1.0.4 and popup runtime v1.3.16. Source and script validation pass; deployed desktop and physical-mobile confirmation remains pending.
+
+### Repository-wide Contents group-heading highlight bar — 13 September 2026
+
+Every non-clickable section or group heading inside a scrolling Contents list now follows the Dhammapada design: one full-width rectangular pale-beige `#EEE1CF` bar with bold left-aligned `#633919` text, no rounded corners or separate frame, and responsive horizontal padding. The heading size remains relative to the Contents text so A− and A+ continue to resize it.
+
+Shared stylesheet v1.3.22 applies the standard to Daily Chants English and Burmese, Dhammapada, Paccayaniddeso English and Chinese, Pāḷi Chanting Book English, Chinese, Burmese and its archival Burmese copy, Paṭisambhidāmagga, and The Only Way. Mindfulness of Breathing, The Buddha’s Twelve Kinds of Evil Retribution, The Requisites of Enlightenment and 止观法要 were audited but contain no equivalent grouped Contents heading. All reader files load the current shared stylesheet cache version. Contents wording, links, destinations and order, book text, translations and unrelated interface behaviour are unchanged. Source validation passes; deployed desktop and physical-mobile visual confirmation remains pending.
+
+### The Only Way English text-flow repair — 13 September 2026
+
+The English edition of `the-only-way-for-realization-of-nibbana.html` was audited against the complete 85-page source PDF. PDF line fragments are rejoined into continuous sentences, broken words at printed-page boundaries are completed, and numbered or bracket-numbered passages remain separate indented lines. The *Samatha (Body Contemplation)* sequence is restored as `1)`, `2)`, `3)`, and `4-12)`. Footnote `16` and endnotes `D` and `E` are separate working popup markers; the clipped end of endnote `I` and the omitted visible endnotes `J` and `K` are restored from the book's existing note data.
+
+The book-specific Pāli convention is retained: middle-dot separators from the source PDF are removed in the English reader, including compounds that crossed printed line boundaries. The Chinese edition, embedded images, page anchors, Contents destinations, search, bookmarks, language-position mapping, PCED data, and existing note definitions remain unchanged.
+
+
+### 觉悟资粮 Word source update — 16 September 2026
+
+The Chinese edition of `the-requisites-of-enlightenment.html` now follows `觉悟资粮 YFL FOR CHATGPT.docx`. It restores source wording, paragraph boundaries, Chinese font roles and Word indentation; converts legacy Sangayana Pāli to Unicode; and provides complete clickable Pāli tokens in body text, headings and all 146 footnotes. The English edition and embedded PCED dictionary remain unchanged.
+
+The publisher is updated to 西双版纳州佛教协会. The publisher logo and QR code are small and side by side. The Ledi Sayadaw portrait and monastery stone-inscription photograph appear with their source captions before the Chinese preface; the ending leaf illustration is restored. These five images are embedded in the HTML. The existing cover image is retained.
+
+Primary headings use the approved pale #F4E8DF panel, #A8734F top border and brown #8F5D3B text. Subheadings use left alignment and a thin divider. Pāli inside headings inherits the heading colour. 目录 is centred and the scrolling Contents list has horizontal padding. Original Chinese page-anchor IDs and the 15 Contents targets are retained.
+
+`REQUISITES-WORD-COMPARISON.html` records all detected non-whitespace text-difference groups and changed footnotes against main commit `91d203aa2ecc8aa67f912393de55900b70772c50`, with formatting and validation notes.
+
+Upload instructions: extract `requisites-word-update.zip`; upload its three files to the repository root, replacing this book HTML and README.md and adding the comparison report. Keep all existing shared CSS, JavaScript and assets. If README.md changed after the base commit, merge this new section into the latest README instead of overwriting newer entries. This ZIP is an update package for the existing repository, not a standalone copy of the complete site. No GitHub push or commit was made.
+
+Validation: source-text, note-reference, Contents-link, unique-ID, preserved-English/dictionary and JavaScript syntax checks pass. Desktop/mobile visual and interactive checks remain pending. Source fonts use fallbacks when unavailable on the reader's device.
