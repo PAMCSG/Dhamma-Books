@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.17 — 2026-09-16 */
+/* PAMC cross-book PCED popup standard v1.3.18 — 2026-09-16 */
 (function () {
   'use strict';
 
@@ -1016,7 +1016,7 @@
         .approved-term-title{margin:0!important;padding:10px 0 7px!important}
         .approved-term-row{padding:7px 0 10px;border-top:1px solid #eadfd5}
         .approved-term-row:first-of-type{border-top:0}
-        .approved-term-definition{font-size:18px!important}
+        .approved-term-definition{font-size:18px!important;white-space:pre-wrap!important;overflow-wrap:anywhere}
         .approved-term-source,.approved-term-status{display:inline!important;margin:0 0 0 .4em!important;font-size:14px!important;font-weight:400!important;white-space:normal}
         .lookup-rule{font-size:14px!important;color:#75543d!important;margin-top:5px}
         .lookup-section{display:none}.lookup-section.active{display:block}

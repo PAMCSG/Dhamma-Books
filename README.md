@@ -2,6 +2,8 @@
 
 ## Landing-page Pāli Lexicon search — 16 September 2026
 
+Chinese-Tipitaka terminology display preserves Enter/newline characters stored in the database. Shared popup v1.3.18 applies `white-space: pre-wrap` only to the standardized-terminology definition block, so paragraph and line separation appears as entered without changing database text or ordinary PCED entries.
+
 The top-level `index.html` now has one compact **Pāli Lexicon / 巴利语词典** search row above the book catalogue. It accepts Pāli, Chinese, English, Burmese and other dictionary languages, and displays results in the established movable, non-dimming Dhamma-Books PCED popup. Its bilingual source note identifies PCED 2.0.5.0 and Bhante Mahinda's standardized terminology. The catalogue cards and book links are unchanged.
 
 The display-priority selector offers English, Chinese and Burmese. English priority orders ordinary PCED as English, Chinese, Burmese, then other languages. Burmese priority orders Burmese, Chinese, English, then other languages. Only Chinese priority searches and displays eligible single-word Chinese-Tipitaka terminology; those results appear first, followed by PCED Chinese, English, Burmese and other languages. Chinese-Tipitaka status values remain hidden in the book popup, and only `规范` and `已确认` terminology is included there.
