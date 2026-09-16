@@ -391,6 +391,7 @@ code, pre, kbd, samp {
     display:flex;align-items:center;flex:0 0 auto;padding:0 4px;
     color:var(--brown-dark);font-size:14px;font-weight:700;white-space:nowrap;
   }
+  .pced-index-label-en{font-size:16px;line-height:1}
   .pced-index-query{
     flex:1 1 auto;min-width:0;height:40px;padding:8px 12px;
     border:1px solid #cdb7a6;border-radius:8px;background:#fff;color:var(--ink);font-size:16px;
@@ -419,8 +420,9 @@ code, pre, kbd, samp {
     .pced-index-search{padding:11px}
     .pced-index-label{display:none}
     .pced-index-form{flex-wrap:wrap}
-    .pced-index-query{flex-basis:calc(100% - 95px)}
-    .pced-index-priority{order:3;flex:1 1 100%;width:100%}
+    .pced-index-priority{order:1;flex:1 1 100%;width:100%}
+    .pced-index-query{order:2;flex-basis:calc(100% - 95px)}
+    .pced-index-submit{order:2}
     .pced-index-submit{min-width:84px;padding-left:10px;padding-right:10px}
     .pced-index-help{font-size:11px}
   }
@@ -437,13 +439,13 @@ code, pre, kbd, samp {
 <main>
 <section class="pced-index-search" aria-labelledby="pced-index-label">
   <form class="pced-index-form" id="pced-index-form" role="search">
-    <label class="pced-index-label" id="pced-index-label" for="pced-index-query">Pāli Lexicon / 巴利语词典</label>
-    <input class="pced-index-query" id="pced-index-query" type="search" autocomplete="off" spellcheck="false" placeholder="Enter Pāli, 中文, English or Burmese / 输入巴利语或其他语言">
+    <label class="pced-index-label" id="pced-index-label" for="pced-index-query"><span class="pced-index-label-en">Pāli Lexicon</span>&nbsp;/ 巴利语词典</label>
     <select class="pced-index-priority" id="pced-index-priority" aria-label="Display priority / 显示优先语言">
       <option value="en">English first</option>
       <option value="zh">中文优先</option>
       <option value="my">Burmese first</option>
     </select>
+    <input class="pced-index-query" id="pced-index-query" type="search" autocomplete="off" spellcheck="false" placeholder="Enter Pāli, 中文, English or Burmese / 输入巴利语或其他语言">
     <button class="pced-index-submit" type="submit">Search / 搜索</button>
   </form>
   <div class="pced-index-help"><strong>Source:</strong> PCED 2.0.5.0 — <em>Pāli Tipiṭaka Electronic Lexicon</em> / <em>Bhante Mahinda’s Standardized Terminology</em><br><strong>来源：</strong>PCED 2.0.5.0 —— <em>巴利三藏电子辞典</em> / <em>玛欣德尊者规范词汇</em></div>
