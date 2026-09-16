@@ -1,5 +1,17 @@
 # PAMC Dhamma Books
 
+## 止观法要 Word-source update — 16 September 2026
+
+Preview correction before upload: the publication logo and QR code now share a centred row, capped at 88px each on desktop and 76px on mobile. The Contents title is centred independently of its Collapse button; the scrolling entries have 18px desktop / 14px mobile horizontal padding. All ten primary headings use the standard pale `#F4E8DF` panel, `#A8734F` top rule, 12px corners and brown text. The 18 secondary headings use brown text and a thin divider; 48 minor headings retain a smaller left-aligned brown treatment. These scoped rules are embedded directly in the HTML so local previews do not depend on shared files for these styles. Word-source content and typography remain intact. Source checks pass; browser visual verification remains pending.
+
+`zhiguan-fayao.html` follows the supplied `止观法要.doc` (printed edition 2023.12), compared with main commit `f3db4ce18526886f9027fe89c6eedb45873b7795`. `ZHIGUAN-WORD-COMPARISON.html` records 109 groups of non-whitespace body differences, plus publication and footnote comparisons. These include paragraph-boundary changes, punctuation, character variants, revised translations, and text formerly present only in table images; the group count is not a count of independent author revisions.
+
+The source's Chinese and Latin font runs are handled separately. Song, Kai, Hei, YouYuan, LiSu, Weibei, Xihei, Xinwei, Zhongsong and MingLiU roles retain source-first Unicode font stacks with category-appropriate fallbacks. Sangayana is converted to Unicode Pāli and shown in Times New Roman/Noto Serif; twelve Wingdings list symbols become Unicode circled numbers. Actual glyph appearance depends on installed fonts. Word first-line, hanging, left and right indentation follows character measures or point-to-em conversion. The 29 single-cell quotation boxes become indented quotations; the two analytical tables retain merged rows/columns as searchable HTML inside contained horizontal scrollers. Publication metadata, copyright notices and QR images follow the supplied source. The existing cover artwork remains.
+
+All 76 heading/Contents targets and old body paragraph IDs are retained; merged paragraph IDs become aliases at the corresponding source paragraph. Five footnote popups carry current Word text and source font roles. Reader controls, header, shared assets and embedded PCED dictionary data remain unchanged. The Word passage in 大马伦迦经 containing two occurrences of `有这可能` is preserved and flagged for author/source review in the comparison report.
+
+Validation: all 916 generated body text blocks match the converted source, IDs are unique, Contents targets and footnote references resolve, embedded PCED data is byte-identical, and inline JavaScript passes syntax checking. Browser download timed out, so desktop/mobile visual and interaction verification remains pending. This is a local manual-upload package; no push, PR, merge or deployment was performed.
+
 The `main` branch is the authoritative source for the current Dhamma Books website.
 
 ## Standard maintenance workflow
