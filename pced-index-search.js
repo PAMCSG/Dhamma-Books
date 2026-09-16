@@ -3,13 +3,15 @@
   'use strict';
 
   const MAX_LANGUAGE_RESULTS = 50;
+  const APPROVED_STATUSES = new Set(['规范', '已确认']);
+  const PRIORITY_KEY = 'pamc_pced_index_priority_v1';
   const PALI_DIACRITICS = /[āīūṅñṭḍṇḷṃṁŋ]/i;
   const PALI_ONLY = /^[a-zāīūṅñṭḍṇḷṃṁŋ'’\-\s]+$/i;
   const languageTitles = {
     en: 'English', zh: '中文', my: 'Burmese', ja: 'Japanese',
     vi: 'Vietnamese', ko: 'Korean', other: 'Other'
   };
-  let dictionary = global.PCEDStandardData?.entries || {};
+  let dictionary = global.PATISAMBHIDAMAGGA_PCED || {};
   // Make the shared popup profile recognise the landing-page dictionary while
   // retaining its index-search renderer and matching rules.
   global.PCED = dictionary;
@@ -41,7 +43,7 @@
   }
 
   function buildIndexes() {
-    dictionary = global.PCEDStandardData?.entries || {};
+    dictionary = global.PATISAMBHIDAMAGGA_PCED || {};
     global.PCED = dictionary;
     global.PCEDStandardData?.applyTo?.(dictionary);
     exactIndex = global.PCEDLookupCore?.createExactIndex(dictionary);
@@ -134,37 +136,72 @@
     return { matches, total };
   }
 
-  function renderRecords(records) {
+  function renderRecords(records, priority) {
     const groups = new Map();
     for (const item of records) {
       const bucket = item.bucket || 'other';
       if (!groups.has(bucket)) groups.set(bucket, []);
       groups.get(bucket).push(item);
     }
-    return [...groups].map(([bucket, items]) =>
+    const order = priority === 'zh' ? ['zh', 'en', 'my', 'ja', 'vi', 'ko', 'other']
+      : priority === 'my' ? ['my', 'zh', 'en', 'ja', 'vi', 'ko', 'other']
+        : ['en', 'zh', 'my', 'ja', 'vi', 'ko', 'other'];
+    return order.filter(bucket => groups.has(bucket)).map(bucket => {
+      const items = groups.get(bucket);
+      return (
       '<div class="group-title" data-language="' + esc(bucket) + '">' + esc(languageTitles[bucket] || 'Other') + '</div>' +
       items.map(item => '<div class="source">' + esc(item.source_label || item.source || '') + '</div>' +
         '<div class="definition">' + (item.definition || '') + '</div>').join('')
-    ).join('');
+      );
+    }).join('');
   }
 
-  function renderHead(key) {
+  function approvedRowsForHead(key) {
+    const records = global.PCEDApprovedTerms?.records || [];
+    const result = resolve(key);
+    const rows = global.PCEDLookupCore?.approvedTermMatches(key, result, {
+      approvedTerms: records, includeAllStatuses: true
+    }) || [];
+    const seen = new Set();
+    return rows.filter(row => {
+      const single = String(row?.pali || '').split(/\s*[,;/；，]\s*/)
+        .some(value => value.trim() && !/\s/.test(value.trim()));
+      const signature = [row?.pali, row?.chinese, row?.source, row?.status].join('\u241f');
+      if (!single || !APPROVED_STATUSES.has(String(row?.status || '').trim()) || seen.has(signature)) return false;
+      seen.add(signature);
+      return true;
+    });
+  }
+
+  function renderApprovedRows(rows) {
+    if (!rows.length) return '';
+    return '<div class="group-title" data-language="zh-tipitaka">汉译巴利三藏</div>' +
+      '<div class="approved-term-block"><div class="source approved-term-title">玛欣德尊者和译藏团队</div>' +
+      rows.map(row => '<div class="approved-term-row"><div class="definition approved-term-definition">' +
+        esc(row.chinese) + (row.source ? '<span class="source approved-term-source">（出处：' +
+          esc(row.source) + '）</span>' : '') + '</div></div>').join('') + '</div>';
+  }
+
+  function renderHead(key, priority) {
     const entry = dictionary[key];
     if (!entry) return '';
-    const groups = global.PCEDLookupCore?.dictionaryGroups(entry, 'zh') || [];
+    const groups = global.PCEDLookupCore?.dictionaryGroups(entry, priority) || [];
+    const approved = priority === 'zh' ? renderApprovedRows(approvedRowsForHead(key)) : '';
     return '<div class="entry"><div class="headword">' + esc(entry.headword || key) + '</div>' +
+      approved +
       groups.map(group => '<div class="group-title" data-language="' + esc(group.key) + '">' +
         esc(languageTitles[group.key] || group.title || 'Other') + '</div>' +
         group.entries.map(item => '<div class="source">' + esc(item.source_label || item.source || '') + '</div>' +
           '<div class="definition">' + (item.definition || '') + '</div>').join('')).join('') + '</div>';
   }
 
-  function renderLanguageResult(result) {
+  function renderLanguageResult(result, priority) {
     return '<div class="entry"><div class="headword">' + esc(result.entry.headword || result.key) + '</div>' +
-      renderRecords(result.records) + '</div>';
+      renderRecords(result.records, priority) + '</div>';
   }
 
-  function search(query) {
+  function search(query, priority = 'en') {
+    priority = ['en', 'zh', 'my'].includes(priority) ? priority : 'en';
     query = String(query || '').replace(/\s+/g, ' ').trim().normalize('NFC');
     if (!query) return { query, heads: [], html: '', kind: 'empty' };
     const pali = PALI_ONLY.test(query) ? paliMatches(query) : { heads: [], marked: false };
@@ -172,23 +209,31 @@
       const note = !pali.marked && pali.heads.some(head => foldPali(head) === foldPali(query) && head !== query.toLowerCase())
         ? '<div class="note"><b>Diacritic-insensitive Pāli search:</b> ' + esc(query) +
           ' matched all exact spellings with possible Pāli diacritics.</div>' : '';
-      return { query, heads: pali.heads, kind: 'pali', html: note + pali.heads.map(renderHead).join('') };
+      return { query, heads: pali.heads, kind: 'pali', priority,
+        html: note + pali.heads.map(head => renderHead(head, priority)).join('') };
     }
     const language = languageMatches(query);
     const limitNote = language.total > language.matches.length
       ? '<div class="note">Showing the first ' + language.matches.length + ' of ' + language.total + ' matching entries.</div>' : '';
     const html = language.matches.length
-      ? limitNote + language.matches.map(renderLanguageResult).join('')
+      ? limitNote + language.matches.map(result => renderLanguageResult(result, priority)).join('')
       : '<div class="note"><b>No PCED entry was found for ' + esc(query) + '.</b></div>';
-    return { query, heads: language.matches.map(item => item.key), kind: 'language', html };
+    return { query, heads: language.matches.map(item => item.key), kind: 'language', priority, html };
   }
 
   function openResult(result) {
     const modal = document.getElementById('pced-modal');
     document.getElementById('pced-title').textContent = result.query;
+    const priorityName = { en: 'English', zh: '中文', my: 'Burmese' }[result.priority] || 'English';
+    const sequence = result.priority === 'zh'
+      ? '汉译巴利三藏 → PCED 中文 → English → Burmese → Other'
+      : result.priority === 'my'
+        ? 'Burmese → 中文 → English → Other'
+        : 'English → 中文 → Burmese → Other';
     document.getElementById('pced-meta').textContent = result.kind === 'pali'
-      ? 'PCED · Pāli headword search'
-      : 'PCED · Chinese, English, Burmese and other-language search';
+      ? 'Pāli Lexicon · ' + priorityName + ' first'
+      : 'Pāli Lexicon · ' + priorityName + ' first · multilingual search';
+    document.getElementById('pced-credit').textContent = 'PCED 2.0.5.0 · ' + sequence;
     document.getElementById('pced-body').innerHTML = result.html;
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');
@@ -206,19 +251,27 @@
     buildIndexes();
     const form = document.getElementById('pced-index-form');
     const input = document.getElementById('pced-index-query');
+    const priority = document.getElementById('pced-index-priority');
     const modal = document.getElementById('pced-modal');
-    form?.addEventListener('submit', event => {
+    try { priority.value = localStorage.getItem(PRIORITY_KEY) || 'en'; } catch (_) {}
+    priority?.addEventListener('change', () => {
+      try { localStorage.setItem(PRIORITY_KEY, priority.value); } catch (_) {}
+    });
+    form?.addEventListener('submit', async event => {
       event.preventDefault();
       const query = input.value.trim();
       if (!query) { input.focus(); return; }
-      openResult(search(query));
+      if (priority.value === 'zh') {
+        try { await global.PCEDApprovedTerms?.ready; } catch (_) {}
+      }
+      openResult(search(query, priority.value));
     });
     document.getElementById('pced-close')?.addEventListener('click', closeModal);
     modal?.addEventListener('click', event => { if (event.target === modal) closeModal(); });
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.0.0' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.2.0' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

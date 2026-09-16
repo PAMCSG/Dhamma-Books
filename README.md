@@ -1,12 +1,14 @@
 # PAMC Dhamma Books
 
-## Landing-page PCED dictionary search — 16 September 2026
+## Landing-page Pāli Lexicon search — 16 September 2026
 
-The top-level `index.html` now has one compact PCED search row above the book catalogue. It accepts Pāli, Chinese, English, Burmese and other dictionary languages, and displays results in the established movable, non-dimming Dhamma-Books PCED popup. The catalogue cards and book links are unchanged.
+The top-level `index.html` now has one compact **Pāli Lexicon / 巴利语词典** search row above the book catalogue. It accepts Pāli, Chinese, English, Burmese and other dictionary languages, and displays results in the established movable, non-dimming Dhamma-Books PCED popup. Its bilingual source note identifies PCED 2.0.5.0 and Bhante Mahinda's standardized terminology. The catalogue cards and book links are unchanged.
+
+The display-priority selector offers English, Chinese and Burmese. English priority orders ordinary PCED as English, Chinese, Burmese, then other languages. Burmese priority orders Burmese, Chinese, English, then other languages. Only Chinese priority searches and displays eligible single-word Chinese-Tipitaka terminology; those results appear first, followed by PCED Chinese, English, Burmese and other languages. Chinese-Tipitaka status values remain hidden in the book popup, and only `规范` and `已确认` terminology is included there.
 
 Pāli entered with diacritics is matched according to those exact diacritics before the shared verified inflection and headword rules are applied. Pāli entered without diacritics is compared against every exact PCED headword and verified inflected form with the corresponding possible Pāli diacritics. Definition-language searches return matching dictionary entries without changing the shared resolver's prohibition on loose Pāli prefix, suffix or fuzzy matching.
 
-The landing page loads `pced-lookup-core.js`, `pced-standard-data.js`, `pced-books-popup.css`, `pced-index-search.js` and `pced-popup-standard.js`; it does not contain a separate copy of the dictionary or modify individual book readers. Shared popup v1.3.17 adds an `index-search` host mode so its movement, stacking and non-dimming presentation remain active without replacing the landing page's multi-result rendering; existing book and reader modes are unchanged.
+The landing page loads the complete PCED base from `patisambhidamagga-pced-data.js`, applies `pced-standard-data.js`, and resolves through `pced-lookup-core.js`, matching the dictionary data and shared linguistic resolver used by reader word-clicks. It loads `pced-approved-terms.js` for Chinese-priority terminology, plus `pced-books-popup.css`, `pced-index-search.js` and `pced-popup-standard.js`; it does not contain a separate copy of the dictionary or modify individual book readers. The search-module query is versioned as `v=1.2.0` to prevent browsers from retaining the earlier incomplete-dictionary module. Shared popup v1.3.17 adds an `index-search` host mode so its movement, stacking and non-dimming presentation remain active without replacing the landing page's multi-result rendering; existing book and reader modes are unchanged.
 
 ## 佛陀的十二种恶报 Word-source update — 16 September 2026
 
