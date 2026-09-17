@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.19 — 2026-09-17 */
+/* PAMC cross-book PCED popup standard v1.3.20 — 2026-09-17 */
 (function () {
   'use strict';
 
@@ -958,6 +958,7 @@
   }
 
   function init() {
+    if (mode === 'index-search') document.body.classList.add('pamc-pced-compact-typography');
     if (isDhammapada()) document.body.classList.add('pamc-dhammapada-popup-standard');
     installDhammapadaContentsNavigation();
     scanModals();
@@ -1033,6 +1034,24 @@
         #dictModal .panel-body .group-title,#lookupModal .panel-body .group-title,#pced-modal .pced-body .group-title{font-family:Georgia,"Times New Roman","Noto Serif SC",SimSun,serif!important;font-size:22px!important;font-weight:700!important;line-height:1.25!important}
         #dictModal .panel-body .source,#lookupModal .panel-body .source,#pced-modal .pced-body .source{font-family:Arial,"Microsoft YaHei","Noto Sans Myanmar",sans-serif!important;font-size:14px!important;line-height:1.45!important}
         #dictModal .panel-body .definition,#lookupModal .panel-body .definition,#pced-modal .pced-body .definition{font-family:Georgia,"Times New Roman","Noto Serif SC","Songti SC",SimSun,"Myanmar Text","Noto Sans Myanmar",serif!important;font-size:18px!important;line-height:1.65!important}
+        body.pamc-pced-compact-typography #dictModal .panel-body .definition,
+        body.pamc-pced-compact-typography #lookupModal .panel-body .definition,
+        body.pamc-pced-compact-typography #pced-modal .pced-body .definition{
+          font-family:Arial,"Microsoft YaHei","PingFang SC","Noto Sans CJK SC",sans-serif!important;
+          font-size:16px!important;line-height:1.7!important;font-weight:400!important
+        }
+        body.pamc-pced-compact-typography #dictModal .panel-body .definition strong,
+        body.pamc-pced-compact-typography #dictModal .panel-body .definition b,
+        body.pamc-pced-compact-typography #lookupModal .panel-body .definition strong,
+        body.pamc-pced-compact-typography #lookupModal .panel-body .definition b,
+        body.pamc-pced-compact-typography #pced-modal .pced-body .definition strong,
+        body.pamc-pced-compact-typography #pced-modal .pced-body .definition b{font-weight:700!important}
+        body.pamc-pced-compact-typography #dictModal .panel-body .source,
+        body.pamc-pced-compact-typography #lookupModal .panel-body .source,
+        body.pamc-pced-compact-typography #pced-modal .pced-body .source{font-size:13px!important}
+        body.pamc-pced-compact-typography #dictModal .panel-body .note,
+        body.pamc-pced-compact-typography #lookupModal .panel-body .note,
+        body.pamc-pced-compact-typography #pced-modal .pced-body .note{font-size:16px!important;line-height:1.55!important}
         .note{background:#f4eee7!important;color:var(--pamc-popup-ink)!important;border:0!important;font-size:18px!important;border-radius:8px!important;padding:11px 14px!important;line-height:1.55!important;margin:8px 0 12px!important}
         .approved-term-entry{background:transparent!important;border:1px solid var(--pamc-popup-line)!important}
         .approved-term-block{border:1px solid #cfae8f;border-radius:9px;background:transparent;margin:7px 0 12px;padding:0 13px}
