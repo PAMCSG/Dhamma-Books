@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.18 — 2026-09-16 */
+/* PAMC cross-book PCED popup standard v1.3.19 — 2026-09-17 */
 (function () {
   'use strict';
 
@@ -16,6 +16,25 @@
   const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[char]));
+  // Preserve editor-created bold and line breaks from the dedicated rich-text
+  // field. Other elements are unwrapped and unsafe/non-content elements are
+  // dropped, so database HTML cannot inject markup into a popup.
+  function approvedChineseHtml(html, plain) {
+    if (!String(html || '').trim()) return esc(plain);
+    const template = document.createElement('template');
+    template.innerHTML = String(html);
+    const output = document.createElement('div');
+    const copy = (node, parent) => {
+      if (node.nodeType === Node.TEXT_NODE) { parent.appendChild(document.createTextNode(node.data)); return; }
+      if (node.nodeType !== Node.ELEMENT_NODE || /^(SCRIPT|STYLE|IFRAME|OBJECT|EMBED)$/.test(node.tagName)) return;
+      if (node.tagName === 'BR') { parent.appendChild(document.createElement('br')); return; }
+      const target = /^(STRONG|B)$/.test(node.tagName) ? document.createElement('strong') : parent;
+      if (target !== parent) parent.appendChild(target);
+      [...node.childNodes].forEach(child => copy(child, target));
+    };
+    [...template.content.childNodes].forEach(node => copy(node, output));
+    return output.innerHTML;
+  }
   const core = () => window.PCEDLookupCore;
   const dictionary = () => {
     try {
@@ -114,7 +133,7 @@
       unique.map(row => {
         const source = String(row.source || '').trim();
         return '<div class="approved-term-row">' +
-          '<div class="definition approved-term-definition"><span>' + esc(row.chinese) + '</span>' +
+          '<div class="definition approved-term-definition"><span>' + approvedChineseHtml(row.chinese_html, row.chinese) + '</span>' +
             (source ? '<span class="source approved-term-source">（出处：' + esc(source) + '）</span>' : '') +
           '</div>' +
           (row.match === 'inflected' ? '<div class="lookup-rule">' + esc(surface) + ' → ' +
@@ -558,7 +577,7 @@
     const unique = uniqueTermRows(rows);
     if (!unique.length) return '<div class="note">No precise 汉译巴利三藏 match was found for <b>' + esc(surface) + '</b>.</div>';
     return '<div class="mahinda-table-wrap"><table class="mahinda-table"><thead><tr><th>Pāli</th><th>玛欣德尊者翻译</th><th>出处</th><th>状态</th></tr></thead><tbody>' +
-      unique.map(row => '<tr><td>' + esc(row.pali) + '</td><td>' + esc(row.chinese) + '</td><td>' +
+      unique.map(row => '<tr><td>' + esc(row.pali) + '</td><td>' + approvedChineseHtml(row.chinese_html, row.chinese) + '</td><td>' +
         esc(row.source || '') + '</td><td>' + esc(row.status || '') + '</td></tr>').join('') +
       '</tbody></table></div>';
   }
@@ -1010,6 +1029,10 @@
         }
         .source{color:#846b58!important;font-family:Arial,"Microsoft YaHei","Noto Sans Myanmar",sans-serif!important;font-size:14px!important;font-weight:600!important;line-height:1.45!important;margin:7px 0 2px!important}
         .definition{color:var(--pamc-popup-ink)!important;font-family:Georgia,"Times New Roman","Noto Serif SC","Songti SC",SimSun,"Myanmar Text","Noto Sans Myanmar",serif!important;font-size:18px!important;line-height:1.65!important}
+        #dictModal .panel-body .headword,#lookupModal .panel-body .headword,#pced-modal .pced-body .headword{font-family:Georgia,"Times New Roman",serif!important;font-size:27px!important;font-weight:700!important;line-height:1.2!important}
+        #dictModal .panel-body .group-title,#lookupModal .panel-body .group-title,#pced-modal .pced-body .group-title{font-family:Georgia,"Times New Roman","Noto Serif SC",SimSun,serif!important;font-size:22px!important;font-weight:700!important;line-height:1.25!important}
+        #dictModal .panel-body .source,#lookupModal .panel-body .source,#pced-modal .pced-body .source{font-family:Arial,"Microsoft YaHei","Noto Sans Myanmar",sans-serif!important;font-size:14px!important;line-height:1.45!important}
+        #dictModal .panel-body .definition,#lookupModal .panel-body .definition,#pced-modal .pced-body .definition{font-family:Georgia,"Times New Roman","Noto Serif SC","Songti SC",SimSun,"Myanmar Text","Noto Sans Myanmar",serif!important;font-size:18px!important;line-height:1.65!important}
         .note{background:#f4eee7!important;color:var(--pamc-popup-ink)!important;border:0!important;font-size:18px!important;border-radius:8px!important;padding:11px 14px!important;line-height:1.55!important;margin:8px 0 12px!important}
         .approved-term-entry{background:transparent!important;border:1px solid var(--pamc-popup-line)!important}
         .approved-term-block{border:1px solid #cfae8f;border-radius:9px;background:transparent;margin:7px 0 12px;padding:0 13px}

@@ -58,6 +58,7 @@ All 13 Dhamma Books HTML readers that provide Roman-script Pāli word lookup now
 - All legacy PCED popup shells use the approved dark-brown title bar, paper background, blue Pāli headword, tiered heading sizes, and consistent serif text.
 - Language headings are standardized as `中文`, `English`, `Burmese`, `Japanese`, `Vietnamese`, `Korean`, and `Other`, with a light-brown heading background.
 - Exact single-word Chinese-Tipiṭaka matches appear once under `中文` in one unshaded framed group. The `《汉译巴利三藏》玛欣德尊者和译藏团队` subheader now uses the same source-label font and size as dictionary source labels; multiple meanings are combined, with each `出处` (source and page when available) displayed inline beside its Chinese meaning.
+- Shared popup v1.3.19 standardizes index-search, Dhamma-Book and Tipiṭaka-Reader popup typography to the approved in-book appearance. Chinese-Tipitaka definitions preserve only editor-created `<strong>`/`<b>` bold tags; all other database HTML remains escaped.
 - Sentence records are excluded from a single-word Chinese-Tipiṭaka lookup.
 - Reader tab names use compact button styling with a light-brown background.
 - Popup movement covers current and legacy panel/header class structures, dynamically added modals, pointer and touch dragging, and unrestricted movement beyond every viewport edge.
