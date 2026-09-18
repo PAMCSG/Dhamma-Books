@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.5.0 — 2026-09-18
+ * Version 3.5.1 — 2026-09-18
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.5.0';
+  const VERSION = '3.5.1';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -40,9 +40,7 @@
     'dissanti': Object.freeze({
       lemma: 'dissati',
       label: 'Third-person plural, present passive',
-      meaning: 'are seen; appear',
-      formation: '√dis + ya + anti → dissanti',
-      sourceNote: 'The older +ante line is a historical/Sanskrit comparison, not the direct Pāli inflection.'
+      meaning: 'are seen; appear'
     })
   });
 
@@ -432,9 +430,20 @@
 
     const exactHeads = context.exact(normalized);
     if (exactHeads.length) {
+      const grammar = exactVerbAnalysis(normalized, exactHeads, context, options);
+      // A finite inflected verb may itself have a PCED record. Once its
+      // verbal status and singular lemma are verified, show the lemma entry
+      // instead of treating the surface record as an exact lexical headword.
+      // This also prevents compound/root decomposition from being applied to
+      // the inflected surface form.
+      if (grammar?.lemmaHead) {
+        return finish({
+          ...base, mode: 'exact', tier: 1, heads: [grammar.lemmaHead], grammar
+        });
+      }
       return finish(addEntryDecomposition({
         ...base, mode: 'exact', tier: 1, heads: exactHeads,
-        grammar: exactVerbAnalysis(normalized, exactHeads, context, options)
+        grammar: null
       }));
     }
 
@@ -457,11 +466,12 @@
     for (const candidate of verifiedCandidates) {
       const heads = context.exact(candidate.form);
       if (heads.length) {
-        return finish(addEntryDecomposition({
+        const result = {
           ...base, mode: 'inflected', tier: 3, heads,
           resolvedForm: candidate.form, rule: candidate.label, family: candidate.family,
           notes: [`${clicked} → ${candidate.form} (${candidate.label})`]
-        }));
+        };
+        return finish(/verb/i.test(candidate.family || '') ? result : addEntryDecomposition(result));
       }
     }
 
@@ -470,11 +480,12 @@
     for (const candidate of candidates) {
       const heads = context.exact(candidate.form);
       if (heads.length) {
-        return finish(addEntryDecomposition({
+        const result = {
           ...base, mode: 'inflected', tier: 3, heads,
           resolvedForm: candidate.form, rule: candidate.label, family: candidate.family,
           notes: [`${clicked} → ${candidate.form} (${candidate.label})`]
-        }));
+        };
+        return finish(/verb/i.test(candidate.family || '') ? result : addEntryDecomposition(result));
       }
     }
 
