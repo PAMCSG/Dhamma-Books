@@ -1,5 +1,11 @@
 # PAMC Dhamma Books
 
+## PCED finite-verb analysis — 18 September 2026
+
+Shared resolver v3.5.0 now explains exact third-person plural finite-verb entries in `-anti`, `-enti`, and `-onti` when the PCED entry is explicitly marked as a verb and its corresponding singular form is also an exact PCED headword. This preserves the exact dictionary entry while adding a clear surface-to-lemma relationship such as `gacchanti → gacchati`. Productive inflection hits that are not themselves dictionary headwords now label third-person plural present and future forms more clearly. Nouns are not inferred from their ending alone.
+
+`dissanti` receives a curated clarification: `dissanti → dissati`, third-person plural present passive, with the formation `√dis + ya + anti → dissanti`. The popup explains that the inherited `+ante` line is a historical/Sanskrit comparison rather than the direct Pāli inflection. Original PCED source records remain visible and unchanged. The same grammar note is used by in-book PCED popups and the landing-page Pāli Lexicon search.
+
 ## Landing-page Pāli Lexicon search — 16 September 2026
 
 Chinese-Tipitaka terminology display preserves Enter/newline characters stored in the database. Shared popup v1.3.20 applies `white-space: pre-wrap` only to the standardized-terminology definition block, so paragraph and line separation appears as entered without changing database text or ordinary PCED entries. It also preserves editor-created `<strong>`/`<b>` bold formatting while escaping every other database HTML tag. The Dhamma-Books index-search popup uses the approved compact in-book reading profile for definitions: 16 px Arial/Microsoft YaHei multilingual sans-serif text, 13 px source labels and 16 px notes, with genuine database bold retained. Existing in-book Dhamma popup typography remains unchanged. The actual face depends on fonts installed on the device.

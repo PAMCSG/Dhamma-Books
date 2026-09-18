@@ -45,7 +45,8 @@ All 13 Dhamma Books HTML readers that provide Roman-script Pāli word lookup now
 ## Repository-wide popup standard — 5 September 2026
 
 - Added `pced-popup-standard.js` and connected 13 PCED-enabled book pages.
-- Uses the shared PCED 3.4.2 resolver: exact → verified alias → verified inflection → verified compound/sandhi; no prefix, substring, or fuzzy fallback.
+- Uses the shared PCED 3.5.0 resolver: exact → verified alias → verified inflection → verified compound/sandhi; no prefix, substring, or fuzzy fallback.
+- Exact PCED finite verbs in `-anti`, `-enti`, and `-onti` show their singular dictionary form only when the entry is explicitly marked as a verb and that singular form is independently attested as a complete PCED headword. `dissanti` is clarified as `dissanti → dissati`, third-person plural present passive, with `√dis + ya + anti → dissanti`; the inherited `+ante` source notation remains visible but is identified as a historical/Sanskrit comparison.
 - Displays approved Chinese-Tipiṭaka terminology first, followed by Chinese, English, Burmese, and other dictionary languages.
 - Every popup opens at its first view and scroll position.
 - Popup dragging is unrestricted so the window can be moved beyond any screen edge, matching the earlier test-reader behavior.
