@@ -2,9 +2,9 @@
 
 ## PCED finite-verb analysis — 18 September 2026
 
-Shared resolver v3.5.0 now explains exact third-person plural finite-verb entries in `-anti`, `-enti`, and `-onti` when the PCED entry is explicitly marked as a verb and its corresponding singular form is also an exact PCED headword. This preserves the exact dictionary entry while adding a clear surface-to-lemma relationship such as `gacchanti → gacchati`. Productive inflection hits that are not themselves dictionary headwords now label third-person plural present and future forms more clearly. Nouns are not inferred from their ending alone.
+Shared resolver v3.5.1 now explains exact third-person plural finite-verb entries in `-anti`, `-enti`, and `-onti` when the PCED entry is explicitly marked as a verb and its corresponding singular form is also an exact PCED headword. A verified finite verb now opens its singular lemma entry, such as `gacchanti → gacchati`, even when the inflected surface form also has an exact PCED record. Productive inflection hits that are not themselves dictionary headwords label third-person plural present and future forms more clearly. Nouns are not inferred from their ending alone.
 
-`dissanti` receives a curated clarification: `dissanti → dissati`, third-person plural present passive, with the formation `√dis + ya + anti → dissanti`. The popup explains that the inherited `+ante` line is a historical/Sanskrit comparison rather than the direct Pāli inflection. Original PCED source records remain visible and unchanged. The same grammar note is used by in-book PCED popups and the landing-page Pāli Lexicon search.
+`dissanti` is therefore resolved directly to `dissati`, identified as third-person plural present passive, and displays the `dissati` dictionary entry. The `dissanti` surface record and its `disa + ya + ante` or component analysis are not displayed for this lookup. Once any finite-verb lemma is recognized, compound or component decomposition stops; for example, `karonti → karoti` is not subsequently split as `kara + ti`. Source dictionary data remains unchanged. The same grammar rule is used by in-book PCED popups and the landing-page Pāli Lexicon search.
 
 ## Landing-page Pāli Lexicon search — 16 September 2026
 
