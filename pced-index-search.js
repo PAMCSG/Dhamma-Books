@@ -91,7 +91,7 @@
     const marked = PALI_DIACRITICS.test(query);
     const result = resolve(query);
     const direct = result?.allHeads || result?.heads || [];
-    if (marked) return { heads: unique(direct), mode: result?.mode || 'none', marked: true };
+    if (marked) return { heads: unique(direct), mode: result?.mode || 'none', marked: true, resolution: result };
 
     const folded = foldPali(query);
     const heads = [...direct, ...(foldedHeadwords.get(folded) || [])];
@@ -106,7 +106,21 @@
         heads.push(...(candidateResult?.allHeads || candidateResult?.heads || []));
       }
     }
-    return { heads: unique(heads), mode: heads.length ? 'plain-pali' : (result?.mode || 'none'), marked: false };
+    return { heads: unique(heads), mode: heads.length ? 'plain-pali' : (result?.mode || 'none'), marked: false,
+      resolution: result };
+  }
+
+  function renderGrammarNote(result) {
+    const grammar = result?.grammar;
+    if (!grammar) return '';
+    const lemma = dictionary[grammar.lemmaHead]?.headword || grammar.lemma;
+    return '<div class="note grammar-analysis"><b>Verb form:</b> ' + esc(result.clicked || grammar.surface) +
+      ' → <b>' + esc(lemma) + '</b>' +
+      (grammar.label ? '<br><span class="lookup-rule">' + esc(grammar.label) + '</span>' : '') +
+      (grammar.meaning ? '<br><span class="lookup-rule">Meaning: “' + esc(grammar.meaning) + '”</span>' : '') +
+      (grammar.formation ? '<br><span class="lookup-rule">Formation: ' + esc(grammar.formation) + '</span>' : '') +
+      (grammar.sourceNote ? '<br><span class="lookup-rule">Note: ' + esc(grammar.sourceNote) + '</span>' : '') +
+      '</div>';
   }
 
   function recordsForEntry(entry) {
@@ -210,7 +224,8 @@
         ? '<div class="note"><b>Diacritic-insensitive Pāli search:</b> ' + esc(query) +
           ' matched all exact spellings with possible Pāli diacritics.</div>' : '';
       return { query, heads: pali.heads, kind: 'pali', priority,
-        html: note + pali.heads.map(head => renderHead(head, priority)).join('') };
+        html: note + renderGrammarNote(pali.resolution) +
+          pali.heads.map(head => renderHead(head, priority)).join('') };
     }
     const language = languageMatches(query);
     const limitNote = language.total > language.matches.length
@@ -271,7 +286,7 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.2.0' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.3.0' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
