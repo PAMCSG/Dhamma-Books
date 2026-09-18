@@ -1,5 +1,9 @@
 # PAMC Dhamma Books
 
+## Verified compound correction — 19 September 2026
+
+Shared resolver v3.5.2 recognizes `hatāvasesaka` as the contracted compound `hata + avasesaka`. Inflected forms such as `hatāvasesakā` retain their whole-word definition and also display both independently attested PCED component entries. The unverified split `hata + vasesaka` is not used because `vasesaka` is not a complete PCED headword.
+
 ## PCED finite-verb analysis — 18 September 2026
 
 Shared resolver v3.5.1 now explains exact third-person plural finite-verb entries in `-anti`, `-enti`, and `-onti` when the PCED entry is explicitly marked as a verb and its corresponding singular form is also an exact PCED headword. A verified finite verb now opens its singular lemma entry, such as `gacchanti → gacchati`, even when the inflected surface form also has an exact PCED record. Productive inflection hits that are not themselves dictionary headwords label third-person plural present and future forms more clearly. Nouns are not inferred from their ending alone.
