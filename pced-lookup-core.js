@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.4.2 — 2026-09-05
+ * Version 3.5.0 — 2026-09-18
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.4.2';
+  const VERSION = '3.5.0';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -30,6 +30,20 @@
   // when it is an exact PCED headword in the host dictionary.
   const BUILTIN_ALIASES = Object.freeze({
     'vīriyindriya': Object.freeze(['viriyindriya'])
+  });
+
+  // Curated analyses are reserved for forms whose inherited dictionary
+  // formula needs clarification. Productive verb-number recognition remains
+  // rule-based and is accepted only when both the surface form and its lemma
+  // are complete PCED headwords.
+  const BUILTIN_GRAMMAR_ANALYSES = Object.freeze({
+    'dissanti': Object.freeze({
+      lemma: 'dissati',
+      label: 'Third-person plural, present passive',
+      meaning: 'are seen; appear',
+      formation: '√dis + ya + anti → dissanti',
+      sourceNote: 'The older +ante line is a historical/Sanskrit comparison, not the direct Pāli inflection.'
+    })
   });
 
   const SOURCE_LANGUAGE = Object.freeze({
@@ -197,10 +211,10 @@
     // classes can share a surface ending, so candidates are ordered from the
     // most common class and every accepted lemma is independently attested.
     suffixRules([
-      ['enti', 'eti'], ['etu', 'eti'], ['entu', 'eti'], ['emi', 'eti'], ['esi', 'eti'], ['etha', 'eti'],
-      ['onti', 'oti'], ['otu', 'oti'], ['ontu', 'oti'], ['omi', 'oti'], ['oma', 'oti'], ['osi', 'oti'], ['otha', 'oti'],
-      ['āmi', 'ati'], ['āma', 'ati'], ['asi', 'ati'], ['atha', 'ati'], ['atu', 'ati'], ['antu', 'ati'], ['anti', 'ati'],
-      ['āmi', 'āti'], ['āma', 'āti'], ['āsi', 'āti'], ['ātha', 'āti'], ['ātu', 'āti'], ['anti', 'āti'],
+      ['enti', 'eti', 'third-person plural, present'], ['etu', 'eti'], ['entu', 'eti'], ['emi', 'eti'], ['esi', 'eti'], ['etha', 'eti'],
+      ['onti', 'oti', 'third-person plural, present'], ['otu', 'oti'], ['ontu', 'oti'], ['omi', 'oti'], ['oma', 'oti'], ['osi', 'oti'], ['otha', 'oti'],
+      ['āmi', 'ati'], ['āma', 'ati'], ['asi', 'ati'], ['atha', 'ati'], ['atu', 'ati'], ['antu', 'ati'], ['anti', 'ati', 'third-person plural, present'],
+      ['āmi', 'āti'], ['āma', 'āti'], ['āsi', 'āti'], ['ātha', 'āti'], ['ātu', 'āti'], ['anti', 'āti', 'third-person plural, present'],
       ['ate', 'ati'], ['ante', 'ati']
     ], 'present/imperative verb');
 
@@ -213,7 +227,8 @@
     for (const lemmaEnding of ['ati', 'āti', 'eti', 'oti']) {
       suffixRules([
         ['issāmi', lemmaEnding], ['issāma', lemmaEnding], ['issasi', lemmaEnding],
-        ['issatha', lemmaEnding], ['issati', lemmaEnding], ['issanti', lemmaEnding]
+        ['issatha', lemmaEnding], ['issati', lemmaEnding],
+        ['issanti', lemmaEnding, 'third-person plural, future']
       ], 'future verb');
     }
 
@@ -285,6 +300,53 @@
     const index = options.index || createExactIndex(dictionary);
     const exact = form => (index.get(cleanWord(form)) || []).slice();
     return { dictionary, index, exact };
+  }
+
+  function entryRecords(entry) {
+    return ['zh', 'en', 'my', 'vi', 'other']
+      .flatMap(key => Array.isArray(entry?.[key]) ? entry[key] : [])
+      .concat(entry?.entries || [], entry?.extra_entries || []);
+  }
+
+  function exactVerbAnalysis(surface, exactHeads, context, options = {}) {
+    const word = cleanWord(surface);
+    const maintained = options.grammarAnalyses?.[word] ||
+      global.PCEDStandardData?.grammarAnalyses?.[word] ||
+      BUILTIN_GRAMMAR_ANALYSES[word];
+    if (maintained) {
+      const lemmaHeads = context.exact(maintained.lemma);
+      if (!lemmaHeads.length) return null;
+      return { surface: word, ...maintained, lemmaHead: lemmaHeads[0], verified: true };
+    }
+
+    // Do not guess from -anti alone: nouns such as santi could otherwise be
+    // misidentified. Require an exact PCED surface entry explicitly marked as
+    // a verb, plus an independently attested singular dictionary form.
+    const records = exactHeads.flatMap(head => entryRecords(context.dictionary[head]));
+    const grammarText = records.map(record => String(record?.definition || '')).join(' ');
+    if (!/(?:\(\s*(?:kamma\s*[,，]\s*)?kri\s*\)|（\s*(?:kamma\s*[,，]\s*)?kri\s*）|ကြိ)/i.test(grammarText)) {
+      return null;
+    }
+
+    const endings = [
+      ['enti', 'eti'], ['onti', 'oti'], ['anti', 'ati'], ['anti', 'āti']
+    ];
+    for (const [ending, lemmaEnding] of endings) {
+      if (!word.endsWith(ending) || word.length <= ending.length + 2) continue;
+      const lemma = word.slice(0, -ending.length) + lemmaEnding;
+      const lemmaHeads = context.exact(lemma);
+      if (!lemmaHeads.length) continue;
+      const passive = /(?:kamma|ကမ္မ)/i.test(grammarText);
+      const tense = word.endsWith('issanti') ? 'future' : 'present';
+      return {
+        surface: word,
+        lemma,
+        lemmaHead: lemmaHeads[0],
+        label: `Third-person plural, ${tense} ${passive ? 'passive' : 'verb'}`,
+        verified: false
+      };
+    }
+    return null;
   }
 
   function verifiedInflectionCandidates(surface, options) {
@@ -370,7 +432,10 @@
 
     const exactHeads = context.exact(normalized);
     if (exactHeads.length) {
-      return finish(addEntryDecomposition({ ...base, mode: 'exact', tier: 1, heads: exactHeads }));
+      return finish(addEntryDecomposition({
+        ...base, mode: 'exact', tier: 1, heads: exactHeads,
+        grammar: exactVerbAnalysis(normalized, exactHeads, context, options)
+      }));
     }
 
     for (const [map, label] of [
