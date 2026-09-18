@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.3.20 — 2026-09-17 */
+/* PAMC cross-book PCED popup standard v1.4.0 — 2026-09-18 */
 (function () {
   'use strict';
 
@@ -169,7 +169,17 @@
     const shown = heads.map(head => dictionary()[head]?.headword || head).join(', ');
     const parts = (result.components || []).map(item => item.surface).join(' + ');
     let note = '';
-    if (result.mode === 'inflected') note = '<div class="note"><b>Inflected form:</b> ' + esc(surface) +
+    if (result.mode === 'exact' && result.grammar) {
+      const grammar = result.grammar;
+      const lemma = dictionary()[grammar.lemmaHead]?.headword || grammar.lemma;
+      note = '<div class="note grammar-analysis"><b>Verb form:</b> ' + esc(surface) +
+        ' → <b>' + esc(lemma) + '</b>' +
+        (grammar.label ? '<br><span class="lookup-rule">' + esc(grammar.label) + '</span>' : '') +
+        (grammar.meaning ? '<br><span class="lookup-rule">Meaning: “' + esc(grammar.meaning) + '”</span>' : '') +
+        (grammar.formation ? '<br><span class="lookup-rule">Formation: ' + esc(grammar.formation) + '</span>' : '') +
+        (grammar.sourceNote ? '<br><span class="lookup-rule">Note: ' + esc(grammar.sourceNote) + '</span>' : '') +
+        '</div>';
+    } else if (result.mode === 'inflected') note = '<div class="note"><b>Inflected form:</b> ' + esc(surface) +
       ' → <b>' + esc(dictionary()[heads[0]]?.headword || result.resolvedForm || shown) + '</b>' +
       (result.rule ? '<br><span class="lookup-rule">' + esc(result.rule) + '</span>' : '') + '</div>';
     else if (result.mode === 'alias' || result.mode === 'related') note = '<div class="note"><b>PCED form:</b> ' +
