@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.5.3 — 2026-09-19
+ * Version 3.5.4 — 2026-09-19
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.5.3';
+  const VERSION = '3.5.4';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -234,6 +234,16 @@
         ['issanti', lemmaEnding, 'third-person plural, future']
       ], 'future verb');
     }
+
+    // Verbs whose present citation form ends in -eti commonly form their
+    // future with -ess- rather than -iss-: viheṭheti → viheṭhessanti.
+    // As with every productive rule, the proposed -eti lemma is used only
+    // when it is independently attested as a complete PCED headword.
+    suffixRules([
+      ['essāmi', 'eti'], ['essāma', 'eti'], ['essasi', 'eti'],
+      ['essatha', 'eti'], ['essati', 'eti'],
+      ['essanti', 'eti', 'third-person plural, future']
+    ], 'future -e verb');
 
     suffixRules([
       ['itvā', 'ati'], ['ituṃ', 'ati'], ['etvā', 'eti'], ['etuṃ', 'eti'],
