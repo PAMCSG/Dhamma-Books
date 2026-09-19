@@ -143,6 +143,39 @@
       '</div>';
   }
 
+  function renderInflectionPanel(head) {
+    const entry = dictionary[head];
+    const paradigm = global.PCEDLookupCore?.inflectionParadigm?.(head, entry, {
+      inflections: global.PCEDStandardData?.inflections
+    });
+    if (!paradigm) return '';
+    const chips = forms => (forms || []).map(form =>
+      '<span class="pced-form-chip">' + esc(form) + '</span>'
+    ).join(' ');
+    let content = '';
+    if (paradigm.verified?.length) {
+      content += '<div class="pced-inflection-group"><b>Verified forms / 已核实词形</b>' +
+        '<div class="pced-form-list">' + chips(paradigm.verified) + '</div></div>';
+    }
+    for (const group of paradigm.groups || []) {
+      content += '<div class="pced-inflection-group"><b>' + esc(group.label) + '</b>';
+      if (group.rows) {
+        content += '<div class="pced-inflection-table-wrap"><table class="pced-inflection-table">' +
+          '<thead><tr><th>Case / 格</th><th>Singular / 单数</th><th>Plural / 复数</th></tr></thead><tbody>' +
+          group.rows.map(row => '<tr><th>' + esc(row.label) + '</th><td>' + chips(row.singular) +
+            '</td><td>' + chips(row.plural) + '</td></tr>').join('') + '</tbody></table></div>';
+      } else content += '<div class="pced-form-list">' + chips(group.forms) + '</div>';
+      content += '</div>';
+    }
+    if (paradigm.generated) {
+      content += '<div class="pced-inflection-caution">Possible regular forms / 可能的规则词形；' +
+        'irregular forms may differ.</div>';
+    }
+    return '<div class="pced-inflections"><button type="button" class="pced-inflection-toggle" ' +
+      'aria-expanded="false">Inflections / 词形</button><div class="pced-inflection-panel" hidden>' +
+      content + '</div></div>';
+  }
+
   function recordsForEntry(entry) {
     const records = [];
     for (const bucket of ['zh', 'en', 'my', 'vi', 'other']) {
@@ -222,6 +255,7 @@
     const groups = global.PCEDLookupCore?.dictionaryGroups(entry, priority) || [];
     const approved = priority === 'zh' ? renderApprovedRows(approvedRowsForHead(key)) : '';
     return '<div class="entry"><div class="headword">' + esc(entry.headword || key) + '</div>' +
+      renderInflectionPanel(key) +
       approved +
       groups.map(group => '<div class="group-title" data-language="' + esc(group.key) + '">' +
         esc(languageTitles[group.key] || group.title || 'Other') + '</div>' +
@@ -231,6 +265,7 @@
 
   function renderLanguageResult(result, priority) {
     return '<div class="entry"><div class="headword">' + esc(result.entry.headword || result.key) + '</div>' +
+      renderInflectionPanel(result.key) +
       renderRecords(result.records, priority) + '</div>';
   }
 
@@ -303,10 +338,18 @@
     });
     document.getElementById('pced-close')?.addEventListener('click', closeModal);
     modal?.addEventListener('click', event => { if (event.target === modal) closeModal(); });
+    modal?.addEventListener('click', event => {
+      const toggle = event.target.closest?.('.pced-inflection-toggle');
+      if (!toggle) return;
+      const panel = toggle.nextElementSibling;
+      const opening = !!panel?.hidden;
+      if (panel) panel.hidden = !opening;
+      toggle.setAttribute('aria-expanded', String(opening));
+    });
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.3.1' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.4.0' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

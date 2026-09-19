@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.5.4 — 2026-09-19
+ * Version 3.6.0 — 2026-09-19
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.5.4';
+  const VERSION = '3.6.0';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -35,6 +35,25 @@
   // when it is an exact PCED headword in the host dictionary.
   const BUILTIN_ALIASES = Object.freeze({
     'vīriyindriya': Object.freeze(['viriyindriya'])
+  });
+
+  // Verified whole-word inflections that cannot be recovered reliably by a
+  // productive suffix rule. `preferLemma` also applies when PCED contains a
+  // separate entry for the surface form, so the popup still identifies the
+  // grammatical form and opens the verb's citation entry.
+  const BUILTIN_INFLECTIONS = Object.freeze({
+    'paṭisuṇitvā': Object.freeze([Object.freeze({
+      form: 'paṭissuṇāti', label: 'absolutive: having agreed/promised',
+      family: 'verified verb form', preferLemma: true
+    })]),
+    'paṭissuṇitvā': Object.freeze([Object.freeze({
+      form: 'paṭissuṇāti', label: 'absolutive: having agreed/promised',
+      family: 'verified verb form', preferLemma: true
+    })]),
+    'paṭissutvā': Object.freeze([Object.freeze({
+      form: 'paṭissuṇāti', label: 'absolutive: having agreed/promised',
+      family: 'verified verb form', preferLemma: true
+    })])
   });
 
   // Curated analyses are reserved for forms whose inherited dictionary
@@ -363,13 +382,19 @@
   }
 
   function verifiedInflectionCandidates(surface, options) {
-    const map = options.inflections || global.PCEDStandardData?.inflections;
-    const values = map?.[cleanWord(surface)];
-    if (!Array.isArray(values)) return [];
-    return values.map(item => typeof item === 'string'
+    const key = cleanWord(surface);
+    const maintainedMap = options.inflections || global.PCEDStandardData?.inflections;
+    const values = [...(maintainedMap?.[key] || []), ...(BUILTIN_INFLECTIONS[key] || [])];
+    const candidates = values.map(item => typeof item === 'string'
       ? { form: cleanWord(item), label: 'verified inflection', family: 'verified' }
-      : { form: cleanWord(item?.form), label: item?.label || 'verified inflection', family: item?.family || 'verified' })
+      : {
+          form: cleanWord(item?.form), label: item?.label || 'verified inflection',
+          family: item?.family || 'verified', preferLemma: !!item?.preferLemma
+        })
       .filter(item => item.form);
+    return candidates.filter((item, index) =>
+      candidates.findIndex(candidate => candidate.form === item.form) === index
+    );
   }
 
   function resolvePart(form, context, options) {
@@ -445,6 +470,15 @@
 
     const exactHeads = context.exact(normalized);
     if (exactHeads.length) {
+      const preferred = verifiedInflectionCandidates(normalized, options)
+        .find(candidate => candidate.preferLemma && context.exact(candidate.form).length);
+      if (preferred) {
+        return finish({
+          ...base, mode: 'inflected', tier: 1, heads: context.exact(preferred.form),
+          resolvedForm: preferred.form, rule: preferred.label, family: preferred.family,
+          notes: [`${clicked} → ${preferred.form} (${preferred.label})`]
+        });
+      }
       const grammar = exactVerbAnalysis(normalized, exactHeads, context, options);
       // A finite inflected verb may itself have a PCED record. Once its
       // verbal status and singular lemma are verified, show the lemma entry
@@ -642,6 +676,168 @@
     }));
   }
 
+  function uniqueForms(forms) {
+    return [...new Set(forms.map(cleanWord).filter(Boolean))];
+  }
+
+  function inflectionGrammarText(entry) {
+    return entryRecords(entry).map(record =>
+      String(record?.definition || '').replace(/<[^>]*>/g, ' ')
+    ).join('\u241e');
+  }
+
+  function verifiedFormsForLemma(lemma, options = {}) {
+    lemma = cleanWord(lemma);
+    const forms = [];
+    const maps = [options.inflections, global.PCEDStandardData?.inflections, BUILTIN_INFLECTIONS];
+    for (const map of maps) {
+      for (const [surface, rawValues] of Object.entries(map || {})) {
+        const values = Array.isArray(rawValues) ? rawValues : [rawValues];
+        if (values.some(value => cleanWord(typeof value === 'string' ? value : value?.form) === lemma)) {
+          forms.push(cleanWord(surface));
+        }
+      }
+    }
+    return uniqueForms(forms).filter(form => form !== lemma);
+  }
+
+  function nounParadigm(lemma, grammarText) {
+    // Gender labels are read only near the beginning of each dictionary
+    // record. Later compound descriptions often mention words of another
+    // gender (for example bhikkhuṇī inside the bhikkhu entry).
+    const genderText = grammarText.split('\u241e').map(text => text.slice(0, 180)).join(' ');
+    const masculine = /(?:\[\s*m\.?\s*\]|(?:^|[\s：,，;；])m\.|【阳】)/i.test(genderText);
+    const feminine = /(?:\[\s*f\.?\s*\]|(?:^|[\s：,，;；])f\.|【阴】)/i.test(genderText);
+    const neuter = /(?:\[\s*n(?:t)?\.?\s*\]|(?:^|[\s：,，;；])n(?:t)?\.|【中】)/i.test(genderText);
+    const paradigms = [];
+    const row = (label, singular, plural) => ({ label, singular: uniqueForms(singular), plural: uniqueForms(plural) });
+
+    if (lemma.endsWith('a') && (masculine || (!feminine && !neuter))) {
+      const stem = lemma.slice(0, -1);
+      paradigms.push({ label: 'Masculine -a', rows: [
+        row('Nominative', [stem + 'o'], [stem + 'ā']),
+        row('Accusative', [stem + 'aṃ'], [stem + 'e']),
+        row('Instrumental', [stem + 'ena'], [stem + 'ehi', stem + 'ebhi']),
+        row('Dative / Genitive', [stem + 'assa'], [stem + 'ānaṃ']),
+        row('Ablative', [stem + 'ā', stem + 'asmā', stem + 'amhā'], [stem + 'ehi', stem + 'ebhi']),
+        row('Locative', [stem + 'e', stem + 'asmiṃ', stem + 'amhi'], [stem + 'esu']),
+        row('Vocative', [lemma], [stem + 'ā'])
+      ] });
+    }
+    if (lemma.endsWith('a') && neuter) {
+      const stem = lemma.slice(0, -1);
+      paradigms.push({ label: 'Neuter -a', rows: [
+        row('Nominative / Accusative', [stem + 'aṃ'], [stem + 'āni']),
+        row('Instrumental', [stem + 'ena'], [stem + 'ehi', stem + 'ebhi']),
+        row('Dative / Genitive', [stem + 'assa'], [stem + 'ānaṃ']),
+        row('Ablative', [stem + 'ā', stem + 'asmā', stem + 'amhā'], [stem + 'ehi', stem + 'ebhi']),
+        row('Locative', [stem + 'e', stem + 'asmiṃ', stem + 'amhi'], [stem + 'esu']),
+        row('Vocative', [lemma], [stem + 'āni'])
+      ] });
+    }
+    if (lemma.endsWith('ā') && (feminine || (!masculine && !neuter))) {
+      const stem = lemma.slice(0, -1);
+      paradigms.push({ label: 'Feminine -ā', rows: [
+        row('Nominative', [lemma], [stem + 'āyo']),
+        row('Accusative', [stem + 'aṃ'], [stem + 'āyo']),
+        row('Instrumental / Ablative', [stem + 'āya'], [stem + 'āhi', stem + 'ābhi']),
+        row('Dative / Genitive', [stem + 'āya'], [stem + 'ānaṃ']),
+        row('Locative', [stem + 'āyaṃ', stem + 'āya'], [stem + 'āsu']),
+        row('Vocative', [stem + 'e'], [stem + 'āyo'])
+      ] });
+    }
+    if (lemma.endsWith('i') && (masculine || feminine)) {
+      const stem = lemma.slice(0, -1);
+      paradigms.push({ label: (masculine ? 'Masculine' : 'Feminine') + ' -i', rows: !masculine && feminine ? [
+        row('Nominative', [lemma], [stem + 'iyo']),
+        row('Accusative', [stem + 'iṃ'], [stem + 'iyo']),
+        row('Instrumental / Ablative', [stem + 'iyā'], [stem + 'īhi', stem + 'ībhi']),
+        row('Dative / Genitive', [stem + 'iyā'], [stem + 'īnaṃ']),
+        row('Locative', [stem + 'iyaṃ', stem + 'iyā'], [stem + 'īsu']),
+        row('Vocative', [lemma], [stem + 'iyo'])
+      ] : [
+        row('Nominative', [lemma], [stem + 'ayo', stem + 'ī']),
+        row('Accusative', [stem + 'iṃ'], [stem + 'ayo', stem + 'ī']),
+        row('Instrumental', [stem + 'inā'], [stem + 'īhi', stem + 'ībhi']),
+        row('Dative / Genitive', [stem + 'issa', stem + 'ino'], [stem + 'īnaṃ']),
+        row('Ablative', [stem + 'ismā', stem + 'imhā'], [stem + 'īhi', stem + 'ībhi']),
+        row('Locative', [stem + 'ismiṃ', stem + 'imhi'], [stem + 'īsu']),
+        row('Vocative', [lemma], [stem + 'ayo', stem + 'ī'])
+      ] });
+    }
+    if (lemma.endsWith('ī') && feminine) {
+      const stem = lemma.slice(0, -1);
+      paradigms.push({ label: 'Feminine -ī', rows: [
+        row('Nominative', [lemma], [stem + 'iyo']),
+        row('Accusative', [stem + 'iṃ'], [stem + 'iyo']),
+        row('Instrumental / Ablative', [stem + 'iyā'], [stem + 'īhi', stem + 'ībhi']),
+        row('Dative / Genitive', [stem + 'iyā'], [stem + 'īnaṃ']),
+        row('Locative', [stem + 'iyaṃ', stem + 'iyā'], [stem + 'īsu']),
+        row('Vocative', [stem + 'i'], [stem + 'iyo'])
+      ] });
+    }
+    if (lemma.endsWith('u') && masculine) {
+      const stem = lemma.slice(0, -1);
+      paradigms.push({ label: 'Masculine -u', rows: [
+        row('Nominative', [lemma], [stem + 'avo', stem + 'ū']),
+        row('Accusative', [stem + 'uṃ'], [stem + 'avo', stem + 'ū']),
+        row('Instrumental', [stem + 'unā'], [stem + 'ūhi', stem + 'ūbhi']),
+        row('Dative / Genitive', [stem + 'uno', stem + 'ussa'], [stem + 'ūnaṃ']),
+        row('Ablative', [stem + 'usmā', stem + 'umhā'], [stem + 'ūhi', stem + 'ūbhi']),
+        row('Locative', [stem + 'usmiṃ', stem + 'umhi'], [stem + 'ūsu']),
+        row('Vocative', [lemma], [stem + 'avo', stem + 'ū'])
+      ] });
+    }
+    return paradigms;
+  }
+
+  function verbParadigm(lemma, grammarText) {
+    const ending = ['āti', 'ati', 'eti', 'oti'].find(value => lemma.endsWith(value));
+    if (!ending || !/(?:\bkri\b|ကြိ|【(?:过|現|现|命|独)|\b(?:pr|imper|opt|fut|aor|ger|inf)\s*[．.]|\b(?:goes|does|makes|becomes)\b)/i.test(grammarText)) return [];
+    const stem = lemma.slice(0, -ending.length);
+    const endings = ending === 'eti'
+      ? ['eti', 'enti', 'esi', 'etha', 'emi', 'ema']
+      : ending === 'oti'
+        ? ['oti', 'onti', 'osi', 'otha', 'omi', 'oma']
+        : [ending, 'anti', 'asi', 'atha', 'āmi', 'āma'];
+    const futureMarker = ending === 'eti' ? 'ess' : 'iss';
+    const imperativeEndings = ending === 'eti'
+      ? ['etu', 'entu', 'ehi', 'etha']
+      : ending === 'oti'
+        ? ['otu', 'ontu', 'ohi', 'otha']
+        : ending === 'āti'
+          ? ['ātu', 'antu', 'āhi', 'ātha']
+          : ['atu', 'antu', 'āhi', 'atha'];
+    const group = (label, forms) => ({ label, forms: uniqueForms(forms) });
+    return [
+      group('Present: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl', endings.map(value => stem + value)),
+      group('Imperative', imperativeEndings.map(value => stem + value)),
+      group('Optative', ['eyya', 'eyyuṃ', 'eyyāsi', 'eyyātha', 'eyyāmi', 'eyyāma'].map(value => stem + value)),
+      group('Future', ['ati', 'anti', 'asi', 'atha', 'āmi', 'āma'].map(value => stem + futureMarker + value)),
+      group('Present participle', [stem + 'anta', stem + 'amāna']),
+      group('Absolutive / infinitive', ending === 'eti'
+        ? [stem + 'etvā', stem + 'etuṃ']
+        : ending === 'oti' ? [stem + 'otvā', stem + 'otuṃ'] : [stem + 'itvā', stem + 'ituṃ'])
+    ];
+  }
+
+  function inflectionParadigm(head, entry, options = {}) {
+    const lemma = cleanWord(head);
+    if (!lemma || !entry) return null;
+    const grammarText = inflectionGrammarText(entry);
+    const nounGroups = nounParadigm(lemma, grammarText);
+    const verbGroups = verbParadigm(lemma, grammarText);
+    const verified = verifiedFormsForLemma(lemma, options);
+    if (!nounGroups.length && !verbGroups.length && !verified.length) return null;
+    return {
+      lemma,
+      kind: verbGroups.length ? 'verb' : nounGroups.length ? 'noun' : 'verified',
+      verified,
+      groups: verbGroups.length ? verbGroups : nounGroups,
+      generated: !!(verbGroups.length || nounGroups.length)
+    };
+  }
+
   global.PCEDLookupCore = Object.freeze({
     version: VERSION,
     normalizeForMatch,
@@ -652,6 +848,7 @@
     approvedTermMatches,
     classifySourceEntry,
     dictionaryGroups,
+    inflectionParadigm,
     verifiedDecompositions: BUILTIN_DECOMPOSITIONS
   });
 })(window);
