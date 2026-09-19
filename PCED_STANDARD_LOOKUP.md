@@ -1,7 +1,7 @@
 # Standard PCED Lookup
 
 Release date: 2026-09-19  
-Lookup core: 3.5.4  
+Lookup core: 3.6.0
 Dictionary data: PCED 2.0.5.0 plus the verified standard supplement
 
 ## Scope
@@ -25,6 +25,10 @@ Dhamma-Books and Chinese-Tipitaka share `pced-books-popup.css`. Tipitaka-reader 
 
 Prefix, suffix, substring, and fuzzy dictionary fallbacks are not permitted.
 
+## Inflection display
+
+Every PCED popup provides a compact **Inflections / 词形** button when the resolved headword has a recognized paradigm. Nouns are displayed by case and singular/plural; verbs are grouped by tense, mood, participle, absolutive, and infinitive. Maintained whole-word mappings are labelled **Verified forms / 已核实词形**. Forms produced from a regular paradigm are labelled as possible forms, because irregular verbs and nouns may differ. No paradigm is displayed when the word class or pattern cannot be identified reliably.
+
 ## Source and language display
 
 Original PCED source labels and definition text are preserved. Source codes `A` and `S` display under Japanese, while `H` is not reclassified as Japanese. Myanmar definitions remain Unicode.
@@ -46,6 +50,7 @@ New books must import the standard data before the core and apply the supplement
 | `pākārantaresu` | `pākārantara` analysis; display `pākāra + antara` entries |
 | `hatāvasesakā` | `hatāvasesaka` analysis; display `hata + avasesaka` entries |
 | `dassukhīla`, `dassukhīlassa` | `dassukhīla` analysis; display `dassu + khīla` entries |
+| `paṭisuṇitvā`, `paṭissuṇitvā`, `paṭissutvā` | absolutive (“having agreed/promised”) of `paṭissuṇāti` |
 | `āyasmā`, `sakkacca`, `suvatthi` | exact PCED headword |
 
 The automated suite also covers the historical `ṁ`/`ṃ`/`ŋ` variants, common `bhikkhu` forms, `gahakūṭaṁ`/`gahakūṭaṃ`, and the “no arbitrary partial match” rule.
