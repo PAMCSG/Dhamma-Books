@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.5.2 — 2026-09-19
+ * Version 3.5.3 — 2026-09-19
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.5.2';
+  const VERSION = '3.5.3';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -27,7 +27,8 @@
     // hata + avasesaka contracts across the compound boundary to hatāvasesaka.
     // Some source dictionaries print "hata + vasesaka", but vasesaka is not
     // an independently attested PCED headword; both approved parts below are.
-    'hatāvasesaka': Object.freeze({ kind: 'compound', parts: Object.freeze(['hata', 'avasesaka']) })
+    'hatāvasesaka': Object.freeze({ kind: 'compound', parts: Object.freeze(['hata', 'avasesaka']) }),
+    'dassukhīla': Object.freeze({ kind: 'compound', parts: Object.freeze(['dassu', 'khīla']) })
   });
 
   // Verified whole-word spelling variants. A mapped form is accepted only
