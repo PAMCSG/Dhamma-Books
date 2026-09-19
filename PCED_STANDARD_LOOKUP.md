@@ -1,7 +1,7 @@
 # Standard PCED Lookup
 
 Release date: 2026-09-19  
-Lookup core: 3.5.2  
+Lookup core: 3.5.3  
 Dictionary data: PCED 2.0.5.0 plus the verified standard supplement
 
 ## Scope
@@ -45,6 +45,7 @@ New books must import the standard data before the core and apply the supplement
 | `dhammacakkappavattanaṃ` | `dhammacakkappavattana` |
 | `pākārantaresu` | `pākārantara` analysis; display `pākāra + antara` entries |
 | `hatāvasesakā` | `hatāvasesaka` analysis; display `hata + avasesaka` entries |
+| `dassukhīla`, `dassukhīlassa` | `dassukhīla` analysis; display `dassu + khīla` entries |
 | `āyasmā`, `sakkacca`, `suvatthi` | exact PCED headword |
 
 The automated suite also covers the historical `ṁ`/`ṃ`/`ŋ` variants, common `bhikkhu` forms, `gahakūṭaṁ`/`gahakūṭaṃ`, and the “no arbitrary partial match” rule.
