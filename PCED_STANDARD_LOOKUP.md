@@ -29,6 +29,23 @@ Prefix, suffix, substring, and fuzzy dictionary fallbacks are not permitted.
 
 Every PCED popup provides a compact **Inflections / 词形** button when the resolved headword has a recognized paradigm. Nouns are displayed by case and singular/plural; verbs are grouped by tense, mood, participle, absolutive, and infinitive. Maintained whole-word mappings are labelled **Verified forms / 已核实词形**. Forms produced from a regular paradigm are labelled as possible forms, because irregular verbs and nouns may differ. No paradigm is displayed when the word class or pattern cannot be identified reliably.
 
+### Pali Lookup Unicode morphology trial
+
+The landing-page trial loads `pali-lookup-morphology.js`, generated from the
+grammatical tables in Aukana Trust's Pali Lookup 2.0. Its legacy font encoding
+is converted once; runtime storage, lookup, and display use Unicode Pāli only.
+
+Noun gender and declension are taken from the dictionary's explicit
+`InflectInfo` classification. Gender must not be inferred merely from a final
+`-a`, `-i`, or `-u`. Regular paradigms use the database's ending tables;
+irregular nouns use its stored complete forms. An unclassified noun receives
+no generated table.
+
+Inflection controls, grammatical group headings, and table headings follow
+the selected English, Chinese, or Burmese lookup priority. This first trial
+covers noun declensions; verb conversion must be validated separately before
+it replaces the maintained verb rules.
+
 ## Source and language display
 
 Original PCED source labels and definition text are preserved. Source codes `A` and `S` display under Japanese, while `H` is not reclassified as Japanese. Myanmar definitions remain Unicode.

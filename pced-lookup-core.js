@@ -701,6 +701,55 @@
     return uniqueForms(forms).filter(form => form !== lemma);
   }
 
+  function paliLookupNounParadigm(lemma) {
+    const data = global.PaliLookupMorphology;
+    const records = data?.entries?.[lemma];
+    if (!Array.isArray(records)) return null;
+    const caseOrder = ['nom', 'voc', 'acc', 'ins', 'dat', 'abl', 'gen', 'loc'];
+    const caseLabels = {
+      nom: 'Nominative', voc: 'Vocative', acc: 'Accusative', ins: 'Instrumental',
+      dat: 'Dative', abl: 'Ablative', gen: 'Genitive', loc: 'Locative'
+    };
+    const groups = [];
+    const makeRows = items => caseOrder.map(caseCode => {
+      const selected = items.filter(item => item.c === caseCode);
+      if (!selected.length) return null;
+      const forms = number => uniqueForms(selected.filter(item => item.n === number)
+        .sort((a, b) => a.q - b.q).map(item => item.f));
+      return { label: caseLabels[caseCode], singular: forms('s'), plural: forms('pl') };
+    }).filter(Boolean);
+    for (const record of records.filter(item => item?.g === 'N')) {
+      if (!record.r || !record.s) continue;
+      for (const groupCode of data.infoGroups?.[record.i] || []) {
+        const endings = data.nounGroups?.[groupCode] || [];
+        const rows = caseOrder.map(caseCode => {
+          const selected = endings.filter(item => item.c === caseCode);
+          if (!selected.length) return null;
+          const forms = number => uniqueForms(selected.filter(item => item.n === number)
+            .sort((a, b) => a.q - b.q).map(item => record.s + item.e));
+          return { label: caseLabels[caseCode], singular: forms('s'), plural: forms('pl') };
+        }).filter(Boolean);
+        if (rows.length) groups.push({
+          label: data.descriptions?.[record.i] || record.i,
+          source: data.source,
+          rows
+        });
+      }
+    }
+    const irregular = data.irregularNouns?.[lemma] || [];
+    const definitions = [...new Set(irregular.map(item => item.d))];
+    for (const definition of definitions) {
+      const selected = irregular.filter(item => item.d === definition);
+      const gender = selected[0]?.g;
+      const label = gender === 'm' ? 'Masculine noun, irregular declension'
+        : gender === 'f' ? 'Feminine noun, irregular declension'
+          : gender === 'nt' ? 'Neuter noun, irregular declension' : 'Irregular noun';
+      const rows = makeRows(selected);
+      if (rows.length) groups.push({ label, source: data.source, rows });
+    }
+    return groups;
+  }
+
   function nounParadigm(lemma, grammarText) {
     // Gender labels are read only near the beginning of each dictionary
     // record. Later compound descriptions often mention words of another
@@ -825,7 +874,12 @@
     const lemma = cleanWord(head);
     if (!lemma || !entry) return null;
     const grammarText = inflectionGrammarText(entry);
-    const nounGroups = nounParadigm(lemma, grammarText);
+    const reliableNounGroups = paliLookupNounParadigm(lemma);
+    // Once the Pali Lookup morphology dataset is present, never guess a
+    // noun's gender from its final letter.  Unknown nouns get no generated
+    // noun table until their grammatical class is confirmed.
+    const nounGroups = reliableNounGroups ||
+      (global.PaliLookupMorphology ? [] : nounParadigm(lemma, grammarText));
     const verbGroups = verbParadigm(lemma, grammarText);
     const verified = verifiedFormsForLemma(lemma, options);
     if (!nounGroups.length && !verbGroups.length && !verified.length) return null;
@@ -834,7 +888,8 @@
       kind: verbGroups.length ? 'verb' : nounGroups.length ? 'noun' : 'verified',
       verified,
       groups: verbGroups.length ? verbGroups : nounGroups,
-      generated: !!(verbGroups.length || nounGroups.length)
+      generated: !!(verbGroups.length || nounGroups.length),
+      morphologySource: reliableNounGroups?.length ? global.PaliLookupMorphology?.source : ''
     };
   }
 
