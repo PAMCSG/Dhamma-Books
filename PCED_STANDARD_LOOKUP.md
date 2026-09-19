@@ -1,7 +1,7 @@
 # Standard PCED Lookup
 
 Release date: 2026-09-19  
-Lookup core: 3.5.3  
+Lookup core: 3.5.4  
 Dictionary data: PCED 2.0.5.0 plus the verified standard supplement
 
 ## Scope
@@ -102,3 +102,8 @@ Book popups continue to hide status. The Tipitaka-reader **汉译巴利三藏** 
 - Shared popup v1.3.9 uses equal, wider Pāli and Chinese widths, a narrower normally-wrapping 出处 column, and a non-wrapping 状态 column.
 - Desktop layout avoids left clipping and unnecessary inner horizontal scrolling; narrow mobile screens may scroll horizontally.
 - No lookup, language-gating, AI, source, status, duplicate, or deletion logic is changed.
+
+
+### Future-tense verb acceptance
+
+For verbs whose citation form ends in `-eti`, the productive `-ess-` future endings are recognized only when the reconstructed complete lemma is an attested PCED headword. Acceptance example: `viheṭhessanti → viheṭheti` (third-person plural, future).
