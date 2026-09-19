@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.4.0 — 2026-09-18 */
+/* PAMC cross-book PCED popup standard v1.5.0 — 2026-09-19 */
 (function () {
   'use strict';
 
@@ -161,6 +161,39 @@
     return html + '</div>';
   }
 
+  function renderInflectionPanel(head) {
+    const entry = dictionary()[head];
+    const paradigm = core()?.inflectionParadigm?.(head, entry, standardOptions());
+    if (!paradigm) return '';
+    const chips = forms => (forms || []).map(form =>
+      '<span class="pced-form-chip">' + esc(form) + '</span>'
+    ).join(' ');
+    let content = '';
+    if (paradigm.verified?.length) {
+      content += '<div class="pced-inflection-group"><b>Verified forms / 已核实词形</b>' +
+        '<div class="pced-form-list">' + chips(paradigm.verified) + '</div></div>';
+    }
+    for (const group of paradigm.groups || []) {
+      content += '<div class="pced-inflection-group"><b>' + esc(group.label) + '</b>';
+      if (group.rows) {
+        content += '<div class="pced-inflection-table-wrap"><table class="pced-inflection-table">' +
+          '<thead><tr><th>Case / 格</th><th>Singular / 单数</th><th>Plural / 复数</th></tr></thead><tbody>' +
+          group.rows.map(row => '<tr><th>' + esc(row.label) + '</th><td>' + chips(row.singular) +
+            '</td><td>' + chips(row.plural) + '</td></tr>').join('') + '</tbody></table></div>';
+      } else {
+        content += '<div class="pced-form-list">' + chips(group.forms) + '</div>';
+      }
+      content += '</div>';
+    }
+    if (paradigm.generated) {
+      content += '<div class="pced-inflection-caution">Possible regular forms / 可能的规则词形；' +
+        'irregular forms may differ.</div>';
+    }
+    return '<div class="pced-inflections"><button type="button" class="pced-inflection-toggle" ' +
+      'aria-expanded="false">Inflections / 词形</button><div class="pced-inflection-panel" hidden>' +
+      content + '</div></div>';
+  }
+
   function renderDictionary(surface, suppliedRows, primaryLanguage = 'zh') {
     const result = resolution(surface);
     const heads = result.allHeads || result.heads || [];
@@ -196,7 +229,7 @@
       return note + approvedEntry + '<div class="note"><b>No reliable PCED entry was found for ' +
         esc(surface) + '.</b><br>Only exact headwords, verified forms, conservative inflections, and verified compound or sandhi analyses were accepted.</div>';
     }
-    return note + heads.map((head, index) =>
+    return note + renderInflectionPanel(heads[0]) + heads.map((head, index) =>
       renderEntry(head, approvedRows, surface, index === 0, primaryLanguage)).join('');
   }
 
@@ -1071,6 +1104,19 @@
         .approved-term-definition{font-size:18px!important;white-space:pre-wrap!important;overflow-wrap:anywhere}
         .approved-term-source,.approved-term-status{display:inline!important;margin:0 0 0 .4em!important;font-size:14px!important;font-weight:400!important;white-space:normal}
         .lookup-rule{font-size:14px!important;color:#75543d!important;margin-top:5px}
+        .pced-inflections{margin:8px 0 13px!important}
+        .pced-inflection-toggle{display:inline-flex!important;align-items:center!important;justify-content:center!important;padding:6px 11px!important;border:1px solid #b98f6d!important;border-radius:7px!important;background:var(--pamc-popup-tan)!important;color:#68442f!important;font:600 13px/1.3 Arial,"Microsoft YaHei",sans-serif!important;cursor:pointer!important}
+        .pced-inflection-toggle[aria-expanded="true"]{background:#9a6b49!important;color:#fff!important}
+        .pced-inflection-panel{margin-top:8px!important;padding:10px 12px!important;border:1px solid var(--pamc-popup-line)!important;border-radius:9px!important;background:#fffaf5!important;color:var(--pamc-popup-ink)!important;font:14px/1.5 Arial,"Microsoft YaHei",sans-serif!important}
+        .pced-inflection-panel[hidden]{display:none!important}
+        .pced-inflection-group+.pced-inflection-group{margin-top:10px!important}
+        .pced-form-list{margin-top:4px!important}
+        .pced-form-chip{display:inline-block!important;margin:2px 3px 2px 0!important;padding:2px 6px!important;border-radius:5px!important;background:#f1e3d4!important;color:#174f7a!important;font-family:Georgia,"Times New Roman",serif!important;font-size:15px!important}
+        .pced-inflection-table-wrap{max-width:100%!important;overflow-x:auto!important;margin-top:5px!important}
+        .pced-inflection-table{width:100%!important;border-collapse:collapse!important;font-size:13px!important}
+        .pced-inflection-table th,.pced-inflection-table td{padding:5px 7px!important;border:1px solid #e2d2c4!important;text-align:left!important;vertical-align:top!important}
+        .pced-inflection-table thead th{background:#ead7c2!important;color:#68442f!important;white-space:nowrap!important}
+        .pced-inflection-caution{margin-top:9px!important;color:#75543d!important;font-size:12px!important}
         .lookup-section{display:none}.lookup-section.active{display:block}
         .tabs{display:flex!important;gap:6px!important;flex-wrap:wrap!important;border-bottom:1px solid var(--pamc-popup-line)!important;margin:3px 0 13px!important;padding-bottom:8px!important}
         .tabs button[data-tab]{display:inline-flex;align-items:center;justify-content:center;color:#68442f!important;background:var(--pamc-popup-tan)!important;border:1px solid #c7a684!important;border-radius:7px!important;padding:5px 9px!important;font-family:Arial,"Microsoft YaHei",sans-serif!important;font-size:12px!important;font-weight:600!important;line-height:1.25!important;box-shadow:none!important}
@@ -1150,6 +1196,16 @@
     // its modal. This makes the real page integration deterministic instead
     // of depending only on attribute-observer timing.
     document.addEventListener('click', event => {
+      const inflectionToggle = event.target.closest?.('.pced-inflection-toggle');
+      if (inflectionToggle) {
+        event.preventDefault();
+        event.stopPropagation();
+        const panel = inflectionToggle.nextElementSibling;
+        const opening = !!panel?.hidden;
+        if (panel) panel.hidden = !opening;
+        inflectionToggle.setAttribute('aria-expanded', String(opening));
+        return;
+      }
       const word = event.target.closest?.('.pali-word,.attha-word,[data-word]');
       if (word?.dataset?.word) {
         captureMobileHeader();
