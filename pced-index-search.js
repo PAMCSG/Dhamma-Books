@@ -95,19 +95,31 @@
 
     const folded = foldPali(query);
     const heads = [...direct, ...(foldedHeadwords.get(folded) || [])];
+    // A plain-ASCII query may resolve only after trying its possible Pāli
+    // diacritics. Preserve that successful resolution so the landing-page
+    // popup can display the same inflected-form analysis as reader popups.
+    let displayResolution = result;
+    const rememberResolution = candidateResult => {
+      if (!candidateResult?.heads?.length) return;
+      const candidateIsAnalysis = candidateResult.mode === 'inflected' || candidateResult.grammar;
+      const currentIsAnalysis = displayResolution?.mode === 'inflected' || displayResolution?.grammar;
+      if (candidateIsAnalysis && !currentIsAnalysis) displayResolution = candidateResult;
+    };
     for (const candidate of foldedInflections.get(folded) || []) {
       const candidateResult = resolve(candidate.surface);
       heads.push(...(candidateResult?.allHeads || candidateResult?.heads || []));
+      rememberResolution(candidateResult);
       if (!candidateResult?.heads?.length && dictionary[candidate.form]) heads.push(candidate.form);
     }
     if (!heads.length && !/\s/.test(query)) {
       for (const candidate of possibleDiacriticForms(query)) {
         const candidateResult = resolve(candidate);
         heads.push(...(candidateResult?.allHeads || candidateResult?.heads || []));
+        rememberResolution(candidateResult);
       }
     }
     return { heads: unique(heads), mode: heads.length ? 'plain-pali' : (result?.mode || 'none'), marked: false,
-      resolution: result };
+      resolution: displayResolution };
   }
 
   function renderGrammarNote(result) {
@@ -294,7 +306,7 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.3.0' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.3.1' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
