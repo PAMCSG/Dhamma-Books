@@ -174,12 +174,14 @@
   };
   function localizedGroupLabel(label, language) {
     const text = String(label || '');
-    const gender = /Masculine/i.test(text) ? 'm' : /Feminine/i.test(text) ? 'f' : /Neuter/i.test(text) ? 'n' : '';
+    const gender = /Masculine|Masc\./i.test(text) ? 'm' : /Feminine|Fem\./i.test(text) ? 'f' : /Neuter|Neut\./i.test(text) ? 'n' : '';
     const ending = text.match(/["“]([^"”]+)["”]/)?.[1];
     const irregular = /irregular/i.test(text);
     if (language === 'zh' && gender) {
       const name = { m: '阳性名词', f: '阴性名词', n: '中性名词' }[gender];
-      return irregular ? name + '，不规则变格' : name + (ending ? '，-' + ending + ' 变格' : '');
+      if (irregular) return name + '，不规则变格';
+      if (/\bas\s*\(mano\)/i.test(text)) return name + '，-as（mano 类）变格';
+      return name + (ending ? '，-' + ending + ' 变格' : '');
     }
     if (language === 'my' && gender) {
       const name = { m: 'ပုလ္လိင်နာမ်', f: 'ဣတ္ထိလိင်နာမ်', n: 'နပုံသကလိင်နာမ်' }[gender];
@@ -205,10 +207,12 @@
     for (const group of paradigm.groups || []) {
       content += '<div class="pced-inflection-group"><b>' + esc(localizedGroupLabel(group.label, primaryLanguage)) + '</b>';
       if (group.rows) {
+        const hasPlural = group.rows.some(row => row.plural?.length);
         content += '<div class="pced-inflection-table-wrap"><table class="pced-inflection-table">' +
-          '<thead><tr><th>' + esc(ui.case) + '</th><th>' + esc(ui.singular) + '</th><th>' + esc(ui.plural) + '</th></tr></thead><tbody>' +
+          '<thead><tr><th>' + esc(ui.case) + '</th><th>' + esc(ui.singular) + '</th>' +
+          (hasPlural ? '<th>' + esc(ui.plural) + '</th>' : '') + '</tr></thead><tbody>' +
           group.rows.map(row => '<tr><th>' + esc(caseLabel(row.label)) + '</th><td>' + chips(row.singular) +
-            '</td><td>' + chips(row.plural) + '</td></tr>').join('') + '</tbody></table></div>';
+            '</td>' + (hasPlural ? '<td>' + chips(row.plural) + '</td>' : '') + '</tr>').join('') + '</tbody></table></div>';
       } else {
         content += '<div class="pced-form-list">' + chips(group.forms) + '</div>';
       }
@@ -1141,7 +1145,9 @@
         .pced-form-list{margin-top:4px!important}
         .pced-form-chip{display:inline-block!important;margin:2px 3px 2px 0!important;padding:2px 6px!important;border-radius:5px!important;background:#f1e3d4!important;color:#174f7a!important;font-family:Georgia,"Times New Roman",serif!important;font-size:15px!important}
         .pced-inflection-table-wrap{max-width:100%!important;overflow-x:auto!important;margin-top:5px!important}
-        .pced-inflection-table{width:100%!important;border-collapse:collapse!important;font-size:13px!important}
+        .pced-inflection-table{width:auto!important;max-width:100%!important;border-collapse:collapse!important;font-size:13px!important}
+        .pced-inflection-table th:first-child{width:84px!important;min-width:84px!important}
+        .pced-inflection-table td{min-width:150px!important;max-width:360px!important}
         .pced-inflection-table th,.pced-inflection-table td{padding:5px 7px!important;border:1px solid #e2d2c4!important;text-align:left!important;vertical-align:top!important}
         .pced-inflection-table thead th{background:#ead7c2!important;color:#68442f!important;white-space:nowrap!important}
         .pced-inflection-caution{margin-top:9px!important;color:#75543d!important;font-size:12px!important}
