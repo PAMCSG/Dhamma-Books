@@ -161,24 +161,53 @@
     return html + '</div>';
   }
 
-  function renderInflectionPanel(head) {
+  const INFLECTION_UI = {
+    en: { title: 'Inflections', verified: 'Verified forms', case: 'Case', singular: 'Singular', plural: 'Plural',
+      caution: 'Possible regular forms; irregular forms may differ.' },
+    zh: { title: '词形变化', verified: '已核实词形', case: '格', singular: '单数', plural: '复数',
+      caution: '可能的规则词形；不规则形式可能不同。' },
+    my: { title: 'ဝေါဟာရပုံစံများ', verified: 'အတည်ပြုပြီးသော ပုံစံများ', case: 'ဝိဘတ်', singular: 'ဧကဝုစ်', plural: 'ဗဟုဝုစ်',
+      caution: 'ဖြစ်နိုင်သော ပုံမှန်ပုံစံများဖြစ်ပြီး မမှန်ပုံစံများ ကွဲပြားနိုင်သည်။' }
+  };
+  const CASE_UI = {
+    zh: { Nominative: '主格', Vocative: '呼格', Accusative: '宾格', Instrumental: '具格', Dative: '与格', Ablative: '从格', Genitive: '属格', Locative: '处格' }
+  };
+  function localizedGroupLabel(label, language) {
+    const text = String(label || '');
+    const gender = /Masculine/i.test(text) ? 'm' : /Feminine/i.test(text) ? 'f' : /Neuter/i.test(text) ? 'n' : '';
+    const ending = text.match(/["“]([^"”]+)["”]/)?.[1];
+    const irregular = /irregular/i.test(text);
+    if (language === 'zh' && gender) {
+      const name = { m: '阳性名词', f: '阴性名词', n: '中性名词' }[gender];
+      return irregular ? name + '，不规则变格' : name + (ending ? '，-' + ending + ' 变格' : '');
+    }
+    if (language === 'my' && gender) {
+      const name = { m: 'ပုလ္လိင်နာမ်', f: 'ဣတ္ထိလိင်နာမ်', n: 'နပုံသကလိင်နာမ်' }[gender];
+      return irregular ? name + '၊ မမှန်ဝိဘတ်ပြောင်း' : name + (ending ? '၊ -' + ending + ' ဝိဘတ်ပြောင်း' : '');
+    }
+    return text.replace('declens.', 'declension').replace('decl.', 'declension');
+  }
+
+  function renderInflectionPanel(head, primaryLanguage = 'en') {
     const entry = dictionary()[head];
     const paradigm = core()?.inflectionParadigm?.(head, entry, standardOptions());
     if (!paradigm) return '';
+    const ui = INFLECTION_UI[primaryLanguage] || INFLECTION_UI.en;
+    const caseLabel = label => CASE_UI[primaryLanguage]?.[label] || label;
     const chips = forms => (forms || []).map(form =>
       '<span class="pced-form-chip">' + esc(form) + '</span>'
     ).join(' ');
     let content = '';
     if (paradigm.verified?.length) {
-      content += '<div class="pced-inflection-group"><b>Verified forms / 已核实词形</b>' +
+      content += '<div class="pced-inflection-group"><b>' + esc(ui.verified) + '</b>' +
         '<div class="pced-form-list">' + chips(paradigm.verified) + '</div></div>';
     }
     for (const group of paradigm.groups || []) {
-      content += '<div class="pced-inflection-group"><b>' + esc(group.label) + '</b>';
+      content += '<div class="pced-inflection-group"><b>' + esc(localizedGroupLabel(group.label, primaryLanguage)) + '</b>';
       if (group.rows) {
         content += '<div class="pced-inflection-table-wrap"><table class="pced-inflection-table">' +
-          '<thead><tr><th>Case / 格</th><th>Singular / 单数</th><th>Plural / 复数</th></tr></thead><tbody>' +
-          group.rows.map(row => '<tr><th>' + esc(row.label) + '</th><td>' + chips(row.singular) +
+          '<thead><tr><th>' + esc(ui.case) + '</th><th>' + esc(ui.singular) + '</th><th>' + esc(ui.plural) + '</th></tr></thead><tbody>' +
+          group.rows.map(row => '<tr><th>' + esc(caseLabel(row.label)) + '</th><td>' + chips(row.singular) +
             '</td><td>' + chips(row.plural) + '</td></tr>').join('') + '</tbody></table></div>';
       } else {
         content += '<div class="pced-form-list">' + chips(group.forms) + '</div>';
@@ -186,11 +215,10 @@
       content += '</div>';
     }
     if (paradigm.generated) {
-      content += '<div class="pced-inflection-caution">Possible regular forms / 可能的规则词形；' +
-        'irregular forms may differ.</div>';
+      content += '<div class="pced-inflection-caution">' + esc(ui.caution) + '</div>';
     }
     return '<div class="pced-inflections"><button type="button" class="pced-inflection-toggle" ' +
-      'aria-expanded="false">Inflections / 词形</button><div class="pced-inflection-panel" hidden>' +
+      'aria-expanded="false">' + esc(ui.title) + '</button><div class="pced-inflection-panel" hidden>' +
       content + '</div></div>';
   }
 
@@ -229,7 +257,7 @@
       return note + approvedEntry + '<div class="note"><b>No reliable PCED entry was found for ' +
         esc(surface) + '.</b><br>Only exact headwords, verified forms, conservative inflections, and verified compound or sandhi analyses were accepted.</div>';
     }
-    return note + renderInflectionPanel(heads[0]) + heads.map((head, index) =>
+    return note + renderInflectionPanel(heads[0], primaryLanguage) + heads.map((head, index) =>
       renderEntry(head, approvedRows, surface, index === 0, primaryLanguage)).join('');
   }
 
