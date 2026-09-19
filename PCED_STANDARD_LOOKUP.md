@@ -107,3 +107,8 @@ Book popups continue to hide status. The Tipitaka-reader **汉译巴利三藏** 
 ### Future-tense verb acceptance
 
 For verbs whose citation form ends in `-eti`, the productive `-ess-` future endings are recognized only when the reconstructed complete lemma is an attested PCED headword. Acceptance example: `viheṭhessanti → viheṭheti` (third-person plural, future).
+
+
+### Dhamma Books landing-page display
+
+The Dhamma Books landing-page PCED search displays the same inflection banner as book and Tipiṭaka Reader popups whenever the shared resolver returns an inflected result. Acceptance example: `viheṭhessanti → viheṭheti`, followed by `third-person plural, future`.
