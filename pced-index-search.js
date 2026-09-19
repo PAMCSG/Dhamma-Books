@@ -112,7 +112,15 @@
 
   function renderGrammarNote(result) {
     const grammar = result?.grammar;
-    if (!grammar) return '';
+    if (!grammar) {
+      if (result?.mode !== 'inflected') return '';
+      const head = result.heads?.[0];
+      const lemma = dictionary[head]?.headword || result.resolvedForm || head;
+      return '<div class="note"><b>Inflected form:</b> ' + esc(result.clicked || '') +
+        ' → <b>' + esc(lemma || '') + '</b>' +
+        (result.rule ? '<br><span class="lookup-rule">' + esc(result.rule) + '</span>' : '') +
+        '</div>';
+    }
     const lemma = dictionary[grammar.lemmaHead]?.headword || grammar.lemma;
     return '<div class="note grammar-analysis"><b>Verb form:</b> ' + esc(result.clicked || grammar.surface) +
       ' → <b>' + esc(lemma) + '</b>' +
