@@ -173,10 +173,16 @@
   }
 
   function renderInflectionPanel(head, priority = 'en') {
-    const entry = dictionary[head];
-    const paradigm = global.PCEDLookupCore?.inflectionParadigm?.(head, entry, {
-      inflections: global.PCEDStandardData?.inflections
-    });
+    const inflections = global.PCEDStandardData?.inflections;
+    const mappedLemmas = (inflections?.[head] || []).map(item =>
+      typeof item === 'string' ? item : item?.form
+    ).filter(Boolean);
+    const candidates = [head, ...mappedLemmas];
+    let paradigm = null;
+    for (const lemma of candidates) {
+      paradigm = global.PCEDLookupCore?.inflectionParadigm?.(lemma, dictionary[lemma], { inflections });
+      if (paradigm) break;
+    }
     if (!paradigm) return '';
     const ui = INFLECTION_UI[priority] || INFLECTION_UI.en;
     const caseLabel = label => CASE_UI[priority]?.[label] || label;
@@ -382,7 +388,7 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.5.1' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.5.2' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
