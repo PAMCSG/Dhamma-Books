@@ -1,4 +1,4 @@
-/* PAMC Kaccayana-based nominal declension generator v1.4.0 — 2026-09-20
+/* PAMC Kaccayana-based nominal declension generator v1.5.0 — 2026-09-20
  *
  * Classification input: Pali Lookup 2.0 morphology (lemma, gender, stem class).
  * Forms: Bhante U Janakabhivamsa, "13 Groups - List of Declension" (July 2019),
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '1.4.0';
+  const VERSION = '1.5.0';
   const SOURCE = "Bhante U Janakābhivaṃsa’s Kaccāyana-based 13 Groups of Declension";
   const GROUPS = Object.freeze({
     1: 'Purisādigaṇa', 2: 'Cittādigaṇa', 3: 'Kaññādigaṇa', 4: 'Pumādigaṇa',
@@ -94,13 +94,18 @@
   // Manogaṇa is a closed lexical class in the teacher's table. Do not assign
   // Group 6 merely because another word has the same final vowel or a Pali
   // Lookup m.s/nt.s code. Encode each admitted lemma separately.
-  const MANOGANA_MEMBERS = Object.freeze(new Set([
-    'mana', 'vaco', 'vayo', 'tejo', 'tapo', 'ceto', 'tamo', 'yaso',
-    'ayo', 'payo', 'siro', 'chando', 'saro', 'uro', 'raho', 'aho'
-  ]));
+  const MANOGANA_CITATION_FORMS = Object.freeze({
+    mana: 'mana', vaca: 'vaco', vaco: 'vaco', vaya: 'vayo', vayo: 'vayo',
+    teja: 'tejo', tejo: 'tejo', tapa: 'tapo', tapo: 'tapo', ceta: 'ceto', ceto: 'ceto',
+    tama: 'tamo', tamo: 'tamo', yasa: 'yaso', yaso: 'yaso', aya: 'ayo', ayo: 'ayo',
+    paya: 'payo', payo: 'payo', sira: 'siro', siro: 'siro', chanda: 'chando', chando: 'chando',
+    sara: 'saro', saro: 'saro', ura: 'uro', uro: 'uro', raha: 'raho', raho: 'raho',
+    aha: 'aho', aho: 'aho'
+  });
   function specialGroup6(lemma) {
-    if (!MANOGANA_MEMBERS.has(lemma)) return null;
-    const base = lemma === 'mana' ? 'mana' : lemma.slice(0, -1) + 'a';
+    const teacherForm = MANOGANA_CITATION_FORMS[lemma];
+    if (!teacherForm) return null;
+    const base = teacherForm === 'mana' ? 'mana' : teacherForm.slice(0, -1) + 'a';
     const stem = base.slice(0, -1);
     return explicit(6, 'Masculine/neuter noun, mana/manas declension', 'm/nt', [
       [[stem + 'aṃ', stem + 'o'], [stem + 'ā', stem + 'āni']],
@@ -111,7 +116,30 @@
       [[stem + 'asmā', stem + 'amhā', stem + 'ā'], [stem + 'ehi', stem + 'ebhi']],
       [[stem + 'assa', stem + 'aso'], [stem + 'ānaṃ']],
       [[stem + 'asmiṃ', stem + 'amhi', stem + 'e', stem + 'asi'], [stem + 'esu']]
-    ], 'Restricted Manogaṇa membership; classification is lexical, not inferred from the ending.');
+    ], 'Restricted Manogaṇa membership; the PCED citation/stem form is mapped explicitly to the teacher’s -o form, never inferred from an ending.');
+  }
+
+  function specialGroup6Adi(lemma) {
+    // The teacher separates these Manogaṇādigaṇa examples from the closed
+    // Manogaṇa list above. They must not be mixed with vaco/mano-type words.
+    if (lemma === 'bila') return explicit(6, 'Neuter noun, Manogaṇādigaṇa bila type', 'nt', [
+      [['bilaṃ'], ['bilā', 'bilāni']], [['bila', 'bilā'], ['bilā', 'bilāni']], [['bilaṃ'], ['bile', 'bilāni']],
+      [['bilena', 'bilasa'], ['bilehi', 'bilebhi']], [['bilassa', 'bilaso'], ['bilānaṃ']],
+      [['bilasmā', 'bilamhā', 'bilā'], ['bilehi', 'bilebhi']], [['bilassa', 'bilaso'], ['bilānaṃ']],
+      [['bilasmiṃ', 'bilamhi', 'bile', 'bilasi'], ['bilesu']]
+    ], 'Expanded from the teacher’s complete bila table; accusative singular bilo is explicitly excluded.');
+    if (lemma === 'thāma') return explicit(6, 'Neuter noun, Manogaṇādigaṇa thāma type', 'nt', [
+      [['thāmaṃ'], ['thāmā', 'thāmāni']], [['thāma', 'thāmā'], ['thāmā', 'thāmāni']], [['thāmaṃ'], ['thāme', 'thāmāni']],
+      [['thāmena', 'thāmasa', 'thāmaso', 'thāmunā'], ['thāmehi', 'thāmebhi']],
+      [['thāmassa', 'thāmaso', 'thāmuno'], ['thāmānaṃ']], [['thāmasmā', 'thāmamhā', 'thāmā', 'thāmunā'], ['thāmehi', 'thāmebhi']],
+      [['thāmassa', 'thāmaso', 'thāmuno'], ['thāmānaṃ']], [['thāmasmiṃ', 'thāmamhi', 'thāme', 'thāmasi'], ['thāmesu']]
+    ], 'Expanded from the teacher’s complete thāma table; accusative singular thāmo is explicitly excluded.');
+    if (lemma === 'āpa') return explicit(6, 'Masculine noun, Manogaṇādigaṇa āpa type', 'm', [
+      [['āpo'], ['āpā']], [['āpa', 'āpā'], ['āpā']], [['āpaṃ', 'āpo'], ['āpe', 'āpāni']],
+      [['āpena'], ['āpehi', 'āpebhi']], [['āpassa'], ['āpānaṃ']], [['āpasmā', 'āpamhā', 'āpā'], ['āpehi', 'āpebhi']],
+      [['āpassa'], ['āpānaṃ']], [['āpasmiṃ', 'āpamhi', 'āpe'], ['āpesu']]
+    ], 'Expanded from the teacher’s complete āpa table; āpasā, āpaso and āpasi are explicitly excluded.');
+    return null;
   }
 
   const SABBANAMA_MEMBERS = Object.freeze(new Set([
@@ -120,7 +148,13 @@
     'eta', 'ima', 'amu', 'kiṃ', 'eka', 'ubha', 'ubhaya', 'dvi', 'ti',
     'catu', 'pañca', 'tumha', 'amha'
   ]));
-  const g9 = (label, gender, rows, note) => group(9, label, rows, gender, note);
+  const g9 = (label, gender, rows, note) => {
+    const expandedRows = rows.slice();
+    if (!expandedRows.some(item => item.label === 'Vocative')) {
+      expandedRows.splice(1, 0, row('Vocative', [], []));
+    }
+    return group(9, label, expandedRows, gender, note);
+  };
   function sabbanamaRegular(lemma, stem = lemma.slice(0, -1)) {
     const m = g9('Masculine pronoun/adjective', 'm', [
       row('Nominative', [stem + 'o'], [stem + 'e']), row('Vocative', [stem + 'a', stem + 'ā'], [stem + 'e']),
@@ -161,9 +195,29 @@
     if (['katara','katama','itara','añña','aññatara','aññatama'].includes(lemma)) return kataraFamily(lemma);
     if (['pubba','para','apara','dakkhiṇa','uttara','adhara'].includes(lemma)) {
       const groups = sabbanamaRegular(lemma), stem = lemma.slice(0, -1);
-      groups[0].rows[0].plural.push(stem + 'ā');
-      groups[0].rows[1].singular.push(stem + 'ā'); groups[0].rows[1].plural.push(stem + 'ā');
-      groups[0].rows[6].plural.push(stem + 'ānaṃ');
+      const add = (values, value) => { if (!values.includes(value)) values.push(value); };
+      const masculine = groups[0], neuter = groups[1], feminine = groups[2];
+      // Teacher table §9.8-9.13: the bold alternatives from the masculine
+      // pubba table also supplement the corresponding neuter sabba table.
+      add(masculine.rows[0].plural, stem + 'ā');
+      add(masculine.rows[1].singular, stem + 'ā');
+      add(masculine.rows[1].plural, stem + 'ā');
+      add(masculine.rows[5].singular, stem + 'ā');
+      add(masculine.rows[6].plural, stem + 'ānaṃ');
+      add(masculine.rows[7].singular, stem + 'e');
+      add(neuter.rows[0].plural, stem + 'ā');
+      add(neuter.rows[1].singular, stem + 'ā');
+      add(neuter.rows[1].plural, stem + 'ā');
+      add(neuter.rows[5].singular, stem + 'ā');
+      add(neuter.rows[6].plural, stem + 'ānaṃ');
+      add(neuter.rows[7].singular, stem + 'e');
+      // Pubba, para, apara and adhara follow sabba in the feminine. Dakkhiṇa
+      // and uttara add the teacher's third locative-singular alternative.
+      if (lemma === 'dakkhiṇa' || lemma === 'uttara') {
+        add(feminine.rows[7].singular, stem + 'āya');
+        add(feminine.rows[7].singular, stem + 'āyaṃ');
+        add(feminine.rows[7].singular, stem + 'assaṃ');
+      }
       return groups;
     }
     if (lemma === 'ta') return [
@@ -237,6 +291,14 @@
       row('Genitive', [base + 'iyā', ...(nad ? ['najjā'] : [])], [lemma + 'naṃ']),
       row('Locative', [base + 'iyā', base + 'iyaṃ', ...(nad ? ['najjaṃ'] : [])], [lemma + 'su'])
     ], 'f');
+  }
+  function specialGroup8(lemma) {
+    if (!['gahapatānī', 'bhikkhunī', 'rājinī', 'daṇḍinī', 'paracittavidūnī'].includes(lemma)) return null;
+    const g = group7(lemma, lemma.slice(0, -1));
+    g.teacherGroupNumber = 8; g.teacherGroupName = GROUPS[8];
+    g.label = 'Feminine noun, "inī" declension';
+    g.note = 'All rows are expanded here; the teacher’s abbreviated table refers the remaining cases to māṇavī/itthī.';
+    return g;
   }
   function group10(lemma, record) {
     const s = record.s;
@@ -351,6 +413,48 @@
   }
   function specialGroup11(lemma) {
     if (lemma === 'bhikkhu') return group11(lemma, { i: 'm.u', s: 'bhikkh' });
+    if (lemma === 'ratti') return group11(lemma, { i: 'f.i', s: 'ratt' });
+    if (lemma === 'aggi') return group11(lemma, { i: 'm.i', s: 'agg' });
+    if (lemma === 'aṭṭhi') return group11(lemma, { i: 'nt.i', s: 'aṭṭh' });
+    if (lemma === 'cakkhu') return group11(lemma, { i: 'nt.u', s: 'cakkh' });
+    if (lemma === 'yāgu') return group11(lemma, { i: 'f.u', s: 'yāg' });
+    if (lemma === 'daṇḍī') return group11InAdjective(lemma, 'daṇḍ')[0];
+    if (lemma === 'sukhakārī') return group11InAdjective(lemma, 'sukhakār')[2];
+    if (lemma === 'sayambhū' || lemma === 'sabbanñū' || lemma === 'sabbaññū' || lemma === 'vedagū' || lemma === 'viññū' || lemma === 'sahabhū') {
+      const stem = lemma.slice(0, -1);
+      const noEnding = ['sabbaññū', 'sabbanñū', 'vedagū', 'viññū'].includes(lemma) ? 'no' : null;
+      const plural = [lemma, stem + 'uvo', ...(noEnding ? [stem + 'uno'] : []), ...(lemma === 'sahabhū' ? [stem + 'uno'] : [])];
+      return group(11, 'Masculine noun, "ū" declension', [
+        row('Nominative', [lemma], plural), row('Vocative', [lemma], plural), row('Accusative', [stem + 'uṃ'], plural),
+        row('Instrumental', [stem + 'unā'], [lemma + 'hi', lemma + 'bhi']), row('Dative', [stem + 'ussa', stem + 'uno'], [lemma + 'naṃ']),
+        row('Ablative', [stem + 'usmā', stem + 'umhā', stem + 'unā'], [lemma + 'hi', lemma + 'bhi']),
+        row('Genitive', [stem + 'ussa', stem + 'uno'], [lemma + 'naṃ']), row('Locative', [stem + 'usmiṃ', stem + 'umhi'], [lemma + 'su'])
+      ], 'm');
+    }
+    if (lemma === 'vadhū') {
+      const stem = 'vadh';
+      return group(11, 'Feminine noun, "ū" declension', [
+        row('Nominative', ['vadhū'], ['vadhū', 'vadhuyo']), row('Vocative', ['vadhu'], ['vadhū', 'vadhuyo']),
+        row('Accusative', ['vadhuṃ'], ['vadhū', 'vadhuyo']), row('Instrumental', ['vadhuyā'], ['vadhūhi', 'vadhūbhi']),
+        row('Dative', ['vadhuyā'], ['vadhūnaṃ']), row('Ablative', ['vadhuyā'], ['vadhūhi', 'vadhūbhi']),
+        row('Genitive', ['vadhuyā'], ['vadhūnaṃ']), row('Locative', ['vadhuyā', 'vadhuyaṃ'], ['vadhūsu'])
+      ], 'f');
+    }
+    if (lemma === 'gotrabhū') {
+      const inherited = specialGroup11('sayambhū');
+      inherited.label = 'Neuter noun, "ū" declension'; inherited.gender = 'nt';
+      inherited.rows[0] = row('Nominative', ['gotrabhu'], ['gotrabhū', 'gotrabhūni']);
+      inherited.rows[1] = row('Vocative', ['gotrabhu'], ['gotrabhū', 'gotrabhūni']);
+      inherited.rows[2] = row('Accusative', ['gotrabhuṃ'], ['gotrabhū', 'gotrabhūni']);
+      inherited.rows.slice(3).forEach(r => { r.singular = r.singular.map(x => x.replaceAll('sayambh', 'gotrabh')); r.plural = r.plural.map(x => x.replaceAll('sayambh', 'gotrabh')); });
+      return inherited;
+    }
+    if (lemma === 'cittago') {
+      const inherited = group11('cakkhu', { i: 'nt.u', s: 'cakkh' });
+      inherited.label = 'Neuter noun, "o/u" declension';
+      inherited.rows.forEach(r => { r.singular = r.singular.map(x => x.replaceAll('cakkh', 'cittag')); r.plural = r.plural.map(x => x.replaceAll('cakkh', 'cittag')); });
+      return inherited;
+    }
     if (lemma !== 'go') return null;
     return explicit(11, 'Masculine noun, "o" declension', 'm', [
       [['go'], ['gāvo', 'gavo']], [['go'], ['gāvo', 'gavo']], [['gavaṃ', 'gāvaṃ', 'gāvuṃ'], ['gāvo', 'gavo']],
@@ -411,12 +515,50 @@
   }
   function specialGroup13(lemma) {
     const bases = { arahanta: 'arah', mahanta: 'mah', santa: 's' };
+    if (lemma === 'gacchanta') return group13(lemma, { i: 'ac.prp.nt', s: 'gacch' });
+    if (lemma === 'karonta') return group13(lemma, { i: 'ac.prp.nto', s: 'kar' });
+    if (lemma === 'bhavanta') {
+      const groups = group13(lemma, { i: 'ac.prp.nt', s: 'bhav' });
+      groups[0] = explicit(13, 'Masculine present participle, irregular bhavanta declension', 'm', [
+        [['bhavaṃ'], ['bhonto', 'bhontā', 'bhavanto', 'bhavantā']],
+        [['bhavaṃ', 'bhava', 'bhavā', 'bhonta', 'bhontā'], ['bhonto', 'bhontā', 'bhavanto', 'bhavantā']],
+        [['bhavaṃ', 'bhavantaṃ'], ['bhonte', 'bhavante']],
+        [['bhotā', 'bhontena', 'bhavatā', 'bhavantena'], ['bhavantehi', 'bhavantebhi']],
+        [['bhavassa', 'bhavato', 'bhavantassa', 'bhoto', 'bhontassa'], ['bhavataṃ', 'bhavantānaṃ']],
+        [['bhotā', 'bhavatā', 'bhavantasmā', 'bhavantamhā', 'bhavantā'], ['bhavantehi', 'bhavantebhi']],
+        [['bhavassa', 'bhavato', 'bhavantassa', 'bhoto', 'bhontassa'], ['bhavataṃ', 'bhavantānaṃ']],
+        [['bhavati', 'bhavantasmiṃ', 'bhavantamhi', 'bhavante'], ['bhavantesu']]
+      ]);
+      return groups;
+    }
     if (!bases[lemma]) return null;
     const groups = group13(lemma, { i: 'ac.prp.nt', s: bases[lemma] });
     if (lemma === 'arahanta') groups[0].rows[0].singular.push('arahā');
     if (lemma === 'mahanta') groups[0].rows[0].singular.push('mahā');
+    if (lemma === 'santa') groups[0].rows[1].plural = ['santa', 'santo'];
     return groups;
   }
+
+  // Fully expanded audit catalogue. It deliberately includes examples whose
+  // printed teacher tables say "same as ..." so future code can inspect eight
+  // concrete rows instead of having to interpret cross-references again.
+  const REFERENCE_LEMMAS = Object.freeze([
+    'purisa', 'citta', 'kamma', 'kaññā', 'puma', 'yuva', 'addhā', 'rāja',
+    'mana', 'vaca', 'vaco', 'bila', 'thāma', 'āpa', 'nadī', 'māṇavī', 'gahapatānī',
+    ...SABBANAMA_MEMBERS, 'satthu', 'mātu', 'jetu', 'bhātu', 'pitu',
+    'ratti', 'aggi', 'aṭṭhi', 'daṇḍī', 'sukhakārī', 'bhikkhu', 'cakkhu',
+    'yāgu', 'sayambhū', 'vadhū', 'gotrabhū', 'go', 'cittago', 'guṇavantu',
+    'gacchanta', 'karonta', 'bhavanta', 'santa', 'arahanta', 'mahanta'
+  ]);
+  const REFERENCE_MORPHOLOGY = Object.freeze({ entries: Object.freeze({
+    purisa: Object.freeze([{ r: true, i: 'm.a', s: 'puris' }]),
+    citta: Object.freeze([{ r: true, i: 'nt.a', s: 'citt' }]),
+    'kaññā': Object.freeze([{ r: true, i: 'f.ā', s: 'kaññ' }]),
+    'nadī': Object.freeze([{ r: true, i: 'f.ī', s: 'nad' }]),
+    'māṇavī': Object.freeze([{ r: true, i: 'f.ī', s: 'māṇav' }]),
+    satthu: Object.freeze([{ r: true, i: 'm.r', s: 'satth' }]),
+    mātu: Object.freeze([{ r: true, i: 'f.p', s: 'māt' }])
+  }) });
 
   function paradigm(lemma, morphology) {
     lemma = String(lemma || '').normalize('NFC').toLowerCase();
@@ -426,9 +568,12 @@
     const special4 = specialGroup4(lemma); if (special4) return result([special4], SOURCE);
     const special5 = specialGroup5(lemma); if (special5) return result([special5], SOURCE);
     const special6 = specialGroup6(lemma); if (special6) return result([special6], SOURCE);
+    const special6Adi = specialGroup6Adi(lemma); if (special6Adi) return result([special6Adi], SOURCE);
+    const special8 = specialGroup8(lemma); if (special8) return result([special8], SOURCE);
     const special9 = specialGroup9(lemma); if (special9) return result(special9, SOURCE);
     const special10 = specialGroup10(lemma); if (special10) return result([special10], SOURCE);
     const special11 = specialGroup11(lemma); if (special11) return result([special11], SOURCE);
+    if (lemma === 'guṇavantu') return result(group12({ i: 'adj.v', s: 'guṇav' }), SOURCE);
     const special13 = specialGroup13(lemma); if (special13) return result(special13, SOURCE);
     // Pali Lookup marks kamma as nt.x with no stem, although its nominal
     // paradigm follows the regular neuter a-stem Cittadigana pattern.
@@ -464,5 +609,17 @@
     return result(groups);
   }
 
-  global.KaccayanaDeclension = Object.freeze({ VERSION, SOURCE, GROUPS, paradigm });
+  function expandedReference() {
+    const tables = {};
+    for (const lemma of REFERENCE_LEMMAS) {
+      const table = paradigm(lemma, REFERENCE_MORPHOLOGY);
+      if (table?.groups?.length) tables[lemma] = table;
+    }
+    return tables;
+  }
+
+  global.KaccayanaDeclension = Object.freeze({
+    VERSION, SOURCE, GROUPS, paradigm, referenceLemmas: REFERENCE_LEMMAS,
+    expandedReference
+  });
 })(window);

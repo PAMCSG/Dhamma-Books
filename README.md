@@ -525,12 +525,35 @@ Thus exact `gacchati` wins over its secondary analysis as a locative form of
 noun declension. The landing page pins lookup core v3.9.1 to prevent a cached
 older core from replacing this behavior.
 
-### PCED short forms and Manogaṇa correction — 20 September 2026
+### PCED exact noun forms and restricted groups — 20 September 2026
 
 Shared resolver v3.9.4 retracts the incorrect v3.9.3 redirections. `jetu`,
 `bhātu`, and `pitu` remain exact PCED noun headwords; they are not converted
-to `jeti`, `bhātar`, or `pitar`. Kaccāyana declension v1.4.0
+to `jeti`, `bhātar`, or `pitar`. Exact complete headwords are evaluated before
+all inflection fallbacks. Kaccāyana declension v1.4.0
 records the complete closed groups: `mana` plus 15 teacher-listed Manogaṇa
 words, and all 28 teacher-listed Sabbanāmagaṇa words. Their paradigms come from
 the teacher tables; no additional word enters either group merely by sharing
 an ending or morphology code.
+
+### All 13 groups expanded-table audit — 20 September 2026
+
+Kaccāyana declension v1.5.0 expands inherited teacher-note instructions such
+as “same as sabba”, “same as māṇavī”, and “same as pumaliṅga” into complete
+eight-row paradigms. The maintained reference catalogue contains 70 audited
+paradigms across all 13 groups. A missing vocative is stored as an explicit
+empty row instead of being omitted. Pali Lookup fallback tables are no longer
+labelled as a teacher group by guessing from a morphology code.
+
+For Group 9, the `pubba` family (`pubba`, `para`, `apara`, `dakkhiṇa`,
+`uttara`, `adhara`) now includes the teacher’s bold alternatives without
+duplicates, including masculine/neuter locative singular `pubbe`-type forms.
+The complete `añña` feminine table is checked row by row against the `katara`
+table. Pāli-looking input with no exact or verified result, such as `saba`, now
+reports no reliable PCED entry instead of falling through to a multilingual
+definition-substring result.
+
+The closed Manogaṇa catalogue also records each PCED citation/stem spelling
+explicitly: for example, exact PCED `vaca` is linked to teacher-table `vaco`
+and receives both singular and plural forms. This is a lexical mapping, not a
+productive guess from the ending.

@@ -61,6 +61,24 @@ All 13 Dhamma Books HTML readers that provide Roman-script Pāli word lookup now
 - Landing-page search v1.7.4 and popup standard v1.8.4 pin lookup core v3.9.4
   and declension v1.4.0.
 
+## Complete 13-group table expansion — 20 September 2026
+
+- Declension v1.5.0 audits all 13 teacher groups and stores 70 fully expanded
+  reference paradigms, including tables abbreviated in the notes by “same as”.
+- Group membership labels now come only from a completed Kaccāyana table.
+  The exact PCED citation form `vaca` is explicitly linked to teacher-table
+  `vaco`, while unrelated words cannot enter Manogaṇa through morphology.
+- Every stored paradigm has all eight cases. Where the teacher specifies no
+  vocative, the vocative row is present and empty.
+- The six-word `pubba` family has deduplicated vocatives, restored `pubbe`-type
+  locatives, neuter bold alternatives, and the special feminine locatives for
+  `dakkhiṇa` and `uttara`.
+- The `katara`-type feminine pattern, including `añña`, is verified for every
+  case and number against the teacher table.
+- Landing search v1.7.5 does not reinterpret an unmatched Roman-Pāli query as
+  arbitrary text inside definitions. Popup standard v1.8.5 removes inferred
+  teacher-group labels from fallback morphology.
+
 ## Readers covered
 
 - `daily-chants.html`

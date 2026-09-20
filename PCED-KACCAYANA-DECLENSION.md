@@ -98,10 +98,17 @@ For a fallback table retain:
   `a`-stem Cittādigaṇa paradigm.
 - Group 4: explicit teacher paradigms for `puma`, `yuva` and `addhāna`.
 - Group 5: explicit teacher paradigm for `rāja`.
-- Groups 7 and 8: feminine `ī` and listed `inī` classes.
-- Group 10: regular agent class and the explicit `mātu` paradigm.
-- Group 11: encoded `i`, `u`, and masculine/neuter `ī/in` stem classes plus
-  explicit `bhikkhu` and `go`. For `adj.ī` compounds such as `kammavādī`, the
+- Group 6: the closed `mana`/Manogaṇa list, plus separately classified
+  Manogaṇādigaṇa reference types `bila`, `thāma`, and `āpa`.
+- Groups 7 and 8: feminine `ī` and listed `inī` classes. Every Group 8 row is
+  expanded even where the teacher says to follow `māṇavī` or `itthī`.
+- Group 9: all 28 listed pronouns and numerals, with every “same as sabba” and
+  gender cross-reference expanded into concrete rows.
+- Group 10: regular agent class and explicit `mātu`, `jetu`, `bhātu`, and
+  `pitu` paradigms.
+- Group 11: encoded `i`, `u`, `ū`, `o`, and masculine/neuter `ī/in` stem
+  classes, including the teacher’s abbreviated neuter tables. For `adj.ī`
+  compounds such as `kammavādī`, the
   masculine and neuter follow Group 11, while the feminine `-inī` follows
   Group 8.
   Group 11 `ī` forms must follow the teacher's `daṇḍī` and `sukhakārī dānaṃ`
@@ -109,11 +116,13 @@ For a fallback table retain:
 - Group 12: masculine, feminine and neuter `vantu/mantu` paradigms; feminine
   forms follow Group 7.
 - Group 13: masculine, feminine and neuter present-participle paradigms plus
-  teacher-listed special handling for `arahanta`, `mahanta` and `santa`.
+  teacher-listed special handling for `karonta`, `bhavanta`, `arahanta`,
+  `mahanta`, and `santa`.
 
-Groups 6 and 9, additional Group 11 stem types, and unverified members of short
-exception lists remain attributed Pali Lookup fallbacks until their complete
-teacher/Kaccāyana rule sets are encoded and tested.
+The module exposes an expanded reference catalogue containing 70 paradigms
+across all 13 groups. Every group has eight concrete case rows; “no vocative”
+is represented by an empty vocative row. Unverified lexical members still
+remain Pali Lookup fallbacks and are not assigned a teacher group by inference.
 
 ## Canonical-usage safeguard
 

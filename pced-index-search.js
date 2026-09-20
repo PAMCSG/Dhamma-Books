@@ -1,4 +1,4 @@
-/* PCED landing-page search v1.7.4 — exact Pāli/diacritic-aware and multilingual. */
+/* PCED landing-page search v1.7.5 — exact Pāli/diacritic-aware and multilingual. */
 (function (global) {
   'use strict';
 
@@ -175,25 +175,9 @@
   }
   function teacherDeclensionGroup(group, lemma, gender) {
     if (Number(group?.teacherGroupNumber)) return Number(group.teacherGroupNumber);
-    const text = String(group?.label || '');
-    const code = String(group?.morphologyCode || '');
-    const word = global.PCEDLookupCore?.normalizeForMatch(group?.lemma || lemma) ||
-      String(group?.lemma || lemma || '').normalize('NFC').toLowerCase();
-    if (/vant\/?mant/i.test(text) || /^(?:adj\.v|m\.v)$/i.test(code)) return 12;
-    if (/pres(?:ent)?\.?\s*part|participle/i.test(text) || /^(?:adj\.t|adj\.te|adj\.to|m\.t|m\.te|m\.to)$/i.test(code) || /(?:anta|amāna)$/.test(word)) return 13;
-    if (SABBANAMA_MEMBERS.has(word)) return 9;
-    if (/\bas\s*\(mano\)/i.test(text) || /^(?:m\.s|nt\.s)$/i.test(code)) return 6;
-    if (/agent\s*\(ar\)|pitar\/mātar/i.test(text) || /^(?:m\.r|m\.p|f\.p)$/i.test(code)) return 10;
-    if (['puma', 'yuva', 'addhā', 'addhāna'].includes(word)) return 4;
-    if (['rāja', 'brahma', 'atta', 'sakha', 'ātuma'].includes(word)) return 5;
-    if (['gahapatānī', 'bhikkhunī', 'rājinī', 'daṇḍinī'].includes(word)) return 8;
-    if (['arahanta', 'mahanta', 'bhavanta', 'santa'].includes(word)) return 13;
-    if (['ratti', 'aggi', 'aṭṭhi', 'daṇḍī', 'sukhakārī', 'bhikkhu', 'cakkhu', 'yāgu', 'sayambhū', 'vadhū', 'gotrabhū', 'go', 'cittago'].includes(word)) return 11;
-    if (code === 'm.a' || (gender === 'm' && /["“]a["”]\s*decl/i.test(text))) return 1;
-    if (code === 'nt.a' || (gender === 'n' && /["“]a["”]\s*decl/i.test(text))) return 2;
-    if (code === 'f.ā' || (gender === 'f' && /["“]ā["”]\s*decl/i.test(text))) return 3;
-    if (code === 'f.ī') return 7;
-    if (/^(?:m|f|nt)\.(?:i|ī|u|ū)$/.test(code)) return 11;
+    // Never attach a teacher-group number to a Pali Lookup fallback by
+    // guessing from an ending or morphology code. The Kaccāyana module sets
+    // teacherGroupNumber only after it has actually produced that table.
     return 0;
   }
   function withTeacherGroup(label, language, groupNumber) {
@@ -385,6 +369,13 @@
         html: note + renderGrammarNote(pali.resolution) +
           pali.heads.map(head => renderHead(head, priority)).join('') };
     }
+    // A query made entirely of Roman Pāli characters is a headword request.
+    // If exact/verified Pāli lookup found nothing, do not reinterpret the same
+    // letters as a substring inside unrelated dictionary definitions.
+    if (PALI_ONLY.test(query)) {
+      return { query, heads: [], kind: 'none', priority,
+        html: '<div class="note"><b>No reliable PCED entry was found for ' + esc(query) + '.</b></div>' };
+    }
     const language = languageMatches(query);
     const limitNote = language.total > language.matches.length
       ? '<div class="note">Showing the first ' + language.matches.length + ' of ' + language.total + ' matching entries.</div>' : '';
@@ -452,7 +443,7 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.4' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.5' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

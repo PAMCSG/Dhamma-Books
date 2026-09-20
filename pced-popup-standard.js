@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.4 — 2026-09-20 */
+/* PAMC cross-book PCED popup standard v1.8.5 — 2026-09-20 */
 (function () {
   'use strict';
 
@@ -59,7 +59,7 @@
       document.head.append(loader);
     });
     morphologyPromise = Promise.resolve()
-      .then(() => window.KaccayanaDeclension?.VERSION === '1.4.0' ? null : load('kaccayana-declension.js', '1.4.0'))
+      .then(() => window.KaccayanaDeclension?.VERSION === '1.5.0' ? null : load('kaccayana-declension.js', '1.5.0'))
       .then(() => core()?.version === '3.9.4' ? null : load('pced-lookup-core.js', '3.9.4'))
       .then(() => window.PaliLookupMorphology ? null : load('pali-lookup-morphology.js', '2.0-unicode-trial'))
       .then(() => window.PaliLookupMorphology || null);
@@ -209,24 +209,8 @@
   }
   function teacherDeclensionGroup(group, lemma, gender) {
     if (Number(group?.teacherGroupNumber)) return Number(group.teacherGroupNumber);
-    const text = String(group?.label || '');
-    const code = String(group?.morphologyCode || '');
-    const word = normalize(group?.lemma || lemma);
-    if (/vant\/?mant/i.test(text) || /^(?:adj\.v|m\.v)$/i.test(code)) return 12;
-    if (/pres(?:ent)?\.?\s*part|participle/i.test(text) || /^(?:adj\.t|adj\.te|adj\.to|m\.t|m\.te|m\.to)$/i.test(code) || /(?:anta|amāna)$/.test(word)) return 13;
-    if (SABBANAMA_MEMBERS.has(word)) return 9;
-    if (/\bas\s*\(mano\)/i.test(text) || /^(?:m\.s|nt\.s)$/i.test(code)) return 6;
-    if (/agent\s*\(ar\)|pitar\/mātar/i.test(text) || /^(?:m\.r|m\.p|f\.p)$/i.test(code)) return 10;
-    if (['puma', 'yuva', 'addhā', 'addhāna'].includes(word)) return 4;
-    if (['rāja', 'brahma', 'atta', 'sakha', 'ātuma'].includes(word)) return 5;
-    if (['gahapatānī', 'bhikkhunī', 'rājinī', 'daṇḍinī'].includes(word)) return 8;
-    if (['arahanta', 'mahanta', 'bhavanta', 'santa'].includes(word)) return 13;
-    if (['ratti', 'aggi', 'aṭṭhi', 'daṇḍī', 'sukhakārī', 'bhikkhu', 'cakkhu', 'yāgu', 'sayambhū', 'vadhū', 'gotrabhū', 'go', 'cittago'].includes(word)) return 11;
-    if (code === 'm.a' || (gender === 'm' && /["“]a["”]\s*decl/i.test(text))) return 1;
-    if (code === 'nt.a' || (gender === 'n' && /["“]a["”]\s*decl/i.test(text))) return 2;
-    if (code === 'f.ā' || (gender === 'f' && /["“]ā["”]\s*decl/i.test(text))) return 3;
-    if (code === 'f.ī') return 7;
-    if (/^(?:m|f|nt)\.(?:i|ī|u|ū)$/.test(code)) return 11;
+    // Pali Lookup morphology is a fallback, not proof of membership in a
+    // teacher-defined group. Only completed Kaccāyana tables carry a number.
     return 0;
   }
   function withTeacherGroup(label, language, groupNumber) {
