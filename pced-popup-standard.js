@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.6.3 — 2026-09-20 */
+/* PAMC cross-book PCED popup standard v1.6.5 — 2026-09-20 */
 (function () {
   'use strict';
 
@@ -48,19 +48,18 @@
     .replace(/[^a-zāīūṅñṭḍṇḷṃ\s]/g, ' ').replace(/\s+/g, ' ').trim() || '';
 
   function ensureMorphology() {
-    if (window.PaliLookupMorphology) return Promise.resolve(window.PaliLookupMorphology);
     if (morphologyPromise) return morphologyPromise;
-    morphologyPromise = new Promise(resolve => {
-      const existing = document.querySelector('script[src*="pali-lookup-morphology.js"]');
-      const loader = existing || document.createElement('script');
-      const done = () => resolve(window.PaliLookupMorphology || null);
-      loader.addEventListener('load', done, { once: true });
-      loader.addEventListener('error', done, { once: true });
-      if (!existing) {
-        loader.src = new URL('pali-lookup-morphology.js?v=2.0-unicode-trial', script?.src || location.href).href;
-        document.head.append(loader);
-      }
+    const load = (filename, version) => new Promise(resolve => {
+      const loader = document.createElement('script');
+      loader.src = new URL(filename + '?v=' + version, script?.src || location.href).href;
+      loader.addEventListener('load', resolve, { once: true });
+      loader.addEventListener('error', resolve, { once: true });
+      document.head.append(loader);
     });
+    morphologyPromise = Promise.resolve()
+      .then(() => core()?.version === '3.7.1' ? null : load('pced-lookup-core.js', '3.7.1'))
+      .then(() => window.PaliLookupMorphology ? null : load('pali-lookup-morphology.js', '2.0-unicode-trial'))
+      .then(() => window.PaliLookupMorphology || null);
     return morphologyPromise;
   }
 
@@ -211,8 +210,12 @@
       return name + (ending ? '，-' + ending + ' 变格' : '');
     }
     if (language === 'my' && gender) {
+      if (/vant\/?mant/i.test(text)) return { m: 'ပုလ္လိင် နာမဝိသေသန၊ vant/mant ဝိဘတ်ပြောင်း', f: 'ဣတ္ထိလိင် နာမဝိသေသန၊ vant/mant ဝိဘတ်ပြောင်း', n: 'နပုံသကလိင် နာမဝိသေသန၊ vant/mant ဝိဘတ်ပြောင်း' }[gender];
       const name = { m: 'ပုလ္လိင်နာမ်', f: 'ဣတ္ထိလိင်နာမ်', n: 'နပုံသကလိင်နာမ်' }[gender];
       return irregular ? name + '၊ မမှန်ဝိဘတ်ပြောင်း' : name + (ending ? '၊ -' + ending + ' ဝိဘတ်ပြောင်း' : '');
+    }
+    if (gender && /vant\/?mant/i.test(text)) {
+      return { m: 'Masculine adjective, vant/mant declension', f: 'Feminine adjective, vant/mant declension', n: 'Neuter adjective, vant/mant declension' }[gender];
     }
     return text.replace('declens.', 'declension').replace('decl.', 'declension');
   }

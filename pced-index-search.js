@@ -175,8 +175,12 @@
       return name + (ending ? '，-' + ending + ' 变格' : '');
     }
     if (language === 'my' && gender) {
+      if (/vant\/?mant/i.test(text)) return { m: 'ပုလ္လိင် နာမဝိသေသန၊ vant/mant ဝိဘတ်ပြောင်း', f: 'ဣတ္ထိလိင် နာမဝိသေသန၊ vant/mant ဝိဘတ်ပြောင်း', n: 'နပုံသကလိင် နာမဝိသေသန၊ vant/mant ဝိဘတ်ပြောင်း' }[gender];
       const name = { m: 'ပုလ္လိင်နာမ်', f: 'ဣတ္ထိလိင်နာမ်', n: 'နပုံသကလိင်နာမ်' }[gender];
       return irregular ? name + '၊ မမှန်ဝိဘတ်ပြောင်း' : name + (ending ? '၊ -' + ending + ' ဝိဘတ်ပြောင်း' : '');
+    }
+    if (gender && /vant\/?mant/i.test(text)) {
+      return { m: 'Masculine adjective, vant/mant declension', f: 'Feminine adjective, vant/mant declension', n: 'Neuter adjective, vant/mant declension' }[gender];
     }
     return text.replace('declens.', 'declension').replace('decl.', 'declension');
   }

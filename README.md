@@ -83,6 +83,8 @@ The landing-page renderer must also follow a verified inflected-form mapping fro
 
 In every Chinese-priority view, Pali Lookup `vant/mant` groups must be labelled explicitly as `阳性形容词，vant/mant 变格`, `中性形容词，vant/mant 变格`, and `阴性形容词，vant/mant 变格`; case and number headings must also use Chinese-priority labels. The three entry paths must show the same groups in the same order.
 
+All Dhamma Books use one repository-level PCED implementation; individual books must not maintain independent morphology or inflection rules. The shared popup verifies and loads the authoritative shared lookup core and Pali Lookup morphology dataset. English-, Chinese-, and Burmese-priority views use the same paradigms and differ only in localized labels. The corresponding shared files in Tipitaka-reader must be released and tested at the same time.
+
 PCED-enabled books use the Daily-Chants standard:
 
 1. Approved Chinese-Tipiṭaka entry, when precisely matched

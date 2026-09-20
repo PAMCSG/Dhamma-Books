@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.6.0 — 2026-09-19
+ * Version 3.7.1 — 2026-09-20
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.6.0';
+  const VERSION = '3.7.1';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -729,8 +729,10 @@
             .sort((a, b) => a.q - b.q).map(item => record.s + item.e));
           return { label: caseLabels[caseCode], singular: forms('s'), plural: forms('pl') };
         }).filter(Boolean);
+        const gender = /^S/u.test(groupCode) ? 'Masculine' : /^U/u.test(groupCode) ? 'Neuter' : /^T/u.test(groupCode) ? 'Feminine' : '';
+        const description = data.descriptions?.[record.i] || record.i;
         if (rows.length) groups.push({
-          label: data.descriptions?.[record.i] || record.i,
+          label: gender ? gender + ' ' + description.charAt(0).toLowerCase() + description.slice(1) : description,
           source: data.source,
           rows
         });
