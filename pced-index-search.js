@@ -182,6 +182,10 @@
     if (gender && /vant\/?mant/i.test(text)) {
       return { m: 'Masculine adjective, vant/mant declension', f: 'Feminine adjective, vant/mant declension', n: 'Neuter adjective, vant/mant declension' }[gender];
     }
+    if (gender && language === 'en' && !/Masculine|Feminine|Neuter/i.test(text)) {
+      return { m: 'Masculine', f: 'Feminine', n: 'Neuter' }[gender] + ' ' + text.charAt(0).toLowerCase() + text.slice(1)
+        .replace('declens.', 'declension').replace('decl.', 'declension');
+    }
     return text.replace('declens.', 'declension').replace('decl.', 'declension');
   }
 

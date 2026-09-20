@@ -22,7 +22,7 @@ The expanded inflection panel must display:
 
 Do not display a separate `Verified forms / 已核实词形` list. Verified mappings are used internally to locate the canonical Pali Lookup lemma. For example, all three paths must resolve `bhagavā` through `bhagavantu` and display the adjective `vant/mant` declension, never a feminine `-ā` declension.
 
-The three `vant/mant` groups must always identify gender. English-priority views use `Masculine adjective, vant/mant declension`, `Neuter adjective, vant/mant declension`, and `Feminine adjective, vant/mant declension`. Chinese-priority views use `阳性形容词，vant/mant 变格`, `中性形容词，vant/mant 变格`, and `阴性形容词，vant/mant 变格`. Burmese-priority views use the corresponding Burmese gender labels. Case and number headings follow the selected language priority. Tipitaka Reader and both Dhamma-Books entry paths must use the same paradigm.
+Every noun or adjective declension group must identify masculine, neuter, or feminine in its header. This applies to all classes, including `-a`, `-ā`, irregular and `vant/mant` paradigms. English-priority views use English gender labels, Chinese-priority views use `阳性`, `中性`, or `阴性`, and Burmese-priority views use the corresponding Burmese labels. Case and number headings follow the selected language priority. Tipitaka Reader and both Dhamma-Books entry paths must use the same paradigm.
 
 When a JavaScript renderer changes, every HTML loader that references it must receive a new cache-version query before release. A change is incomplete if only one or two entry paths are updated.
 

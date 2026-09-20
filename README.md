@@ -81,7 +81,7 @@ Do not display a separate `Verified forms / 已核实词形` chip list above the
 
 The landing-page renderer must also follow a verified inflected-form mapping from the searched surface form to its canonical morphology lemma before deciding that no paradigm exists. For example, exact dictionary headword `bhagavā` must use the maintained `bhagavā → bhagavantu` mapping and display the same adjectival-noun paradigm as the two word-click popup paths.
 
-In every Chinese-priority view, Pali Lookup `vant/mant` groups must be labelled explicitly as `阳性形容词，vant/mant 变格`, `中性形容词，vant/mant 变格`, and `阴性形容词，vant/mant 变格`; case and number headings must also use Chinese-priority labels. The three entry paths must show the same groups in the same order.
+Every Pali Lookup noun or adjective declension header must state masculine, neuter, or feminine, including `-a`, `-ā`, irregular and `vant/mant` classes. English-, Chinese-, and Burmese-priority views use the corresponding localized gender labels; case and number headings follow the same language priority. The three entry paths must show the same groups in the same order.
 
 All Dhamma Books use one repository-level PCED implementation; individual books must not maintain independent morphology or inflection rules. The shared popup verifies and loads the authoritative shared lookup core and Pali Lookup morphology dataset. English-, Chinese-, and Burmese-priority views use the same paradigms and differ only in localized labels. The corresponding shared files in Tipitaka-reader must be released and tested at the same time.
 

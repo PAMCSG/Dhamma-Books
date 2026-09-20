@@ -729,10 +729,15 @@
             .sort((a, b) => a.q - b.q).map(item => record.s + item.e));
           return { label: caseLabels[caseCode], singular: forms('s'), plural: forms('pl') };
         }).filter(Boolean);
-        const gender = /^S/u.test(groupCode) ? 'Masculine' : /^U/u.test(groupCode) ? 'Neuter' : /^T/u.test(groupCode) ? 'Feminine' : '';
+        const nominative = rows.find(row => row.label === 'Nominative') || rows[0];
+        const nominativeForms = [...(nominative?.singular || []), ...(nominative?.plural || [])];
+        const gender = nominativeForms.some(form => /(?:atī|atiyo|antiyo|āyo)$/u.test(form)) ? 'Feminine'
+          : nominativeForms.some(form => /(?:aṃ|antāni|āni)$/u.test(form)) ? 'Neuter'
+            : nominativeForms.length ? 'Masculine' : '';
         const description = data.descriptions?.[record.i] || record.i;
         if (rows.length) groups.push({
-          label: gender ? gender + ' ' + description.charAt(0).toLowerCase() + description.slice(1) : description,
+          label: gender && !/^(?:Masculine|Feminine|Neuter)\b/i.test(description)
+            ? gender + ' ' + description.charAt(0).toLowerCase() + description.slice(1) : description,
           source: data.source,
           rows
         });
