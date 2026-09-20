@@ -77,6 +77,8 @@ Every PCED morphology, inflection, attribution, compound-analysis, sandhi, or po
 
 Acceptance testing must use the same recognized inflected word in all three paths. The inflection table, labels, cautions, and attribution must agree. The expanded panel must display `来源 / Source: Pali Lookup version 2.0`.
 
+Do not display a separate `Verified forms / 已核实词形` chip list above the paradigm table. Verified surface-to-lemma mappings are lookup inputs, not a second user-facing inflection table. All three paths must load the Pali Lookup morphology dataset and use the mapped canonical lemma; they must not fall back to a feminine `-ā` paradigm for `bhagavā`.
+
 The landing-page renderer must also follow a verified inflected-form mapping from the searched surface form to its canonical morphology lemma before deciding that no paradigm exists. For example, exact dictionary headword `bhagavā` must use the maintained `bhagavā → bhagavantu` mapping and display the same adjectival-noun paradigm as the two word-click popup paths.
 
 PCED-enabled books use the Daily-Chants standard:

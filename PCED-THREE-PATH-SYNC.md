@@ -14,4 +14,6 @@ The expanded inflection panel must display:
 
 `来源 / Source: Pali Lookup version 2.0`
 
+Do not display a separate `Verified forms / 已核实词形` list. Verified mappings are used internally to locate the canonical Pali Lookup lemma. For example, all three paths must resolve `bhagavā` through `bhagavantu` and display the adjective `vant/mant` declension, never a feminine `-ā` declension.
+
 When a JavaScript renderer changes, every HTML loader that references it must receive a new cache-version query before release. A change is incomplete if only one or two entry paths are updated.

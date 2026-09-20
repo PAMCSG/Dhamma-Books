@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.5.1 — 2026-09-19 */
+/* PAMC cross-book PCED popup standard v1.5.2 — 2026-09-20 */
 (function () {
   'use strict';
 
@@ -8,6 +8,7 @@
   let lastWord = '';
   let lastWordElement = null;
   let livePromise = null;
+  let morphologyPromise = null;
   const dhammapadaPopupSelections = new Map();
   const popupStack = [];
   const POPUP_Z_BASE = 2147483000;
@@ -45,6 +46,23 @@
   };
   const normalize = value => core()?.normalizeForMatch(value)
     .replace(/[^a-zāīūṅñṭḍṇḷṃ\s]/g, ' ').replace(/\s+/g, ' ').trim() || '';
+
+  function ensureMorphology() {
+    if (window.PaliLookupMorphology) return Promise.resolve(window.PaliLookupMorphology);
+    if (morphologyPromise) return morphologyPromise;
+    morphologyPromise = new Promise(resolve => {
+      const existing = document.querySelector('script[src*="pali-lookup-morphology.js"]');
+      const loader = existing || document.createElement('script');
+      const done = () => resolve(window.PaliLookupMorphology || null);
+      loader.addEventListener('load', done, { once: true });
+      loader.addEventListener('error', done, { once: true });
+      if (!existing) {
+        loader.src = new URL('pali-lookup-morphology.js?v=2.0-unicode-trial', script?.src || location.href).href;
+        document.head.append(loader);
+      }
+    });
+    return morphologyPromise;
+  }
 
   function standardOptions() {
     const data = dictionary();
@@ -162,11 +180,11 @@
   }
 
   const INFLECTION_UI = {
-    en: { title: 'Inflections', verified: 'Verified forms', case: 'Case', singular: 'Singular', plural: 'Plural',
+    en: { title: 'Inflections', case: 'Case', singular: 'Singular', plural: 'Plural',
       caution: 'Possible regular forms; irregular forms may differ.' },
-    zh: { title: '词形变化', verified: '已核实词形', case: '格', singular: '单数', plural: '复数',
+    zh: { title: '词形变化', case: '格', singular: '单数', plural: '复数',
       caution: '可能的规则词形；不规则形式可能不同。' },
-    my: { title: 'ဝေါဟာရပုံစံများ', verified: 'အတည်ပြုပြီးသော ပုံစံများ', case: 'ဝိဘတ်', singular: 'ဧကဝုစ်', plural: 'ဗဟုဝုစ်',
+    my: { title: 'ဝေါဟာရပုံစံများ', case: 'ဝိဘတ်', singular: 'ဧကဝုစ်', plural: 'ဗဟုဝုစ်',
       caution: 'ဖြစ်နိုင်သော ပုံမှန်ပုံစံများဖြစ်ပြီး မမှန်ပုံစံများ ကွဲပြားနိုင်သည်။' }
   };
   const CASE_UI = {
@@ -191,8 +209,18 @@
   }
 
   function renderInflectionPanel(head, primaryLanguage = 'en') {
-    const entry = dictionary()[head];
-    const paradigm = core()?.inflectionParadigm?.(head, entry, standardOptions());
+    const data = dictionary();
+    const options = standardOptions();
+    const mappedLemmas = (options.inflections?.[head] || []).map(item =>
+      typeof item === 'string' ? item : item?.form
+    ).filter(Boolean);
+    if (mappedLemmas.length && !window.PaliLookupMorphology) return '';
+    const candidates = [...mappedLemmas, head];
+    let paradigm = null;
+    for (const lemma of candidates) {
+      paradigm = core()?.inflectionParadigm?.(lemma, data[lemma] || data[head], options);
+      if (paradigm?.groups?.length) break;
+    }
     if (!paradigm) return '';
     const ui = INFLECTION_UI[primaryLanguage] || INFLECTION_UI.en;
     const caseLabel = label => CASE_UI[primaryLanguage]?.[label] || label;
@@ -200,10 +228,6 @@
       '<span class="pced-form-chip">' + esc(form) + '</span>'
     ).join(' ');
     let content = '';
-    if (paradigm.verified?.length) {
-      content += '<div class="pced-inflection-group"><b>' + esc(ui.verified) + '</b>' +
-        '<div class="pced-form-list">' + chips(paradigm.verified) + '</div></div>';
-    }
     for (const group of paradigm.groups || []) {
       content += '<div class="pced-inflection-group"><b>' + esc(localizedGroupLabel(group.label, primaryLanguage)) + '</b>';
       if (group.rows) {
@@ -1089,6 +1113,9 @@
     if (isDhammapada()) document.body.classList.add('pamc-dhammapada-popup-standard');
     installDhammapadaContentsNavigation();
     scanModals();
+    ensureMorphology().then(() => document.querySelectorAll(MOVABLE_MODAL_SELECTOR).forEach(modal => {
+      if (isOpen(modal)) modalOpened(modal, false);
+    }));
     new MutationObserver(mutations => mutations.forEach(mutation => mutation.addedNodes.forEach(node => {
       if (node.nodeType === 1) scanModals(node);
     }))).observe(document.documentElement, { childList: true, subtree: true });

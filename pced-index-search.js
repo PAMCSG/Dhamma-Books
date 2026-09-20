@@ -144,11 +144,11 @@
   }
 
   const INFLECTION_UI = {
-    en: { title: 'Inflections', verified: 'Verified forms', case: 'Case', singular: 'Singular', plural: 'Plural',
+    en: { title: 'Inflections', case: 'Case', singular: 'Singular', plural: 'Plural',
       caution: 'Possible regular forms; irregular forms may differ.' },
-    zh: { title: '词形变化', verified: '已核实词形', case: '格', singular: '单数', plural: '复数',
+    zh: { title: '词形变化', case: '格', singular: '单数', plural: '复数',
       caution: '可能的规则词形；不规则形式可能不同。' },
-    my: { title: 'ဝေါဟာရပုံစံများ', verified: 'အတည်ပြုပြီးသော ပုံစံများ', case: 'ဝိဘတ်', singular: 'ဧကဝုစ်', plural: 'ဗဟုဝုစ်',
+    my: { title: 'ဝေါဟာရပုံစံများ', case: 'ဝိဘတ်', singular: 'ဧကဝုစ်', plural: 'ဗဟုဝုစ်',
       caution: 'ဖြစ်နိုင်သော ပုံမှန်ပုံစံများဖြစ်ပြီး မမှန်ပုံစံများ ကွဲပြားနိုင်သည်။' }
   };
   const CASE_UI = {
@@ -177,7 +177,7 @@
     const mappedLemmas = (inflections?.[head] || []).map(item =>
       typeof item === 'string' ? item : item?.form
     ).filter(Boolean);
-    const candidates = [head, ...mappedLemmas];
+    const candidates = [...mappedLemmas, head];
     let paradigm = null;
     for (const lemma of candidates) {
       paradigm = global.PCEDLookupCore?.inflectionParadigm?.(lemma, dictionary[lemma], { inflections });
@@ -190,10 +190,6 @@
       '<span class="pced-form-chip">' + esc(form) + '</span>'
     ).join(' ');
     let content = '';
-    if (paradigm.verified?.length) {
-      content += '<div class="pced-inflection-group"><b>' + esc(ui.verified) + '</b>' +
-        '<div class="pced-form-list">' + chips(paradigm.verified) + '</div></div>';
-    }
     for (const group of paradigm.groups || []) {
       content += '<div class="pced-inflection-group"><b>' + esc(localizedGroupLabel(group.label, priority)) + '</b>';
       if (group.rows) {
