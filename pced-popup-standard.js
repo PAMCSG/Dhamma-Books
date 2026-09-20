@@ -218,6 +218,7 @@
       }
       content += '</div>';
     }
+    content += '<div class="pced-inflection-caution">来源 / Source: Pali Lookup version 2.0</div>';
     if (paradigm.generated) {
       content += '<div class="pced-inflection-caution">' + esc(ui.caution) + '</div>';
     }
@@ -294,54 +295,46 @@
   const PANEL_SELECTOR = '.panel,.pced-panel,.modalcontent,.modal-content,.lookup-panel,.dictionary-panel,.dialog,.db-bookmark-panel,.fn-dialog';
   const HANDLE_SELECTOR = '.panel-head,.pced-panel-head,.modal-header,.dialog-header,.lookup-header,.dict-header,.modal-titlebar,.db-bookmark-head,#fnTitle';
 
-  const SCROLLABLE_SELECTOR = [
-    '.panel', '.pced-panel', '.modalcontent', '.modal-content', '.lookup-panel',
-    '.dictionary-panel', '.dialog', '.db-bookmark-panel', '.fn-dialog',
-    '.panel-body', '.modal-body', '.pced-panel-body', '.pced-body',
-    '.lookup-section', '.tab-panel', '[data-popup-scroll]'
-  ].join(',');
-
-  function installScrollBoundaryGuard(modal) {
-    if (!modal || modal.dataset.pamcScrollBoundary === '1') return;
-    const panel = panelOf(modal);
-    if (!panel) return;
-    modal.dataset.pamcScrollBoundary = '1';
-
-    const contain = root => {
-      root.style.setProperty('overscroll-behavior', 'contain');
-      root.style.setProperty('overscroll-behavior-y', 'contain');
+  function installPopupScrollContainment() {
+    if (document.documentElement.dataset.pamcPopupScrollContainment === '1') return;
+    document.documentElement.dataset.pamcPopupScrollContainment = '1';
+    const touches = new Map();
+    const targetElement = target => target instanceof Element ? target : target?.parentElement;
+    const scrollable = node => {
+      if (!(node instanceof Element)) return false;
+      const overflow = getComputedStyle(node).overflowY;
+      return /^(?:auto|scroll|overlay)$/.test(overflow) && node.scrollHeight > node.clientHeight + 1;
     };
-    contain(modal);
-    contain(panel);
-    modal.querySelectorAll(SCROLLABLE_SELECTOR).forEach(contain);
-
-    modal.addEventListener('wheel', event => {
-      if (event.ctrlKey) return;
-      const path = typeof event.composedPath === 'function' ? event.composedPath() : [];
-      const candidates = path.filter(node =>
-        node instanceof Element && modal.contains(node) &&
-        node.matches(SCROLLABLE_SELECTOR)
-      );
-      if (!candidates.includes(panel)) candidates.push(panel);
-
-      const canContinue = candidates.some(node => {
-        const style = getComputedStyle(node);
-        const vertical = /(auto|scroll|overlay)/.test(style.overflowY) &&
-          node.scrollHeight > node.clientHeight + 1;
-        const horizontal = /(auto|scroll|overlay)/.test(style.overflowX) &&
-          node.scrollWidth > node.clientWidth + 1;
-        const canY = event.deltaY < 0 ? node.scrollTop > 0 :
-          event.deltaY > 0 && node.scrollTop + node.clientHeight < node.scrollHeight - 1;
-        const canX = event.deltaX < 0 ? node.scrollLeft > 0 :
-          event.deltaX > 0 && node.scrollLeft + node.clientWidth < node.scrollWidth - 1;
-        return (vertical && canY) || (horizontal && canX);
-      });
-
-      if (!canContinue) {
-        event.preventDefault();
-        event.stopPropagation();
+    const canScroll = (modal, target, deltaY) => {
+      for (let node = targetElement(target); node && modal.contains(node); node = node.parentElement) {
+        if (scrollable(node) && (deltaY < 0 ? node.scrollTop > 1 :
+            deltaY > 0 ? node.scrollTop + node.clientHeight < node.scrollHeight - 1 : true)) return true;
+        if (node === modal) break;
       }
+      return false;
+    };
+    const contain = (event, deltaY) => {
+      if (!deltaY) return;
+      const target = targetElement(event.target);
+      const modal = target?.closest(MOVABLE_MODAL_SELECTOR);
+      if (modal && isOpen(modal) && !canScroll(modal, target, deltaY)) event.preventDefault();
+    };
+    document.addEventListener('wheel', event => contain(event, event.deltaY), { capture: true, passive: false });
+    document.addEventListener('touchstart', event => {
+      for (const touch of event.changedTouches) touches.set(touch.identifier, touch.clientY);
+    }, { capture: true, passive: true });
+    document.addEventListener('touchmove', event => {
+      const touch = event.changedTouches[0];
+      if (!touch || !touches.has(touch.identifier)) return;
+      const previousY = touches.get(touch.identifier);
+      touches.set(touch.identifier, touch.clientY);
+      contain(event, previousY - touch.clientY);
     }, { capture: true, passive: false });
+    const forgetTouches = event => {
+      for (const touch of event.changedTouches) touches.delete(touch.identifier);
+    };
+    document.addEventListener('touchend', forgetTouches, true);
+    document.addEventListener('touchcancel', forgetTouches, true);
   }
 
   function panelOf(modal) {
@@ -1058,7 +1051,6 @@
     if (!modal || modal.dataset.pamcWatched === '1') return;
     modal.dataset.pamcWatched = '1';
     installMovable(modal);
-    installScrollBoundaryGuard(modal);
     normalizeFootnoteTitle(modal);
     let wasOpen = isOpen(modal);
     new MutationObserver(() => {
@@ -1087,11 +1079,12 @@
     if (mode === 'index-search') document.body.classList.add('pamc-pced-compact-typography');
     if (isDhammapada()) document.body.classList.add('pamc-dhammapada-popup-standard');
     installDhammapadaContentsNavigation();
+    installPopupScrollContainment();
     scanModals();
     new MutationObserver(mutations => mutations.forEach(mutation => mutation.addedNodes.forEach(node => {
       if (node.nodeType === 1) scanModals(node);
     }))).observe(document.documentElement, { childList: true, subtree: true });
-    window.PAMCPopupMovement = Object.freeze({ install: installMovable, scan: scanModals, version: '1.1.0' });
+    window.PAMCPopupMovement = Object.freeze({ install: installMovable, scan: scanModals, version: '1.2.0' });
     const raiseTriggeredPopup = event => {
       if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
       const trigger = event.target;
@@ -1114,6 +1107,7 @@
       style.id = 'pamc-pced-standard-style';
       style.textContent = `
         :root{--pamc-popup-brown:#75482d;--pamc-popup-brown-dark:#603921;--pamc-popup-tan:#ead8c3;--pamc-popup-paper:#fffdf9;--pamc-popup-ink:#2d2924;--pamc-popup-blue:#0b4f8a;--pamc-popup-line:#ddc7b1}
+        .modal,#pced-modal,[data-modal],.db-bookmark-overlay,.fn-modal{overscroll-behavior:contain}
         .modal,#pced-modal,[data-modal]{color:var(--pamc-popup-ink);font-family:Georgia,"Times New Roman","Noto Serif SC","Songti SC",SimSun,serif;font-size:18px}
         #dictModal,#lookupModal,#pced-modal{z-index:2147483000!important}
         body>.modal,body>.modalbg,body>#pced-modal,body>[data-modal],body>.fn-modal,body>.db-bookmark-overlay{background:transparent!important}
@@ -1131,7 +1125,7 @@
         }
         .modal .panel,.modal .pced-panel,.modal .modalcontent,.modal .modal-content,.modal .lookup-panel,.modal .dictionary-panel,.modal .dialog,
         #pced-modal .panel,#pced-modal .pced-panel,#pced-modal .modalcontent,#pced-modal .modal-content{
-          background:var(--pamc-popup-paper)!important;color:var(--pamc-popup-ink)!important;border:1px solid #a97958!important;border-radius:13px!important;box-shadow:0 20px 70px #0006!important;max-height:92vh
+          background:var(--pamc-popup-paper)!important;color:var(--pamc-popup-ink)!important;border:1px solid #a97958!important;border-radius:13px!important;box-shadow:0 20px 70px #0006!important;max-height:92vh;overscroll-behavior:contain
         }
         .modal .panel-head,.modal .pced-panel-head,.modal .modal-header,.modal .dialog-header,.modal .lookup-header,.modal .dict-header,.modal .modal-titlebar,
         #pced-modal .panel-head,#pced-modal .pced-panel-head,#pced-modal .modal-header{
@@ -1145,7 +1139,7 @@
           color:#fff!important;background:transparent!important;border:1px solid #d6bda9!important;border-radius:9px!important;font-family:Arial,sans-serif!important;font-size:26px!important;line-height:1!important;min-width:36px;min-height:36px;padding:4px 8px!important
         }
         .modal .panel-body,.modal .modal-body,.modal .pced-panel-body,.modal .pced-body,#pced-modal .panel-body,#pced-modal .modal-body,#pced-modal .pced-body{
-          background:var(--pamc-popup-paper)!important;color:var(--pamc-popup-ink)!important;padding:18px 22px 24px!important
+          background:var(--pamc-popup-paper)!important;color:var(--pamc-popup-ink)!important;padding:18px 22px 24px!important;overscroll-behavior:contain
         }
         .lookup-meta,.panel-meta,#dictMeta,#pced-meta{color:#74665b!important;font-size:14px!important;margin-bottom:10px!important}
         .entry{padding:13px 0!important;border-top:1px solid #eadfd5!important;background:transparent!important}
