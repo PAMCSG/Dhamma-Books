@@ -169,6 +169,7 @@
     return '';
   }
   function teacherDeclensionGroup(group, lemma, gender) {
+    if (Number(group?.teacherGroupNumber)) return Number(group.teacherGroupNumber);
     const text = String(group?.label || '');
     const code = String(group?.morphologyCode || '');
     const word = global.PCEDLookupCore?.normalizeForMatch(group?.lemma || lemma) ||
@@ -248,9 +249,15 @@
           group.rows.map(row => '<tr><th>' + esc(caseLabel(row.label)) + '</th><td>' + chips(row.singular) +
             '</td>' + (hasPlural ? '<td>' + chips(row.plural) + '</td>' : '') + '</tr>').join('') + '</tbody></table></div>';
       } else content += '<div class="pced-form-list">' + chips(group.forms) + '</div>';
+      if (group.note) content += '<div class="pced-inflection-caution">' + esc(group.note) + '</div>';
       content += '</div>';
     }
-    content += '<div class="pced-inflection-caution">来源 / Source: Pali Lookup version 2.0</div>';
+    if (paradigm.formSystem === 'kaccayana') {
+      content += '<div class="pced-inflection-caution">性别及词干识别 / Gender and stem identification: Pali Lookup version 2.0</div>' +
+        '<div class="pced-inflection-caution">变格组及词形 / Declension group and forms: ' + esc(paradigm.formSource) + '</div>';
+    } else {
+      content += '<div class="pced-inflection-caution">来源 / Source: Pali Lookup version 2.0</div>';
+    }
     if (paradigm.generated) {
       content += '<div class="pced-inflection-caution">' + esc(ui.caution) + '</div>';
     }
@@ -432,7 +439,7 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.5.3' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.6.0' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

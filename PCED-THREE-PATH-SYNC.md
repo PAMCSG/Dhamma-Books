@@ -10,9 +10,10 @@ Every PCED morphology, inflection, attribution, compound-analysis, sandhi, or po
 
 The same recognized inflected word must be tested in all three paths. The displayed headword, analysis, inflection table, labels, cautions, and attribution must agree.
 
-The expanded inflection panel must display:
-
-`来源 / Source: Pali Lookup version 2.0`
+The expanded inflection panel must identify the source of the displayed forms.
+Kaccāyana-generated tables show separate identification and form sources;
+fallback tables display `来源 / Source: Pali Lookup version 2.0`. See
+`PCED-KACCAYANA-DECLENSION.md` for the controlling standard.
 
 Every nominal/adjectival inflection table must also display the applicable
 declension group from Bhante U Janakābhivaṃsa's *13 Groups - List of
@@ -21,8 +22,10 @@ Declension* (revised July 2019), together with the gender. Examples:
 - `第12组：Guṇavādigaṇa（阳性形容词，vant/mant 变格）`
 - `Group 12: Guṇavādigaṇa (Masculine adjective, vant/mant declension)`
 
-The Pali Lookup morphology class and canonical lemma determine the group; the
-surface word ending alone must never determine gender or group. Feminine
+The Pali Lookup morphology class and canonical lemma determine the proposed
+gender and group; the surface word ending alone must never determine them.
+The displayed forms come from the Kaccāyana generator only for paradigms safely
+encoded from the teacher's tables. Feminine
 `vant/mant` and present-participle paradigms must state that they follow Group
 7, Nadādigaṇa. If the available data cannot establish a group reliably, do not
 guess or display a group number.

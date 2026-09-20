@@ -81,10 +81,6 @@ Do not display a separate `Verified forms / 已核实词形` chip list above the
 
 The landing-page renderer must also follow a verified inflected-form mapping from the searched surface form to its canonical morphology lemma before deciding that no paradigm exists. For example, exact dictionary headword `bhagavā` must use the maintained `bhagavā → bhagavantu` mapping and display the same adjectival-noun paradigm as the two word-click popup paths.
 
-Every Pali Lookup noun or adjective declension header must state masculine, neuter, or feminine, including `-a`, `-ā`, irregular and `vant/mant` classes. English-, Chinese-, and Burmese-priority views use the corresponding localized gender labels; case and number headings follow the same language priority. The three entry paths must show the same groups in the same order.
-
-All Dhamma Books use one repository-level PCED implementation; individual books must not maintain independent morphology or inflection rules. The shared popup verifies and loads the authoritative shared lookup core and Pali Lookup morphology dataset. English-, Chinese-, and Burmese-priority views use the same paradigms and differ only in localized labels. The corresponding shared files in Tipitaka-reader must be released and tested at the same time.
-
 PCED-enabled books use the Daily-Chants standard:
 
 1. Approved Chinese-Tipiṭaka entry, when precisely matched
@@ -496,3 +492,15 @@ Primary headings use the approved pale #F4E8DF panel, #A8734F top border and bro
 Upload instructions: extract `requisites-word-update.zip`; upload its three files to the repository root, replacing this book HTML and README.md and adding the comparison report. Keep all existing shared CSS, JavaScript and assets. If README.md changed after the base commit, merge this new section into the latest README instead of overwriting newer entries. This ZIP is an update package for the existing repository, not a standalone copy of the complete site. No GitHub push or commit was made.
 
 Validation: source-text, note-reference, Contents-link, unique-ID, preserved-English/dictionary and JavaScript syntax checks pass. Desktop/mobile visual and interactive checks remain pending. Source fonts use fallbacks when unavailable on the reader's device.
+
+### PCED Kaccāyana declension source separation — 20 September 2026
+
+`PCED-KACCAYANA-DECLENSION.md` is the controlling morphology specification.
+Pali Lookup version 2.0 identifies the normalized lemma, gender, stem and
+morphology class. `kaccayana-declension.js` generates displayed forms only for
+paradigms safely encoded from Bhante U Janakābhivaṃsa's *13 Groups - List of
+Declension*, checked against A. Thitzana's *Kaccāyana Pāli Vyākaraṇaṁ, Volume 2,
+New MLBD Edition* (2021). Unsupported classes retain a clearly attributed Pali
+Lookup fallback and are never silently labelled Kaccāyana forms. The same
+source labels and paradigms apply to the landing-page search, every Dhamma-Books
+reader and every Tipitaka-Reader sutta.

@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.7.1 — 2026-09-20
+ * Version 3.8.0 — 2026-09-20
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.7.1';
+  const VERSION = '3.8.0';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -887,11 +887,12 @@
     const lemma = cleanWord(head);
     if (!lemma || !entry) return null;
     const grammarText = inflectionGrammarText(entry);
+    const kaccayana = global.KaccayanaDeclension?.paradigm?.(lemma, global.PaliLookupMorphology);
     const reliableNounGroups = paliLookupNounParadigm(lemma);
     // Once the Pali Lookup morphology dataset is present, never guess a
     // noun's gender from its final letter.  Unknown nouns get no generated
     // noun table until their grammatical class is confirmed.
-    const nounGroups = reliableNounGroups ||
+    const nounGroups = kaccayana?.groups || reliableNounGroups ||
       (global.PaliLookupMorphology ? [] : nounParadigm(lemma, grammarText));
     const verbGroups = verbParadigm(lemma, grammarText);
     const verified = verifiedFormsForLemma(lemma, options);
@@ -902,6 +903,9 @@
       verified,
       groups: verbGroups.length ? verbGroups : nounGroups,
       generated: !!(verbGroups.length || nounGroups.length),
+      formSystem: kaccayana?.groups?.length ? 'kaccayana' : reliableNounGroups?.length ? 'pali-lookup' : 'generated',
+      formSource: kaccayana?.formSource || (reliableNounGroups?.length ? 'Pali Lookup version 2.0' : ''),
+      classificationSource: kaccayana?.classificationSource || '',
       morphologySource: reliableNounGroups?.length ? global.PaliLookupMorphology?.source : ''
     };
   }
