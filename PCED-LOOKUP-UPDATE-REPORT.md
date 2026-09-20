@@ -1,7 +1,7 @@
 # PCED Lookup Update Report
 
-Date: 2 September 2026  
-Shared core: `pced-lookup-core.js` version 1.0.0
+Initial report date: 2 September 2026
+Current shared core: `pced-lookup-core.js` version 3.9.1
 
 ## Result
 
@@ -14,6 +14,35 @@ All 13 Dhamma Books HTML readers that provide Roman-script Pāli word lookup now
 - Runtime inflection candidates are accepted only when the complete proposed headword exists in the PCED subset embedded in that book.
 - Pāli spelling normalization includes NFC/lowercase handling and approved equivalents such as `ṁ` → `ṃ`, `aa` → `ā`, `ii` → `ī`, and `uu` → `ū`.
 - No arbitrary prefix, suffix-fragment, or substring entry is accepted as a dictionary headword.
+
+## Generic verified past-tense verb lookup — 20 September 2026
+
+- Shared resolver `pced-lookup-core.js` is advanced to version 3.9.1.
+- Verb classification takes precedence over noun declension. Verified citation
+  forms including `gacchati`, `pavisati`, `cinteti`, and `karoti` therefore
+  display verb paradigms and are not treated as nouns.
+- The resolver builds a cached index only from forms explicitly marked as
+  past/aorist inside PCED verb entries. It supports both label-before-form
+  records (`【过】ahosi`, `[aor] passi`) and form-before-label records
+  (`kari, akāsi,【过】`). Translated prose is excluded from this extraction.
+- Accepted examples include `gacchi → gacchati`, `pavisi → pavisati`,
+  `cintesi → cinteti`, `kari`/`akāsi → karoti`, `ahosi → hoti`, and
+  `passi → passati`.
+- The maintained Kaccāyana `gacchati` family remains authoritative for
+  `agamā`, `agamū`, `agamī`, `agamuṃ`, `agacchi`, and `agacchuṃ`.
+- Irregular past stems are not guessed productively. A past form is accepted
+  only through a maintained Kaccāyana family or an explicit PCED past/aorist
+  citation, and the resolved present headword must exist in the dictionary.
+- The inflection panel inserts an **Ajjatanī / Aorist
+  (dictionary-attested)** group for the extracted forms and attributes verb
+  tables to Bhante U Janakābhivaṃsa's verb table and the Kaccāyana
+  *Ākhyāta Kappa*.
+- Automated checks passed for the examples above, the maintained `gacchati`
+  forms, and the regression `purisa → noun`.
+- Landing-page search v1.7.1 and popup standard v1.8.1 now try the resolver's
+  canonical headword before reverse inflection mappings. This fixes the
+  collision where exact verb `gacchati` was replaced in the table by the
+  `gacchanta` Group 13 declension. The main page also pins lookup core v3.9.1.
 
 ## Readers covered
 

@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.0 — 2026-09-20 */
+/* PAMC cross-book PCED popup standard v1.8.1 — 2026-09-20 */
 (function () {
   'use strict';
 
@@ -60,7 +60,7 @@
     });
     morphologyPromise = Promise.resolve()
       .then(() => window.KaccayanaDeclension ? null : load('kaccayana-declension.js', '1.1.1'))
-      .then(() => core()?.version === '3.9.0' ? null : load('pced-lookup-core.js', '3.9.0'))
+      .then(() => core()?.version === '3.9.1' ? null : load('pced-lookup-core.js', '3.9.1'))
       .then(() => window.PaliLookupMorphology ? null : load('pali-lookup-morphology.js', '2.0-unicode-trial'))
       .then(() => window.PaliLookupMorphology || null);
     return morphologyPromise;
@@ -265,7 +265,10 @@
       typeof item === 'string' ? item : item?.form
     ).filter(Boolean);
     if (mappedLemmas.length && !window.PaliLookupMorphology) return '';
-    const candidates = [...mappedLemmas, head];
+    // Prefer the resolver's canonical headword. A surface such as gacchati is
+    // also a valid inflection of gacchanta, but its exact verb analysis must
+    // not be replaced by the Group 13 present-participle noun paradigm.
+    const candidates = [head, ...mappedLemmas.filter(lemma => lemma !== head)];
     let paradigm = null;
     for (const lemma of candidates) {
       paradigm = core()?.inflectionParadigm?.(lemma, data[lemma] || data[head], options);
@@ -294,8 +297,12 @@
       content += '</div>';
     }
     if (paradigm.formSystem === 'kaccayana') {
-      content += '<div class="pced-inflection-caution">性别及词干识别 / Gender and stem identification: ' + esc(paradigm.classificationSource || 'Pali Lookup version 2.0') + '</div>' +
-        '<div class="pced-inflection-caution">变格组及词形 / Declension group and forms: ' + esc(paradigm.formSource) + '</div>';
+      if (paradigm.kind === 'verb') {
+        content += '<div class="pced-inflection-caution">动词词形 / Verb forms: ' + esc(paradigm.formSource) + '</div>';
+      } else {
+        content += '<div class="pced-inflection-caution">性别及词干识别 / Gender and stem identification: ' + esc(paradigm.classificationSource || 'Pali Lookup version 2.0') + '</div>' +
+          '<div class="pced-inflection-caution">变格组及词形 / Declension group and forms: ' + esc(paradigm.formSource) + '</div>';
+      }
     } else {
       content += '<div class="pced-inflection-caution">来源 / Source: Pali Lookup version 2.0</div>';
     }

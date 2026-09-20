@@ -504,3 +504,23 @@ New MLBD Edition* (2021). Unsupported classes retain a clearly attributed Pali
 Lookup fallback and are never silently labelled Kaccāyana forms. The same
 source labels and paradigms apply to the landing-page search, every Dhamma-Books
 reader and every Tipitaka-Reader sutta.
+
+### PCED generic verified past-tense verbs — 20 September 2026
+
+Shared resolver `pced-lookup-core.js` v3.9.1 classifies verified verbs before
+noun declension and reads explicitly labelled PCED past/aorist citations as
+whole-word mappings to their present headwords. Examples include
+`gacchi → gacchati`, `pavisi → pavisati`, `cintesi → cinteti`,
+`kari`/`akāsi → karoti`, `ahosi → hoti`, and `passi → passati`. The maintained
+teacher/Kaccāyana family also resolves `agamā`, `agamū`, `agamī`, `agamuṃ`,
+`agacchi`, and `agacchuṃ → gacchati`. Irregular past stems are never invented
+from suffixes alone; the evidence must be a maintained Kaccāyana family or an
+explicit PCED past/aorist label. `PCED-KACCAYANA-DECLENSION.md` is the
+controlling source and classification specification.
+
+Landing-page search v1.7.1 and popup standard v1.8.1 preserve that resolved
+verb analysis when a spelling also occurs in the reverse inflection index.
+Thus exact `gacchati` wins over its secondary analysis as a locative form of
+`gacchanta`, and the interface shows the verb paradigm instead of Group 13
+noun declension. The landing page pins lookup core v3.9.1 to prevent a cached
+older core from replacing this behavior.

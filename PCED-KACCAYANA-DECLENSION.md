@@ -1,11 +1,11 @@
-# PCED Kaccāyana Declension Standard
+# PCED Kaccāyana Declension and Verb Standard
 
 Effective: 20 September 2026
 
 ## Purpose
 
-PCED keeps identification and declension generation as separate operations so
-that their sources are visible and are never silently mixed.
+PCED keeps grammatical identification and form generation as separate
+operations so that their sources are visible and are never silently mixed.
 
 ## Authoritative sources and roles
 
@@ -23,6 +23,11 @@ The teacher's 13 groups are a pedagogical synthesis of the Kaccāyana tradition,
 not a verbatim 13-item chapter in the root grammar. Some tables also expressly
 refer to Rūpasiddhi; the interface therefore calls the output “Kaccāyana-based”.
 
+For verbs, Bhante U Janakābhivaṃsa's uploaded verb-ending table supplies the
+eight tense/mood ending sets, while the *Ākhyāta Kappa* supplies their rules and
+examples. PCED dictionary entries supply explicitly attested lexical past
+forms. These three roles must remain distinguishable.
+
 ## Runtime decision sequence
 
 1. Normalize the entered or clicked Pāli form.
@@ -33,6 +38,28 @@ refer to Rūpasiddhi; the interface therefore calls the output “Kaccāyana-bas
    paradigm or cross-reference has been safely encoded.
 6. Otherwise display the Pali Lookup paradigm as a clearly attributed fallback.
    Never label fallback forms as Kaccāyana-generated.
+
+## Verb decision sequence
+
+1. Resolve the entered or clicked form to an attested PCED verb headword.
+2. Identify a finite verb from explicit PCED grammatical evidence or a
+   maintained teacher/Kaccāyana family before considering noun declension.
+3. Generate regular present, imperative, optative, future, participle,
+   absolutive and infinitive groups only for a reliably identified verb.
+4. For irregular and transformed past systems, prefer complete maintained
+   teacher/Kaccāyana forms.
+5. Additionally index only forms explicitly labelled `【过】`, `【過】`,
+   `[aor]`, `[aorist]`, or `[past]` inside the PCED verb entry.
+6. Never infer an irregular past stem from the present spelling alone. Do not
+   extract translated prose or accept a past candidate by substring matching.
+
+For a recognized verb display:
+
+`动词词形 / Verb forms: Bhante U Janakābhivaṃsa’s verb table; Kaccāyana Pāli Vyākaraṇaṁ, Ākhyāta Kappa`
+
+Explicit PCED past citations are placed in:
+
+`Ajjatanī / Aorist (dictionary-attested)`
 
 ## Source labels in the popup
 
@@ -107,3 +134,18 @@ these JavaScript files changes.
 | `khatta` | Pali Lookup `nt.a` | 2 Cittādigaṇa | `khattaṃ` |
 | `bhagavantu` | Pali Lookup `adj.v` | 12 Guṇavādigaṇa | `bhagavā`, `bhagavanto` |
 | `gacchanta` | Pali Lookup present participle | 13 Gacchantādigaṇa | `gacchaṃ`, `gacchanto` |
+
+### Verb acceptance examples
+
+| Input | Resolution | Evidence |
+| --- | --- | --- |
+| `gacchati` | verb, never noun | maintained teacher/Kaccāyana family |
+| `gacchi` | `gacchati` | explicit PCED `【过】` form |
+| `agamā`, `agamū` | `gacchati` | Kaccāyana Hiyyattanī |
+| `agamī`, `agamuṃ`, `agacchi`, `agacchuṃ` | `gacchati` | Kaccāyana Ajjatanī |
+| `pavisi` | `pavisati` | explicit PCED `【过】` form |
+| `cintesi` | `cinteti` | explicit PCED `【过】` / `[aor]` form |
+| `kari`, `akāsi` | `karoti` | explicit PCED form-before-label record |
+| `ahosi` | `hoti` | explicit PCED `【过】` form |
+| `passi` | `passati` | explicit PCED `【过】` / `[aor]` form |
+| `purisa` | noun | noun regression; no verb evidence |

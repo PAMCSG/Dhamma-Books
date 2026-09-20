@@ -1,7 +1,7 @@
 # Standard PCED Lookup
 
-Release date: 2026-09-19  
-Lookup core: 3.6.0
+Release date: 2026-09-20
+Lookup core: 3.9.1
 Dictionary data: PCED 2.0.5.0 plus the verified standard supplement
 
 ## Scope
@@ -17,7 +17,8 @@ Dhamma-Books and Chinese-Tipitaka share `pced-books-popup.css`. Tipitaka-reader 
 ## Lookup order
 
 1. Normalize spelling only for matching (`ṁ` and `ŋ` are matched as `ṃ`; Unicode text is normalized).
-2. Search the exact complete PCED headword.
+2. Search the exact complete PCED headword and any explicitly labelled PCED
+   past/aorist citation attached to a verb entry.
 3. Check a verified canonical or related form when supplied by the host book.
 4. Check the verified inflection workbook, then conservative morphology rules.
 5. Check an approved sandhi or compound decomposition; each displayed component must itself be a complete PCED headword.
@@ -42,9 +43,40 @@ irregular nouns use its stored complete forms. An unclassified noun receives
 no generated table.
 
 Inflection controls, grammatical group headings, and table headings follow
-the selected English, Chinese, or Burmese lookup priority. This first trial
-covers noun declensions; verb conversion must be validated separately before
-it replaces the maintained verb rules.
+the selected English, Chinese, or Burmese lookup priority. Pali Lookup remains
+the morphology source for noun identification. Finite verbs are classified
+separately from their PCED grammatical evidence and the teacher/Kaccāyana verb
+rules; a recognized verb is processed before any noun paradigm is considered.
+
+### Teacher/Kaccāyana verb classification and past forms
+
+Shared resolver 3.9.1 treats a recognized finite verb as a verb before noun
+declension. This prevents citation forms such as `gacchati`, `pavisati`,
+`cinteti`, and `karoti` from receiving a noun table merely because their final
+letters resemble a nominal ending.
+
+The display layer must try the resolver's canonical headword before reverse
+inflection mappings. In particular, `gacchati` is also listed as a locative
+singular form of the participle `gacchanta`; this secondary analysis must not
+replace the exact `gacchati` verb paradigm with Group 13 noun declension.
+
+The displayed verb system follows Bhante U Janakābhivaṃsa's verb-ending table,
+checked against A. Thitzana's *Kaccāyana Pāli Vyākaraṇaṁ, Ākhyāta Kappa*.
+Irregular or historically transformed past stems are not invented from the
+present spelling. Instead, the resolver accepts:
+
+- complete maintained Kaccāyana families, such as `agamā`, `agamū`, `agamī`,
+  `agamuṃ`, `agacchi`, and `agacchuṃ → gacchati`; and
+- past/aorist forms explicitly labelled inside a PCED verb entry, such as
+  `gacchi → gacchati`, `pavisi → pavisati`, `cintesi → cinteti`,
+  `kari`/`akāsi → karoti`, `ahosi → hoti`, and `passi → passati`.
+
+Dictionary-attested past forms are displayed in an **Ajjatanī / Aorist
+(dictionary-attested)** group. A syncretic form may appear in more than one
+grammatical group when the source supports both functions; for example,
+`cintesi` can be present second-person singular and an attested aorist form.
+No unlabelled prose token, loose suffix match, or guessed irregular past form
+may be promoted to a verb headword.
 
 ## Source and language display
 
@@ -68,6 +100,9 @@ New books must import the standard data before the core and apply the supplement
 | `hatāvasesakā` | `hatāvasesaka` analysis; display `hata + avasesaka` entries |
 | `dassukhīla`, `dassukhīlassa` | `dassukhīla` analysis; display `dassu + khīla` entries |
 | `paṭisuṇitvā`, `paṭissuṇitvā`, `paṭissutvā` | absolutive (“having agreed/promised”) of `paṭissuṇāti` |
+| `gacchi`, `pavisi`, `cintesi` | dictionary-attested past/aorist of `gacchati`, `pavisati`, `cinteti` |
+| `kari`, `akāsi`, `ahosi`, `passi` | dictionary-attested past/aorist of `karoti`, `hoti`, `passati` |
+| `agamā`, `agamū`, `agamī`, `agamuṃ`, `agacchi`, `agacchuṃ` | maintained teacher/Kaccāyana forms of `gacchati` |
 | `āyasmā`, `sakkacca`, `suvatthi` | exact PCED headword |
 
 The automated suite also covers the historical `ṁ`/`ṃ`/`ŋ` variants, common `bhikkhu` forms, `gahakūṭaṁ`/`gahakūṭaṃ`, and the “no arbitrary partial match” rule.

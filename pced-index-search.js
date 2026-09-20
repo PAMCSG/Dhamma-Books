@@ -1,4 +1,4 @@
-/* PCED landing-page search v1.7.0 — exact Pāli/diacritic-aware and multilingual. */
+/* PCED landing-page search v1.7.1 — exact Pāli/diacritic-aware and multilingual. */
 (function (global) {
   'use strict';
 
@@ -226,7 +226,11 @@
     const mappedLemmas = (inflections?.[head] || []).map(item =>
       typeof item === 'string' ? item : item?.form
     ).filter(Boolean);
-    const candidates = [...mappedLemmas, head];
+    // The resolver has already selected the canonical headword. Try it before
+    // reverse inflection mappings: gacchati is also a valid locative form of
+    // the participle gacchanta, but an exact resolved verb must keep its verb
+    // paradigm instead of being replaced by the Group 13 noun table.
+    const candidates = [head, ...mappedLemmas.filter(lemma => lemma !== head)];
     let paradigm = null;
     for (const lemma of candidates) {
       paradigm = global.PCEDLookupCore?.inflectionParadigm?.(lemma, dictionary[lemma], { inflections });
@@ -253,8 +257,12 @@
       content += '</div>';
     }
     if (paradigm.formSystem === 'kaccayana') {
-      content += '<div class="pced-inflection-caution">性别及词干识别 / Gender and stem identification: ' + esc(paradigm.classificationSource || 'Pali Lookup version 2.0') + '</div>' +
-        '<div class="pced-inflection-caution">变格组及词形 / Declension group and forms: ' + esc(paradigm.formSource) + '</div>';
+      if (paradigm.kind === 'verb') {
+        content += '<div class="pced-inflection-caution">动词词形 / Verb forms: ' + esc(paradigm.formSource) + '</div>';
+      } else {
+        content += '<div class="pced-inflection-caution">性别及词干识别 / Gender and stem identification: ' + esc(paradigm.classificationSource || 'Pali Lookup version 2.0') + '</div>' +
+          '<div class="pced-inflection-caution">变格组及词形 / Declension group and forms: ' + esc(paradigm.formSource) + '</div>';
+      }
     } else {
       content += '<div class="pced-inflection-caution">来源 / Source: Pali Lookup version 2.0</div>';
     }
