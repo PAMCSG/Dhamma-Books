@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.8.0 — 2026-09-20
+ * Version 3.9.0 — 2026-09-20
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.8.0';
+  const VERSION = '3.9.0';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -53,7 +53,28 @@
     'paṭissutvā': Object.freeze([Object.freeze({
       form: 'paṭissuṇāti', label: 'absolutive: having agreed/promised',
       family: 'verified verb form', preferLemma: true
-    })])
+    })]),
+    'agamā': Object.freeze([Object.freeze({ form: 'gacchati', label: 'Hiyyattanī, third-person singular: went', family: 'Kaccāyana verb form', preferLemma: true })]),
+    'agamū': Object.freeze([Object.freeze({ form: 'gacchati', label: 'Hiyyattanī, third-person plural: went', family: 'Kaccāyana verb form', preferLemma: true })]),
+    'agamī': Object.freeze([Object.freeze({ form: 'gacchati', label: 'Ajjatanī (aorist), third-person singular: went', family: 'Kaccāyana verb form', preferLemma: true })]),
+    'agamuṃ': Object.freeze([Object.freeze({ form: 'gacchati', label: 'Ajjatanī (aorist), third-person plural: went', family: 'Kaccāyana verb form', preferLemma: true })]),
+    'agacchi': Object.freeze([Object.freeze({ form: 'gacchati', label: 'Ajjatanī (aorist), third-person singular: went', family: 'Kaccāyana verb form', preferLemma: true })]),
+    'agacchuṃ': Object.freeze([Object.freeze({ form: 'gacchati', label: 'Ajjatanī (aorist), third-person plural: went', family: 'Kaccāyana verb form', preferLemma: true })])
+  });
+
+  // Kaccāyana-confirmed forms of gamu (to go). Past systems cannot be
+  // recovered safely from a present-tense ending alone, so irregular and
+  // historically transformed forms are maintained as complete-word families.
+  // Sources: Kaccāyana Pāli Vyākaraṇaṁ §§418–419, 476, 517, 519.
+  const KACCAYANA_VERB_PARADIGMS = Object.freeze({
+    'gacchati': Object.freeze([
+      Object.freeze({ label: 'Present (Vattamānā): 3sg, 3pl, 2sg, 2pl, 1sg, 1pl', forms: Object.freeze(['gacchati', 'gacchanti', 'gacchasi', 'gacchatha', 'gacchāmi', 'gacchāma']) }),
+      Object.freeze({ label: 'Past imperfect (Hiyyattanī)', forms: Object.freeze(['agamā', 'agamū']) }),
+      Object.freeze({ label: 'Aorist / recent past (Ajjatanī)', forms: Object.freeze(['agamī', 'agamuṃ', 'agacchi', 'agacchuṃ']) }),
+      Object.freeze({ label: 'Imperative (Pañcamī)', forms: Object.freeze(['gacchatu', 'gacchantu', 'gacchāhi', 'gacchatha']) }),
+      Object.freeze({ label: 'Optative (Sattamī)', forms: Object.freeze(['gaccheyya', 'gaccheyyuṃ', 'gaccheyyāsi', 'gaccheyyātha', 'gaccheyyāmi', 'gaccheyyāma']) }),
+      Object.freeze({ label: 'Future (Bhavissanti)', forms: Object.freeze(['gacchissati', 'gacchissanti', 'gacchissasi', 'gacchissatha', 'gacchissāmi', 'gacchissāma']) })
+    ])
   });
 
   // Curated analyses are reserved for forms whose inherited dictionary
@@ -61,6 +82,7 @@
   // rule-based and is accepted only when both the surface form and its lemma
   // are complete PCED headwords.
   const BUILTIN_GRAMMAR_ANALYSES = Object.freeze({
+    'gacchati': Object.freeze({ lemma: 'gacchati', root: 'gamu', label: 'Third-person singular, present active', meaning: 'goes' }),
     'dissanti': Object.freeze({
       lemma: 'dissati',
       label: 'Third-person plural, present passive',
@@ -854,6 +876,8 @@
   }
 
   function verbParadigm(lemma, grammarText) {
+    const maintained = KACCAYANA_VERB_PARADIGMS[lemma];
+    if (maintained) return maintained.map(group => ({ label: group.label, forms: uniqueForms(group.forms) }));
     const ending = ['āti', 'ati', 'eti', 'oti'].find(value => lemma.endsWith(value));
     if (!ending || !/(?:\bkri\b|ကြိ|【(?:过|現|现|命|独)|\b(?:pr|imper|opt|fut|aor|ger|inf)\s*[．.]|\b(?:goes|does|makes|becomes)\b)/i.test(grammarText)) return [];
     const stem = lemma.slice(0, -ending.length);
@@ -903,8 +927,8 @@
       verified,
       groups: verbGroups.length ? verbGroups : nounGroups,
       generated: !!(verbGroups.length || nounGroups.length),
-      formSystem: kaccayana?.groups?.length ? 'kaccayana' : reliableNounGroups?.length ? 'pali-lookup' : 'generated',
-      formSource: kaccayana?.formSource || (reliableNounGroups?.length ? 'Pali Lookup version 2.0' : ''),
+      formSystem: KACCAYANA_VERB_PARADIGMS[lemma] ? 'kaccayana' : kaccayana?.groups?.length ? 'kaccayana' : reliableNounGroups?.length ? 'pali-lookup' : 'generated',
+      formSource: KACCAYANA_VERB_PARADIGMS[lemma] ? 'Kaccāyana Pāli Vyākaraṇaṁ, Ākhyāta Kappa' : kaccayana?.formSource || (reliableNounGroups?.length ? 'Pali Lookup version 2.0' : ''),
       classificationSource: kaccayana?.classificationSource || '',
       morphologySource: reliableNounGroups?.length ? global.PaliLookupMorphology?.source : ''
     };
