@@ -61,6 +61,21 @@ Explicit PCED past citations are placed in:
 
 `Ajjatanī / Aorist (dictionary-attested)`
 
+## Closed teacher groups
+
+Manogaṇa contains model `mana` and the 15 similar words explicitly listed by
+the teacher: `vaco`, `vayo`, `tejo`, `tapo`, `ceto`, `tamo`, `yaso`, `ayo`,
+`payo`, `siro`, `chando`, `saro`, `uro`, `raho`, and `aho`. Their applicable
+senses and the three `-as` characteristics must be preserved; membership is
+never inferred from an ending.
+
+Sabbanāmagaṇa contains exactly the 28 teacher-table entries `sabba`, `katara`,
+`katama`, `itara`, `añña`, `aññatara`, `aññatama`, `pubba`, `para`, `apara`,
+`dakkhiṇa`, `uttara`, `adhara`, `ya`, `ta`, `eta`, `ima`, `amu`, `kiṃ`, `eka`,
+`ubha`, `ubhaya`, `dvi`, `ti`, `catu`, `pañca`, `tumha`, and `amha`. Their
+pronoun and numeral paradigms are transcribed from the teacher tables rather
+than generated from a general suffix rule.
+
 ## Source labels in the popup
 
 For a Kaccāyana-generated table display both:

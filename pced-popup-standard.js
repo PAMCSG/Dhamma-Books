@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.1 — 2026-09-20 */
+/* PAMC cross-book PCED popup standard v1.8.3 — 2026-09-20 */
 (function () {
   'use strict';
 
@@ -59,8 +59,8 @@
       document.head.append(loader);
     });
     morphologyPromise = Promise.resolve()
-      .then(() => window.KaccayanaDeclension ? null : load('kaccayana-declension.js', '1.1.1'))
-      .then(() => core()?.version === '3.9.1' ? null : load('pced-lookup-core.js', '3.9.1'))
+      .then(() => window.KaccayanaDeclension?.VERSION === '1.3.0' ? null : load('kaccayana-declension.js', '1.3.0'))
+      .then(() => core()?.version === '3.9.3' ? null : load('pced-lookup-core.js', '3.9.3'))
       .then(() => window.PaliLookupMorphology ? null : load('pali-lookup-morphology.js', '2.0-unicode-trial'))
       .then(() => window.PaliLookupMorphology || null);
     return morphologyPromise;
@@ -194,10 +194,11 @@
   };
   const TEACHER_DECLENSION_GROUPS = {
     1: 'Purisādigaṇa', 2: 'Cittādigaṇa', 3: 'Kaññādigaṇa', 4: 'Pumādigaṇa',
-    5: 'Rājādigaṇa', 6: 'Manogaṇādi', 7: 'Nadādigaṇa', 8: 'Gahapatādigaṇa',
+    5: 'Rājādigaṇa', 6: 'Manogaṇa', 7: 'Nadādigaṇa', 8: 'Gahapatādigaṇa',
     9: 'Sabbanāmagaṇa', 10: 'Satthādigaṇa', 11: 'Rattādigaṇa',
     12: 'Guṇavādigaṇa', 13: 'Gacchantādigaṇa'
   };
+  const SABBANAMA_MEMBERS = new Set(['sabba','katara','katama','itara','añña','aññatara','aññatama','pubba','para','apara','dakkhiṇa','uttara','adhara','ya','ta','eta','ima','amu','kiṃ','eka','ubha','ubhaya','dvi','ti','catu','pañca','tumha','amha']);
   function inflectionGroupGender(group) {
     const row = (group?.rows || []).find(item => item.label === 'Nominative') || group?.rows?.[0];
     const forms = [...(row?.singular || []), ...(row?.plural || [])];
@@ -213,7 +214,7 @@
     const word = normalize(group?.lemma || lemma);
     if (/vant\/?mant/i.test(text) || /^(?:adj\.v|m\.v)$/i.test(code)) return 12;
     if (/pres(?:ent)?\.?\s*part|participle/i.test(text) || /^(?:adj\.t|adj\.te|adj\.to|m\.t|m\.te|m\.to)$/i.test(code) || /(?:anta|amāna)$/.test(word)) return 13;
-    if (/pronoun|numeral/i.test(text) || /^(?:pro|pro\.a|pro\.x|adj\.n)$/i.test(code)) return 9;
+    if (SABBANAMA_MEMBERS.has(word)) return 9;
     if (/\bas\s*\(mano\)/i.test(text) || /^(?:m\.s|nt\.s)$/i.test(code)) return 6;
     if (/agent\s*\(ar\)|pitar\/mātar/i.test(text) || /^(?:m\.r|m\.p|f\.p)$/i.test(code)) return 10;
     if (['puma', 'yuva', 'addhā', 'addhāna'].includes(word)) return 4;

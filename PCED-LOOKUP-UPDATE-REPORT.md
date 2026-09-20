@@ -1,7 +1,7 @@
 # PCED Lookup Update Report
 
 Initial report date: 2 September 2026
-Current shared core: `pced-lookup-core.js` version 3.9.1
+Current shared core: `pced-lookup-core.js` version 3.9.3
 
 ## Result
 
@@ -43,6 +43,22 @@ All 13 Dhamma Books HTML readers that provide Roman-script Pāli word lookup now
   canonical headword before reverse inflection mappings. This fixes the
   collision where exact verb `gacchati` was replaced in the table by the
   `gacchanta` Group 13 declension. The main page also pins lookup core v3.9.1.
+
+## Short forms and restricted Groups 6 and 9 — 20 September 2026
+
+- Lookup core v3.9.2 adds verified complete-word resolutions `jetu → jeti`,
+  `bhatu`/`bhātu → bhātar`, and `pitu → pitar`, preventing the unrelated
+  substring results `Ceta`, `Labhati`, and `Attha`.
+- Kaccāyana declension v1.3.0 records the full closed Manogaṇa membership:
+  `mana` plus the 15 similar words in the teacher's table, with the maintained
+  `-asā`, `-aso`, and `-asi` alternatives.
+- The same module directly encodes all 28 teacher-listed Sabbanāmagaṇa
+  pronouns and numerals. Generic morphology labels cannot add further members.
+- Automated checks require all 16 Manogaṇa entries and all 28 Sabbanāmagaṇa
+  entries to produce their respective teacher group, while unlisted words do
+  not enter either restricted group.
+- Landing-page search v1.7.3 and popup standard v1.8.3 pin lookup core v3.9.3
+  and declension v1.3.0.
 
 ## Readers covered
 

@@ -1,4 +1,4 @@
-/* PCED landing-page search v1.7.1 — exact Pāli/diacritic-aware and multilingual. */
+/* PCED landing-page search v1.7.3 — exact Pāli/diacritic-aware and multilingual. */
 (function (global) {
   'use strict';
 
@@ -156,10 +156,11 @@
   };
   const TEACHER_DECLENSION_GROUPS = {
     1: 'Purisādigaṇa', 2: 'Cittādigaṇa', 3: 'Kaññādigaṇa', 4: 'Pumādigaṇa',
-    5: 'Rājādigaṇa', 6: 'Manogaṇādi', 7: 'Nadādigaṇa', 8: 'Gahapatādigaṇa',
+    5: 'Rājādigaṇa', 6: 'Manogaṇa', 7: 'Nadādigaṇa', 8: 'Gahapatādigaṇa',
     9: 'Sabbanāmagaṇa', 10: 'Satthādigaṇa', 11: 'Rattādigaṇa',
     12: 'Guṇavādigaṇa', 13: 'Gacchantādigaṇa'
   };
+  const SABBANAMA_MEMBERS = new Set(['sabba','katara','katama','itara','añña','aññatara','aññatama','pubba','para','apara','dakkhiṇa','uttara','adhara','ya','ta','eta','ima','amu','kiṃ','eka','ubha','ubhaya','dvi','ti','catu','pañca','tumha','amha']);
   function inflectionGroupGender(group) {
     const row = (group?.rows || []).find(item => item.label === 'Nominative') || group?.rows?.[0];
     const forms = [...(row?.singular || []), ...(row?.plural || [])];
@@ -176,7 +177,7 @@
       String(group?.lemma || lemma || '').normalize('NFC').toLowerCase();
     if (/vant\/?mant/i.test(text) || /^(?:adj\.v|m\.v)$/i.test(code)) return 12;
     if (/pres(?:ent)?\.?\s*part|participle/i.test(text) || /^(?:adj\.t|adj\.te|adj\.to|m\.t|m\.te|m\.to)$/i.test(code) || /(?:anta|amāna)$/.test(word)) return 13;
-    if (/pronoun|numeral/i.test(text) || /^(?:pro|pro\.a|pro\.x|adj\.n)$/i.test(code)) return 9;
+    if (SABBANAMA_MEMBERS.has(word)) return 9;
     if (/\bas\s*\(mano\)/i.test(text) || /^(?:m\.s|nt\.s)$/i.test(code)) return 6;
     if (/agent\s*\(ar\)|pitar\/mātar/i.test(text) || /^(?:m\.r|m\.p|f\.p)$/i.test(code)) return 10;
     if (['puma', 'yuva', 'addhā', 'addhāna'].includes(word)) return 4;
@@ -447,7 +448,7 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.6.0' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.3' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

@@ -524,3 +524,13 @@ Thus exact `gacchati` wins over its secondary analysis as a locative form of
 `gacchanta`, and the interface shows the verb paradigm instead of Group 13
 noun declension. The landing page pins lookup core v3.9.1 to prevent a cached
 older core from replacing this behavior.
+
+### PCED short forms and Manogaṇa correction — 20 September 2026
+
+Shared resolver v3.9.3 uses verified whole-word mappings for `jetu → jeti`,
+`bhatu`/`bhātu → bhātar`, and `pitu → pitar`; these queries no longer fall
+through to unrelated definition-substring results. Kaccāyana declension v1.3.0
+records the complete closed groups: `mana` plus 15 teacher-listed Manogaṇa
+words, and all 28 teacher-listed Sabbanāmagaṇa words. Their paradigms come from
+the teacher tables; no additional word enters either group merely by sharing
+an ending or morphology code.

@@ -1,7 +1,7 @@
 # Standard PCED Lookup
 
 Release date: 2026-09-20
-Lookup core: 3.9.1
+Lookup core: 3.9.3
 Dictionary data: PCED 2.0.5.0 plus the verified standard supplement
 
 ## Scope
@@ -77,6 +77,29 @@ grammatical group when the source supports both functions; for example,
 `cintesi` can be present second-person singular and an attested aorist form.
 No unlabelled prose token, loose suffix match, or guessed irregular past form
 may be promoted to a verb headword.
+
+### Short-form and Manogaṇa corrections
+
+Verified whole-word mappings prevent short Pāli input from falling through to
+unrelated multilingual substring results: `jetu → jeti` (imperative),
+`bhātu → bhātar`, and `pitu → pitar`. Plain ASCII `bhatu` is normalized through
+the same verified `bhātu` relationship; it must never resolve to `labhati`.
+
+Group 6 **Manogaṇa** is a closed lexical list: model `mana` plus the teacher's
+15 similar words `vaco`, `vayo`, `tejo`, `tapo`, `ceto`, `tamo`, `yaso`,
+`ayo`, `payo`, `siro`, `chando`, `saro`, `uro`, `raho`, and `aho`. Their
+maintained `-a/-as` forms include the three identifying alternatives in
+instrumental `-asā`, dative/genitive `-aso`, and locative `-asi`. The teacher's
+semantic restrictions remain applicable (for example `vayo` “age,” `tejo`
+“fire/power,” and `ayo` “iron/metal”). No ending or generic morphology code can
+admit another word.
+
+Group 9 **Sabbanāmagaṇa** is likewise closed to the teacher's 28 entries:
+`sabba`, `katara`, `katama`, `itara`, `añña`, `aññatara`, `aññatama`, `pubba`,
+`para`, `apara`, `dakkhiṇa`, `uttara`, `adhara`, `ya`, `ta`, `eta`, `ima`,
+`amu`, `kiṃ`, `eka`, `ubha`, `ubhaya`, `dvi`, `ti`, `catu`, `pañca`, `tumha`,
+and `amha`. Their teacher-table pronoun and numeral paradigms are encoded
+directly; a generic “pronoun” or “numeral” label does not assign Group 9.
 
 ## Source and language display
 

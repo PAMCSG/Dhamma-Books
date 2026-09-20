@@ -1,4 +1,4 @@
-/* PAMC Kaccayana-based nominal declension generator v1.1.1 — 2026-09-20
+/* PAMC Kaccayana-based nominal declension generator v1.3.0 — 2026-09-20
  *
  * Classification input: Pali Lookup 2.0 morphology (lemma, gender, stem class).
  * Forms: Bhante U Janakabhivamsa, "13 Groups - List of Declension" (July 2019),
@@ -10,11 +10,11 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '1.1.1';
+  const VERSION = '1.3.0';
   const SOURCE = "Bhante U Janakābhivaṃsa’s Kaccāyana-based 13 Groups of Declension";
   const GROUPS = Object.freeze({
     1: 'Purisādigaṇa', 2: 'Cittādigaṇa', 3: 'Kaññādigaṇa', 4: 'Pumādigaṇa',
-    5: 'Rājādigaṇa', 6: 'Manogaṇādi', 7: 'Nadādigaṇa', 8: 'Gahapatādigaṇa',
+    5: 'Rājādigaṇa', 6: 'Manogaṇa', 7: 'Nadādigaṇa', 8: 'Gahapatādigaṇa',
     9: 'Sabbanāmagaṇa', 10: 'Satthādigaṇa', 11: 'Rattādigaṇa',
     12: 'Guṇavādigaṇa', 13: 'Gacchantādigaṇa'
   });
@@ -90,6 +90,139 @@
       [['rañño', 'rājino'], ['raññaṃ', 'rājūnaṃ', 'rājānaṃ']], [['raññā'], ['rājūhi', 'rājūbhi', 'rājehi', 'rājebhi']],
       [['rañño', 'rājino'], ['raññaṃ', 'rājūnaṃ', 'rājānaṃ']], [['raññe', 'rājini'], ['rājesu', 'rājūsu']]
     ], 'The teacher lists brahma, atta, sakha and ātuma as similar; they remain on fallback until separately verified.');
+  }
+  // Manogaṇa is a closed lexical class in the teacher's table. Do not assign
+  // Group 6 merely because another word has the same final vowel or a Pali
+  // Lookup m.s/nt.s code. Encode each admitted lemma separately.
+  const MANOGANA_MEMBERS = Object.freeze(new Set([
+    'mana', 'vaco', 'vayo', 'tejo', 'tapo', 'ceto', 'tamo', 'yaso',
+    'ayo', 'payo', 'siro', 'chando', 'saro', 'uro', 'raho', 'aho'
+  ]));
+  function specialGroup6(lemma) {
+    if (!MANOGANA_MEMBERS.has(lemma)) return null;
+    const base = lemma === 'mana' ? 'mana' : lemma.slice(0, -1) + 'a';
+    const stem = base.slice(0, -1);
+    return explicit(6, 'Masculine/neuter noun, mana/manas declension', 'm/nt', [
+      [[stem + 'aṃ', stem + 'o'], [stem + 'ā', stem + 'āni']],
+      [[stem + 'a', stem + 'ā'], [stem + 'ā', stem + 'āni']],
+      [[stem + 'aṃ', stem + 'o'], [stem + 'e', stem + 'āni']],
+      [[stem + 'ena', stem + 'asā'], [stem + 'ehi', stem + 'ebhi']],
+      [[stem + 'assa', stem + 'aso'], [stem + 'ānaṃ']],
+      [[stem + 'asmā', stem + 'amhā', stem + 'ā'], [stem + 'ehi', stem + 'ebhi']],
+      [[stem + 'assa', stem + 'aso'], [stem + 'ānaṃ']],
+      [[stem + 'asmiṃ', stem + 'amhi', stem + 'e', stem + 'asi'], [stem + 'esu']]
+    ], 'Restricted Manogaṇa membership; classification is lexical, not inferred from the ending.');
+  }
+
+  const SABBANAMA_MEMBERS = Object.freeze(new Set([
+    'sabba', 'katara', 'katama', 'itara', 'añña', 'aññatara', 'aññatama',
+    'pubba', 'para', 'apara', 'dakkhiṇa', 'uttara', 'adhara', 'ya', 'ta',
+    'eta', 'ima', 'amu', 'kiṃ', 'eka', 'ubha', 'ubhaya', 'dvi', 'ti',
+    'catu', 'pañca', 'tumha', 'amha'
+  ]));
+  const g9 = (label, gender, rows, note) => group(9, label, rows, gender, note);
+  function sabbanamaRegular(lemma, stem = lemma.slice(0, -1)) {
+    const m = g9('Masculine pronoun/adjective', 'm', [
+      row('Nominative', [stem + 'o'], [stem + 'e']), row('Vocative', [stem + 'a', stem + 'ā'], [stem + 'e']),
+      row('Accusative', [stem + 'aṃ'], [stem + 'e']), row('Instrumental', [stem + 'ena'], [stem + 'ehi', stem + 'ebhi']),
+      row('Dative', [stem + 'assa'], [stem + 'esaṃ', stem + 'esānaṃ']), row('Ablative', [stem + 'asmā', stem + 'amhā'], [stem + 'ehi', stem + 'ebhi']),
+      row('Genitive', [stem + 'assa'], [stem + 'esaṃ', stem + 'esānaṃ']), row('Locative', [stem + 'asmiṃ', stem + 'amhi'], [stem + 'esu'])
+    ]);
+    const n = g9('Neuter pronoun/adjective', 'nt', [
+      row('Nominative', [stem + 'aṃ'], [stem + 'āni']), row('Vocative', [stem + 'a', stem + 'ā'], [stem + 'āni']),
+      row('Accusative', [stem + 'aṃ'], [stem + 'āni']), ...m.rows.slice(3)
+    ]);
+    const f = g9('Feminine pronoun/adjective', 'f', [
+      row('Nominative', [stem + 'ā'], [stem + 'ā', stem + 'āyo']), row('Vocative', [stem + 'e'], [stem + 'ā', stem + 'āyo']),
+      row('Accusative', [stem + 'aṃ'], [stem + 'ā', stem + 'āyo']), row('Instrumental', [stem + 'āya'], [stem + 'āhi', stem + 'ābhi']),
+      row('Dative', [stem + 'āya', stem + 'assā'], [stem + 'āsaṃ', stem + 'āsānaṃ']), row('Ablative', [stem + 'āya'], [stem + 'āhi', stem + 'ābhi']),
+      row('Genitive', [stem + 'āya', stem + 'assā'], [stem + 'āsaṃ', stem + 'āsānaṃ']), row('Locative', [stem + 'āyaṃ', stem + 'assaṃ'], [stem + 'āsu'])
+    ]);
+    return [m, n, f];
+  }
+  function kataraFamily(lemma) {
+    const groups = sabbanamaRegular(lemma);
+    const stem = lemma.slice(0, -1), f = groups[2];
+    f.rows[4] = row('Dative', [stem + 'āya', stem + 'issā'], [stem + 'āsaṃ', stem + 'āsānaṃ']);
+    f.rows[6] = row('Genitive', [stem + 'āya', stem + 'issā'], [stem + 'āsaṃ', stem + 'āsānaṃ']);
+    f.rows[7] = row('Locative', [stem + 'āyaṃ', stem + 'issaṃ'], [stem + 'āsu']);
+    return groups;
+  }
+  function pluralOnly(label, gender, values) {
+    return g9(label, gender, CASES.filter(name => name !== 'Vocative').map((name, i) => row(name, [], values[i])));
+  }
+  function specialGroup9(lemma) {
+    if (!SABBANAMA_MEMBERS.has(lemma)) return null;
+    if (lemma === 'sabba' || lemma === 'ya' || lemma === 'ubhaya') {
+      const groups = sabbanamaRegular(lemma);
+      if (lemma === 'ubhaya') groups[0].rows[0].plural.push('ubhayo');
+      return groups;
+    }
+    if (['katara','katama','itara','añña','aññatara','aññatama'].includes(lemma)) return kataraFamily(lemma);
+    if (['pubba','para','apara','dakkhiṇa','uttara','adhara'].includes(lemma)) {
+      const groups = sabbanamaRegular(lemma), stem = lemma.slice(0, -1);
+      groups[0].rows[0].plural.push(stem + 'ā');
+      groups[0].rows[1].singular.push(stem + 'ā'); groups[0].rows[1].plural.push(stem + 'ā');
+      groups[0].rows[6].plural.push(stem + 'ānaṃ');
+      return groups;
+    }
+    if (lemma === 'ta') return [
+      g9('Masculine demonstrative pronoun','m',[row('Nominative',['so'],['ne','te']),row('Accusative',['naṃ','taṃ'],['ne','te']),row('Instrumental',['nena','tena'],['nehi','nebhi','tehi','tebhi']),row('Dative',['nassa','assa','tassa'],['nesaṃ','nesānaṃ','tesaṃ','tesānaṃ']),row('Ablative',['nasmā','asmā','tasmā','namhā','tamhā'],['nehi','nebhi','tehi','tebhi']),row('Genitive',['nassa','assa','tassa'],['nesaṃ','nesānaṃ','tesaṃ','tesānaṃ']),row('Locative',['nasmiṃ','asmiṃ','tasmiṃ','namhi','tamhi'],['nesu','tesu'])]),
+      g9('Neuter demonstrative pronoun','nt',[row('Nominative',['naṃ','taṃ'],['nāni','tāni']),row('Accusative',['naṃ','taṃ'],['nāni','tāni']),row('Instrumental',['nena','tena'],['nehi','nebhi','tehi','tebhi']),row('Dative',['nassa','assa','tassa'],['nesaṃ','nesānaṃ','tesaṃ','tesānaṃ']),row('Ablative',['nasmā','asmā','tasmā','namhā','tamhā'],['nehi','nebhi','tehi','tebhi']),row('Genitive',['nassa','assa','tassa'],['nesaṃ','nesānaṃ','tesaṃ','tesānaṃ']),row('Locative',['nasmiṃ','asmiṃ','tasmiṃ','namhi','tamhi'],['nesu','tesu'])]),
+      g9('Feminine demonstrative pronoun','f',[row('Nominative',['sā'],['nā','nāyo','tā','tāyo']),row('Accusative',['naṃ','taṃ'],['nā','nāyo','tā','tāyo']),row('Instrumental',['nāya','tāya'],['nāhi','nābhi','tāhi','tābhi']),row('Dative',['tissā','tassā','nassā','assā','tissāya','tassāya','nassāya','assāya','nāya','tāya'],['nāsaṃ','nāsānaṃ','tāsaṃ','tāsānaṃ']),row('Ablative',['nāya','tāya'],['nāhi','nābhi','tāhi','tābhi']),row('Genitive',['tissā','tassā','nassā','assā','tissāya','tassāya','nassāya','assāya','nāya','tāya'],['nāsaṃ','nāsānaṃ','tāsaṃ','tāsānaṃ']),row('Locative',['tissaṃ','tassaṃ','nassaṃ','assaṃ','nāyaṃ','tāyaṃ'],['nāsu','tāsu'])])
+    ];
+    if (lemma === 'eta') return [
+      g9('Masculine demonstrative pronoun','m',[row('Nominative',['eso'],['ete']),row('Accusative',['etaṃ'],['ete']),row('Instrumental',['etena'],['etehi','etebhi']),row('Dative',['etassa'],['etesaṃ','etesānaṃ']),row('Ablative',['etasmā','etamhā'],['etehi','etebhi']),row('Genitive',['etassa'],['etesaṃ','etesānaṃ']),row('Locative',['etasmiṃ','etamhi'],['etesu'])]),
+      g9('Neuter demonstrative pronoun','nt',[row('Nominative',['etaṃ'],['etāni']),row('Accusative',['etaṃ'],['etāni']),row('Instrumental',['etena'],['etehi','etebhi']),row('Dative',['etassa'],['etesaṃ','etesānaṃ']),row('Ablative',['etasmā','etamhā'],['etehi','etebhi']),row('Genitive',['etassa'],['etesaṃ','etesānaṃ']),row('Locative',['etasmiṃ','etamhi'],['etesu'])]),
+      g9('Feminine demonstrative pronoun','f',[row('Nominative',['esā'],['etā','etāyo']),row('Accusative',['etaṃ'],['etā','etāyo']),row('Instrumental',['esā'],['etā','etāyo']),row('Dative',['etaṃ'],['etā','etāyo']),row('Ablative',['etāya'],['etāhi','etābhi']),row('Genitive',['etāya','etissā','etissāya'],['etāsaṃ','etāsānaṃ']),row('Locative',['etāya'],['etāhi','etābhi'])])
+    ];
+    if (lemma === 'ima') return [
+      g9('Masculine demonstrative pronoun','m',[row('Nominative',['ayaṃ'],['ime']),row('Accusative',['imaṃ'],['ime']),row('Instrumental',['anena','iminā'],['imehi','imebhi','ehi','ebhi']),row('Dative',['imassa','assa'],['imesaṃ','imesānaṃ','esaṃ','esānaṃ']),row('Ablative',['imasmā','imamhā','asmā'],['imehi','imebhi','ehi','ebhi']),row('Genitive',['imassa','assa'],['imesaṃ','imesānaṃ','esaṃ','esānaṃ']),row('Locative',['imasmiṃ','imamhi','asmiṃ'],['imesu','esu'])]),
+      g9('Neuter demonstrative pronoun','nt',[row('Nominative',['idaṃ','imaṃ'],['imāni']),row('Accusative',['idaṃ','imaṃ'],['imāni']),row('Instrumental',['anena','iminā'],['imehi','imebhi','ehi','ebhi']),row('Dative',['imassa','assa'],['imesaṃ','imesānaṃ','esaṃ','esānaṃ']),row('Ablative',['imasmā','imamhā','asmā'],['imehi','imebhi','ehi','ebhi']),row('Genitive',['imassa','assa'],['imesaṃ','imesānaṃ','esaṃ','esānaṃ']),row('Locative',['imasmiṃ','imamhi','asmiṃ'],['imesu','esu'])]),
+      g9('Feminine demonstrative pronoun','f',[row('Nominative',['ayaṃ'],['imā','imāyo']),row('Accusative',['imaṃ'],['imā','imāyo']),row('Instrumental',['imāya'],['imāhi','imābhi']),row('Dative',['imāya','assā','assāya','imissā','imissāya'],['imāsaṃ','imāsānaṃ']),row('Ablative',['imāya'],['imāhi','imābhi']),row('Genitive',['imāya','assā','assāya','imissā','imissāya'],['imāsaṃ','imāsānaṃ']),row('Locative',['imāyaṃ','assaṃ','imissaṃ'],['imāsu'])])
+    ];
+    if (lemma === 'amu') return [
+      g9('Masculine remote demonstrative','m',[row('Nominative',['asu','amu'],['amū']),row('Accusative',['amuṃ'],['amū']),row('Instrumental',['amunā'],['amūhi','amūbhi','amuhi','amubhi']),row('Dative',['amussa','adussa'],['amūsaṃ','amūsānaṃ','amusaṃ','amusānaṃ']),row('Ablative',['amusmā','amumhā'],['amūhi','amūbhi','amuhi','amubhi']),row('Genitive',['amussa','adussa'],['amūsaṃ','amūsānaṃ','amusaṃ','amusānaṃ']),row('Locative',['amusmiṃ','amumhi'],['amūsu','amusu'])]),
+      g9('Neuter remote demonstrative','nt',[row('Nominative',['aduṃ'],['amuni','amūni']),row('Accusative',['aduṃ'],['amuni','amūni']),row('Instrumental',['amunā'],['amūhi','amūbhi','amuhi','amubhi']),row('Dative',['amussa','adussa'],['amūsaṃ','amūsānaṃ','amusaṃ','amusānaṃ']),row('Ablative',['amusmā','amumhā'],['amūhi','amūbhi','amuhi','amubhi']),row('Genitive',['amussa','adussa'],['amūsaṃ','amūsānaṃ','amusaṃ','amusānaṃ']),row('Locative',['amusmiṃ','amumhi'],['amūsu','amusu'])]),
+      g9('Feminine remote demonstrative','f',[row('Nominative',['asu','amu'],['amū','amuyo']),row('Accusative',['amuṃ'],['amū','amuyo']),row('Instrumental',['amuyā'],['amūhi','amūbhi','amuhi','amubhi']),row('Dative',['amuyā','amussā'],['amūsaṃ','amūsānaṃ','amusaṃ','amusānaṃ']),row('Ablative',['amuyā'],['amūhi','amūbhi','amuhi','amubhi']),row('Genitive',['amuyā','amussā'],['amūsaṃ','amūsānaṃ','amusaṃ','amusānaṃ']),row('Locative',['amuyaṃ','amusaṃ'],['amūsu','amusu'])])
+    ];
+    if (lemma === 'kiṃ') return [
+      g9('Masculine interrogative pronoun','m',[row('Nominative',['ko'],['ke']),row('Accusative',['kaṃ'],['ke']),row('Instrumental',['kena'],['kehi','kebhi']),row('Dative',['kassa','kissa'],['kesaṃ','kesānaṃ']),row('Ablative',['kasmā','kamhā'],['kehi','kebhi']),row('Genitive',['kassa','kissa'],['kesaṃ','kesānaṃ']),row('Locative',['kasmiṃ','kisamiṃ','kamhi','kimhi'],['kesu'])]),
+      g9('Neuter interrogative pronoun','nt',[row('Nominative',['kiṃ'],['kāni']),row('Accusative',['kiṃ'],['kāni']),row('Instrumental',['kena'],['kehi','kebhi']),row('Dative',['kassa','kissa'],['kesaṃ','kesānaṃ']),row('Ablative',['kasmā','kamhā'],['kehi','kebhi']),row('Genitive',['kassa','kissa'],['kesaṃ','kesānaṃ']),row('Locative',['kasmiṃ','kisamiṃ','kamhi','kimhi'],['kesu'])]),
+      g9('Feminine interrogative pronoun','f',[row('Nominative',['kā'],['kā','kāyo']),row('Accusative',['kaṃ'],['kā','kāyo']),row('Instrumental',['kāya'],['kāhi','kābhi']),row('Dative',['kāya','kassā'],['kāsaṃ','kāsānaṃ']),row('Ablative',['kāya'],['kāhi','kābhi']),row('Genitive',['kāya','kassā'],['kāsaṃ','kāsānaṃ']),row('Locative',['kāya','kassaṃ'],['kāsu'])])
+    ];
+    if (lemma === 'eka') return kataraFamily(lemma).map(g => { g.rows.forEach(r => { r.plural = []; }); return g; });
+    if (lemma === 'ubha') return [g9('Pronoun/adjective, plural only', 'm/nt/f', [
+      row('Nominative', [], ['ubho','ubhe']), row('Accusative', [], ['ubho','ubhe']),
+      row('Instrumental', [], ['ubohi','ubobhi','ubehi','ubebhi']), row('Dative', [], ['ubinnaṃ']),
+      row('Ablative', [], ['ubohi','ubobhi','ubehi','ubebhi']), row('Genitive', [], ['ubinnaṃ']), row('Locative', [], ['ubhosu','ubhesu'])
+    ])];
+    if (lemma === 'dvi') return [pluralOnly('Cardinal numeral, plural only', 'm/nt/f', [
+      ['dve','duve'], ['dve','duve'], ['dvīhi','dvībhi','dvihi','dvibhi'], ['dvinnaṃ','duvinnaṃ'],
+      ['dvīhi','dvībhi','dvihi','dvibhi'], ['dvinnaṃ','duvinnaṃ'], ['dvīsu','dvisu']
+    ])];
+    if (lemma === 'ti') return [
+      pluralOnly('Masculine cardinal numeral, plural only','m',[['tayo'],['tayo'],['tīhi','tībhi','tihi','tibhi'],['tiṇṇaṃ','tiṇṇanaṃ'],['tīhi','tībhi','tihi','tibhi'],['tiṇṇaṃ','tiṇṇanaṃ'],['tīsu','tisu']]),
+      pluralOnly('Neuter cardinal numeral, plural only','nt',[['tīṇṇi'],['tīṇṇi'],['tīhi','tībhi','tihi','tibhi'],['tiṇṇaṃ','tiṇṇanaṃ'],['tīhi','tībhi','tihi','tibhi'],['tiṇṇaṃ','tiṇṇanaṃ'],['tīsu','tisu']]),
+      pluralOnly('Feminine cardinal numeral, plural only','f',[['tisso'],['tisso'],['tīhi','tībhi','tihi','tibhi'],['tissannaṃ'],['tīhi','tībhi','tihi','tibhi'],['tissannaṃ'],['tīsu','tisu']])
+    ];
+    if (lemma === 'catu') return [
+      pluralOnly('Masculine cardinal numeral, plural only','m',[['cattāro'],['cattāro'],['catūhi','catūbhi','catuhi','catubhi','catubbhi'],['catunnaṃ'],['catūhi','catūbhi','catuhi','catubhi','catubbhi'],['catunnaṃ'],['catūsu','catusu']]),
+      pluralOnly('Neuter cardinal numeral, plural only','nt',[['cattāri'],['cattāri'],['catūhi','catūbhi','catuhi','catubhi','catubbhi'],['catunnaṃ'],['catūhi','catūbhi','catuhi','catubhi','catubbhi'],['catunnaṃ'],['catūsu','catusu']]),
+      pluralOnly('Feminine cardinal numeral, plural only','f',[['catasso'],['catasso'],['catūhi','catūbhi','catuhi','catubhi','catubbhi'],['catassannaṃ'],['catūhi','catūbhi','catuhi','catubhi','catubbhi'],['catassannaṃ'],['catūsu','catusu']])
+    ];
+    if (lemma === 'pañca') return [pluralOnly('Cardinal numeral, plural only','m/nt/f',[['pañca'],['pañca'],['pañcahi','pañcabhi'],['pañcannaṃ'],['pañcahi','pañcabhi'],['pañcannaṃ'],['pañcasu']])];
+    if (lemma === 'tumha') return [g9('Second-person pronoun','m/nt/f',[
+      row('Nominative',['tvaṃ','tuvaṃ'],['tumhe','vo']), row('Accusative',['taṃ','tavaṃ','tuvaṃ','tvaṃ'],['tumhe','tumhākaṃ','vo']),
+      row('Instrumental',['tayā','tvayā','te'],['tumhehi','tumhebhi','vo']), row('Dative',['tava','tuyhaṃ','tumhaṃ','te'],['tumhākaṃ','tumhaṃ','vo']),
+      row('Ablative',['tayā','tvayā'],['tumhehi','tumhebhi']), row('Genitive',['tava','tuyhaṃ','tumhaṃ','te'],['tumhākaṃ','tumhaṃ','vo']), row('Locative',['tayi','tvayi'],['tumhesu'])
+    ])];
+    if (lemma === 'amha') return [g9('First-person pronoun','m/nt/f',[
+      row('Nominative',['ahaṃ'],['mayaṃ','amhe','no']), row('Accusative',['maṃ','mamaṃ'],['amhe','amhākaṃ','no']), row('Instrumental',['mayā','me'],['amhehi','amhebhi','no']),
+      row('Dative',['mama','mayhaṃ','amhaṃ','mamaṃ','me'],['amhākaṃ','asmhākaṃ','amhaṃ','no']), row('Ablative',['mayā'],['amhehi','amhebhi']),
+      row('Genitive',['mama','mayhaṃ','amhaṃ','mamaṃ','me'],['amhākaṃ','asmhākaṃ','amhaṃ','no']), row('Locative',['mayi'],['amhesu','asmesu'])
+    ])];
+    return null;
   }
   function group7(lemma, stem) {
     const base = lemma.slice(0, -1);
@@ -271,6 +404,8 @@
     const record = Array.isArray(records) ? records.find(item => item?.r && item?.s) : null;
     const special4 = specialGroup4(lemma); if (special4) return result([special4], SOURCE);
     const special5 = specialGroup5(lemma); if (special5) return result([special5], SOURCE);
+    const special6 = specialGroup6(lemma); if (special6) return result([special6], SOURCE);
+    const special9 = specialGroup9(lemma); if (special9) return result(special9, SOURCE);
     const special11 = specialGroup11(lemma); if (special11) return result([special11], SOURCE);
     const special13 = specialGroup13(lemma); if (special13) return result(special13, SOURCE);
     // Pali Lookup marks kamma as nt.x with no stem, although its nominal

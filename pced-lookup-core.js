@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.1 — 2026-09-20
+ * Version 3.9.3 — 2026-09-20
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.1';
+  const VERSION = '3.9.3';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -42,6 +42,22 @@
   // separate entry for the surface form, so the popup still identifies the
   // grammatical form and opens the verb's citation entry.
   const BUILTIN_INFLECTIONS = Object.freeze({
+    'jetu': Object.freeze([Object.freeze({
+      form: 'jeti', label: 'Pañcamī (imperative), third-person singular',
+      family: 'verified verb form', preferLemma: true
+    })]),
+    'bhatu': Object.freeze([Object.freeze({
+      form: 'bhātar', label: 'ASCII input for bhātu, oblique kinship-noun form',
+      family: 'verified kinship-noun form', preferLemma: true
+    })]),
+    'bhātu': Object.freeze([Object.freeze({
+      form: 'bhātar', label: 'oblique kinship-noun form',
+      family: 'verified kinship-noun form', preferLemma: true
+    })]),
+    'pitu': Object.freeze([Object.freeze({
+      form: 'pitar', label: 'oblique kinship-noun form',
+      family: 'verified kinship-noun form', preferLemma: true
+    })]),
     'paṭisuṇitvā': Object.freeze([Object.freeze({
       form: 'paṭissuṇāti', label: 'absolutive: having agreed/promised',
       family: 'verified verb form', preferLemma: true
