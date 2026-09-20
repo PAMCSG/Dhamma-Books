@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.0 — 2026-09-20
+ * Version 3.9.1 — 2026-09-20
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.0';
+  const VERSION = '3.9.1';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -362,6 +362,54 @@
       .concat(entry?.entries || [], entry?.extra_entries || []);
   }
 
+  // PCED frequently records the attested past/aorist form inside the verb
+  // entry instead of giving that form a separate headword, for example:
+  // gacchati 【过】gacchi; pavisati 【过】pavisi; cinteti [aor] cintesi.
+  // Keep these forms separate from productive suffix guesses. They are
+  // accepted only when a dictionary record explicitly labels them as past.
+  const PAST_FORM_INDEX_CACHE = new WeakMap();
+
+  function explicitPastForms(entry) {
+    const forms = [];
+    const add = value => {
+      const form = cleanWord(value);
+      if (form && form.length > 2 && PALI_FORM.test(form) && !forms.includes(form)) forms.push(form);
+    };
+    const take = value => String(value || '').split(/[\s,，、/]+/).slice(0, 4).forEach(add);
+    for (const record of entryRecords(entry)) {
+      const text = String(record?.definition || '').replace(/<[^>]*>/g, ' ');
+      // Some PCED records place the label after the forms:
+      // "kari, akāsi,【过】". Limit the backwards match to Pāli tokens so
+      // translated prose before the citation cannot become a candidate.
+      const beforeMarker = /([a-zāīūṅñṭḍṇḷṃ-]+(?:\s*[,，、/]\s*[a-zāīūṅñṭḍṇḷṃ-]+){0,5})\s*[,，]?\s*【(?:过|過|过去|過去)】/gi;
+      let beforeMatch;
+      while ((beforeMatch = beforeMarker.exec(text))) take(beforeMatch[1]);
+      for (const pattern of [
+        /【(?:过|過|过去|過去)】\s*([^。；;【】\n]+)/gi,
+        /\[(?:aor(?:ist)?|past)\]\s*([^.;\[\]\n]+)/gi
+      ]) {
+        pattern.lastIndex = 0;
+        let match;
+        while ((match = pattern.exec(text))) take(match[1]);
+      }
+    }
+    return forms;
+  }
+
+  function explicitPastIndex(dictionary) {
+    if (!dictionary || typeof dictionary !== 'object') return new Map();
+    if (PAST_FORM_INDEX_CACHE.has(dictionary)) return PAST_FORM_INDEX_CACHE.get(dictionary);
+    const index = new Map();
+    for (const [head, entry] of Object.entries(dictionary)) {
+      for (const form of explicitPastForms(entry)) {
+        if (!index.has(form)) index.set(form, []);
+        if (!index.get(form).includes(head)) index.get(form).push(head);
+      }
+    }
+    PAST_FORM_INDEX_CACHE.set(dictionary, index);
+    return index;
+  }
+
   function exactVerbAnalysis(surface, exactHeads, context, options = {}) {
     const word = cleanWord(surface);
     const maintained = options.grammarAnalyses?.[word] ||
@@ -491,6 +539,7 @@
     };
 
     const exactHeads = context.exact(normalized);
+    const attestedPastHeads = explicitPastIndex(context.dictionary).get(normalized) || [];
     if (exactHeads.length) {
       const preferred = verifiedInflectionCandidates(normalized, options)
         .find(candidate => candidate.preferLemma && context.exact(candidate.form).length);
@@ -499,6 +548,15 @@
           ...base, mode: 'inflected', tier: 1, heads: context.exact(preferred.form),
           resolvedForm: preferred.form, rule: preferred.label, family: preferred.family,
           notes: [`${clicked} → ${preferred.form} (${preferred.label})`]
+        });
+      }
+      if (attestedPastHeads.length) {
+        return finish({
+          ...base, mode: 'inflected', tier: 1, heads: attestedPastHeads,
+          resolvedForm: cleanWord(attestedPastHeads[0]),
+          rule: 'dictionary-attested past / aorist form',
+          family: 'Kaccāyana past verb',
+          notes: [`${clicked} → ${attestedPastHeads.join(', ')} (dictionary-attested past / aorist form)`]
         });
       }
       const grammar = exactVerbAnalysis(normalized, exactHeads, context, options);
@@ -544,6 +602,16 @@
         };
         return finish(/verb/i.test(candidate.family || '') ? result : addEntryDecomposition(result));
       }
+    }
+
+    if (attestedPastHeads.length) {
+      return finish({
+        ...base, mode: 'inflected', tier: 3, heads: attestedPastHeads,
+        resolvedForm: cleanWord(attestedPastHeads[0]),
+        rule: 'dictionary-attested past / aorist form',
+        family: 'Kaccāyana past verb',
+        notes: [`${clicked} → ${attestedPastHeads.join(', ')} (dictionary-attested past / aorist form)`]
+      });
     }
 
     const candidates = inflectionCandidates(normalized);
@@ -919,6 +987,22 @@
     const nounGroups = kaccayana?.groups || reliableNounGroups ||
       (global.PaliLookupMorphology ? [] : nounParadigm(lemma, grammarText));
     const verbGroups = verbParadigm(lemma, grammarText);
+    const attestedPast = explicitPastForms(entry);
+    if (verbGroups.length && attestedPast.length) {
+      // A form can legitimately be syncretic (for example cintesi is both
+      // present 2sg and an attested aorist 3sg). Only deduplicate against an
+      // existing past group, not against the whole conjugation table.
+      const existingPast = new Set(verbGroups
+        .filter(group => /past|aorist|ajjatanī|hiyyattanī/i.test(group.label))
+        .flatMap(group => group.forms || []));
+      const additional = attestedPast.filter(form => !existingPast.has(form));
+      if (additional.length) {
+        const futureIndex = verbGroups.findIndex(group => /^Future/.test(group.label));
+        const pastGroup = { label: 'Ajjatanī / Aorist (dictionary-attested)', forms: additional };
+        if (futureIndex >= 0) verbGroups.splice(futureIndex, 0, pastGroup);
+        else verbGroups.push(pastGroup);
+      }
+    }
     const verified = verifiedFormsForLemma(lemma, options);
     if (!nounGroups.length && !verbGroups.length && !verified.length) return null;
     return {
@@ -927,8 +1011,10 @@
       verified,
       groups: verbGroups.length ? verbGroups : nounGroups,
       generated: !!(verbGroups.length || nounGroups.length),
-      formSystem: KACCAYANA_VERB_PARADIGMS[lemma] ? 'kaccayana' : kaccayana?.groups?.length ? 'kaccayana' : reliableNounGroups?.length ? 'pali-lookup' : 'generated',
-      formSource: KACCAYANA_VERB_PARADIGMS[lemma] ? 'Kaccāyana Pāli Vyākaraṇaṁ, Ākhyāta Kappa' : kaccayana?.formSource || (reliableNounGroups?.length ? 'Pali Lookup version 2.0' : ''),
+      formSystem: verbGroups.length ? 'kaccayana' : kaccayana?.groups?.length ? 'kaccayana' : reliableNounGroups?.length ? 'pali-lookup' : 'generated',
+      formSource: verbGroups.length
+        ? 'Bhante U Janakābhivaṃsa’s verb table; Kaccāyana Pāli Vyākaraṇaṁ, Ākhyāta Kappa'
+        : kaccayana?.formSource || (reliableNounGroups?.length ? 'Pali Lookup version 2.0' : ''),
       classificationSource: kaccayana?.classificationSource || '',
       morphologySource: reliableNounGroups?.length ? global.PaliLookupMorphology?.source : ''
     };
