@@ -1,4 +1,4 @@
-/* PCED landing-page search — exact Pāli/diacritic-aware and multilingual. */
+/* PCED landing-page search v1.7.0 — exact Pāli/diacritic-aware and multilingual. */
 (function (global) {
   'use strict';
 
@@ -253,7 +253,7 @@
       content += '</div>';
     }
     if (paradigm.formSystem === 'kaccayana') {
-      content += '<div class="pced-inflection-caution">性别及词干识别 / Gender and stem identification: Pali Lookup version 2.0</div>' +
+      content += '<div class="pced-inflection-caution">性别及词干识别 / Gender and stem identification: ' + esc(paradigm.classificationSource || 'Pali Lookup version 2.0') + '</div>' +
         '<div class="pced-inflection-caution">变格组及词形 / Declension group and forms: ' + esc(paradigm.formSource) + '</div>';
     } else {
       content += '<div class="pced-inflection-caution">来源 / Source: Pali Lookup version 2.0</div>';

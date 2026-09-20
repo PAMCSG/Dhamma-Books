@@ -51,11 +51,17 @@ For a fallback table retain:
 - Groups 1, 2 and 3: regular masculine `a`, neuter `a`, and feminine `ā` nouns.
 - Regular `adj.a` adjectives in all three genders: masculine Group 1,
   feminine Group 3, and neuter Group 2.
+- `kamma`: an explicit Group 2 lexical correction. Pali Lookup labels it
+  `nt.x` without a stem, but its declension follows the regular neuter
+  `a`-stem Cittādigaṇa paradigm.
 - Group 4: explicit teacher paradigms for `puma`, `yuva` and `addhāna`.
 - Group 5: explicit teacher paradigm for `rāja`.
 - Groups 7 and 8: feminine `ī` and listed `inī` classes.
 - Group 10: regular agent class and the explicit `mātu` paradigm.
-- Group 11: encoded `i` and `u` stem classes plus explicit `bhikkhu` and `go`.
+- Group 11: encoded `i`, `u`, and masculine/neuter `ī/in` stem classes plus
+  explicit `bhikkhu` and `go`. For `adj.ī` compounds such as `kammavādī`, the
+  masculine and neuter follow Group 11, while the feminine `-inī` follows
+  Group 8.
 - Group 12: masculine, feminine and neuter `vantu/mantu` paradigms; feminine
   forms follow Group 7.
 - Group 13: masculine, feminine and neuter present-participle paradigms plus
@@ -70,6 +76,11 @@ teacher/Kaccāyana rule sets are encoded and tested.
 Kaccāyana Volume 2 states that gender and word forms are to be established in a
 way that does not contradict canonical usage. Stem endings overlap between
 genders, so spelling alone is evidence but not a sufficient gender rule.
+
+Classification order is: an explicit teacher/Kaccāyana lexical classification;
+then the Pali Lookup morphology class; then a documented lexical correction for
+an unspecified `x` record. A compound is classified from its final member, so
+`kammavādī` follows `vādī`, not `kamma`.
 
 ## Three-path synchronization
 

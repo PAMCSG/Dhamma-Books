@@ -1,4 +1,4 @@
-/* PAMC Kaccayana-based nominal declension generator v1.0.1 — 2026-09-20
+/* PAMC Kaccayana-based nominal declension generator v1.1.0 — 2026-09-20
  *
  * Classification input: Pali Lookup 2.0 morphology (lemma, gender, stem class).
  * Forms: Bhante U Janakabhivamsa, "13 Groups - List of Declension" (July 2019),
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '1.0.1';
+  const VERSION = '1.1.0';
   const SOURCE = "Bhante U Janakābhivaṃsa’s Kaccāyana-based 13 Groups of Declension";
   const GROUPS = Object.freeze({
     1: 'Purisādigaṇa', 2: 'Cittādigaṇa', 3: 'Kaññādigaṇa', 4: 'Pumādigaṇa',
@@ -162,6 +162,39 @@
     }
     return null;
   }
+  function group11InAdjective(lemma, stem) {
+    const masculine = group(11, 'Masculine adjective, "ī/in" declension', [
+      row('Nominative', [stem + 'ī'], [stem + 'ino']),
+      row('Vocative', [stem + 'ī'], [stem + 'ino']),
+      row('Accusative', [stem + 'inaṃ'], [stem + 'ino']),
+      row('Instrumental', [stem + 'inā'], [stem + 'ihi', stem + 'īhi']),
+      row('Dative', [stem + 'ino'], [stem + 'inaṃ', stem + 'īnaṃ']),
+      row('Ablative', [stem + 'inā', stem + 'ismā', stem + 'imhā'], [stem + 'ihi', stem + 'īhi']),
+      row('Genitive', [stem + 'ino'], [stem + 'inaṃ', stem + 'īnaṃ']),
+      row('Locative', [stem + 'ini', stem + 'ismiṃ', stem + 'imhi'], [stem + 'isu', stem + 'īsu'])
+    ], 'm');
+    const feminine = group(8, 'Feminine adjective, "inī" declension', [
+      row('Nominative', [stem + 'inī'], [stem + 'iniyo']),
+      row('Vocative', [stem + 'ini'], [stem + 'inī', stem + 'iniyo']),
+      row('Accusative', [stem + 'iniṃ'], [stem + 'iniyo']),
+      row('Instrumental', [stem + 'iniyā'], [stem + 'inīhi']),
+      row('Dative', [stem + 'iniyā'], [stem + 'inīnaṃ']),
+      row('Ablative', [stem + 'iniyā'], [stem + 'inīhi']),
+      row('Genitive', [stem + 'iniyā'], [stem + 'inīnaṃ']),
+      row('Locative', [stem + 'iniyā', stem + 'iniyaṃ'], [stem + 'inīsu'])
+    ], 'f');
+    const neuter = group(11, 'Neuter adjective, "i/in" declension', [
+      row('Nominative', [stem + 'i', stem + 'iṃ'], [stem + 'ī', stem + 'īni']),
+      row('Vocative', [stem + 'i', stem + 'iṃ'], [stem + 'ī', stem + 'īni']),
+      row('Accusative', [stem + 'i', stem + 'iṃ'], [stem + 'ī', stem + 'īni']),
+      row('Instrumental', [stem + 'inā'], [stem + 'ihi', stem + 'īhi']),
+      row('Dative', [stem + 'ino'], [stem + 'inaṃ', stem + 'īnaṃ']),
+      row('Ablative', [stem + 'inā', stem + 'ito', stem + 'ismā', stem + 'imhā'], [stem + 'ihi', stem + 'īhi']),
+      row('Genitive', [stem + 'ino', stem + 'issa'], [stem + 'inaṃ', stem + 'īnaṃ']),
+      row('Locative', [stem + 'ismiṃ', stem + 'imhi'], [stem + 'isu', stem + 'īsu'])
+    ], 'nt');
+    return [masculine, feminine, neuter];
+  }
   function specialGroup11(lemma) {
     if (lemma === 'bhikkhu') return group11(lemma, { i: 'm.u', s: 'bhikkh' });
     if (lemma !== 'go') return null;
@@ -233,13 +266,16 @@
 
   function paradigm(lemma, morphology) {
     lemma = String(lemma || '').normalize('NFC').toLowerCase();
-    const result = groups => ({ lemma, groups, formSystem: 'kaccayana', formSource: SOURCE, classificationSource: 'Pali Lookup version 2.0' });
+    const result = (groups, classificationSource = 'Pali Lookup version 2.0') => ({ lemma, groups, formSystem: 'kaccayana', formSource: SOURCE, classificationSource });
     const records = morphology?.entries?.[lemma];
     const record = Array.isArray(records) ? records.find(item => item?.r && item?.s) : null;
-    const special4 = specialGroup4(lemma); if (special4) return result([special4]);
-    const special5 = specialGroup5(lemma); if (special5) return result([special5]);
-    const special11 = specialGroup11(lemma); if (special11) return result([special11]);
-    const special13 = specialGroup13(lemma); if (special13) return result(special13);
+    const special4 = specialGroup4(lemma); if (special4) return result([special4], SOURCE);
+    const special5 = specialGroup5(lemma); if (special5) return result([special5], SOURCE);
+    const special11 = specialGroup11(lemma); if (special11) return result([special11], SOURCE);
+    const special13 = specialGroup13(lemma); if (special13) return result(special13, SOURCE);
+    // Pali Lookup marks kamma as nt.x with no stem, although its nominal
+    // paradigm follows the regular neuter a-stem Cittadigana pattern.
+    if (lemma === 'kamma') return result([group2(lemma, 'kamm')], SOURCE);
     if (!record) return null;
     let groups = [];
     if (record.i === 'm.a') groups = [group1(lemma, record.s)];
@@ -254,6 +290,8 @@
       neuter.label = 'Neuter adjective, "a" declension';
       groups = [masculine, feminine, neuter];
     }
+    else if (record.i === 'adj.ī') groups = group11InAdjective(lemma, record.s);
+    else if (record.i === 'm.ī') groups = [group11InAdjective(lemma, record.s)[0]];
     else if (record.i === 'f.ī') {
       const g = group7(lemma, record.s);
       if (/(?:patānī|bhikkhunī|rājinī|daṇḍinī)$/.test(lemma)) {

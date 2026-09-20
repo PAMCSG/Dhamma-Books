@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.7.0 — 2026-09-20 */
+/* PAMC cross-book PCED popup standard v1.8.0 — 2026-09-20 */
 (function () {
   'use strict';
 
@@ -59,7 +59,7 @@
       document.head.append(loader);
     });
     morphologyPromise = Promise.resolve()
-      .then(() => window.KaccayanaDeclension ? null : load('kaccayana-declension.js', '1.0.1'))
+      .then(() => window.KaccayanaDeclension ? null : load('kaccayana-declension.js', '1.1.0'))
       .then(() => core()?.version === '3.8.0' ? null : load('pced-lookup-core.js', '3.8.0'))
       .then(() => window.PaliLookupMorphology ? null : load('pali-lookup-morphology.js', '2.0-unicode-trial'))
       .then(() => window.PaliLookupMorphology || null);
@@ -294,7 +294,7 @@
       content += '</div>';
     }
     if (paradigm.formSystem === 'kaccayana') {
-      content += '<div class="pced-inflection-caution">性别及词干识别 / Gender and stem identification: Pali Lookup version 2.0</div>' +
+      content += '<div class="pced-inflection-caution">性别及词干识别 / Gender and stem identification: ' + esc(paradigm.classificationSource || 'Pali Lookup version 2.0') + '</div>' +
         '<div class="pced-inflection-caution">变格组及词形 / Declension group and forms: ' + esc(paradigm.formSource) + '</div>';
     } else {
       content += '<div class="pced-inflection-caution">来源 / Source: Pali Lookup version 2.0</div>';
