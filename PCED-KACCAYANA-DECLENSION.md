@@ -49,6 +49,8 @@ For a fallback table retain:
 ## Initial encoded coverage
 
 - Groups 1, 2 and 3: regular masculine `a`, neuter `a`, and feminine `ā` nouns.
+- Regular `adj.a` adjectives in all three genders: masculine Group 1,
+  feminine Group 3, and neuter Group 2.
 - Group 4: explicit teacher paradigms for `puma`, `yuva` and `addhāna`.
 - Group 5: explicit teacher paradigm for `rāja`.
 - Groups 7 and 8: feminine `ī` and listed `inī` classes.
@@ -92,4 +94,3 @@ these JavaScript files changes.
 | `khatta` | Pali Lookup `nt.a` | 2 Cittādigaṇa | `khattaṃ` |
 | `bhagavantu` | Pali Lookup `adj.v` | 12 Guṇavādigaṇa | `bhagavā`, `bhagavanto` |
 | `gacchanta` | Pali Lookup present participle | 13 Gacchantādigaṇa | `gacchaṃ`, `gacchanto` |
-

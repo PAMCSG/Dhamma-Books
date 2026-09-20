@@ -1,4 +1,4 @@
-/* PAMC Kaccayana-based nominal declension generator v1.0.0 — 2026-09-20
+/* PAMC Kaccayana-based nominal declension generator v1.0.1 — 2026-09-20
  *
  * Classification input: Pali Lookup 2.0 morphology (lemma, gender, stem class).
  * Forms: Bhante U Janakabhivamsa, "13 Groups - List of Declension" (July 2019),
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '1.0.0';
+  const VERSION = '1.0.1';
   const SOURCE = "Bhante U Janakābhivaṃsa’s Kaccāyana-based 13 Groups of Declension";
   const GROUPS = Object.freeze({
     1: 'Purisādigaṇa', 2: 'Cittādigaṇa', 3: 'Kaññādigaṇa', 4: 'Pumādigaṇa',
@@ -245,6 +245,15 @@
     if (record.i === 'm.a') groups = [group1(lemma, record.s)];
     else if (record.i === 'nt.a') groups = [group2(lemma, record.s)];
     else if (record.i === 'f.ā') groups = [group3(lemma, record.s)];
+    else if (record.i === 'adj.a') {
+      const masculine = group1(lemma, record.s);
+      const feminine = group3(record.s + 'ā', record.s);
+      const neuter = group2(lemma, record.s);
+      masculine.label = 'Masculine adjective, "a" declension';
+      feminine.label = 'Feminine adjective, "ā" declension';
+      neuter.label = 'Neuter adjective, "a" declension';
+      groups = [masculine, feminine, neuter];
+    }
     else if (record.i === 'f.ī') {
       const g = group7(lemma, record.s);
       if (/(?:patānī|bhikkhunī|rājinī|daṇḍinī)$/.test(lemma)) {

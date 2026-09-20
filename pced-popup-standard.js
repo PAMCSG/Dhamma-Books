@@ -59,7 +59,7 @@
       document.head.append(loader);
     });
     morphologyPromise = Promise.resolve()
-      .then(() => window.KaccayanaDeclension ? null : load('kaccayana-declension.js', '1.0.0'))
+      .then(() => window.KaccayanaDeclension ? null : load('kaccayana-declension.js', '1.0.1'))
       .then(() => core()?.version === '3.8.0' ? null : load('pced-lookup-core.js', '3.8.0'))
       .then(() => window.PaliLookupMorphology ? null : load('pali-lookup-morphology.js', '2.0-unicode-trial'))
       .then(() => window.PaliLookupMorphology || null);
