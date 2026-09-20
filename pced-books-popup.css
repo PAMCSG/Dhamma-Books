@@ -88,3 +88,19 @@
   #dictModal .panel-body,
   #pced-modal .pced-body { padding: 14px 15px 22px; }
 }
+
+/* Prevent popup scrolling from chaining to the page underneath. */
+:is(.modal,.modalbg,#dictModal,#lookupModal,#pced-modal,[data-modal],[role="dialog"],.db-bookmark-overlay,.fn-modal) {
+  overscroll-behavior: contain;
+}
+:is(
+  .modal .panel,.modal .modal-content,.modal .modalcontent,.modal .panel-body,.modal .modal-body,
+  .modal .pced-panel,.modal .pced-body,.modal .lookup-section,.modal .tab-panel,
+  #dictModal .panel,#dictModal .panel-body,#lookupModal .panel,#lookupModal .panel-body,
+  #pced-modal .pced-panel,#pced-modal .pced-body,[data-modal] [data-popup-scroll],
+  [role="dialog"],.db-bookmark-panel,.fn-dialog
+) {
+  overscroll-behavior: contain;
+  overscroll-behavior-y: contain;
+}
+
