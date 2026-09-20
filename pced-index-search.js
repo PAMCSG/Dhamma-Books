@@ -154,12 +154,21 @@
   const CASE_UI = {
     zh: { Nominative: '主格', Vocative: '呼格', Accusative: '宾格', Instrumental: '具格', Dative: '与格', Ablative: '从格', Genitive: '属格', Locative: '处格' }
   };
-  function localizedGroupLabel(label, language) {
+  function inflectionGroupGender(group) {
+    const row = (group?.rows || []).find(item => item.label === 'Nominative') || group?.rows?.[0];
+    const forms = [...(row?.singular || []), ...(row?.plural || [])];
+    if (forms.some(form => /(?:atī|atiyo|antiyo)$/u.test(form))) return 'f';
+    if (forms.some(form => /(?:aṃ|antāni)$/u.test(form))) return 'n';
+    if (forms.some(form => /(?:ā|anto|antā)$/u.test(form))) return 'm';
+    return '';
+  }
+  function localizedGroupLabel(label, language, group) {
     const text = String(label || '');
-    const gender = /Masculine|Masc\./i.test(text) ? 'm' : /Feminine|Fem\./i.test(text) ? 'f' : /Neuter|Neut\./i.test(text) ? 'n' : '';
+    const gender = /Masculine|Masc\./i.test(text) ? 'm' : /Feminine|Fem\./i.test(text) ? 'f' : /Neuter|Neut\./i.test(text) ? 'n' : inflectionGroupGender(group);
     const ending = text.match(/["“]([^"”]+)["”]/)?.[1];
     const irregular = /irregular/i.test(text);
     if (language === 'zh' && gender) {
+      if (/vant\/?mant/i.test(text)) return { m: '阳性形容词，vant/mant 变格', f: '阴性形容词，vant/mant 变格', n: '中性形容词，vant/mant 变格' }[gender];
       const name = { m: '阳性名词', f: '阴性名词', n: '中性名词' }[gender];
       if (irregular) return name + '，不规则变格';
       if (/\bas\s*\(mano\)/i.test(text)) return name + '，-as（mano 类）变格';
@@ -191,7 +200,7 @@
     ).join(' ');
     let content = '';
     for (const group of paradigm.groups || []) {
-      content += '<div class="pced-inflection-group"><b>' + esc(localizedGroupLabel(group.label, priority)) + '</b>';
+      content += '<div class="pced-inflection-group"><b>' + esc(localizedGroupLabel(group.label, priority, group)) + '</b>';
       if (group.rows) {
         const hasPlural = group.rows.some(row => row.plural?.length);
         content += '<div class="pced-inflection-table-wrap"><table class="pced-inflection-table">' +

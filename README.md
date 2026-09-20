@@ -81,6 +81,8 @@ Do not display a separate `Verified forms / 已核实词形` chip list above the
 
 The landing-page renderer must also follow a verified inflected-form mapping from the searched surface form to its canonical morphology lemma before deciding that no paradigm exists. For example, exact dictionary headword `bhagavā` must use the maintained `bhagavā → bhagavantu` mapping and display the same adjectival-noun paradigm as the two word-click popup paths.
 
+In every Chinese-priority view, Pali Lookup `vant/mant` groups must be labelled explicitly as `阳性形容词，vant/mant 变格`, `中性形容词，vant/mant 变格`, and `阴性形容词，vant/mant 变格`; case and number headings must also use Chinese-priority labels. The three entry paths must show the same groups in the same order.
+
 PCED-enabled books use the Daily-Chants standard:
 
 1. Approved Chinese-Tipiṭaka entry, when precisely matched
