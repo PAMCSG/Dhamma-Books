@@ -1,4 +1,4 @@
-/* PAMC Kaccayana-based nominal declension generator v1.1.0 — 2026-09-20
+/* PAMC Kaccayana-based nominal declension generator v1.1.1 — 2026-09-20
  *
  * Classification input: Pali Lookup 2.0 morphology (lemma, gender, stem class).
  * Forms: Bhante U Janakabhivamsa, "13 Groups - List of Declension" (July 2019),
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '1.1.0';
+  const VERSION = '1.1.1';
   const SOURCE = "Bhante U Janakābhivaṃsa’s Kaccāyana-based 13 Groups of Declension";
   const GROUPS = Object.freeze({
     1: 'Purisādigaṇa', 2: 'Cittādigaṇa', 3: 'Kaññādigaṇa', 4: 'Pumādigaṇa',
@@ -163,15 +163,15 @@
     return null;
   }
   function group11InAdjective(lemma, stem) {
-    const masculine = group(11, 'Masculine adjective, "ī/in" declension', [
-      row('Nominative', [stem + 'ī'], [stem + 'ino']),
-      row('Vocative', [stem + 'ī'], [stem + 'ino']),
-      row('Accusative', [stem + 'inaṃ'], [stem + 'ino']),
-      row('Instrumental', [stem + 'inā'], [stem + 'ihi', stem + 'īhi']),
-      row('Dative', [stem + 'ino'], [stem + 'inaṃ', stem + 'īnaṃ']),
-      row('Ablative', [stem + 'inā', stem + 'ismā', stem + 'imhā'], [stem + 'ihi', stem + 'īhi']),
-      row('Genitive', [stem + 'ino'], [stem + 'inaṃ', stem + 'īnaṃ']),
-      row('Locative', [stem + 'ini', stem + 'ismiṃ', stem + 'imhi'], [stem + 'isu', stem + 'īsu'])
+    const masculine = group(11, 'Masculine adjective, "ī" declension', [
+      row('Nominative', [stem + 'ī'], [stem + 'ī', stem + 'ino']),
+      row('Vocative', [stem + 'i'], [stem + 'ī', stem + 'ino']),
+      row('Accusative', [stem + 'iṃ', stem + 'inaṃ'], [stem + 'ī', stem + 'ino']),
+      row('Instrumental', [stem + 'inā'], [stem + 'īhi', stem + 'ībhi']),
+      row('Dative', [stem + 'issa', stem + 'ino'], [stem + 'īnaṃ']),
+      row('Ablative', [stem + 'issa', stem + 'ino'], [stem + 'īnaṃ']),
+      row('Genitive', [stem + 'issa', stem + 'ino'], [stem + 'īnaṃ']),
+      row('Locative', [stem + 'ismiṃ', stem + 'imhi', stem + 'ini'], [stem + 'īsu'])
     ], 'm');
     const feminine = group(8, 'Feminine adjective, "inī" declension', [
       row('Nominative', [stem + 'inī'], [stem + 'iniyo']),
@@ -183,15 +183,15 @@
       row('Genitive', [stem + 'iniyā'], [stem + 'inīnaṃ']),
       row('Locative', [stem + 'iniyā', stem + 'iniyaṃ'], [stem + 'inīsu'])
     ], 'f');
-    const neuter = group(11, 'Neuter adjective, "i/in" declension', [
-      row('Nominative', [stem + 'i', stem + 'iṃ'], [stem + 'ī', stem + 'īni']),
-      row('Vocative', [stem + 'i', stem + 'iṃ'], [stem + 'ī', stem + 'īni']),
-      row('Accusative', [stem + 'i', stem + 'iṃ'], [stem + 'ī', stem + 'īni']),
-      row('Instrumental', [stem + 'inā'], [stem + 'ihi', stem + 'īhi']),
-      row('Dative', [stem + 'ino'], [stem + 'inaṃ', stem + 'īnaṃ']),
-      row('Ablative', [stem + 'inā', stem + 'ito', stem + 'ismā', stem + 'imhā'], [stem + 'ihi', stem + 'īhi']),
-      row('Genitive', [stem + 'ino', stem + 'issa'], [stem + 'inaṃ', stem + 'īnaṃ']),
-      row('Locative', [stem + 'ismiṃ', stem + 'imhi'], [stem + 'isu', stem + 'īsu'])
+    const neuter = group(11, 'Neuter adjective, "ī" declension', [
+      row('Nominative', [stem + 'i'], [stem + 'ī', stem + 'īni']),
+      row('Vocative', [stem + 'i'], [stem + 'ī', stem + 'īni']),
+      row('Accusative', [stem + 'iṃ', stem + 'inaṃ'], [stem + 'ī', stem + 'īni']),
+      row('Instrumental', [stem + 'inā'], [stem + 'īhi', stem + 'ībhi']),
+      row('Dative', [stem + 'issa', stem + 'ino'], [stem + 'īnaṃ']),
+      row('Ablative', [stem + 'issa', stem + 'ino'], [stem + 'īnaṃ']),
+      row('Genitive', [stem + 'issa', stem + 'ino'], [stem + 'īnaṃ']),
+      row('Locative', [stem + 'ismiṃ', stem + 'imhi', stem + 'ini'], [stem + 'īsu'])
     ], 'nt');
     return [masculine, feminine, neuter];
   }

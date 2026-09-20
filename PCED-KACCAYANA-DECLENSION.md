@@ -62,6 +62,8 @@ For a fallback table retain:
   explicit `bhikkhu` and `go`. For `adj.ī` compounds such as `kammavādī`, the
   masculine and neuter follow Group 11, while the feminine `-inī` follows
   Group 8.
+  Group 11 `ī` forms must follow the teacher's `daṇḍī` and `sukhakārī dānaṃ`
+  tables exactly; Pali Lookup alternatives are not added to these tables.
 - Group 12: masculine, feminine and neuter `vantu/mantu` paradigms; feminine
   forms follow Group 7.
 - Group 13: masculine, feminine and neuter present-participle paradigms plus
