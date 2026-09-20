@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.5.0 — 2026-09-19 */
+/* PAMC cross-book PCED popup standard v1.5.1 — 2026-09-19 */
 (function () {
   'use strict';
 
@@ -293,6 +293,56 @@
   const MOVABLE_MODAL_SELECTOR = '.modal,#pced-modal,[data-modal],.db-bookmark-overlay,.fn-modal';
   const PANEL_SELECTOR = '.panel,.pced-panel,.modalcontent,.modal-content,.lookup-panel,.dictionary-panel,.dialog,.db-bookmark-panel,.fn-dialog';
   const HANDLE_SELECTOR = '.panel-head,.pced-panel-head,.modal-header,.dialog-header,.lookup-header,.dict-header,.modal-titlebar,.db-bookmark-head,#fnTitle';
+
+  const SCROLLABLE_SELECTOR = [
+    '.panel', '.pced-panel', '.modalcontent', '.modal-content', '.lookup-panel',
+    '.dictionary-panel', '.dialog', '.db-bookmark-panel', '.fn-dialog',
+    '.panel-body', '.modal-body', '.pced-panel-body', '.pced-body',
+    '.lookup-section', '.tab-panel', '[data-popup-scroll]'
+  ].join(',');
+
+  function installScrollBoundaryGuard(modal) {
+    if (!modal || modal.dataset.pamcScrollBoundary === '1') return;
+    const panel = panelOf(modal);
+    if (!panel) return;
+    modal.dataset.pamcScrollBoundary = '1';
+
+    const contain = root => {
+      root.style.setProperty('overscroll-behavior', 'contain');
+      root.style.setProperty('overscroll-behavior-y', 'contain');
+    };
+    contain(modal);
+    contain(panel);
+    modal.querySelectorAll(SCROLLABLE_SELECTOR).forEach(contain);
+
+    modal.addEventListener('wheel', event => {
+      if (event.ctrlKey) return;
+      const path = typeof event.composedPath === 'function' ? event.composedPath() : [];
+      const candidates = path.filter(node =>
+        node instanceof Element && modal.contains(node) &&
+        node.matches(SCROLLABLE_SELECTOR)
+      );
+      if (!candidates.includes(panel)) candidates.push(panel);
+
+      const canContinue = candidates.some(node => {
+        const style = getComputedStyle(node);
+        const vertical = /(auto|scroll|overlay)/.test(style.overflowY) &&
+          node.scrollHeight > node.clientHeight + 1;
+        const horizontal = /(auto|scroll|overlay)/.test(style.overflowX) &&
+          node.scrollWidth > node.clientWidth + 1;
+        const canY = event.deltaY < 0 ? node.scrollTop > 0 :
+          event.deltaY > 0 && node.scrollTop + node.clientHeight < node.scrollHeight - 1;
+        const canX = event.deltaX < 0 ? node.scrollLeft > 0 :
+          event.deltaX > 0 && node.scrollLeft + node.clientWidth < node.scrollWidth - 1;
+        return (vertical && canY) || (horizontal && canX);
+      });
+
+      if (!canContinue) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    }, { capture: true, passive: false });
+  }
 
   function panelOf(modal) {
     if (!modal) return null;
@@ -1008,6 +1058,7 @@
     if (!modal || modal.dataset.pamcWatched === '1') return;
     modal.dataset.pamcWatched = '1';
     installMovable(modal);
+    installScrollBoundaryGuard(modal);
     normalizeFootnoteTitle(modal);
     let wasOpen = isOpen(modal);
     new MutationObserver(() => {
