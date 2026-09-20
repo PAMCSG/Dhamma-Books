@@ -200,6 +200,7 @@
       } else content += '<div class="pced-form-list">' + chips(group.forms) + '</div>';
       content += '</div>';
     }
+    content += '<div class="pced-inflection-caution">来源 / Source: Pali Lookup version 2.0</div>';
     if (paradigm.generated) {
       content += '<div class="pced-inflection-caution">' + esc(ui.caution) + '</div>';
     }
@@ -381,7 +382,7 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.4.0' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.5.1' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

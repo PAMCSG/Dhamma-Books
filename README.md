@@ -67,6 +67,16 @@ Book-content fonts follow the source file. Preserve distinct source fonts for bo
 - `pced-approved-terms.js` — approved Chinese-Tipiṭaka terminology snapshot
 - `pced-popup-standard.js` — cross-book popup display, reset, and movement behavior
 
+### Mandatory three-path PCED synchronization
+
+Every PCED morphology, inflection, attribution, compound-analysis, sandhi, or popup-display change must be reviewed and released through all three user entry paths at the same time:
+
+1. Dhamma-Books in-book word-click popups (`pced-popup-standard.js`).
+2. Tipitaka-reader word-click popups (its repository copy of `pced-popup-standard.js`).
+3. Dhamma-Books landing-page search in `index.html` (`pced-index-search.js`, with its cache version in `index.html` advanced whenever the renderer changes).
+
+Acceptance testing must use the same recognized inflected word in all three paths. The inflection table, labels, cautions, and attribution must agree. The expanded panel must display `来源 / Source: Pali Lookup version 2.0`.
+
 PCED-enabled books use the Daily-Chants standard:
 
 1. Approved Chinese-Tipiṭaka entry, when precisely matched
