@@ -1,4 +1,4 @@
-/* PAMC Kaccayana-based nominal declension generator v1.3.0 — 2026-09-20
+/* PAMC Kaccayana-based nominal declension generator v1.4.0 — 2026-09-20
  *
  * Classification input: Pali Lookup 2.0 morphology (lemma, gender, stem class).
  * Forms: Bhante U Janakabhivamsa, "13 Groups - List of Declension" (July 2019),
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '1.3.0';
+  const VERSION = '1.4.0';
   const SOURCE = "Bhante U Janakābhivaṃsa’s Kaccāyana-based 13 Groups of Declension";
   const GROUPS = Object.freeze({
     1: 'Purisādigaṇa', 2: 'Cittādigaṇa', 3: 'Kaññādigaṇa', 4: 'Pumādigaṇa',
@@ -258,6 +258,27 @@
     ]);
     return null;
   }
+
+  function specialGroup10(lemma) {
+    if (lemma === 'jetu') return explicit(10, 'Masculine noun, nattu / -tu/-tar declension', 'm', [
+      [['jetā'], ['jetāro']], [['jeta', 'jetā'], ['jetāro']], [['jetāraṃ'], ['jetāre', 'jetāro']],
+      [['jetārā'], ['jetārebhi', 'jetārehi']], [['jetu', 'jetuno', 'jetussa'], ['jetārānaṃ', 'jetānaṃ']],
+      [['jetārā'], ['jetārebhi', 'jetārehi']], [['jetu', 'jetuno', 'jetussa'], ['jetārānaṃ', 'jetānaṃ']],
+      [['jetari'], ['jetāresu']]
+    ], 'Verified against PCED Inflection Master v1.5; exact clicked headword remains jetu.');
+    if (lemma === 'bhātu' || lemma === 'pitu') {
+      const s = lemma === 'bhātu' ? 'bhāt' : 'pit';
+      return explicit(10, 'Masculine relationship noun, u/ar declension', 'm', [
+        [[s + 'ā'], [s + 'aro']], [[s + 'a', s + 'ā'], [s + 'aro']], [[s + 'araṃ'], [s + 'aro', s + 'are']],
+        [[s + 'arā'], [s + 'arehi', s + 'arebhi', s + 'ūhi', s + 'ūbhi']],
+        [[lemma, s + 'uno', s + 'ussa'], [s + 'arānaṃ', s + 'ūnaṃ', s + 'ānaṃ']],
+        [[s + 'arā'], [s + 'arehi', s + 'arebhi', s + 'ūhi', s + 'ūbhi']],
+        [[lemma, s + 'uno', s + 'ussa'], [s + 'arānaṃ', s + 'ūnaṃ', s + 'ānaṃ']],
+        [[s + 'ari'], [s + 'aresu', s + 'ūsu']]
+      ], 'Verified relationship-noun paradigm from PCED Inflection Master v1.5.');
+    }
+    return null;
+  }
   function group11(lemma, record) {
     const code = record.i, stem = record.s;
     if (code === 'm.i') return group(11, 'Masculine noun, "i" declension', [
@@ -406,6 +427,7 @@
     const special5 = specialGroup5(lemma); if (special5) return result([special5], SOURCE);
     const special6 = specialGroup6(lemma); if (special6) return result([special6], SOURCE);
     const special9 = specialGroup9(lemma); if (special9) return result(special9, SOURCE);
+    const special10 = specialGroup10(lemma); if (special10) return result([special10], SOURCE);
     const special11 = specialGroup11(lemma); if (special11) return result([special11], SOURCE);
     const special13 = specialGroup13(lemma); if (special13) return result(special13, SOURCE);
     // Pali Lookup marks kamma as nt.x with no stem, although its nominal

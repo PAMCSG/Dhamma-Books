@@ -1,7 +1,7 @@
 # Standard PCED Lookup
 
 Release date: 2026-09-20
-Lookup core: 3.9.3
+Lookup core: 3.9.4
 Dictionary data: PCED 2.0.5.0 plus the verified standard supplement
 
 ## Scope

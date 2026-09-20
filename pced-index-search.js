@@ -1,4 +1,4 @@
-/* PCED landing-page search v1.7.3 — exact Pāli/diacritic-aware and multilingual. */
+/* PCED landing-page search v1.7.4 — exact Pāli/diacritic-aware and multilingual. */
 (function (global) {
   'use strict';
 
@@ -101,6 +101,10 @@
     let displayResolution = result;
     const rememberResolution = candidateResult => {
       if (!candidateResult?.heads?.length) return;
+      if (!displayResolution?.heads?.length) {
+        displayResolution = candidateResult;
+        return;
+      }
       const candidateIsAnalysis = candidateResult.mode === 'inflected' || candidateResult.grammar;
       const currentIsAnalysis = displayResolution?.mode === 'inflected' || displayResolution?.grammar;
       if (candidateIsAnalysis && !currentIsAnalysis) displayResolution = candidateResult;
@@ -448,7 +452,7 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.3' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.4' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

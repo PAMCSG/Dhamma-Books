@@ -527,9 +527,9 @@ older core from replacing this behavior.
 
 ### PCED short forms and Manogaṇa correction — 20 September 2026
 
-Shared resolver v3.9.3 uses verified whole-word mappings for `jetu → jeti`,
-`bhatu`/`bhātu → bhātar`, and `pitu → pitar`; these queries no longer fall
-through to unrelated definition-substring results. Kaccāyana declension v1.3.0
+Shared resolver v3.9.4 retracts the incorrect v3.9.3 redirections. `jetu`,
+`bhātu`, and `pitu` remain exact PCED noun headwords; they are not converted
+to `jeti`, `bhātar`, or `pitar`. Kaccāyana declension v1.4.0
 records the complete closed groups: `mana` plus 15 teacher-listed Manogaṇa
 words, and all 28 teacher-listed Sabbanāmagaṇa words. Their paradigms come from
 the teacher tables; no additional word enters either group merely by sharing

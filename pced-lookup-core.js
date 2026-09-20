@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.3 — 2026-09-20
+ * Version 3.9.4 — 2026-09-20
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.3';
+  const VERSION = '3.9.4';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -38,26 +38,9 @@
   });
 
   // Verified whole-word inflections that cannot be recovered reliably by a
-  // productive suffix rule. `preferLemma` also applies when PCED contains a
-  // separate entry for the surface form, so the popup still identifies the
-  // grammatical form and opens the verb's citation entry.
+  // productive suffix rule. Exact complete PCED headwords always take
+  // precedence over this table.
   const BUILTIN_INFLECTIONS = Object.freeze({
-    'jetu': Object.freeze([Object.freeze({
-      form: 'jeti', label: 'Pañcamī (imperative), third-person singular',
-      family: 'verified verb form', preferLemma: true
-    })]),
-    'bhatu': Object.freeze([Object.freeze({
-      form: 'bhātar', label: 'ASCII input for bhātu, oblique kinship-noun form',
-      family: 'verified kinship-noun form', preferLemma: true
-    })]),
-    'bhātu': Object.freeze([Object.freeze({
-      form: 'bhātar', label: 'oblique kinship-noun form',
-      family: 'verified kinship-noun form', preferLemma: true
-    })]),
-    'pitu': Object.freeze([Object.freeze({
-      form: 'pitar', label: 'oblique kinship-noun form',
-      family: 'verified kinship-noun form', preferLemma: true
-    })]),
     'paṭisuṇitvā': Object.freeze([Object.freeze({
       form: 'paṭissuṇāti', label: 'absolutive: having agreed/promised',
       family: 'verified verb form', preferLemma: true
@@ -76,6 +59,32 @@
     'agamuṃ': Object.freeze([Object.freeze({ form: 'gacchati', label: 'Ajjatanī (aorist), third-person plural: went', family: 'Kaccāyana verb form', preferLemma: true })]),
     'agacchi': Object.freeze([Object.freeze({ form: 'gacchati', label: 'Ajjatanī (aorist), third-person singular: went', family: 'Kaccāyana verb form', preferLemma: true })]),
     'agacchuṃ': Object.freeze([Object.freeze({ form: 'gacchati', label: 'Ajjatanī (aorist), third-person plural: went', family: 'Kaccāyana verb form', preferLemma: true })])
+  });
+
+  // These complete PCED headwords are absent from the reduced web extract but
+  // are present in PCED 2.0.5.0 and in the project's verified Inflection
+  // Master. Keep them as exact noun headwords; never redirect them to a
+  // similarly-spelled verb or to an unrelated substring result.
+  const BUILTIN_EXACT_HEADWORDS = Object.freeze({
+    jetu: Object.freeze({
+      headword: 'jetu', zh: Object.freeze([]),
+      en: Object.freeze([Object.freeze({
+        source: 'M', source_label: 'PCED Inflection Master v1.5 — verified PCED headword',
+        definition: '[m.] victor; conqueror.', headword: 'jetu'
+      })]), my: Object.freeze([]), vi: Object.freeze([]), other: Object.freeze([])
+    }),
+    'bhātu': Object.freeze({
+      headword: 'bhātu', zh: Object.freeze([]), en: Object.freeze([Object.freeze({
+        source: 'P', source_label: 'PCED verified relationship-noun headword',
+        definition: '[m.] brother; a member of the bhātu / bhātar relationship-noun family.', headword: 'bhātu'
+      })]), my: Object.freeze([]), vi: Object.freeze([]), other: Object.freeze([])
+    }),
+    pitu: Object.freeze({
+      headword: 'pitu', zh: Object.freeze([]), en: Object.freeze([Object.freeze({
+        source: 'P', source_label: 'PCED verified relationship-noun headword',
+        definition: '[m.] father; a member of the pitu / pitar relationship-noun family.', headword: 'pitu'
+      })]), my: Object.freeze([]), vi: Object.freeze([]), other: Object.freeze([])
+    })
   });
 
   // Kaccāyana-confirmed forms of gamu (to go). Past systems cannot be
@@ -367,7 +376,15 @@
 
   function resolutionContext(options) {
     const dictionary = options.dictionary || {};
-    const index = options.index || createExactIndex(dictionary);
+    for (const [key, entry] of Object.entries(BUILTIN_EXACT_HEADWORDS)) {
+      if (!dictionary[key]) dictionary[key] = entry;
+    }
+    // A supplied index may have been created before the reduced dictionary was
+    // completed above. Rebuild it whenever one of these exact keys is absent.
+    let index = options.index;
+    if (!index || Object.keys(BUILTIN_EXACT_HEADWORDS).some(key => !(index.get(key) || []).length)) {
+      index = createExactIndex(dictionary);
+    }
     const exact = form => (index.get(cleanWord(form)) || []).slice();
     return { dictionary, index, exact };
   }
@@ -557,15 +574,6 @@
     const exactHeads = context.exact(normalized);
     const attestedPastHeads = explicitPastIndex(context.dictionary).get(normalized) || [];
     if (exactHeads.length) {
-      const preferred = verifiedInflectionCandidates(normalized, options)
-        .find(candidate => candidate.preferLemma && context.exact(candidate.form).length);
-      if (preferred) {
-        return finish({
-          ...base, mode: 'inflected', tier: 1, heads: context.exact(preferred.form),
-          resolvedForm: preferred.form, rule: preferred.label, family: preferred.family,
-          notes: [`${clicked} → ${preferred.form} (${preferred.label})`]
-        });
-      }
       if (attestedPastHeads.length) {
         return finish({
           ...base, mode: 'inflected', tier: 1, heads: attestedPastHeads,
