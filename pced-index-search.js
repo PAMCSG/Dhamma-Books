@@ -154,6 +154,12 @@
   const CASE_UI = {
     zh: { Nominative: '主格', Vocative: '呼格', Accusative: '宾格', Instrumental: '具格', Dative: '与格', Ablative: '从格', Genitive: '属格', Locative: '处格' }
   };
+  const TEACHER_DECLENSION_GROUPS = {
+    1: 'Purisādigaṇa', 2: 'Cittādigaṇa', 3: 'Kaññādigaṇa', 4: 'Pumādigaṇa',
+    5: 'Rājādigaṇa', 6: 'Manogaṇādi', 7: 'Nadādigaṇa', 8: 'Gahapatādigaṇa',
+    9: 'Sabbanāmagaṇa', 10: 'Satthādigaṇa', 11: 'Rattādigaṇa',
+    12: 'Guṇavādigaṇa', 13: 'Gacchantādigaṇa'
+  };
   function inflectionGroupGender(group) {
     const row = (group?.rows || []).find(item => item.label === 'Nominative') || group?.rows?.[0];
     const forms = [...(row?.singular || []), ...(row?.plural || [])];
@@ -162,31 +168,56 @@
     if (forms.some(form => /(?:ā|anto|antā)$/u.test(form))) return 'm';
     return '';
   }
-  function localizedGroupLabel(label, language, group) {
+  function teacherDeclensionGroup(group, lemma, gender) {
+    const text = String(group?.label || '');
+    const code = String(group?.morphologyCode || '');
+    const word = global.PCEDLookupCore?.normalizeForMatch(group?.lemma || lemma) ||
+      String(group?.lemma || lemma || '').normalize('NFC').toLowerCase();
+    if (/vant\/?mant/i.test(text) || /^(?:adj\.v|m\.v)$/i.test(code)) return 12;
+    if (/pres(?:ent)?\.?\s*part|participle/i.test(text) || /^(?:adj\.t|adj\.te|adj\.to|m\.t|m\.te|m\.to)$/i.test(code) || /(?:anta|amāna)$/.test(word)) return 13;
+    if (/pronoun|numeral/i.test(text) || /^(?:pro|pro\.a|pro\.x|adj\.n)$/i.test(code)) return 9;
+    if (/\bas\s*\(mano\)/i.test(text) || /^(?:m\.s|nt\.s)$/i.test(code)) return 6;
+    if (/agent\s*\(ar\)|pitar\/mātar/i.test(text) || /^(?:m\.r|m\.p|f\.p)$/i.test(code)) return 10;
+    if (['puma', 'yuva', 'addhā', 'addhāna'].includes(word)) return 4;
+    if (['rāja', 'brahma', 'atta', 'sakha', 'ātuma'].includes(word)) return 5;
+    if (['gahapatānī', 'bhikkhunī', 'rājinī', 'daṇḍinī'].includes(word)) return 8;
+    if (['arahanta', 'mahanta', 'bhavanta', 'santa'].includes(word)) return 13;
+    if (['ratti', 'aggi', 'aṭṭhi', 'daṇḍī', 'sukhakārī', 'bhikkhu', 'cakkhu', 'yāgu', 'sayambhū', 'vadhū', 'gotrabhū', 'go', 'cittago'].includes(word)) return 11;
+    if (code === 'm.a' || (gender === 'm' && /["“]a["”]\s*decl/i.test(text))) return 1;
+    if (code === 'nt.a' || (gender === 'n' && /["“]a["”]\s*decl/i.test(text))) return 2;
+    if (code === 'f.ā' || (gender === 'f' && /["“]ā["”]\s*decl/i.test(text))) return 3;
+    if (code === 'f.ī') return 7;
+    if (/^(?:m|f|nt)\.(?:i|ī|u|ū)$/.test(code)) return 11;
+    return 0;
+  }
+  function withTeacherGroup(label, language, groupNumber) {
+    if (!groupNumber) return label;
+    const name = TEACHER_DECLENSION_GROUPS[groupNumber];
+    return language === 'zh'
+      ? '第' + groupNumber + '组：' + name + '（' + label + '）'
+      : 'Group ' + groupNumber + ': ' + name + ' (' + label + ')';
+  }
+  function localizedGroupLabel(label, language, group, lemma) {
     const text = String(label || '');
     const gender = /Masculine|Masc\./i.test(text) ? 'm' : /Feminine|Fem\./i.test(text) ? 'f' : /Neuter|Neut\./i.test(text) ? 'n' : inflectionGroupGender(group);
     const ending = text.match(/["“]([^"”]+)["”]/)?.[1];
     const irregular = /irregular/i.test(text);
+    const groupNumber = teacherDeclensionGroup(group, lemma, gender);
+    let localized = '';
     if (language === 'zh' && gender) {
-      if (/vant\/?mant/i.test(text)) return { m: '阳性形容词，vant/mant 变格', f: '阴性形容词，vant/mant 变格', n: '中性形容词，vant/mant 变格' }[gender];
+      if (/vant\/?mant/i.test(text)) localized = { m: '阳性形容词，vant/mant 变格', f: '阴性形容词，vant/mant 变格（依第7组 Nadādigaṇa）', n: '中性形容词，vant/mant 变格' }[gender];
       const name = { m: '阳性名词', f: '阴性名词', n: '中性名词' }[gender];
-      if (irregular) return name + '，不规则变格';
-      if (/\bas\s*\(mano\)/i.test(text)) return name + '，-as（mano 类）变格';
-      return name + (ending ? '，-' + ending + ' 变格' : '');
+      if (!localized && irregular) localized = name + '，不规则变格';
+      if (!localized && /\bas\s*\(mano\)/i.test(text)) localized = name + '，-as（mano 类）变格';
+      if (!localized) localized = name + (ending ? '，-' + ending + ' 变格' : '，变格');
     }
-    if (language === 'my' && gender) {
-      if (/vant\/?mant/i.test(text)) return { m: 'ပုလ္လိင် နာမဝိသေသန၊ vant/mant ဝိဘတ်ပြောင်း', f: 'ဣတ္ထိလိင် နာမဝိသေသန၊ vant/mant ဝိဘတ်ပြောင်း', n: 'နပုံသကလိင် နာမဝိသေသန၊ vant/mant ဝိဘတ်ပြောင်း' }[gender];
+    if (!localized && language === 'my' && gender) {
       const name = { m: 'ပုလ္လိင်နာမ်', f: 'ဣတ္ထိလိင်နာမ်', n: 'နပုံသကလိင်နာမ်' }[gender];
-      return irregular ? name + '၊ မမှန်ဝိဘတ်ပြောင်း' : name + (ending ? '၊ -' + ending + ' ဝိဘတ်ပြောင်း' : '');
+      localized = irregular ? name + '၊ မမှန်ဝိဘတ်ပြောင်း' : name + (ending ? '၊ -' + ending + ' ဝိဘတ်ပြောင်း' : '');
     }
-    if (gender && /vant\/?mant/i.test(text)) {
-      return { m: 'Masculine adjective, vant/mant declension', f: 'Feminine adjective, vant/mant declension', n: 'Neuter adjective, vant/mant declension' }[gender];
-    }
-    if (gender && language === 'en' && !/Masculine|Feminine|Neuter/i.test(text)) {
-      return { m: 'Masculine', f: 'Feminine', n: 'Neuter' }[gender] + ' ' + text.charAt(0).toLowerCase() + text.slice(1)
-        .replace('declens.', 'declension').replace('decl.', 'declension');
-    }
-    return text.replace('declens.', 'declension').replace('decl.', 'declension');
+    if (!localized && gender && /vant\/?mant/i.test(text)) localized = { m: 'Masculine adjective, vant/mant declension', f: 'Feminine adjective, vant/mant declension (follows Group 7 Nadādigaṇa)', n: 'Neuter adjective, vant/mant declension' }[gender];
+    if (!localized) localized = text.replace('declens.', 'declension').replace('decl.', 'declension');
+    return withTeacherGroup(localized, language, groupNumber);
   }
 
   function renderInflectionPanel(head, priority = 'en') {
@@ -208,7 +239,7 @@
     ).join(' ');
     let content = '';
     for (const group of paradigm.groups || []) {
-      content += '<div class="pced-inflection-group"><b>' + esc(localizedGroupLabel(group.label, priority, group)) + '</b>';
+      content += '<div class="pced-inflection-group"><b>' + esc(localizedGroupLabel(group.label, priority, group, paradigm.lemma)) + '</b>';
       if (group.rows) {
         const hasPlural = group.rows.some(row => row.plural?.length);
         content += '<div class="pced-inflection-table-wrap"><table class="pced-inflection-table">' +
@@ -401,7 +432,7 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.5.2' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.5.3' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

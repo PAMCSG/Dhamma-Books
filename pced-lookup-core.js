@@ -731,13 +731,19 @@
         }).filter(Boolean);
         const nominative = rows.find(row => row.label === 'Nominative') || rows[0];
         const nominativeForms = [...(nominative?.singular || []), ...(nominative?.plural || [])];
-        const gender = nominativeForms.some(form => /(?:atī|atiyo|antiyo|āyo)$/u.test(form)) ? 'Feminine'
-          : nominativeForms.some(form => /(?:aṃ|antāni|āni)$/u.test(form)) ? 'Neuter'
-            : nominativeForms.length ? 'Masculine' : '';
+        const gender = /^f\./i.test(record.i) ? 'Feminine'
+          : /^nt\./i.test(record.i) ? 'Neuter'
+            : /^m\./i.test(record.i) ? 'Masculine'
+              : nominativeForms.some(form => /(?:atī|atiyo|antiyo|āyo)$/u.test(form)) ? 'Feminine'
+                : nominativeForms.some(form => /(?:aṃ|antāni|āni)$/u.test(form)) ? 'Neuter'
+                  : nominativeForms.length ? 'Masculine' : '';
         const description = data.descriptions?.[record.i] || record.i;
         if (rows.length) groups.push({
-          label: gender && !/^(?:Masculine|Feminine|Neuter)\b/i.test(description)
+          label: gender && !/^(?:Masculine|Feminine|Neuter|Masc\.?|Fem\.?|Neut\.?)\b/i.test(description)
             ? gender + ' ' + description.charAt(0).toLowerCase() + description.slice(1) : description,
+          morphologyCode: record.i,
+          morphologyGroupCode: groupCode,
+          lemma,
           source: data.source,
           rows
         });
@@ -752,7 +758,7 @@
         : gender === 'f' ? 'Feminine noun, irregular declension'
           : gender === 'nt' ? 'Neuter noun, irregular declension' : 'Irregular noun';
       const rows = makeRows(selected);
-      if (rows.length) groups.push({ label, source: data.source, rows });
+      if (rows.length) groups.push({ label, morphologyCode: 'irregular', lemma, source: data.source, rows });
     }
     return groups;
   }
