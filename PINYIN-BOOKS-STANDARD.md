@@ -47,6 +47,8 @@ This document applies to every book listed under `menu-pinyinbooks.html`.
 - Chinese, Pāli and English parallel text must remain readable on desktop and stack cleanly on mobile.
 - Use Times New Roman for all Pāli and English text.
 - Use the specially widened `1540px` desktop reading area for parallel-text and two-column books, while retaining a responsive mobile width.
+- When the source book uses one Pāli page followed by its corresponding Chinese page, preserve those source page pairs in HTML: show the complete Pāli page in the left column and its corresponding Chinese/English page in the right column. Do not force unequal line counts into incorrect row-by-row matches.
+- Show the original printed page numbers on each paired-page block so the HTML can be checked directly against the PDF.
 - The contents window must follow the book order and show the English title beside every Chinese title.
 - Every visible chapter and section title must include its English translation. Explanatory notices must also include an English line.
 - Short Pāli–Chinese labels introducing rules or procedures must use the standard title format, for example `Pubbakaraṇaṃ–4. 四种事前任务`.
@@ -69,13 +71,23 @@ This document applies to every book listed under `menu-pinyinbooks.html`.
 5. Record the exact English translation source and licence.
 6. Add the book card without changing the PAMC header or the Pāli Lexicon search section.
 7. Test the menu link, reader return link, cover, search, PCED popup (including inflected Pāli forms), bookmarks, contents panel and font-size controls.
-8. Check desktop and mobile layouts before publication.
+8. Verify every source footnote number, anchor and popup against the Word or PDF source.
+9. Check desktop and mobile layouts before publication.
 
-## 8. Temporary proofreading remarks
+## 8. Footnotes
+
+- Preserve the source book's footnote numbering; do not silently renumber notes in the HTML edition.
+- Display each footnote reference as a small superscript number at the exact word, phrase or punctuation position used by the source.
+- Each superscript must be clickable and keyboard accessible. It opens a non-dimming popup headed `Footnote n / 註释 n`, containing the complete source note and all of its paragraphs.
+- The popup must provide a visible close button, close with `Escape`, stay within the viewport, and appear below the reader header on mobile. On desktop it may be dragged without blocking the book text.
+- A footnote marker inside or next to a Pāli expression must open the footnote without also triggering the PCED lookup. The Pāli expression itself must remain clickable for PCED.
+- Convert legacy-encoded Pāli inside footnotes to Unicode before publishing.
+- Audit the final reader mechanically: every visible marker must have exactly one popup entry, no marker number may be duplicated, and every footnote belonging to text included in the HTML must have a visible marker.
+
+## 9. Temporary proofreading remarks
 
 - For private proofreading editions, a temporary in-browser remark facility may be enabled.
 - Each proofreadable passage receives a small `Add remark / 添加备注` control only while proofreading mode is on; passages with saved remarks remain visibly marked.
 - Remarks save automatically in the browser's local storage and can be exported as a UTF-8 text file for review. The interface must warn the proofreader to export remarks before clearing browser data.
 - This temporary feature must not alter the book text or PCED lookup behaviour and may be removed after proofreading is complete.
 - Mark English taken from SuttaCentral with a very small `SC` superscript. Unmarked English is understood to have been translated from the Chinese source text.
-
