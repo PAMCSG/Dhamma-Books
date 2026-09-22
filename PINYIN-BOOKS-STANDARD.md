@@ -25,6 +25,8 @@ This document applies to every book listed under `menu-pinyinbooks.html`.
 - Do not depend on a legacy Sangayana font for the meaning of the text.
 - Every Pāli word must use `Times New Roman`, appear in the standard blue lookup style and open the PCED popup when clicked or activated from the keyboard.
 - Detect complete Pāli quotations, including previously unrecognised words. All words in a Pāli quotation must be treated as Pāli and linked to PCED rather than being mistaken for English.
+- Detect Pāli embedded inside a Chinese sentence or explanation as well as complete Pāli-only quotations. Embedded forms such as `bhikkhaka`, names, compounds and inflected words must also use the blue PCED lookup style.
+- A Pāli word remains Pāli even when PCED has no exact headword result. Keep it clickable so the reader can try the standard inflection and compound lookup paths.
 - In word-by-word Pāli–Chinese explanation chapters, all Latin-script words are Pāli unless explicitly identified otherwise; do not style them as English.
 
 ## 4. English text and translation source
@@ -33,8 +35,10 @@ This document applies to every book listed under `menu-pinyinbooks.html`.
 - For matched Bhikkhupātimokkha passages, use Bhikkhu Brahmali's English translation from SuttaCentral and keep the source attribution visible.
 - If no matching SuttaCentral translation is available, translate from the Chinese text into English and mark it as `data-source="translated-from-chinese"`.
 - Chinese-based English must be reviewed for natural grammar and correct Buddhist and Vinaya terminology; never publish an unreviewed automatic translation.
+- Use the fixed terminology `比库巴帝摩卡` = `Bhikkhu Pātimokkha` and `比库尼巴帝摩卡` = `Bhikkhunī Pātimokkha`. Do not transliterate these Chinese terms mechanically.
 - Do not describe Chinese-based translations, editorial notes, introductions or newly written working translations as SuttaCentral text.
 - Retain source metadata such as `data-source="suttacentral"` and segment references where available.
+- Match complete semantic units across Pāli, Chinese and English. Do not split a Pāli sentence in a way that leaves a predicate such as “are called” only in the translation, and do not align a translation with a neighbouring Pāli fragment.
 
 ## 5. Reader layout and text size
 
