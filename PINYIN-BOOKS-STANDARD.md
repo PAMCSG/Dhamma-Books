@@ -50,8 +50,9 @@ This document applies to every book listed under `menu-pinyinbooks.html`.
 - Chinese, Pāli and English parallel text must remain readable on desktop and stack cleanly on mobile.
 - Use Times New Roman for all Pāli and English text.
 - Use the specially widened `1540px` desktop reading area for parallel-text and two-column books, while retaining a responsive mobile width.
-- When the source book uses one Pāli page followed by its corresponding Chinese page, preserve those source page pairs in HTML: show the complete Pāli page in the left column and its corresponding Chinese/English page in the right column. Do not force unequal line counts into incorrect row-by-row matches.
+- When the source book uses one Pāli page followed by its corresponding Chinese page, preserve those source page pairs in HTML. Within each pair, align complete semantic units in synchronized rows. Merge source line fragments where necessary; never let either language advance into the next sentence merely to keep the raw paragraph counts equal.
 - Show the original printed page numbers on each paired-page block so the HTML can be checked directly against the PDF.
+- Keep the Pāli and Chinese/English page labels static. They must not float over or conceal the first passage when the reader scrolls.
 - The contents window must follow the book order and show the English title beside every Chinese title.
 - Every visible chapter and section title must include its English translation. Explanatory notices must also include an English line.
 - Short Pāli–Chinese labels introducing rules or procedures must use the standard title format, for example `Pubbakaraṇaṃ–4. 四种事前任务`.
@@ -78,6 +79,7 @@ This document applies to every book listed under `menu-pinyinbooks.html`.
 7. Test the menu link, reader return link, cover, search, PCED popup (including inflected Pāli forms), bookmarks, contents panel and font-size controls.
 8. Verify every source footnote number, anchor and popup against the Word or PDF source.
 9. Check desktop and mobile layouts before publication.
+10. For facing-page sources, verify every Pāli/Chinese page pair in sequence and audit every SuttaCentral segment against the Pāli in the same synchronized row.
 
 ## 8. Footnotes
 
