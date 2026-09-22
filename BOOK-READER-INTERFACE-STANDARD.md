@@ -205,7 +205,7 @@ For every conversion, record a source-to-HTML font map and verify both normal re
 
 ### Source-faithful numbered paragraphs
 
-Retain the source book's paragraph inset as well as its hanging indent. For a normally two-character-indented Chinese numbered paragraph, the number itself begins at that two-character inset; it must not be pulled back to the reader's left text boundary. Wrapped continuation lines align beneath the item wording, not beneath the number. Preserve deliberate compact spacing between consecutive numbered items and do not add blank lines merely to separate them.
+Retain each numbered paragraph's actual source indentation; do not impose one universal hanging-indent template on every numbered item. If the source uses an ordinary first-line indent, the number begins at that inset and wrapped lines return to the source paragraph margin. If the source explicitly uses a hanging indent or a left-indented list, preserve that different measurement and align its continuation lines accordingly. Audit the complete book because visually similar numbered passages may use different source paragraph settings. Preserve deliberate compact spacing between consecutive numbered items and do not add blank lines merely to separate them.
 
 ## 7. Book cover
 
