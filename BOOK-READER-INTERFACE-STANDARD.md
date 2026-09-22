@@ -203,6 +203,10 @@ An exception applies when the source uses a non-Unicode font encoding, or when c
 
 For every conversion, record a source-to-HTML font map and verify both normal reading text and popup copies of notes. Popup construction must preserve the source element's font class or equivalent semantic font role.
 
+### Source-faithful numbered paragraphs
+
+Retain the source book's paragraph inset as well as its hanging indent. For a normally two-character-indented Chinese numbered paragraph, the number itself begins at that two-character inset; it must not be pulled back to the reader's left text boundary. Wrapped continuation lines align beneath the item wording, not beneath the number. Preserve deliberate compact spacing between consecutive numbered items and do not add blank lines merely to separate them.
+
 ## 7. Book cover
 
 - Use the Daily Chants English cover card as the visual reference for every book: one warm cream card with `linear-gradient(135deg, #fffdf8, #f6eddf)`, a 1 px `#D8CFC3` border, 14 px rounded corners, `overflow: hidden`, and the soft shadow `0 8px 30px #5A46331C`.
@@ -260,6 +264,8 @@ Every popup overlay in every Dhamma-Books reader must be transparent. Opening PC
 ### Footnote popup wording
 
 Use `註释`, not `注释`, as the title of a Chinese footnote popup. This terminology rule changes the popup title only; do not rewrite ordinary book text containing `注释`.
+
+Every footnote trigger must resolve to exactly one hidden note body. The trigger and body may use different attribute names only when the popup script explicitly maps them; validate the script's selector against the generated HTML and confirm that the trigger-ID and body-ID sets are identical. A correct superscript appearance alone is not sufficient evidence that the popup works.
 
 ### Dhammapada nested popups
 
