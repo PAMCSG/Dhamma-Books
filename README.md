@@ -1,5 +1,15 @@
 # PAMC Dhamma Books
 
+## 《比库巴帝摩卡》complete source-book reader — 22 September 2026
+
+`bhikkhupatimokkha.html` is the complete four-chapter reader built from the supplied revised-edition Word source. It includes the copyright conditions, 序, 序言, 增订版序, 凡例, the source abbreviation table, Chapters 1–4, the reference list, and all 243 source notes. Chapter 1 is Chinese-only in continuous book paragraphs. Chapter 2 preserves the printed one-page Pāli / one-page Chinese correspondence as synchronized two-column page pairs, with no English translation. Chapters 3 and 4 retain the complete source content and are separate semantic chapter sections.
+
+Chinese typography follows the source roles: direct translations of Pāli use a Song-style Unicode font stack; explanations and notes use a Kai-style stack; Xinwei, Zhongsong, Xihei and YouYuan roles are retained where used in the front matter. Sangayana-encoded Pāli is converted to Unicode and displayed in Times New Roman with Unicode serif fallbacks. Source first-line, hanging and side indentation is transferred to matched paragraphs. Consecutive stanza/Pāli lines do not receive extra paragraph gaps.
+
+Every displayed Pāli token uses the shared clickable PCED lookup. All 243 note references are superscript buttons linked to movable, non-dimming `註释` popups in the established cream-and-brown book theme. The temporary proofreading panel and all generated English columns are absent. The reader uses the complete standard header, a single-column Chinese Contents panel, 19px normal book text, a wide two-column reading area, standard Search and Book Mark controls, and the shared responsive reader assets.
+
+The landing page places the book under `玛欣德尊者译著 Dhamma Books authored or translated by Venerable Mahinda`, in the new `戒律 The Code of Monastic Discipline` subcategory. Static validation confirms four chapter sections, 81 Contents destinations, 12,255 clickable Pāli spans, 243 superscript references and 243 corresponding note records, with no pinyin or generated English translation elements. Browser visual and interaction verification remains pending because a Chromium executable is unavailable in this environment. This is a manual-upload package; no push, PR, merge or deployment was performed.
+
 ## Verified compound correction — 19 September 2026
 
 Shared resolver v3.5.2 recognizes `hatāvasesaka` as the contracted compound `hata + avasesaka`. Inflected forms such as `hatāvasesakā` retain their whole-word definition and also display both independently attested PCED component entries. The unverified split `hata + vasesaka` is not used because `vasesaka` is not a complete PCED headword.
