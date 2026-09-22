@@ -70,3 +70,12 @@ This document applies to every book listed under `menu-pinyinbooks.html`.
 6. Add the book card without changing the PAMC header or the Pāli Lexicon search section.
 7. Test the menu link, reader return link, cover, search, PCED popup (including inflected Pāli forms), bookmarks, contents panel and font-size controls.
 8. Check desktop and mobile layouts before publication.
+
+## 8. Temporary proofreading remarks
+
+- For private proofreading editions, a temporary in-browser remark facility may be enabled.
+- Each proofreadable passage receives a small `Add remark / 添加备注` control only while proofreading mode is on; passages with saved remarks remain visibly marked.
+- Remarks save automatically in the browser's local storage and can be exported as a UTF-8 text file for review. The interface must warn the proofreader to export remarks before clearing browser data.
+- This temporary feature must not alter the book text or PCED lookup behaviour and may be removed after proofreading is complete.
+- Mark English taken from SuttaCentral with a very small `SC` superscript. Unmarked English is understood to have been translated from the Chinese source text.
+
