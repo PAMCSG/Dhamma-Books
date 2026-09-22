@@ -29,7 +29,8 @@ This document applies to every book listed under `menu-pinyinbooks.html`.
 
 - Display English text in `Times New Roman`, with `Times` and a generic serif as fallbacks.
 - For matched Bhikkhupātimokkha passages, use Bhikkhu Brahmali's English translation from SuttaCentral and keep the source attribution visible.
-- Do not describe editorial notes, introductions or newly written working translations as SuttaCentral text.
+- If no matching SuttaCentral translation is available, translate from the Chinese text into English and mark it as `data-source="translated-from-chinese"`.
+- Do not describe Chinese-based translations, editorial notes, introductions or newly written working translations as SuttaCentral text.
 - Retain source metadata such as `data-source="suttacentral"` and segment references where available.
 
 ## 5. Reader layout and text size
@@ -37,6 +38,10 @@ This document applies to every book listed under `menu-pinyinbooks.html`.
 - Default book reading text: `36px`.
 - Reader size controls: minimum `30px`, maximum `54px`, in `2px` steps.
 - Chinese, Pāli and English parallel text must remain readable on desktop and stack cleanly on mobile.
+- Use Times New Roman for all Pāli and English text.
+- Use the widened `1320px` desktop reading area while retaining a responsive mobile width.
+- The contents window must follow the book order and show the English title beside every Chinese title.
+- Short Pāli–Chinese labels introducing rules or procedures must use the standard title format, for example `Pubbakaraṇaṃ–4. 四种事前任务`.
 - The reader's home/logo link must return to `menu-pinyinbooks.html`.
 
 ## 6. Required files for each book
