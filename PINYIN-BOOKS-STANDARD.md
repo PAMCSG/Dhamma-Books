@@ -21,13 +21,16 @@ This document applies to every book listed under `menu-pinyinbooks.html`.
 ## 3. Pāli text
 
 - Convert Sangayana or other legacy-encoded Pāli to standard Unicode before adding it to HTML.
+- Identify legacy Pāli from the Word run's font metadata, not merely from the characters that happen to be stored in the file. Sangayana text may look like ordinary Latin text in extraction while actually representing Pāli glyphs.
 - Store and display the final Pāli as Unicode, preferably Unicode NFC.
 - Do not depend on a legacy Sangayana font for the meaning of the text.
+- If a source Pāli term appears in both the Chinese and English columns, use the exact same reviewed Unicode spelling in both columns. Never translate or transliterate the legacy code separately in the English column.
 - Every Pāli word must use `Times New Roman`, appear in the standard blue lookup style and open the PCED popup when clicked or activated from the keyboard.
 - Detect complete Pāli quotations, including previously unrecognised words. All words in a Pāli quotation must be treated as Pāli and linked to PCED rather than being mistaken for English.
 - Detect Pāli embedded inside a Chinese sentence or explanation as well as complete Pāli-only quotations. Embedded forms such as `bhikkhaka`, names, compounds and inflected words must also use the blue PCED lookup style.
 - A Pāli word remains Pāli even when PCED has no exact headword result. Keep it clickable so the reader can try the standard inflection and compound lookup paths.
 - In word-by-word Pāli–Chinese explanation chapters, all Latin-script words are Pāli unless explicitly identified otherwise; do not style them as English.
+- Before release, scan all visible book text for residual Sangayana code points such as à, ã, å, ï, ¤, ò, õ, ë, ü and their uppercase forms. A match must be reviewed and converted; do not assume it is a valid Unicode Pāli character.
 
 ## 4. English text and translation source
 
@@ -66,6 +69,8 @@ This document applies to every book listed under `menu-pinyinbooks.html`.
 
 1. Confirm the book title, cover, author or translator credit, and private/public status.
 2. Convert all legacy Pāli to Unicode and validate the result.
+   - Compare every mixed Chinese/Pāli passage with its English column and confirm that corresponding Pāli strings are identical.
+   - Check references, footnotes and word-by-word headings as well as the main body; split Word runs can leave one legacy character outside an otherwise converted word.
 3. Apply the pinyin font so pronunciation appears above each Chinese character.
 4. Apply Times New Roman to English text.
 5. Record the exact English translation source and licence.
