@@ -117,9 +117,11 @@ Use Daily Chants Burmese as the structural reference.
 
 Do not combine two languages in the title, such as `Contents · 目录`, unless a later book-specific requirement expressly asks for it.
 
-### HTML navigation; no printed page numbers
+### No printed page numbers in a standard HTML reader
 
-Do not copy printed-book page numbers or Roman-numeral front-matter page numbers into an HTML Contents panel. HTML is reflowable and its links already take the reader directly to the corresponding section, so printed page numbers are misleading and unnecessary. Omit the page-number column, dot leaders and any page number appended to a Contents title. Printed page numbers may remain only when they are part of quoted source text or when an expressly requested book-specific source-comparison feature needs them outside the normal HTML Contents.
+Do not display printed-book page numbers or Roman-numeral front-matter page numbers in the HTML Contents or ordinary reading body. HTML is reflowable, and Contents links already take the reader directly to the corresponding section, so printed page numbers are misleading and unnecessary. Omit the Contents page-number column, dot leaders, numbers appended to Contents titles, visible `Source page` labels, repeated `Pāli · page` / `Chinese · page` labels and other decorations created only by a printed page turn. Source-page references may remain privately in `data-*` attributes for conversion checking, but they must not break or label the visible reading flow. Display them only in an expressly requested source-comparison or proofreading mode.
+
+Content under the same title must flow continuously in HTML. A printed page break must not create a new card, repeated column heading, large gap or artificial section boundary. Begin a new visual section only when the source begins a new semantic title or heading.
 
 ### Size
 
@@ -351,6 +353,7 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 - [ ] Contents title row stays outside the scrolling entries.
 - [ ] Contents title wording and pinkish colour pair are correct.
 - [ ] Contents omits printed-book page numbers, Roman numerals and dot leaders.
+- [ ] Ordinary reading text omits visible printed-page labels; printed page turns do not interrupt content under the same title.
 - [ ] Every Contents section/group heading uses the standard full-width rectangular highlight bar on desktop and mobile.
 - [ ] Contents height matches the standard.
 - [ ] Main text follows Contents continuously.
