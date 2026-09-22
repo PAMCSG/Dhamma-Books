@@ -88,7 +88,7 @@ Follow the displayed Daily Chants English state treatment: Contents is a navigat
 
 - A− and A+ must work with touch as well as mouse input.
 - Each press must visibly resize the active book text.
-- They must also resize the Contents heading, Contents entries and Contents page numbers.
+- They must also resize the Contents heading and Contents entries.
 - Do not hard-code descendant font sizes in a way that prevents them from following the book's font-size setting.
 - Preserve the selected size consistently while the reader remains in use, according to the book's established storage behaviour.
 
@@ -117,6 +117,10 @@ Use Daily Chants Burmese as the structural reference.
 
 Do not combine two languages in the title, such as `Contents · 目录`, unless a later book-specific requirement expressly asks for it.
 
+### HTML navigation; no printed page numbers
+
+Do not copy printed-book page numbers or Roman-numeral front-matter page numbers into an HTML Contents panel. HTML is reflowable and its links already take the reader directly to the corresponding section, so printed page numbers are misleading and unnecessary. Omit the page-number column, dot leaders and any page number appended to a Contents title. Printed page numbers may remain only when they are part of quoted source text or when an expressly requested book-specific source-comparison feature needs them outside the normal HTML Contents.
+
 ### Size
 
 The entries window uses the Daily Chants Burmese height plus approximately one normal Contents-entry row:
@@ -133,7 +137,7 @@ The entries window uses the Daily Chants Burmese height plus approximately one n
 | Contents panel | `#FFFDF9` |
 | Main entry text | `#302A26` |
 | Borders and row separators | `#DFCBBB` |
-| Muted text and page numbers | `#7B685A` |
+| Muted auxiliary text | `#7B685A` |
 | Section/group highlight bar | background `#EEE1CF`; text `#633919` |
 
 Every non-clickable section or group heading inside the scrolling Contents entries uses the Dhammapada highlight-bar treatment: a rectangular `#EEE1CF` bar beginning exactly one character-space (`1em`) from the left edge of the scrolling Contents window, with bold, left-aligned `#633919` text, no rounded corners or separate frame, and `10px 16px` internal padding (`10px 14px` on mobile). The bar fills the remaining width to the right after that `1em` inset. Its font size must remain relative to the Contents font size so A− and A+ resize it. This group-heading bar is distinct from the fixed Contents title row.
@@ -346,6 +350,7 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 - [ ] Contents uses one outer frame with no inner frame.
 - [ ] Contents title row stays outside the scrolling entries.
 - [ ] Contents title wording and pinkish colour pair are correct.
+- [ ] Contents omits printed-book page numbers, Roman numerals and dot leaders.
 - [ ] Every Contents section/group heading uses the standard full-width rectangular highlight bar on desktop and mobile.
 - [ ] Contents height matches the standard.
 - [ ] Main text follows Contents continuously.
