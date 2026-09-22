@@ -23,7 +23,8 @@ This document applies to every book listed under `menu-pinyinbooks.html`.
 - Convert Sangayana or other legacy-encoded Pāli to standard Unicode before adding it to HTML.
 - Store and display the final Pāli as Unicode, preferably Unicode NFC.
 - Do not depend on a legacy Sangayana font for the meaning of the text.
-- Pāli words may remain clickable for PCED dictionary lookup.
+- Every Pāli word must use `Times New Roman`, appear in the standard blue lookup style and open the PCED popup when clicked or activated from the keyboard.
+- In word-by-word Pāli–Chinese explanation chapters, all Latin-script words are Pāli unless explicitly identified otherwise; do not style them as English.
 
 ## 4. English text and translation source
 
@@ -39,8 +40,9 @@ This document applies to every book listed under `menu-pinyinbooks.html`.
 - Reader size controls: minimum `30px`, maximum `54px`, in `2px` steps.
 - Chinese, Pāli and English parallel text must remain readable on desktop and stack cleanly on mobile.
 - Use Times New Roman for all Pāli and English text.
-- Use the widened `1320px` desktop reading area while retaining a responsive mobile width.
+- Use the specially widened `1540px` desktop reading area for parallel-text and two-column books, while retaining a responsive mobile width.
 - The contents window must follow the book order and show the English title beside every Chinese title.
+- Every visible chapter and section title must include its English translation. Explanatory notices must also include an English line.
 - Short Pāli–Chinese labels introducing rules or procedures must use the standard title format, for example `Pubbakaraṇaṃ–4. 四种事前任务`.
 - The reader's home/logo link must return to `menu-pinyinbooks.html`.
 
@@ -60,5 +62,5 @@ This document applies to every book listed under `menu-pinyinbooks.html`.
 4. Apply Times New Roman to English text.
 5. Record the exact English translation source and licence.
 6. Add the book card without changing the PAMC header or the Pāli Lexicon search section.
-7. Test the menu link, reader return link, cover, search, dictionary lookup, bookmarks, contents panel and font-size controls.
+7. Test the menu link, reader return link, cover, search, PCED popup (including inflected Pāli forms), bookmarks, contents panel and font-size controls.
 8. Check desktop and mobile layouts before publication.
