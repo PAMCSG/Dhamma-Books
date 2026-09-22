@@ -24,6 +24,7 @@ This document applies to every book listed under `menu-pinyinbooks.html`.
 - Store and display the final Pāli as Unicode, preferably Unicode NFC.
 - Do not depend on a legacy Sangayana font for the meaning of the text.
 - Every Pāli word must use `Times New Roman`, appear in the standard blue lookup style and open the PCED popup when clicked or activated from the keyboard.
+- Detect complete Pāli quotations, including previously unrecognised words. All words in a Pāli quotation must be treated as Pāli and linked to PCED rather than being mistaken for English.
 - In word-by-word Pāli–Chinese explanation chapters, all Latin-script words are Pāli unless explicitly identified otherwise; do not style them as English.
 
 ## 4. English text and translation source
@@ -31,13 +32,14 @@ This document applies to every book listed under `menu-pinyinbooks.html`.
 - Display English text in `Times New Roman`, with `Times` and a generic serif as fallbacks.
 - For matched Bhikkhupātimokkha passages, use Bhikkhu Brahmali's English translation from SuttaCentral and keep the source attribution visible.
 - If no matching SuttaCentral translation is available, translate from the Chinese text into English and mark it as `data-source="translated-from-chinese"`.
+- Chinese-based English must be reviewed for natural grammar and correct Buddhist and Vinaya terminology; never publish an unreviewed automatic translation.
 - Do not describe Chinese-based translations, editorial notes, introductions or newly written working translations as SuttaCentral text.
 - Retain source metadata such as `data-source="suttacentral"` and segment references where available.
 
 ## 5. Reader layout and text size
 
-- Default book reading text: `36px`.
-- Reader size controls: minimum `30px`, maximum `54px`, in `2px` steps.
+- Default book reading text: `34px`.
+- Reader size controls: minimum `28px`, maximum `52px`, in `2px` steps.
 - Chinese, Pāli and English parallel text must remain readable on desktop and stack cleanly on mobile.
 - Use Times New Roman for all Pāli and English text.
 - Use the specially widened `1540px` desktop reading area for parallel-text and two-column books, while retaining a responsive mobile width.
