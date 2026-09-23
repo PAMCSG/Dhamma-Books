@@ -5,7 +5,7 @@
   'use strict';
 
   const STORAGE_KEY = 'pamc-dhamma-books:read-aloud-voice-v1';
-  const DEFAULTS = Object.freeze({ voice: '__male__', pitch: 0.72 });
+  const DEFAULTS = Object.freeze({ voice: '__male__' });
   const MALE_NAME_PATTERN = /(male|man|男声?|康康|kangkang|yunxi|yunjian|yunyang|yunze|yunhao)/i;
 
   function chineseVoices(voices) {
@@ -35,20 +35,14 @@
   function load() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-      return {
-        voice: typeof saved.voice === 'string' ? saved.voice : DEFAULTS.voice,
-        pitch: [0.72, 1, 1.18].includes(Number(saved.pitch)) ? Number(saved.pitch) : DEFAULTS.pitch
-      };
+      return { voice: typeof saved.voice === 'string' ? saved.voice : DEFAULTS.voice };
     } catch (_) {
       return { ...DEFAULTS };
     }
   }
 
   function save(settings) {
-    const next = {
-      voice: typeof settings.voice === 'string' ? settings.voice : DEFAULTS.voice,
-      pitch: [0.72, 1, 1.18].includes(Number(settings.pitch)) ? Number(settings.pitch) : DEFAULTS.pitch
-    };
+    const next = { voice: typeof settings.voice === 'string' ? settings.voice : DEFAULTS.voice };
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch (_) {}
     return next;
   }
@@ -56,12 +50,11 @@
   function applyToUtterance(utterance, voices, settings) {
     const voice = chooseVoice(voices, settings.voice);
     if (voice) utterance.voice = voice;
-    utterance.pitch = Number(settings.pitch) || DEFAULTS.pitch;
     return voice;
   }
 
   global.DhammaBooksReadAloudVoice = Object.freeze({
-    version: '1.0.0',
+    version: '1.0.1',
     defaults: DEFAULTS,
     chineseVoices,
     preferredMaleVoice,
