@@ -98,3 +98,14 @@ This document applies to every book listed under `menu-pinyinbooks.html`.
 - Remarks save automatically in the browser's local storage and can be exported as a UTF-8 text file for review. The interface must warn the proofreader to export remarks before clearing browser data.
 - This temporary feature must not alter the book text or PCED lookup behaviour and may be removed after proofreading is complete.
 - Mark English taken from SuttaCentral with a very small `SC` superscript. Unmarked English is understood to have been translated from the Chinese source text.
+
+## 10. Chinese read-aloud
+
+- Every Hanyu Pinyin reader must provide the standard speaker icon in the sticky header. Do not use a Chinese text label for this control.
+- Load `dhamma-books-read-aloud-standard.js` so the selected Chinese voice is remembered and can be reused by other Dhamma Books that implement the same standard.
+- The read-aloud popup and all of its controls, status messages, accessibility labels and error messages must be in English because the intended reader is learning Chinese.
+- Read only the Chinese book content. Skip English translations, Pāli text, footnote buttons, menus and popup contents.
+- Provide start/restart, pause/resume, stop, speed and Chinese-voice controls.
+- Prefer an identifiable male Mandarin voice when one is available, while allowing the reader to select any Chinese voice exposed by the browser or operating system.
+- Do not provide or apply an artificial pitch adjustment.
+- Highlight and scroll the current Chinese passage into view while it is being read.
