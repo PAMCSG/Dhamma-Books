@@ -137,14 +137,16 @@
     const isLatin=typeof chunk!=='string'&&chunk.lang==='latin';
     const voice = isLatin?choosePaliVoice(voices, paliChoice):chooseVoice(voices, choice);
     const utterance = new SpeechSynthesisUtterance(isLatin?text:prepareSpeechText(text));
-    utterance.rate = Number(rate) || 1;
+    // Keep the chosen Chinese speed; Pāli passages have a gentler pace.
+    const selectedRate = Number(rate) || 1;
+    utterance.rate = isLatin ? selectedRate * 0.85 : selectedRate;
     utterance.lang = isLatin?(voice?.lang || 'en-IN'):'zh-CN';
     if (voice) utterance.voice = voice;
     return utterance;
   }
 
   global.DhammaBooksReadAloudVoice = Object.freeze({
-    version: '1.4.0',
+    version: '1.4.1',
     defaults: DEFAULTS,
     chineseVoices,
     preferredMaleVoice,
