@@ -144,11 +144,12 @@
     const text = selection.toString().replace(/\s+/g, ' ').trim();
     if (!el || !root.contains(el) || !text) return null;
     const blockEl = el.closest(blockSelector) || el;
-    const selectedPali = Boolean(el.closest('.pali-word,.pali-text,[lang^="pi"]'));
+    const explicitLanguageEl = el.closest('[data-lang],.analysis-translation,.eng-cell,.zh-cell,.my-cell,.eng-text,.zh-text,.my-text,.heading-eng,.heading-zh,.heading-my');
+    const selectedPali = !explicitLanguageEl && Boolean(el.closest('.pali-word,.pali-text,[lang^="pi"]'));
     const speechRoot = document.createElement('div');
     speechRoot.append(range.cloneContents());
     speechRoot.querySelectorAll(excludedSelector).forEach(node => node.remove());
-    return {el:blockEl, text, lang:selectedPali ? 'pali' : blockLanguage(blockEl, text), selected:true, range:range.cloneRange(), speechRoot};
+    return {el:blockEl, text, lang:selectedPali ? 'pali' : blockLanguage(explicitLanguageEl || blockEl, text), selected:true, range:range.cloneRange(), speechRoot};
   }
   function selectionStartIndex(selection, list) {
     if (!selection) return -1;
@@ -205,7 +206,8 @@
   }
   function clearHighlight() { current?.classList.remove('db-readaloud-current'); current = null; }
   function setControls(on) { active = on; pauseButton.disabled = !on; stopButton.disabled = !on; startButton.textContent = on ? labels[interfaceLanguage()].restart : labels[interfaceLanguage()].start; }
-  function finish(message) { token++; synth.cancel(); clearHighlight(); paused = false; setControls(false); pauseButton.textContent = labels[interfaceLanguage()].pause; status.textContent = message || labels[interfaceLanguage()].done; }
+  function resetSpeechSynthesis() { if (synth.paused) synth.resume(); synth.cancel(); }
+  function finish(message) { token++; resetSpeechSynthesis(); clearHighlight(); paused = false; setControls(false); pauseButton.textContent = labels[interfaceLanguage()].pause; status.textContent = message || labels[interfaceLanguage()].done; }
   function keepCurrentVisible(el) {
     const rect = el.getBoundingClientRect(), safeTop = topbar.getBoundingClientRect().bottom + 12, safeBottom = innerHeight - 40;
     if (rect.bottom >= safeTop && rect.top <= safeBottom) return;
@@ -278,7 +280,7 @@
   }
   function start() {
     if (!supported) return;
-    token++; synth.cancel(); clearHighlight(); const selection = selectedText(); blocks = readableBlocks();
+    token++; resetSpeechSynthesis(); clearHighlight(); const selection = selectedText(); blocks = readableBlocks();
     if (selection) {
       blockIndex = selectionStartIndex(selection, blocks);
       if (blockIndex < 0) return finish(labels[interfaceLanguage()].empty);
@@ -296,7 +298,7 @@
   function readSelection() {
     if (!supported) return; const selection = selectedText();
     if (!selection) { status.textContent = labels[interfaceLanguage()].noSelection; return; }
-    token++; synth.cancel(); clearHighlight(); blocks = [selection]; blockIndex = 0; paused = false; pauseButton.textContent = labels[interfaceLanguage()].pause; setControls(true); preserveSelection(selection); speakBlock(token);
+    token++; resetSpeechSynthesis(); clearHighlight(); blocks = [selection]; blockIndex = 0; paused = false; pauseButton.textContent = labels[interfaceLanguage()].pause; setControls(true); preserveSelection(selection); speakBlock(token);
   }
 
   button.addEventListener('click', () => { if (panel.hidden) { refreshLanguage(); setPanelTop(); panel.hidden = false; } else panel.hidden = true; button.setAttribute('aria-expanded',String(!panel.hidden)); button.setAttribute('aria-pressed',String(!panel.hidden)); });
