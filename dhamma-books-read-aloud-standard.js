@@ -5,7 +5,7 @@
   'use strict';
 
   const STORAGE_KEY = 'pamc-dhamma-books:read-aloud-voice-v1';
-  const DEFAULTS = Object.freeze({ voice: '__male__', paliVoice: '__indic__', paliScript: 'roman' });
+  const DEFAULTS = Object.freeze({ voice: '__male__', paliVoice: '__indic__', readPali: false });
   const MALE_NAME_PATTERN = /(male|man|男声?|康康|kangkang|yunxi|yunjian|yunyang|yunze|yunhao)/i;
 
   function chineseVoices(voices) {
@@ -35,7 +35,7 @@
   function load() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-      return { voice: typeof saved.voice === 'string' ? saved.voice : DEFAULTS.voice, paliVoice: typeof saved.paliVoice === 'string' ? saved.paliVoice : DEFAULTS.paliVoice, paliScript: saved.paliScript === 'devanagari' ? 'devanagari' : 'roman' };
+      return { voice: typeof saved.voice === 'string' ? saved.voice : DEFAULTS.voice, paliVoice: typeof saved.paliVoice === 'string' ? saved.paliVoice : DEFAULTS.paliVoice, readPali: saved.readPali === true };
     } catch (_) {
       return { ...DEFAULTS };
     }
@@ -43,7 +43,7 @@
 
   function save(settings) {
     const previous = load();
-    const next = { voice: typeof settings.voice === 'string' ? settings.voice : previous.voice, paliVoice: typeof settings.paliVoice === 'string' ? settings.paliVoice : previous.paliVoice, paliScript: settings.paliScript === 'devanagari' || settings.paliScript === 'roman' ? settings.paliScript : previous.paliScript };
+    const next = { voice: typeof settings.voice === 'string' ? settings.voice : previous.voice, paliVoice: typeof settings.paliVoice === 'string' ? settings.paliVoice : previous.paliVoice, readPali: typeof settings.readPali === 'boolean' ? settings.readPali : previous.readPali };
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch (_) {}
     return next;
   }
@@ -117,34 +117,26 @@
     return null;
   }
 
-  // Roman Pāli to Devanagari for the speech engine only. Preserve text on screen.
-  function paliToDevanagari(text) {
-    const independent={a:'अ',ā:'आ',i:'इ',ī:'ई',u:'उ',ū:'ऊ',e:'ए',o:'ओ'};
-    const dependent={a:'',ā:'ा',i:'ि',ī:'ी',u:'ु',ū:'ू',e:'े',o:'ो'};
-    const consonants={kh:'ख',gh:'घ',ch:'छ',jh:'झ',ṭh:'ठ',ḍh:'ढ',th:'थ',dh:'ध',ph:'फ',bh:'भ',k:'क',g:'ग',ṅ:'ङ',c:'च',j:'ज',ñ:'ञ',ṭ:'ट',ḍ:'ड',ṇ:'ण',t:'त',d:'द',n:'न',p:'प',b:'ब',m:'म',y:'य',r:'र',l:'ल',ḷ:'ळ',v:'व',s:'स',h:'ह'};
-    const units=/kh|gh|ch|jh|ṭh|ḍh|th|dh|ph|bh|[aāiīuūeoṅñṭḍṇḷṃṁkgcjtdnpbmyrlvsh]/gu;
-    return String(text || '').normalize('NFC').replace(/[a-zāīūṅñṭḍṇḷṃṁ]+/giu, word => {
-      const parts=word.toLowerCase().match(units);
-      if (!parts || parts.join('') !== word.toLowerCase()) return word;
-      let result='';
-      for (let i=0;i<parts.length;i++) {
-        const part=parts[i];
-        if (consonants[part]) {
-          const vowel=dependent[parts[i+1]];
-          result+=consonants[part]+(vowel!==undefined?(i++,vowel):'्');
-        } else if (independent[part]) result+=independent[part];
-        else if (part==='ṃ' || part==='ṁ') result+='ं';
-      }
-      return result;
+  // Shared collection keeps the book's source paragraphs in document order.
+  function paliBlocks(reader) {
+    const selector='.pali-cell,.pali-source-line,.ch10-pali-line,.opening-pali,.paired-heading-pali';
+    const candidates=Array.from(reader.querySelectorAll(selector)).filter(el => {
+      if (el.closest('.contents,.contents-panel,.cover,.cover-card,.modal,.footnote-popup,.proof-panel,[hidden],[aria-hidden="true"]')) return false;
+      const style=getComputedStyle(el);
+      return style.display!=='none' && style.visibility!=='hidden' && el.getClientRects().length>0;
     });
+    return candidates.filter(el => !candidates.some(other => other!==el && el.contains(other))).map(el => {
+      const copy=el.cloneNode(true);
+      copy.querySelectorAll('rt,.pinyin,.footnote-ref,button,[hidden],[aria-hidden="true"],.proof-marker').forEach(node => node.remove());
+      return {el,text:copy.textContent.replace(/\s+/g,' ').trim(),pali:true};
+    }).filter(block => /[\p{Script=Latin}]/u.test(block.text));
   }
 
-  function makeUtterance(chunk, rate, voices, choice, paliChoice, paliScript) {
+  function makeUtterance(chunk, rate, voices, choice, paliChoice) {
     const text=typeof chunk==='string'?chunk:chunk.text;
     const isLatin=typeof chunk!=='string'&&chunk.lang==='latin';
     const voice = isLatin?choosePaliVoice(voices, paliChoice):chooseVoice(voices, choice);
-    const useDevanagari=isLatin && paliScript==='devanagari' && /^(sa|hi|ne)[-_]/i.test(voice?.lang || '');
-    const utterance = new SpeechSynthesisUtterance(isLatin?(useDevanagari?paliToDevanagari(text):text):prepareSpeechText(text));
+    const utterance = new SpeechSynthesisUtterance(isLatin?text:prepareSpeechText(text));
     utterance.rate = Number(rate) || 1;
     utterance.lang = isLatin?(voice?.lang || 'en-IN'):'zh-CN';
     if (voice) utterance.voice = voice;
@@ -152,7 +144,7 @@
   }
 
   global.DhammaBooksReadAloudVoice = Object.freeze({
-    version: '1.3.0',
+    version: '1.4.0',
     defaults: DEFAULTS,
     chineseVoices,
     preferredMaleVoice,
@@ -165,7 +157,7 @@
     speechChunks,
     paliVoices,
     choosePaliVoice,
-    paliToDevanagari,
+    paliBlocks,
     makeUtterance
   });
 })(window);
