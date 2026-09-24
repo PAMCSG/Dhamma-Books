@@ -109,7 +109,7 @@
     const classes = `${el.className || ''} ${el.parentElement?.className || ''}`;
     if (/\b(my-cell|my-text|heading-my)\b/.test(classes) || /[က-႟]/u.test(text)) return 'my';
     if (/\b(zh-cell|zh-text|heading-zh|verse-zh|nissaya)\b/.test(classes) || /[㐀-鿿]/u.test(text)) return 'zh';
-    if (bookName === 'mindfulness-of-breathing.html') {
+    if (bookName === 'mindfulness-of-breathing.html' || bookName === 'the-only-way-for-realization-of-nibbana.html') {
       const copy = el.cloneNode(true);
       copy.querySelectorAll('.pali-word,.pali-text,[lang^="pi"]').forEach(node => node.remove());
       if (/[A-Za-z]{2,}/.test(copy.textContent)) return 'en';
@@ -216,6 +216,7 @@
     });
   }
   function inlineLanguageChunks(block) {
+    if (bookName === 'the-only-way-for-realization-of-nibbana.html' && block.lang === 'en') return null;
     if (block.selected || !block.el.querySelector('.pali-word,.pali-text,[lang^="pi"]')) return null;
     const runs = [];
     const walker = document.createTreeWalker(block.el, NodeFilter.SHOW_TEXT);
@@ -302,7 +303,7 @@
     if (language === 'zh') profile.save({voice:voiceSelect.value});
   });
   document.addEventListener('click', event => {
-    if (!event.target.closest('[data-lang],.lang-button,#btnReader,#btnChinese,#btnEnglish,#btnBurmese')) return;
+    if (!event.target.closest('[data-lang],.lang-button,#btnReader,#btnChinese,#btnEnglish,#btnBurmese,#langEn,#langZh')) return;
     setTimeout(() => { if (!panel.hidden) refreshLanguage(); }, 0);
   });
   addEventListener('resize', () => { if (!panel.hidden) setPanelTop(); }, {passive:true}); addEventListener('beforeunload', () => synth.cancel());
