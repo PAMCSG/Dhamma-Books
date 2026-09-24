@@ -144,7 +144,10 @@
     if (!el || !root.contains(el) || !text) return null;
     const blockEl = el.closest(blockSelector) || el;
     const selectedPali = Boolean(el.closest('.pali-word,.pali-text,[lang^="pi"]'));
-    return {el:blockEl, text, lang:selectedPali ? 'pali' : blockLanguage(blockEl, text), selected:true, range:range.cloneRange()};
+    const speechRoot = document.createElement('div');
+    speechRoot.append(range.cloneContents());
+    speechRoot.querySelectorAll(excludedSelector).forEach(node => node.remove());
+    return {el:blockEl, text, lang:selectedPali ? 'pali' : blockLanguage(blockEl, text), selected:true, range:range.cloneRange(), speechRoot};
   }
   function selectionStartIndex(selection, list) {
     if (!selection) return -1;
@@ -152,15 +155,16 @@
     if (contained >= 0) return contained;
     return list.findIndex(block => Boolean(selection.el.compareDocumentPosition(block.el) & Node.DOCUMENT_POSITION_FOLLOWING));
   }
-  function textFromSelectionStart(selection, block) {
-    if (!selection?.range || !block?.el.contains(selection.range.startContainer)) return block?.text || '';
+  function contentFromSelectionStart(selection, block) {
+    if (!selection?.range || !block?.el.contains(selection.range.startContainer)) return {text:block?.text || '', speechRoot:null};
     const range = document.createRange();
     range.selectNodeContents(block.el);
     range.setStart(selection.range.startContainer, selection.range.startOffset);
-    const copy = document.createElement('div');
-    copy.append(range.cloneContents());
-    copy.querySelectorAll(excludedSelector).forEach(node => node.remove());
-    return copy.textContent.replace(/\s+/g, ' ').replace(/\s+([，。！？；：、）])/g, '$1').trim();
+    const speechRoot = document.createElement('div');
+    speechRoot.append(range.cloneContents());
+    speechRoot.querySelectorAll(excludedSelector).forEach(node => node.remove());
+    const text = speechRoot.textContent.replace(/\s+/g, ' ').replace(/\s+([，。！？；：、）])/g, '$1').trim();
+    return {text, speechRoot};
   }
   function availableVoices(language) {
     const pattern = language === 'zh' ? /^zh/i : language === 'my' ? /^(my|bur)/i : /^en/i;
@@ -216,9 +220,10 @@
     });
   }
   function inlineLanguageChunks(block) {
-    if (block.selected || !block.el.querySelector('.pali-word,.pali-text,[lang^="pi"]')) return null;
+    const source = block.speechRoot || block.el;
+    if (!source.querySelector('.pali-word,.pali-text,[lang^="pi"]')) return null;
     const runs = [];
-    const walker = document.createTreeWalker(block.el, NodeFilter.SHOW_TEXT);
+    const walker = document.createTreeWalker(source, NodeFilter.SHOW_TEXT);
     let node;
     while ((node = walker.nextNode())) {
       const parent = node.parentElement;
@@ -276,7 +281,10 @@
     if (selection) {
       blockIndex = selectionStartIndex(selection, blocks);
       if (blockIndex < 0) return finish(labels[interfaceLanguage()].empty);
-      if (blocks[blockIndex].el.contains(selection.range.startContainer)) { const remainder = textFromSelectionStart(selection, blocks[blockIndex]); if (remainder) blocks[blockIndex] = {...blocks[blockIndex],text:remainder,selected:true}; }
+      if (blocks[blockIndex].el.contains(selection.range.startContainer)) {
+        const remainder = contentFromSelectionStart(selection, blocks[blockIndex]);
+        if (remainder.text) blocks[blockIndex] = {...blocks[blockIndex],text:remainder.text,speechRoot:remainder.speechRoot,selected:true};
+      }
       preserveSelection(selection);
     } else {
       const offset = topbar.getBoundingClientRect().bottom + 8; blockIndex = blocks.findIndex(block => block.el.getBoundingClientRect().bottom > offset); if (blockIndex < 0) blockIndex = 0;
