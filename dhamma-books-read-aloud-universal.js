@@ -8,7 +8,7 @@
   if (!synth || !profile || !topbar || !fontPlus || document.getElementById('dbReadAloudButton')) return;
 
   const supported = Boolean(window.SpeechSynthesisUtterance);
-  const blockSelector = [
+  const genericBlockSelector = [
     'p.text-block','p.source-paragraph','p.paragraph-text','p.zh-text','p.eng-text','p.my-text',
     '.pali-verse-line','.zh-verse-line','.nissaya-line','.semantic-segment-cell',
     '.pali-cell','.eng-cell','.zh-cell','.my-cell','.analysis-cell','.condition-cell',
@@ -16,6 +16,24 @@
     'h1','h2.section-heading','h3','h4','.section-heading','.subsection-heading',
     '.heading-pali','.heading-eng','.heading-zh','.heading-my','li'
   ].join(',');
+  const bookConfigs = {
+    'dhammapada-pali-chinese.html': {root:'#reader-main', blocks:'p.source-paragraph,.section-heading,.subsection-heading,h1,h3,h4'},
+    'patisambhidamagga.html': {root:'main', blocks:'p.source-paragraph,p.paragraph-text,.section-heading,.subsection-heading,h1,h3,h4'},
+    'patisambhidamagga-chinese.html': {root:'#reader-zh', blocks:'p.source-paragraph,.book-body p,.section-heading,.subsection-heading,h1,h3,h4'},
+    'mindfulness-of-breathing.html': {root:'.lang-panel.active:not([hidden])', blocks:'p.text-block,.section-heading,.subsection-heading,h1,h3,h4'},
+    'the-only-way-for-realization-of-nibbana.html': {root:'.lang-panel.active:not([hidden])', blocks:'p.text-block,p.paragraph-text,.section-heading,.subsection-heading,h1,h3,h4,li'},
+    'daily-chants.html': {root:'#readerView', blocks:'.pali-cell,.eng-cell,.source-line,.gatha-line,.section-heading,.subsection-heading,h1,h3,h4'},
+    'daily-chants-burmese.html': {root:'main', blocks:'.source-line,.gatha-line,.section-heading,.subsection-heading,.chant-invocation,h1,h3,h4'},
+    'paccayaniddeso.html': {root:'#readerView', blocks:'.pali-cell,.eng-cell,.source-line,.condition-cell,.analysis-cell,.analysis-translation,.section-heading,.subsection-heading,h1,h3,h4'},
+    'paccayaniddeso-chinese.html': {root:'#readerView', blocks:'.pali-cell,.zh-cell,.source-line,.condition-cell,.analysis-cell,.analysis-translation,.section-heading,.subsection-heading,h1,h3,h4'},
+    'pali-chanting-book.html': {root:'#readerView', blocks:'.source-line,.gatha-line,.pali-cell,.eng-cell,.section-heading,.subsection-heading,h1,h3,h4'},
+    'pali-chanting-book-chinese.html': {root:'#readerView', blocks:'.source-line,.gatha-line,.pali-cell,.zh-cell,.section-heading,.subsection-heading,h1,h3,h4'},
+    'pali-chanting-book-burmese.html': {root:'#readerView', blocks:'.source-line,.gatha-line,.pali-cell,.my-cell,.section-heading,.subsection-heading,h1,h3,h4'}
+  };
+  const bookName = location.pathname.split('/').pop() || '';
+  const bookConfig = bookConfigs[bookName] || {};
+  const blockSelector = bookConfig.blocks || genericBlockSelector;
+  const voiceStorageKey = 'pamc-dhamma-books:read-aloud-language-voices-v1';
   const excludedSelector = [
     'rt','.pinyin','.fn-marker','.footnote-ref','.fn-link','.page-anchor','.page-tag',
     '.verse-number','.gatha-no','button','script','style','[hidden]','[aria-hidden="true"]',
@@ -67,7 +85,8 @@
   let current = null, blocks = [], blockIndex = 0, chunks = [], chunkIndex = 0, token = 0, paused = false, active = false;
 
   function activeRoot() {
-    return document.querySelector('.lang-panel.active:not([hidden]),.reader.active:not([hidden])')
+    return (bookConfig.root && document.querySelector(bookConfig.root))
+      || document.querySelector('.lang-panel.active:not([hidden]),.reader.active:not([hidden])')
       || document.getElementById('readerView') || document.getElementById('reader-main')
       || document.getElementById('reader-zh') || document.querySelector('.reader-body,.book-body,main,.reader');
   }
@@ -118,11 +137,13 @@
     const text = selection.toString().replace(/\s+/g, ' ').trim();
     if (!el || !root.contains(el) || !text) return null;
     const blockEl = el.closest(blockSelector) || el;
-    const block = {el:blockEl, text, lang:blockLanguage(blockEl, text), selected:true, range:range.cloneRange()};
-    return block.lang === 'pali' && readPaliSelect.value !== 'yes' ? null : block;
+    return {el:blockEl, text, lang:blockLanguage(blockEl, text), selected:true, range:range.cloneRange()};
   }
   function selectionStartIndex(selection, list) {
-    return selection ? list.findIndex(block => block.el === selection.el || block.el.contains(selection.el) || selection.el.contains(block.el)) : -1;
+    if (!selection) return -1;
+    const contained = list.findIndex(block => block.el === selection.el || block.el.contains(selection.el) || selection.el.contains(block.el));
+    if (contained >= 0) return contained;
+    return list.findIndex(block => Boolean(selection.el.compareDocumentPosition(block.el) & Node.DOCUMENT_POSITION_FOLLOWING));
   }
   function textFromSelectionStart(selection, block) {
     if (!selection?.range || !block?.el.contains(selection.range.startContainer)) return block?.text || '';
@@ -138,6 +159,16 @@
     const pattern = language === 'zh' ? /^zh/i : language === 'my' ? /^(my|bur)/i : /^en/i;
     return synth.getVoices().filter(voice => pattern.test(voice.lang));
   }
+  function loadLanguageVoice(language) {
+    try { return JSON.parse(localStorage.getItem(voiceStorageKey) || '{}')[language] || ''; } catch (_) { return ''; }
+  }
+  function saveLanguageVoice(language, voice) {
+    try {
+      const saved = JSON.parse(localStorage.getItem(voiceStorageKey) || '{}');
+      saved[language] = voice;
+      localStorage.setItem(voiceStorageKey, JSON.stringify(saved));
+    } catch (_) {}
+  }
   function setPanelTop() { document.documentElement.style.setProperty('--db-readaloud-top', Math.ceil(topbar.getBoundingClientRect().bottom + 8) + 'px'); }
   function refreshLanguage() {
     const language = interfaceLanguage(), l = labels[language];
@@ -150,11 +181,12 @@
   }
   function populateVoices() {
     const language = interfaceLanguage(), l = labels[language], voices = availableVoices(language);
-    const previous = voiceSelect.dataset.language === language ? voiceSelect.value : '';
+    const saved = profile.load();
+    const previous = voiceSelect.dataset.language === language ? voiceSelect.value : (loadLanguageVoice(language) || (language === 'zh' ? saved.voice : ''));
     voiceSelect.replaceChildren(new Option(l.automatic,''), ...voices.map(voice => new Option(`${voice.name} (${voice.lang})`,voice.voiceURI)));
     voiceSelect.value = voices.some(voice => voice.voiceURI === previous) ? previous : '';
     voiceSelect.dataset.language = language;
-    const paliVoices = profile.paliVoices(synth.getVoices()), paliPrevious = paliVoiceSelect.dataset.ready ? paliVoiceSelect.value : '__indic__';
+    const paliVoices = profile.paliVoices(synth.getVoices()), paliPrevious = paliVoiceSelect.dataset.ready ? paliVoiceSelect.value : saved.paliVoice;
     paliVoiceSelect.replaceChildren(new Option(l.indic,'__indic__'),new Option(l.english,'__english__'),...paliVoices.map(voice => new Option(`${voice.name} (${voice.lang})`,voice.voiceURI)));
     paliVoiceSelect.value = paliVoices.some(voice => voice.voiceURI === paliPrevious) || paliPrevious === '__english__' ? paliPrevious : '__indic__';
     paliVoiceSelect.dataset.ready = 'true';
@@ -167,11 +199,20 @@
     if (rect.bottom >= safeTop && rect.top <= safeBottom) return;
     el.scrollIntoView({behavior:'smooth',block:'nearest'});
   }
+  function preserveSelection(selection) {
+    if (!selection?.range) return;
+    requestAnimationFrame(() => {
+      const live = getSelection();
+      live.removeAllRanges();
+      live.addRange(selection.range.cloneRange());
+      selection.el.scrollIntoView({behavior:'smooth',block:'center'});
+    });
+  }
   function speakNext(runToken) {
     if (runToken !== token) return;
     if (chunkIndex >= chunks.length) { blockIndex++; return speakBlock(runToken); }
     const chunk = chunks[chunkIndex++];
-    if (chunk.lang === 'pali') {
+    if (chunk.lang === 'latin') {
       profile.speakWithFallback(synth, chunk, rateSelect.value, synth.getVoices(), voiceSelect.value, paliVoiceSelect.value,
         () => speakNext(runToken), () => finish(labels[interfaceLanguage()].error));
       return;
@@ -188,8 +229,10 @@
     if (runToken !== token) return;
     if (blockIndex >= blocks.length) return finish();
     clearHighlight(); const block = blocks[blockIndex]; current = block.el; current.classList.add('db-readaloud-current'); keepCurrentVisible(current);
-    const parts = block.lang === 'pali' ? profile.paliSpeechChunks(block.text) : profile.splitText(block.text);
-    chunks = parts.filter(Boolean).map(text => ({text,lang:block.lang})); chunkIndex = 0;
+    if (block.lang === 'pali') chunks = profile.paliSpeechChunks(block.text).filter(Boolean).map(text => ({text,lang:'latin'}));
+    else if (block.lang === 'zh') chunks = profile.speechChunks(block.text);
+    else chunks = profile.splitText(block.text).filter(Boolean).map(text => ({text,lang:block.lang}));
+    chunkIndex = 0;
     const language = interfaceLanguage();
     status.textContent = language === 'zh' ? `正在朗读第 ${blockIndex + 1} 段，共 ${blocks.length} 段`
       : language === 'my' ? `စာပိုဒ် ${blockIndex + 1} / ${blocks.length} ကို ဖတ်နေပါသည်။`
@@ -200,8 +243,10 @@
     if (!supported) return;
     token++; synth.cancel(); clearHighlight(); const selection = selectedText(); blocks = readableBlocks();
     if (selection) {
-      blockIndex = selectionStartIndex(selection, blocks); if (blockIndex < 0) blockIndex = 0;
-      else { const remainder = textFromSelectionStart(selection, blocks[blockIndex]); if (remainder) blocks[blockIndex] = {...blocks[blockIndex],text:remainder,selected:true}; }
+      blockIndex = selectionStartIndex(selection, blocks);
+      if (blockIndex < 0) return finish(labels[interfaceLanguage()].empty);
+      if (blocks[blockIndex].el.contains(selection.range.startContainer)) { const remainder = textFromSelectionStart(selection, blocks[blockIndex]); if (remainder) blocks[blockIndex] = {...blocks[blockIndex],text:remainder,selected:true}; }
+      preserveSelection(selection);
     } else {
       const offset = topbar.getBoundingClientRect().bottom + 8; blockIndex = blocks.findIndex(block => block.el.getBoundingClientRect().bottom > offset); if (blockIndex < 0) blockIndex = 0;
     }
@@ -211,7 +256,7 @@
   function readSelection() {
     if (!supported) return; const selection = selectedText();
     if (!selection) { status.textContent = labels[interfaceLanguage()].noSelection; return; }
-    token++; synth.cancel(); clearHighlight(); blocks = [selection]; blockIndex = 0; paused = false; pauseButton.textContent = labels[interfaceLanguage()].pause; setControls(true); speakBlock(token);
+    token++; synth.cancel(); clearHighlight(); blocks = [selection]; blockIndex = 0; paused = false; pauseButton.textContent = labels[interfaceLanguage()].pause; setControls(true); preserveSelection(selection); speakBlock(token);
   }
 
   button.addEventListener('click', () => { if (panel.hidden) { refreshLanguage(); setPanelTop(); panel.hidden = false; } else panel.hidden = true; button.setAttribute('aria-expanded',String(!panel.hidden)); button.setAttribute('aria-pressed',String(!panel.hidden)); });
@@ -220,6 +265,15 @@
   pauseButton.addEventListener('click', () => { if (!synth.speaking) return; if (paused) synth.resume(); else synth.pause(); paused = !paused; pauseButton.textContent = paused ? labels[interfaceLanguage()].resume : labels[interfaceLanguage()].pause; });
   readPaliSelect.addEventListener('change', () => profile.save({readPali:readPaliSelect.value === 'yes'}));
   paliVoiceSelect.addEventListener('change', () => profile.save({paliVoice:paliVoiceSelect.value}));
+  voiceSelect.addEventListener('change', () => {
+    const language = interfaceLanguage();
+    saveLanguageVoice(language, voiceSelect.value);
+    if (language === 'zh') profile.save({voice:voiceSelect.value});
+  });
+  document.addEventListener('click', event => {
+    if (!event.target.closest('[data-lang],.lang-button,#btnReader,#btnChinese,#btnEnglish,#btnBurmese')) return;
+    setTimeout(() => { if (!panel.hidden) refreshLanguage(); }, 0);
+  });
   addEventListener('resize', () => { if (!panel.hidden) setPanelTop(); }, {passive:true}); addEventListener('beforeunload', () => synth.cancel());
   if (supported) { readPaliSelect.value = profile.load().readPali ? 'yes' : 'no'; populateVoices(); if ('onvoiceschanged' in synth) synth.addEventListener('voiceschanged',populateVoices); }
   else button.disabled = true;

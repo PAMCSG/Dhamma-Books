@@ -20,6 +20,8 @@ When a shared asset changes, update its versioned URL in each affected HTML file
 
 The final header structure must be present in the initial HTML and styled correctly on the first paint. JavaScript may enhance the existing controls, but it must not briefly show an old or duplicate header and replace it after loading. There must be no old-header flash when first entering a book.
 
+The optional Read Aloud control is a progressive enhancement and may be inserted by the shared Read Aloud module after A+. Its absence before the module loads is not an old-header flash. The module must never create a duplicate control.
+
 ## 2. Screen header
 
 ### Control order and alignment
@@ -32,9 +34,10 @@ Use this exact left-to-right sequence:
 4. Language button or buttons, when the book has more than one language
 5. A−
 6. A+
-7. Book Mark
-8. Search field
-9. Search button
+7. Read Aloud, when the book supports speech
+8. Book Mark
+9. Search field
+10. Search button
 
 All controls, fields and rows are left-justified. Do not use a flexible spacer to push some controls to the right.
 
@@ -51,7 +54,7 @@ Labels must follow the active book language. For example, Chinese books use Chin
 Follow the behaviour of Pāli Chanting Burmese and Daily Chants Burmese:
 
 - The complete header is one sticky unit and remains at the top while the book scrolls.
-- The first row contains the logo, book name, Contents, language buttons when applicable, A−, A+ and Book Mark.
+- The first row contains the logo, book name, Contents, language buttons when applicable, A−, A+, Read Aloud when supported, and Book Mark.
 - The second row contains the Search field followed by the Search button.
 - The two rows stay together; the first row must never scroll away while only the Search row remains visible.
 - The Search row occupies the available viewport width without extending beyond it.
