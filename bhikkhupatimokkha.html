@@ -45,4 +45,58 @@ mark.search-hit{background:#ffe68a}.hidden{display:none!important}
 const $=id=>document.getElementById(id),root=document.documentElement,store='pamc-bhikkhupatimokkha:';let size=+(localStorage.getItem(store+'size')||18);function setSize(v){size=Math.max(15,Math.min(27,v));root.style.setProperty('--book-font',size+'px');localStorage.setItem(store+'size',size)}setSize(size);$('fontMinus').onclick=()=>setSize(size-1);$('fontPlus').onclick=()=>setSize(size+1);
 $('contentsBtn').onclick=()=>{$('contents').classList.remove('collapsed');$('contents').scrollIntoView({behavior:'smooth'})};$('tocToggle').onclick=()=>{const c=$('contents').classList.toggle('collapsed');$('tocToggle').textContent=c?'展开':'收起'};
 $('dictClose').onclick=()=>$('dictModal').classList.remove('open');
-</script><script src="dhamma-books-read-aloud-standard.js?v=1.4.5"></script><script src="vinaya-chinese-read-aloud.js?v=1.1.5"></script><script src="dhamma-books-pali-inline.js?v=1.0.0"></script></body></html>
+</script><script src="dhamma-books-read-aloud-standard.js?v=1.4.5"></script><script src="vinaya-chinese-read-aloud.js?v=1.1.5"></script><script src="dhamma-books-pali-inline.js?v=1.0.0"></script><script>
+// Mobile trial: keep the display awake while this book is being read aloud.
+(() => {
+  if (!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return;
+  const start = document.getElementById('read-aloud-start');
+  const pause = document.getElementById('read-aloud-pause');
+  const stop = document.getElementById('read-aloud-stop');
+  const status = document.getElementById('read-aloud-status');
+  if (!start || !pause || !stop) return;
+  let lock = null, reading = false, generation = 0;
+  async function release() {
+    generation++;
+    const current = lock;
+    lock = null;
+    if (current) await current.release().catch(() => {});
+  }
+  async function keepAwake() {
+    if (!reading || document.hidden || lock) return;
+    if (!navigator.wakeLock?.request) {
+      if (status) status.textContent = '此浏览器不支持保持屏幕常亮；请调整手机屏幕休眠时间。';
+      return;
+    }
+    const request = ++generation;
+    try {
+      const next = await navigator.wakeLock.request('screen');
+      if (request !== generation || !reading || document.hidden) {
+        await next.release();
+      } else {
+        lock = next;
+        next.addEventListener('release', () => { if (lock === next) lock = null; });
+      }
+    } catch (_) {
+      if (status) status.textContent = '无法保持屏幕常亮；请检查手机省电设置。';
+    }
+  }
+  start.addEventListener('click', () => {
+    queueMicrotask(() => {
+      reading = !stop.disabled;
+      if (reading) keepAwake();
+      else release();
+    });
+  });
+  pause.addEventListener('click', () => {
+    queueMicrotask(() => { if (speechSynthesis.paused) release(); else if (reading) keepAwake(); });
+  });
+  stop.addEventListener('click', () => { reading = false; release(); });
+  new MutationObserver(() => { if (stop.disabled && reading) { reading = false; release(); } })
+    .observe(stop, {attributes:true, attributeFilter:['disabled']});
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) release();
+    else if (reading && !speechSynthesis.paused) keepAwake();
+  });
+  addEventListener('pagehide', () => { reading = false; release(); });
+})();
+</script></body></html>
