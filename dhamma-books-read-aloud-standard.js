@@ -5,29 +5,18 @@
   'use strict';
 
   const STORAGE_KEY = 'pamc-dhamma-books:read-aloud-voice-v1';
-  const DEFAULTS = Object.freeze({ voice: '__male__', paliVoice: '__indic__', readPali: false });
-  const MALE_NAME_PATTERN = /(male|man|男声?|康康|kangkang|yunxi|yunjian|yunyang|yunze|yunhao)/i;
-
+  const DEFAULTS = Object.freeze({ voice: '', paliVoice: '__indic__', readPali: false });
   function chineseVoices(voices) {
     return Array.from(voices || []).filter(voice => /^zh/i.test(voice.lang));
   }
 
-  function preferredMaleVoice(voices) {
-    const chinese = chineseVoices(voices);
-    return chinese.find(voice => /^zh-(CN|SG)/i.test(voice.lang) && MALE_NAME_PATTERN.test(voice.name))
-      || chinese.find(voice => MALE_NAME_PATTERN.test(voice.name))
-      || null;
-  }
-
   function chooseVoice(voices, choice) {
-    const all = Array.from(voices || []);
+    const chinese = chineseVoices(voices);
     if (choice && choice !== '__male__') {
-      const selected = all.find(voice => voice.voiceURI === choice);
+      const selected = chinese.find(voice => voice.voiceURI === choice);
       if (selected) return selected;
     }
-    const chinese = chineseVoices(all);
-    return (choice === '__male__' ? preferredMaleVoice(chinese) : null)
-      || chinese.find(voice => /^zh-(CN|SG)/i.test(voice.lang))
+    return chinese.find(voice => /^zh-(CN|SG)/i.test(voice.lang))
       || chinese[0]
       || null;
   }
@@ -35,7 +24,7 @@
   function load() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-      return { voice: typeof saved.voice === 'string' ? saved.voice : DEFAULTS.voice, paliVoice: typeof saved.paliVoice === 'string' ? saved.paliVoice : DEFAULTS.paliVoice, readPali: saved.readPali === true };
+      return { voice: typeof saved.voice === 'string' && saved.voice !== '__male__' ? saved.voice : DEFAULTS.voice, paliVoice: typeof saved.paliVoice === 'string' ? saved.paliVoice : DEFAULTS.paliVoice, readPali: saved.readPali === true };
     } catch (_) {
       return { ...DEFAULTS };
     }
@@ -43,7 +32,7 @@
 
   function save(settings) {
     const previous = load();
-    const next = { voice: typeof settings.voice === 'string' ? settings.voice : previous.voice, paliVoice: typeof settings.paliVoice === 'string' ? settings.paliVoice : previous.paliVoice, readPali: typeof settings.readPali === 'boolean' ? settings.readPali : previous.readPali };
+    const next = { voice: typeof settings.voice === 'string' && settings.voice !== '__male__' ? settings.voice : previous.voice, paliVoice: typeof settings.paliVoice === 'string' ? settings.paliVoice : previous.paliVoice, readPali: typeof settings.readPali === 'boolean' ? settings.readPali : previous.readPali };
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch (_) {}
     return next;
   }
@@ -146,10 +135,9 @@
   }
 
   global.DhammaBooksReadAloudVoice = Object.freeze({
-    version: '1.4.1',
+    version: '1.4.2',
     defaults: DEFAULTS,
     chineseVoices,
-    preferredMaleVoice,
     chooseVoice,
     load,
     save,
