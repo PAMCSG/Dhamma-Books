@@ -110,7 +110,7 @@
     if (/\b(my-cell|my-text|heading-my)\b/.test(classes) || /[က-႟]/u.test(text)) return 'my';
     if (/\b(zh-cell|zh-text|heading-zh|verse-zh|nissaya)\b/.test(classes) || /[㐀-鿿]/u.test(text)) return 'zh';
     const markedPali = /\b(pali-cell|pali-text|heading-pali|pali-verse|verse-pali|pali)\b/.test(classes)
-      || el.matches('.pali-word') || Boolean(el.querySelector('.pali-word'));
+      || el.matches('.pali-word');
     if (markedPali || (/^[\p{Script=Latin}\p{Number}\p{Punctuation}\p{Separator}]+$/u.test(text) && /[āīūṅñṭḍṇḷṃ]/iu.test(text))) return 'pali';
     return 'en';
   }
@@ -137,7 +137,8 @@
     const text = selection.toString().replace(/\s+/g, ' ').trim();
     if (!el || !root.contains(el) || !text) return null;
     const blockEl = el.closest(blockSelector) || el;
-    return {el:blockEl, text, lang:blockLanguage(blockEl, text), selected:true, range:range.cloneRange()};
+    const selectedPali = Boolean(el.closest('.pali-word,.pali-text,[lang^="pi"]'));
+    return {el:blockEl, text, lang:selectedPali ? 'pali' : blockLanguage(blockEl, text), selected:true, range:range.cloneRange()};
   }
   function selectionStartIndex(selection, list) {
     if (!selection) return -1;
@@ -208,6 +209,28 @@
       selection.el.scrollIntoView({behavior:'smooth',block:'center'});
     });
   }
+  function inlineLanguageChunks(block) {
+    if (block.selected || !block.el.querySelector('.pali-word,.pali-text,[lang^="pi"]')) return null;
+    const runs = [];
+    const walker = document.createTreeWalker(block.el, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode())) {
+      const parent = node.parentElement;
+      if (!parent || parent.closest(excludedSelector)) continue;
+      const text = node.nodeValue.replace(/\s+/g, ' ');
+      if (!text.trim()) continue;
+      const lang = parent.closest('.pali-word,.pali-text,[lang^="pi"]') ? 'latin' : block.lang;
+      const previous = runs[runs.length - 1];
+      if (previous?.lang === lang) previous.text += text;
+      else runs.push({text,lang});
+    }
+    const chunks = [];
+    runs.forEach(run => {
+      const parts = run.lang === 'latin' ? profile.paliSpeechChunks(run.text) : profile.splitText(run.text);
+      parts.filter(Boolean).forEach(text => chunks.push({text:text.trim(),lang:run.lang}));
+    });
+    return chunks.filter(chunk => chunk.text);
+  }
   function speakNext(runToken) {
     if (runToken !== token) return;
     if (chunkIndex >= chunks.length) { blockIndex++; return speakBlock(runToken); }
@@ -229,7 +252,9 @@
     if (runToken !== token) return;
     if (blockIndex >= blocks.length) return finish();
     clearHighlight(); const block = blocks[blockIndex]; current = block.el; current.classList.add('db-readaloud-current'); keepCurrentVisible(current);
-    if (block.lang === 'pali') chunks = profile.paliSpeechChunks(block.text).filter(Boolean).map(text => ({text,lang:'latin'}));
+    const inlineChunks = inlineLanguageChunks(block);
+    if (inlineChunks) chunks = inlineChunks;
+    else if (block.lang === 'pali') chunks = profile.paliSpeechChunks(block.text).filter(Boolean).map(text => ({text,lang:'latin'}));
     else if (block.lang === 'zh') chunks = profile.speechChunks(block.text);
     else chunks = profile.splitText(block.text).filter(Boolean).map(text => ({text,lang:block.lang}));
     chunkIndex = 0;

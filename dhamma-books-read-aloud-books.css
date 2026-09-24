@@ -8,6 +8,9 @@ body.db-requisites-reader-standard .db-searchbox{order:8}
 body.db-patisambhidamagga-reader-standard .db-readaloud-button{order:5}
 body.db-patisambhidamagga-reader-standard #db-bookmark-button{order:6}
 body.db-patisambhidamagga-reader-standard .db-searchbox{order:7}
+body.db-mindfulness-reader-standard .db-readaloud-button{order:6}
+body.db-mindfulness-reader-standard .db-bookmark-button{order:7}
+body.db-mindfulness-reader-standard .db-searchbox{order:8}
 .db-readaloud-panel[hidden]{display:none}
 .db-readaloud-panel{position:fixed;z-index:1450;top:var(--db-readaloud-top,72px);right:14px;width:min(390px,calc(100vw - 28px));max-height:calc(100vh - var(--db-readaloud-top,72px) - 8px);overflow:auto;padding:12px 13px;background:#fffdf9;border:2px solid #ad744e;border-radius:12px;box-shadow:0 10px 30px rgba(70,42,25,.22);color:#332922;font:13px/1.45 Arial,"Noto Sans SC",sans-serif}
 .db-readaloud-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
