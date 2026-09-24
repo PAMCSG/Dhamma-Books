@@ -233,7 +233,7 @@
   addEventListener('resize', () => { if (!panel.hidden) setTop(); }, {passive:true});
   addEventListener('beforeunload', () => synth?.cancel());
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden && synth?.speaking && !paused) {
+    if (document.hidden && !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && synth?.speaking && !paused) {
       synth.pause(); paused = true; pauseButton.textContent = labels[mode()].resume; status.textContent = labels[mode()].hidden;
     }
   });

@@ -109,6 +109,8 @@
   }
 
   function choosePaliVoice(voices, choice) {
+    // On mobile, the working Pāli pronunciation may be supplied by an English-tagged voice.
+    if (choice === '__indic__' && /Android|iPhone|iPad|iPod/i.test(global.navigator?.userAgent || '')) choice = '__english__';
     const available = paliVoices(voices);
     if (choice && choice !== '__indic__' && choice !== '__english__') {
       const selected = available.find(voice => voice.voiceURI === choice);
@@ -189,7 +191,7 @@
   }
 
   global.DhammaBooksReadAloudVoice = Object.freeze({
-    version: '1.4.4',
+    version: '1.4.5',
     defaults: DEFAULTS,
     chineseVoices,
     chooseVoice,
