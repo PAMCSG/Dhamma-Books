@@ -24,7 +24,7 @@
   const header=document.querySelector('.topbar');
   if(!panel||!openButton||!reader)return;
   const supported=Boolean(synth&&window.SpeechSynthesisUtterance);
-  const blockSelector='.chapter-title,.section-title,.book-heading,.source-paragraph,.single-text,.numbered-item,.rule-item,.ch10-chinese-line,.source-meaning,.opening-quotation,.copyright-line,.copyright-notice li';
+  const blockSelector='.chapter-title,.section-title,.book-heading,.source-paragraph,.single-text,.numbered-item,.rule-item,.ch10-chinese-line,.source-meaning,.opening-quotation,.copyright-line,.copyright-notice li,.translation-cell,.zh-text,.chinese-cell,.prose-zh-cell';
   const excludedSelector='rt,.pinyin,.heading-en,.toc-en,.pali-word,.font-pali,.pali-source-line,.ch10-pali-line,.pali-cell,.footnote-ref,button,[hidden],[aria-hidden="true"],.proof-marker';
   let blocks=[],blockIndex=0,chunks=[],chunkIndex=0,current=null,token=0,paused=false;
   function setPanelTop(){const h=header?.getBoundingClientRect().height||64;document.documentElement.style.setProperty('--read-aloud-top',Math.ceil(h+8)+'px')}
