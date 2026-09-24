@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.4 — 2026-09-20
+ * Version 3.9.5 — 2026-09-24
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.4';
+  const VERSION = '3.9.5';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -38,8 +38,10 @@
   });
 
   // Verified whole-word inflections that cannot be recovered reliably by a
-  // productive suffix rule. Exact complete PCED headwords always take
-  // precedence over this table.
+  // productive suffix rule. Exact complete PCED headwords normally take
+  // precedence over this table. A deliberately curated `preferLemma` mapping
+  // is the narrow exception: it keeps an attested surface-form entry from
+  // hiding its verified lemma analysis.
   const BUILTIN_INFLECTIONS = Object.freeze({
     'paṭisuṇitvā': Object.freeze([Object.freeze({
       form: 'paṭissuṇāti', label: 'absolutive: having agreed/promised',
@@ -572,8 +574,18 @@
     };
 
     const exactHeads = context.exact(normalized);
+    const verifiedCandidates = verifiedInflectionCandidates(normalized, options);
     const attestedPastHeads = explicitPastIndex(context.dictionary).get(normalized) || [];
     if (exactHeads.length) {
+      for (const candidate of verifiedCandidates.filter(item => item.preferLemma)) {
+        const heads = context.exact(candidate.form);
+        if (!heads.length) continue;
+        return finish({
+          ...base, mode: 'inflected', tier: 1, heads,
+          resolvedForm: candidate.form, rule: candidate.label, family: candidate.family,
+          notes: [`${clicked} → ${candidate.form} (${candidate.label})`]
+        });
+      }
       if (attestedPastHeads.length) {
         return finish({
           ...base, mode: 'inflected', tier: 1, heads: attestedPastHeads,
@@ -615,7 +627,6 @@
       }
     }
 
-    const verifiedCandidates = verifiedInflectionCandidates(normalized, options);
     for (const candidate of verifiedCandidates) {
       const heads = context.exact(candidate.form);
       if (heads.length) {
