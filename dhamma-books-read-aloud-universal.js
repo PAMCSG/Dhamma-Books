@@ -216,7 +216,6 @@
     });
   }
   function inlineLanguageChunks(block) {
-    if (bookName === 'the-only-way-for-realization-of-nibbana.html' && block.lang === 'en') return null;
     if (block.selected || !block.el.querySelector('.pali-word,.pali-text,[lang^="pi"]')) return null;
     const runs = [];
     const walker = document.createTreeWalker(block.el, NodeFilter.SHOW_TEXT);
