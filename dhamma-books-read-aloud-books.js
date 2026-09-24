@@ -27,7 +27,7 @@
   panel.className = 'db-readaloud-panel';
   panel.hidden = true;
   panel.innerHTML = '<div class="db-readaloud-head"><h2 id="db-readaloud-title"></h2><button class="db-readaloud-close" type="button" aria-label="Close">×</button></div>'
-    + '<div class="db-readaloud-actions"><button data-action="start" type="button"></button><button data-action="pause" type="button" disabled></button><button data-action="stop" type="button" disabled></button></div>'
+    + '<div class="db-readaloud-actions"><button data-action="start" type="button"></button><button data-action="selection" type="button"></button><button data-action="pause" type="button" disabled></button><button data-action="stop" type="button" disabled></button></div>'
     + '<div class="db-readaloud-settings"><label for="db-readaloud-rate"></label><select id="db-readaloud-rate"><option value="0.75">0.75×</option><option value="0.9">0.9×</option><option value="1" selected>1×</option><option value="1.15">1.15×</option><option value="1.3">1.3×</option><option value="1.5">1.5×</option></select>'
     + '<label for="db-readaloud-voice"></label><select id="db-readaloud-voice"></select><label for="db-readaloud-pali-voice"></label><select id="db-readaloud-pali-voice"></select>'
     + '<label for="db-readaloud-read-pali"></label><select id="db-readaloud-read-pali"><option value="no"></option><option value="yes"></option></select></div><p class="db-readaloud-status" role="status" aria-live="polite"></p>';
@@ -36,6 +36,7 @@
   const title = get('h2');
   const close = get('.db-readaloud-close');
   const startButton = get('[data-action="start"]');
+  const selectionButton = get('[data-action="selection"]');
   const pauseButton = get('[data-action="pause"]');
   const stopButton = get('[data-action="stop"]');
   const rateSelect = get('#db-readaloud-rate');
@@ -44,8 +45,8 @@
   const readPaliSelect = get('#db-readaloud-read-pali');
   const status = get('.db-readaloud-status');
   const labels = {
-    zh: {title:'中文朗读', button:'朗读', close:'关闭朗读控制', start:'从此处开始', restart:'重新开始', pause:'暂停', resume:'继续', stop:'停止', rate:'速度', voice:'中文声音', automatic:'自动选择', paliVoice:'巴利语声音', indic:'优先印度语系声音（如有）', english:'英语声音', readPali:'朗读巴利经文', no:'不朗读', yes:'朗读', ready:'可选择朗读巴利原文与中文；註释按钮和弹窗将略过。', done:'朗读完成。', stopped:'已停止朗读。', error:'朗读发生错误，请再试一次。', empty:'此处没有可朗读的内容。', hidden:'页面已隐藏，朗读自动暂停。', unavailable:'此浏览器不支持朗读。'},
-    en: {title:'Read Aloud', button:'Read aloud', close:'Close read-aloud controls', start:'Start from Here', restart:'Restart', pause:'Pause', resume:'Resume', stop:'Stop', rate:'Speed', voice:'English voice', automatic:'Automatic', paliVoice:'Pāli voice', indic:'Indic voice preferred (if available)', english:'English voice', readPali:'Read Pāli text', no:'No', yes:'Yes', ready:'Read the English text and optionally include Pāli passages. Notes and popups are skipped.', done:'Reading complete.', stopped:'Reading stopped.', error:'A reading error occurred. Please try again.', empty:'No readable text here.', hidden:'Automatically paused while the page is hidden.', unavailable:'Read-aloud is not supported by this browser.'}
+    zh: {title:'中文朗读', button:'朗读', close:'关闭朗读控制', start:'从此处开始', selection:'朗读所选文字', restart:'重新开始', pause:'暂停', resume:'继续', stop:'停止', rate:'速度', voice:'中文声音', automatic:'自动选择', paliVoice:'巴利语声音', indic:'优先印度语系声音（如有）', english:'英语声音', readPali:'朗读巴利经文', no:'不朗读', yes:'朗读', ready:'可选择朗读巴利原文与中文；註释按钮和弹窗将略过。', done:'朗读完成。', stopped:'已停止朗读。', error:'朗读发生错误，请再试一次。', empty:'此处没有可朗读的内容。', noSelection:'请先选择要朗读的文字。', hidden:'页面已隐藏，朗读自动暂停。', unavailable:'此浏览器不支持朗读。'},
+    en: {title:'Read Aloud', button:'Read aloud', close:'Close read-aloud controls', start:'Start from Here', selection:'Read Selected Text', restart:'Restart', pause:'Pause', resume:'Resume', stop:'Stop', rate:'Speed', voice:'English voice', automatic:'Automatic', paliVoice:'Pāli voice', indic:'Indic voice preferred (if available)', english:'English voice', readPali:'Read Pāli text', no:'No', yes:'Yes', ready:'Read the English text and optionally include Pāli passages. Notes and popups are skipped.', done:'Reading complete.', stopped:'Reading stopped.', error:'A reading error occurred. Please try again.', empty:'No readable text here.', noSelection:'Please select the text to read first.', hidden:'Automatically paused while the page is hidden.', unavailable:'Read-aloud is not supported by this browser.'}
   };
   const mode = () => enPanel && !enPanel.hidden ? 'en' : 'zh';
   let current = null, blocks = [], blockIndex = 0, chunks = [], chunkIndex = 0, token = 0, paused = false, active = false;
@@ -76,6 +77,7 @@
     button.title = l.button;
     close.setAttribute('aria-label', l.close);
     startButton.textContent = active ? l.restart : l.start;
+    selectionButton.textContent = l.selection;
     pauseButton.textContent = paused ? l.resume : l.pause;
     stopButton.textContent = l.stop;
     const selects = [rateSelect, voiceSelect, paliVoiceSelect, readPaliSelect];
@@ -104,9 +106,10 @@
   function activeRoot() { return mode() === 'en' ? enPanel.querySelector('.reader-body') : (zhPanel?.querySelector('.book-body') || chineseBook?.querySelector('.book-body')); }
   function cleanText(el) {
     const copy = el.cloneNode(true);
-    copy.querySelectorAll('rt,.pinyin,.fn-marker,.footnote-ref,.page-anchor,button,[hidden],[aria-hidden="true"]').forEach(node => node.remove());
+    copy.querySelectorAll(excludedSelector).forEach(node => node.remove());
     return copy.textContent.replace(/\s+/g, ' ').trim();
   }
+  const excludedSelector = 'rt,.pinyin,.fn-marker,.footnote-ref,.page-anchor,button,[hidden],[aria-hidden="true"]';
   function paliOnly(el, text) {
     if (mode() === 'zh') return !/[\u3400-\u9fff]/u.test(text) && /[\p{Script=Latin}]/u.test(text)
       && (el.querySelector('.pali-word') || /[āīūṅñṭḍṇḷṃ]/iu.test(text));
@@ -127,13 +130,34 @@
   function selectedText() {
     const selection = getSelection(), root = activeRoot();
     if (!selection || selection.isCollapsed || !selection.rangeCount || !root) return null;
-    const node = selection.getRangeAt(0).commonAncestorContainer;
+    const range = selection.getRangeAt(0), node = range.commonAncestorContainer;
     const el = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
     const text = selection.toString().replace(/\s+/g, ' ').trim();
     if (!el || !root.contains(el) || !text) return null;
     const block = {el:el.closest('p.text-block,h2.section-heading,h3.minor-heading,h3.sub-heading') || el,
-      text, pali:!!el.closest('.pali-word') || paliOnly(el, text), selected:true};
+      text, pali:!!el.closest('.pali-word') || paliOnly(el, text), selected:true, range:range.cloneRange()};
     return block.pali && readPaliSelect.value !== 'yes' ? null : block;
+  }
+  function selectionStartIndex(selection, list) {
+    if (!selection) return -1;
+    return list.findIndex(block => block.el === selection.el || block.el.contains(selection.el) || selection.el.contains(block.el));
+  }
+  function textFromSelectionStart(selection, block) {
+    if (!selection?.range || !block?.el.contains(selection.range.startContainer)) return block?.text || '';
+    const range = document.createRange();
+    range.selectNodeContents(block.el);
+    range.setStart(selection.range.startContainer, selection.range.startOffset);
+    const copy = document.createElement('div');
+    copy.append(range.cloneContents());
+    copy.querySelectorAll(excludedSelector).forEach(node => node.remove());
+    return copy.textContent.replace(/\s+/g, ' ').trim();
+  }
+  function keepCurrentVisible(el) {
+    const rect = el.getBoundingClientRect();
+    const safeTop = topbar.getBoundingClientRect().bottom + 12;
+    const safeBottom = innerHeight - 40;
+    if (rect.bottom >= safeTop && rect.top <= safeBottom) return;
+    el.scrollIntoView({behavior:'smooth', block:'nearest'});
   }
   function englishSpeechChunks(el) {
     const runs = [];
@@ -185,7 +209,7 @@
     const block = blocks[blockIndex];
     current = block.el;
     current.classList.add('db-readaloud-current');
-    current.scrollIntoView({behavior:'smooth', block:'center'});
+    keepCurrentVisible(current);
     const parts = block.pali ? profile.paliSpeechChunks(block.text) : profile.splitText(block.text);
     chunks = block.pali ? parts.map(text => ({text, lang:'latin'}))
       : mode() === 'en' ? (block.selected ? parts.map(text => ({text, lang:'en'})) : englishSpeechChunks(block.el))
@@ -200,11 +224,31 @@
     synth.cancel();
     clearHighlight();
     const selected = selectedText();
-    blocks = selected ? [selected] : readableBlocks();
-    if (selected) getSelection()?.removeAllRanges();
+    blocks = readableBlocks();
     const offset = topbar.getBoundingClientRect().bottom + 8;
-    blockIndex = selected ? 0 : Math.max(0, blocks.findIndex(block => block.el.getBoundingClientRect().bottom > offset));
+    if (selected) {
+      blockIndex = selectionStartIndex(selected, blocks);
+      if (blockIndex < 0) blockIndex = 0;
+      else {
+        const remainder = textFromSelectionStart(selected, blocks[blockIndex]);
+        if (remainder) blocks[blockIndex] = {...blocks[blockIndex], text:remainder, selected:true};
+      }
+    } else blockIndex = Math.max(0, blocks.findIndex(block => block.el.getBoundingClientRect().bottom > offset));
     if (!blocks.length) return finish(labels[mode()].empty);
+    paused = false;
+    pauseButton.textContent = labels[mode()].pause;
+    setControls(true);
+    speakBlock(token);
+  }
+  function readSelection() {
+    if (!supported) return;
+    const selected = selectedText();
+    if (!selected) { status.textContent = labels[mode()].noSelection; return; }
+    token++;
+    synth.cancel();
+    clearHighlight();
+    blocks = [selected];
+    blockIndex = 0;
     paused = false;
     pauseButton.textContent = labels[mode()].pause;
     setControls(true);
@@ -218,6 +262,7 @@
   });
   close.addEventListener('click', () => { panel.hidden = true; button.setAttribute('aria-expanded', 'false'); button.setAttribute('aria-pressed', 'false'); });
   startButton.addEventListener('click', start);
+  selectionButton.addEventListener('click', readSelection);
   stopButton.addEventListener('click', () => finish(labels[mode()].stopped));
   pauseButton.addEventListener('click', () => {
     if (!supported || !synth.speaking) return;
