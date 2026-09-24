@@ -935,3 +935,42 @@ html body.db-only-way-reader-standard .contents-scroll > .toc-group{
     padding:10px 14px!important;
   }
 }
+
+/* Book headers: compact mobile controls, with the book title kept in the page. */
+@media (max-width:760px) {
+  html body[class]>header:first-of-type :is(.app-brand-title,.bar-title),
+  html body[class]>nav.topbar :is(.app-brand-title,.bar-title),
+  html body[class]>.topbar :is(.app-brand-title,.bar-title){display:none!important}
+  html body[class]>header:first-of-type .app-brand,
+  html body[class]>nav.topbar .app-brand,
+  html body[class]>.topbar .app-brand{flex:0 0 auto!important;min-width:0!important;width:auto!important;max-width:none!important}
+  html body[class]>header:first-of-type :is(.top,.topbar-inner),
+  html body[class]>nav.topbar .topbar-inner,
+  html body[class]>.topbar .topbar-inner{column-gap:4px!important;row-gap:4px!important}
+  html body[class]>header:first-of-type :is(.top,.topbar-inner) :is(button,a:not(.app-home-logo):not(.home-logo)),
+  html body[class]>nav.topbar .topbar-inner :is(button,a:not(.app-home-logo):not(.home-logo)),
+  html body[class]>.topbar .topbar-inner :is(button,a:not(.app-home-logo):not(.home-logo)){
+    padding-left:5px!important;padding-right:5px!important;
+  }
+  html body[class]>header:first-of-type .db-standard-controls,
+  html body[class]>nav.topbar .db-standard-controls,
+  html body[class]>.topbar .db-standard-controls{display:contents!important}
+  html body[class]>header:first-of-type :is(.db-searchbox,.searchbox),
+  html body[class]>nav.topbar :is(.db-searchbox,.searchbox),
+  html body[class]>.topbar :is(.db-searchbox,.searchbox){
+    order:20!important;flex:1 1 105px!important;min-width:0!important;
+    width:auto!important;max-width:100%!important;
+  }
+  html body[class]>header:first-of-type :is(.db-searchbox,.searchbox) input,
+  html body[class]>nav.topbar :is(.db-searchbox,.searchbox) input,
+  html body[class]>.topbar :is(.db-searchbox,.searchbox) input{
+    flex:1 1 65px!important;width:clamp(65px,30vw,160px)!important;
+    min-width:0!important;max-width:100%!important;
+  }
+  html body[class]>header:first-of-type .db-search-status,
+  html body[class]>nav.topbar .db-search-status,
+  html body[class]>.topbar .db-search-status{
+    order:21!important;flex:0 1 58px!important;max-width:58px!important;
+    overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+  }
+}
