@@ -24,8 +24,8 @@
     'the-only-way-for-realization-of-nibbana.html': {root:'.lang-panel.active:not([hidden])', blocks:'p.text-block,p.paragraph-text,.section-heading,.subsection-heading,h1,h3,h4,li'},
     'daily-chants.html': {root:'#readerView', blocks:'.pali-cell,.eng-cell,.heading-pali,.heading-eng,h1,h3,h4'},
     'daily-chants-burmese.html': {root:'main', blocks:'.source-line,.gatha-line,.section-heading,.subsection-heading,.chant-invocation,h1,h3,h4'},
-    'paccayaniddeso.html': {root:'#readerView', blocks:'.pali-cell,.eng-cell,.source-line,.condition-cell,.analysis-cell,.analysis-translation,.section-heading,.subsection-heading,h1,h3,h4'},
-    'paccayaniddeso-chinese.html': {root:'#readerView', blocks:'.pali-cell,.zh-cell,.source-line,.condition-cell,.analysis-cell,.analysis-translation,.section-heading,.subsection-heading,h1,h3,h4'},
+    'paccayaniddeso.html': {root:'#readerView', blocks:'.pali-cell,.eng-cell,.condition-cell,.analysis-cell,.analysis-translation,.heading-pali,.heading-eng,h1,h3,h4'},
+    'paccayaniddeso-chinese.html': {root:'#readerView', blocks:'.pali-cell,.zh-cell,.condition-cell,.analysis-cell,.analysis-translation,.heading-pali,.heading-zh,h1,h3,h4'},
     'pali-chanting-book.html': {root:'#readerView', blocks:'.source-line,.gatha-line,.pali-cell,.eng-cell,.section-heading,.subsection-heading,h1,h3,h4'},
     'pali-chanting-book-chinese.html': {root:'#readerView', blocks:'.source-line,.gatha-line,.pali-cell,.zh-cell,.section-heading,.subsection-heading,h1,h3,h4'},
     'pali-chanting-book-burmese.html': {root:'#readerView', blocks:'.source-line,.gatha-line,.pali-cell,.my-cell,.section-heading,.subsection-heading,h1,h3,h4'}
@@ -107,7 +107,7 @@
   }
   function blockLanguage(el, text) {
     const classes = `${el.className || ''} ${el.parentElement?.className || ''}`;
-    if (/\b(eng-cell|eng-text|heading-eng)\b/.test(classes)) return 'en';
+    if (/\b(eng-cell|eng-text|heading-eng|analysis-en)\b/.test(classes) || el.matches('[data-lang="en"]')) return 'en';
     if (/\b(my-cell|my-text|heading-my)\b/.test(classes) || /[က-႟]/u.test(text)) return 'my';
     if (/\b(zh-cell|zh-text|heading-zh|verse-zh|nissaya)\b/.test(classes) || /[㐀-鿿]/u.test(text)) return 'zh';
     if (bookName === 'mindfulness-of-breathing.html' || bookName === 'the-only-way-for-realization-of-nibbana.html') {
