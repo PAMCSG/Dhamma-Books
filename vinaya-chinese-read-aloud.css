@@ -1,0 +1,17 @@
+.read-aloud-button{display:inline-flex;align-items:center;justify-content:center;min-width:44px}
+.read-aloud-button svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.read-aloud-button[aria-pressed="true"]{background:#fff;color:#6d3f24}
+.read-aloud-panel[hidden]{display:none}
+.read-aloud-panel{position:fixed;z-index:1450;top:var(--read-aloud-top,72px);right:14px;width:min(390px,calc(100vw - 28px));padding:12px 13px;background:#fffdf9;border:2px solid #ad744e;border-radius:12px;box-shadow:0 10px 30px rgba(70,42,25,.22);color:#332922;font-family:Arial,"Noto Sans SC",sans-serif}
+.read-aloud-panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
+.read-aloud-panel-title{margin:0;color:#673b20;font-size:17px}
+.read-aloud-close{min-width:30px;min-height:30px;padding:0 6px;border:1px solid #b98a69;border-radius:7px;background:#fffaf5;color:#5c341d;font:700 21px/1 Arial,sans-serif;cursor:pointer}
+.read-aloud-actions{display:flex;flex-wrap:wrap;gap:7px}
+.read-aloud-actions button,.read-aloud-settings select{min-height:36px;border:1px solid #b98a69;border-radius:7px;background:#fff8f1;color:#5c341d;font:600 14px/1.2 Arial,"Noto Sans SC",sans-serif;cursor:pointer}
+.read-aloud-actions button{padding:7px 10px}.read-aloud-actions button:disabled{cursor:not-allowed;opacity:.48}
+.read-aloud-settings{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:7px 9px;margin-top:9px;font-size:13px}
+.read-aloud-settings select{width:100%;padding:5px 7px;font-weight:400}
+.read-aloud-status{margin:9px 0 0;color:#6b584b;font-size:13px;line-height:1.45}
+.read-aloud-current{background:#fff1b8!important;box-shadow:0 0 0 3px #d99b43!important;border-radius:5px}
+.read-aloud-unavailable{color:#9b3b2d}
+@media(max-width:720px){.read-aloud-panel{right:8px;width:calc(100vw - 16px);max-height:calc(100vh - var(--read-aloud-top,150px) - 8px);overflow:auto}.read-aloud-actions button{flex:1 1 auto;padding-inline:8px}.read-aloud-settings{grid-template-columns:70px minmax(0,1fr)}}
