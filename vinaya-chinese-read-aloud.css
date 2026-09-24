@@ -14,7 +14,4 @@
 .read-aloud-status{margin:9px 0 0;color:#6b584b;font-size:13px;line-height:1.45}
 .read-aloud-current{background:#fff1b8!important;box-shadow:0 0 0 3px #d99b43!important;border-radius:5px}
 .read-aloud-unavailable{color:#9b3b2d}
-.copyright-notice{margin:0 8px 28px;font-family:"YouYuan","幼圆","STKaiti","KaiTi",serif;line-height:1.75}
-.copyright-notice p{margin:.25em 0}.copyright-notice ol{margin:.4em 0 .7em;padding-left:1.6em}.copyright-notice li{margin:.18em 0}
-.copyright-images{display:flex;justify-content:center;align-items:center;gap:20px;margin:16px 0}.copyright-images img{width:88px;height:88px;object-fit:contain}
 @media(max-width:720px){.read-aloud-panel{right:8px;width:calc(100vw - 16px);max-height:calc(100vh - var(--read-aloud-top,150px) - 8px);overflow:auto}.read-aloud-actions button{flex:1 1 auto;padding-inline:8px}.read-aloud-settings{grid-template-columns:70px minmax(0,1fr)}}
