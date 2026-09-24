@@ -5,7 +5,7 @@
   'use strict';
 
   const STORAGE_KEY = 'pamc-dhamma-books:read-aloud-voice-v1';
-  const DEFAULTS = Object.freeze({ voice: '__male__' });
+  const DEFAULTS = Object.freeze({ voice: '__male__', paliVoice: '__indic__' });
   const MALE_NAME_PATTERN = /(male|man|男声?|康康|kangkang|yunxi|yunjian|yunyang|yunze|yunhao)/i;
 
   function chineseVoices(voices) {
@@ -35,14 +35,15 @@
   function load() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-      return { voice: typeof saved.voice === 'string' ? saved.voice : DEFAULTS.voice };
+      return { voice: typeof saved.voice === 'string' ? saved.voice : DEFAULTS.voice, paliVoice: typeof saved.paliVoice === 'string' ? saved.paliVoice : DEFAULTS.paliVoice };
     } catch (_) {
       return { ...DEFAULTS };
     }
   }
 
   function save(settings) {
-    const next = { voice: typeof settings.voice === 'string' ? settings.voice : DEFAULTS.voice };
+    const previous = load();
+    const next = { voice: typeof settings.voice === 'string' ? settings.voice : previous.voice, paliVoice: typeof settings.paliVoice === 'string' ? settings.paliVoice : previous.paliVoice };
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch (_) {}
     return next;
   }
@@ -92,26 +93,43 @@
     return chunks;
   }
 
-  function latinVoice(voices) {
-    const english=Array.from(voices||[]).filter(voice=>/^en[-_]/i.test(voice.lang));
-    return english.find(voice=>/^en[-_]IN/i.test(voice.lang))
-      ||english.find(voice=>/^en[-_]GB/i.test(voice.lang))
-      ||english[0]||null;
+  // The browser has no standard Pāli voice. Let readers try installed Indic
+  // voices, while keeping an explicit English fallback and a manual choice.
+  function paliVoices(voices) {
+    return Array.from(voices || []).filter(voice => /^(sa|hi|ne|id|en)[-_]/i.test(voice.lang));
   }
 
-  function makeUtterance(chunk, rate, voices, choice) {
+  function choosePaliVoice(voices, choice) {
+    const available = paliVoices(voices);
+    if (choice && choice !== '__indic__' && choice !== '__english__') {
+      const selected = available.find(voice => voice.voiceURI === choice);
+      if (selected) return selected;
+    }
+    const preference = choice === '__english__'
+      ? [/^en[-_]IN/i, /^en[-_]GB/i, /^en[-_]/i]
+      : [/^sa[-_]IN/i, /^hi[-_]IN/i, /^ne[-_]NP/i, /^id[-_]ID/i,
+        /^sa[-_]/i, /^hi[-_]/i, /^ne[-_]/i, /^id[-_]/i,
+        /^en[-_]IN/i, /^en[-_]GB/i, /^en[-_]/i];
+    for (const pattern of preference) {
+      const found = available.find(voice => pattern.test(voice.lang));
+      if (found) return found;
+    }
+    return null;
+  }
+
+  function makeUtterance(chunk, rate, voices, choice, paliChoice) {
     const text=typeof chunk==='string'?chunk:chunk.text;
     const isLatin=typeof chunk!=='string'&&chunk.lang==='latin';
     const utterance = new SpeechSynthesisUtterance(isLatin?text:prepareSpeechText(text));
-    utterance.lang = isLatin?'en-IN':'zh-CN';
     utterance.rate = Number(rate) || 1;
-    const voice = isLatin?latinVoice(voices):chooseVoice(voices, choice);
+    const voice = isLatin?choosePaliVoice(voices, paliChoice):chooseVoice(voices, choice);
+    utterance.lang = isLatin?(voice?.lang || 'en-IN'):'zh-CN';
     if (voice) utterance.voice = voice;
     return utterance;
   }
 
   global.DhammaBooksReadAloudVoice = Object.freeze({
-    version: '1.1.0',
+    version: '1.2.0',
     defaults: DEFAULTS,
     chineseVoices,
     preferredMaleVoice,
@@ -122,6 +140,8 @@
     prepareSpeechText,
     splitText,
     speechChunks,
+    paliVoices,
+    choosePaliVoice,
     makeUtterance
   });
 })(window);
