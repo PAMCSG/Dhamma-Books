@@ -1,4 +1,4 @@
-/* PCED landing-page search v1.7.5 — exact Pāli/diacritic-aware and multilingual. */
+/* PCED landing-page search v1.7.6 — exact Pāli/diacritic-aware and multilingual. */
 (function (global) {
   'use strict';
 
@@ -94,7 +94,8 @@
     if (marked) return { heads: unique(direct), mode: result?.mode || 'none', marked: true, resolution: result };
 
     const folded = foldPali(query);
-    const heads = [...direct, ...(foldedHeadwords.get(folded) || [])];
+    const foldedExactHeads = foldedHeadwords.get(folded) || [];
+    const heads = [...direct, ...foldedExactHeads];
     // A plain-ASCII query may resolve only after trying its possible Pāli
     // diacritics. Preserve that successful resolution so the landing-page
     // popup can display the same inflected-form analysis as reader popups.
@@ -109,6 +110,15 @@
       const currentIsAnalysis = displayResolution?.mode === 'inflected' || displayResolution?.grammar;
       if (candidateIsAnalysis && !currentIsAnalysis) displayResolution = candidateResult;
     };
+    // A plain-ASCII query may immediately find an exact dictionary spelling
+    // through the folded index (for example patissutva → paṭissutvā). Resolve
+    // that recovered spelling as well: the exact surface entry may have a
+    // curated preferLemma mapping that must replace the surface-only result.
+    for (const candidate of foldedExactHeads) {
+      const candidateResult = resolve(candidate);
+      heads.push(...(candidateResult?.allHeads || candidateResult?.heads || []));
+      rememberResolution(candidateResult);
+    }
     for (const candidate of foldedInflections.get(folded) || []) {
       const candidateResult = resolve(candidate.surface);
       heads.push(...(candidateResult?.allHeads || candidateResult?.heads || []));
@@ -122,7 +132,10 @@
         rememberResolution(candidateResult);
       }
     }
-    return { heads: unique(heads), mode: heads.length ? 'plain-pali' : (result?.mode || 'none'), marked: false,
+    const displayHeads = displayResolution?.mode === 'inflected' && displayResolution?.heads?.length
+      ? (displayResolution.allHeads || displayResolution.heads)
+      : heads;
+    return { heads: unique(displayHeads), mode: displayHeads.length ? 'plain-pali' : (result?.mode || 'none'), marked: false,
       resolution: displayResolution };
   }
 
@@ -443,7 +456,7 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.5' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.6' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
