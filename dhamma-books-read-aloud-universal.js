@@ -109,6 +109,12 @@
     const classes = `${el.className || ''} ${el.parentElement?.className || ''}`;
     if (/\b(my-cell|my-text|heading-my)\b/.test(classes) || /[က-႟]/u.test(text)) return 'my';
     if (/\b(zh-cell|zh-text|heading-zh|verse-zh|nissaya)\b/.test(classes) || /[㐀-鿿]/u.test(text)) return 'zh';
+    if (bookName === 'mindfulness-of-breathing.html') {
+      const copy = el.cloneNode(true);
+      copy.querySelectorAll('.pali-word,.pali-text,[lang^="pi"]').forEach(node => node.remove());
+      if (/[A-Za-z]{2,}/.test(copy.textContent)) return 'en';
+      if (el.matches('.pali-word,.pali-text,[lang^="pi"]') || el.querySelector('.pali-word,.pali-text,[lang^="pi"]')) return 'pali';
+    }
     const markedPali = /\b(pali-cell|pali-text|heading-pali|pali-verse|verse-pali|pali)\b/.test(classes)
       || el.matches('.pali-word');
     if (markedPali || (/^[\p{Script=Latin}\p{Number}\p{Punctuation}\p{Separator}]+$/u.test(text) && /[āīūṅñṭḍṇḷṃ]/iu.test(text))) return 'pali';
