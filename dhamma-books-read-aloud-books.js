@@ -65,8 +65,8 @@
     voiceSelect.dataset.language = language;
     const pali = profile.paliVoices(synth.getVoices());
     const paliSelected = paliVoiceSelect.dataset.ready ? paliVoiceSelect.value : saved.paliVoice;
-    paliVoiceSelect.replaceChildren(new Option(labels[language].indic, '__indic__'), new Option(labels[language].english, '__english__'), ...pali.map(v => new Option(`${v.name} (${v.lang})`, v.voiceURI)));
-    paliVoiceSelect.value = pali.some(v => v.voiceURI === paliSelected) || paliSelected === '__english__' ? paliSelected : '__indic__';
+    paliVoiceSelect.replaceChildren(...(profile.hasIndicVoice(synth.getVoices()) ? [new Option(labels[language].indic, '__indic__')] : []), new Option(labels[language].english, '__english__'), ...pali.map(v => new Option(`${v.name} (${v.lang})`, v.voiceURI)));
+    paliVoiceSelect.value = pali.some(v => v.voiceURI === paliSelected) || paliSelected === '__english__' ? paliSelected : profile.hasIndicVoice(synth.getVoices()) ? '__indic__' : '__english__';
     paliVoiceSelect.dataset.ready = 'true';
   }
   function refreshLanguage() {

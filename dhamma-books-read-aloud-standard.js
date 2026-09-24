@@ -104,6 +104,10 @@
     return Array.from(voices || []).filter(voice => /^(sa|hi|ne|id|en)[-_]/i.test(voice.lang));
   }
 
+  function hasIndicVoice(voices) {
+    return paliVoices(voices).some(voice => /^(sa|hi|ne|id)[-_]/i.test(voice.lang));
+  }
+
   function choosePaliVoice(voices, choice) {
     const available = paliVoices(voices);
     if (choice && choice !== '__indic__' && choice !== '__english__') {
@@ -185,7 +189,7 @@
   }
 
   global.DhammaBooksReadAloudVoice = Object.freeze({
-    version: '1.4.3',
+    version: '1.4.4',
     defaults: DEFAULTS,
     chineseVoices,
     chooseVoice,
@@ -197,6 +201,7 @@
     speechChunks,
     paliSpeechChunks,
     paliVoices,
+    hasIndicVoice,
     choosePaliVoice,
     paliBlocks,
     makeUtterance,
