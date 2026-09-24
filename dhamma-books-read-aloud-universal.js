@@ -23,7 +23,7 @@
     'mindfulness-of-breathing.html': {root:'.lang-panel.active:not([hidden])', blocks:'p.text-block,.section-heading,.subsection-heading,h1,h3,h4'},
     'the-only-way-for-realization-of-nibbana.html': {root:'.lang-panel.active:not([hidden])', blocks:'p.text-block,p.paragraph-text,.section-heading,.subsection-heading,h1,h3,h4,li'},
     'daily-chants.html': {root:'#readerView', blocks:'.pali-cell,.eng-cell,.heading-pali,.heading-eng,h1,h3,h4'},
-    'daily-chants-burmese.html': {root:'main', blocks:'.source-line,.gatha-line,.section-heading,.subsection-heading,.chant-invocation,h1,h3,h4'},
+    'daily-chants-burmese.html': {root:'main', blocks:'.source-page p,.source-line,.gatha-line,.section-heading,.subsection-heading,.chant-invocation,h1,h3,h4'},
     'paccayaniddeso.html': {root:'#readerView', blocks:'.pali-cell,.eng-cell,.condition-cell,.analysis-cell,.analysis-translation,.heading-pali,.heading-eng,h1,h3,h4'},
     'paccayaniddeso-chinese.html': {root:'#readerView', blocks:'.pali-cell,.zh-cell,.condition-cell,.analysis-cell,.analysis-translation,.heading-pali,.heading-zh,h1,h3,h4'},
     'pali-chanting-book.html': {root:'#readerView', blocks:'.source-line,.gatha-line,.pali-cell,.eng-cell,.section-heading,.subsection-heading,h1,h3,h4'},
@@ -187,6 +187,24 @@
       localStorage.setItem(voiceStorageKey, JSON.stringify(saved));
     } catch (_) {}
   }
+  function myanmarSpeechChunks(text) {
+    const sentences = String(text || '').match(/[^။!?]+[။!?]?/gu) || [text];
+    const chunks = [];
+    sentences.forEach(sentence => {
+      let rest = sentence.replace(/\s+/g, ' ').trim();
+      while (rest.length > 140) {
+        let cut = Math.max(rest.lastIndexOf('၊', 140), rest.lastIndexOf(' ', 140));
+        if (cut < 45) cut = 140;
+        chunks.push(rest.slice(0, cut + 1).trim());
+        rest = rest.slice(cut + 1).trim();
+      }
+      if (rest) chunks.push(rest);
+    });
+    return chunks;
+  }
+  function languageTextChunks(text, language) {
+    return language === 'my' ? myanmarSpeechChunks(text) : profile.splitText(text);
+  }
   function setPanelTop() { document.documentElement.style.setProperty('--db-readaloud-top', Math.ceil(topbar.getBoundingClientRect().bottom + 8) + 'px'); }
   function refreshLanguage() {
     const language = interfaceLanguage(), l = labels[language];
@@ -245,7 +263,7 @@
     }
     const chunks = [];
     runs.forEach(run => {
-      const parts = run.lang === 'latin' ? profile.paliSpeechChunks(run.text) : profile.splitText(run.text);
+      const parts = run.lang === 'latin' ? profile.paliSpeechChunks(run.text) : languageTextChunks(run.text, run.lang);
       parts.filter(Boolean).forEach(text => chunks.push({text:text.trim(),lang:run.lang}));
     });
     return chunks.filter(chunk => chunk.text);
@@ -275,7 +293,7 @@
     if (inlineChunks) chunks = inlineChunks;
     else if (block.lang === 'pali') chunks = profile.paliSpeechChunks(block.text).filter(Boolean).map(text => ({text,lang:'latin'}));
     else if (block.lang === 'zh') chunks = profile.speechChunks(block.text);
-    else chunks = profile.splitText(block.text).filter(Boolean).map(text => ({text,lang:block.lang}));
+    else chunks = languageTextChunks(block.text, block.lang).filter(Boolean).map(text => ({text,lang:block.lang}));
     chunkIndex = 0;
     const language = interfaceLanguage();
     status.textContent = language === 'zh' ? `正在朗读第 ${blockIndex + 1} 段，共 ${blocks.length} 段`
