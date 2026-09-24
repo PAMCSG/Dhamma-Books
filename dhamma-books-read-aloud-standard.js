@@ -73,11 +73,27 @@
       for(const match of piece.matchAll(latin)){
         const before=piece.slice(last,match.index).replace(/[()（）]/g,'').trim();
         if(before)chunks.push({text:before,lang:'zh'});
-        chunks.push({text:match[0].trim(),lang:'latin'});
+        paliSpeechChunks(match[0].trim()).forEach(text => chunks.push({text,lang:'latin'}));
         last=match.index+match[0].length;
       }
       const after=piece.slice(last).replace(/[()（）]/g,'').trim();
       if(after)chunks.push({text:after,lang:'zh'});
+    }
+    return chunks;
+  }
+
+  // Small utterances are more reliable on mobile speech engines.
+  function paliSpeechChunks(text) {
+    const chunks=[];
+    for (const piece of splitText(text)) {
+      let rest=piece.trim();
+      while (rest.length>90) {
+        let cut=rest.lastIndexOf(' ',90);
+        if (cut<35) cut=90;
+        chunks.push(rest.slice(0,cut).trim());
+        rest=rest.slice(cut).trim();
+      }
+      if (rest) chunks.push(rest);
     }
     return chunks;
   }
@@ -125,17 +141,51 @@
     const text=typeof chunk==='string'?chunk:chunk.text;
     const isLatin=typeof chunk!=='string'&&chunk.lang==='latin';
     const voice = isLatin?choosePaliVoice(voices, paliChoice):chooseVoice(voices, choice);
-    const utterance = new SpeechSynthesisUtterance(isLatin?text:prepareSpeechText(text));
+    const utterance = new SpeechSynthesisUtterance(isLatin && !voice
+      ? text.replace(/[ṃṁ]/gu,'m').normalize('NFD').replace(/[\u0300-\u036f]/gu,'')
+      : isLatin ? text : prepareSpeechText(text));
     // Keep the chosen Chinese speed; Pāli passages have a gentler pace.
     const selectedRate = Number(rate) || 1;
     utterance.rate = isLatin ? selectedRate * 0.85 : selectedRate;
-    utterance.lang = isLatin?(voice?.lang || 'en-IN'):'zh-CN';
+    utterance.lang = isLatin?(voice?.lang || 'en-US'):'zh-CN';
     if (voice) utterance.voice = voice;
     return utterance;
   }
 
+  const activeUtterances=new Set();
+  function speakWithFallback(synth, chunk, rate, voices, choice, paliChoice, onend, onerror, onfallback) {
+    const isPali=typeof chunk!=='string'&&chunk.lang==='latin';
+    let retried=false;
+    function play(fallback) {
+      const utterance=makeUtterance(chunk,rate,synth.getVoices(),choice,fallback?'__english__':paliChoice);
+      if (fallback) {
+        // Some mobile voices reject Pāli diacritics; retain the original on screen.
+        utterance.text=utterance.text.replace(/[ṃṁ]/gu,'m').normalize('NFD').replace(/[\u0300-\u036f]/gu,'');
+        if (!/^en[-_]/i.test(utterance.voice?.lang || '')) {
+          utterance.voice=null;
+          utterance.lang='en-US';
+        }
+      }
+      activeUtterances.add(utterance);
+      utterance.onend=()=>{activeUtterances.delete(utterance);onend()};
+      utterance.onerror=event=>{
+        activeUtterances.delete(utterance);
+        if (event.error==='canceled'||event.error==='interrupted') return;
+        if (isPali&&!retried&&event.error!=='not-allowed') {
+          retried=true;
+          onfallback?.();
+          play(true);
+        } else onerror(event);
+      };
+      synth.speak(utterance);
+      // Canceled utterances do not always dispatch an event on mobile.
+      if (activeUtterances.size>8) activeUtterances.delete(activeUtterances.values().next().value);
+    }
+    play(false);
+  }
+
   global.DhammaBooksReadAloudVoice = Object.freeze({
-    version: '1.4.2',
+    version: '1.4.3',
     defaults: DEFAULTS,
     chineseVoices,
     chooseVoice,
@@ -145,9 +195,11 @@
     prepareSpeechText,
     splitText,
     speechChunks,
+    paliSpeechChunks,
     paliVoices,
     choosePaliVoice,
     paliBlocks,
-    makeUtterance
+    makeUtterance,
+    speakWithFallback
   });
 })(window);

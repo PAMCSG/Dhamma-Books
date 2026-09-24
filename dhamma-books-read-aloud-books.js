@@ -150,7 +150,7 @@
       if (last?.lang === lang) last.text += node.textContent;
       else runs.push({text:node.textContent, lang});
     }
-    return runs.flatMap(run => profile.splitText(run.text.replace(/\s+/g, ' ').trim())
+    return runs.flatMap(run => (run.lang === 'latin' ? profile.paliSpeechChunks : profile.splitText)(run.text.replace(/\s+/g, ' ').trim())
       .filter(Boolean).map(text => ({text, lang:run.lang})));
   }
   function speakNext(runToken) {
@@ -166,7 +166,13 @@
       utterance.rate = Number(rateSelect.value) || 1;
       if (voice) utterance.voice = voice;
     } else {
-      utterance = profile.makeUtterance(chunk, rateSelect.value, synth.getVoices(), voiceSelect.value, paliVoiceSelect.value);
+      profile.speakWithFallback(synth, chunk, rateSelect.value, synth.getVoices(), voiceSelect.value, paliVoiceSelect.value,
+        () => speakNext(runToken),
+        () => finish(labels[mode()].error),
+        () => { status.textContent = mode() === 'en'
+          ? 'Pāli voice unavailable on this device; trying an English voice.'
+          : '此设备无法使用所选巴利语声音，正在尝试英语声音。'; });
+      return;
     }
     utterance.onend = () => speakNext(runToken);
     utterance.onerror = event => { if (event.error !== 'canceled' && event.error !== 'interrupted') finish(labels[mode()].error); };
@@ -180,7 +186,7 @@
     current = block.el;
     current.classList.add('db-readaloud-current');
     current.scrollIntoView({behavior:'smooth', block:'center'});
-    const parts = profile.splitText(block.text);
+    const parts = block.pali ? profile.paliSpeechChunks(block.text) : profile.splitText(block.text);
     chunks = block.pali ? parts.map(text => ({text, lang:'latin'}))
       : mode() === 'en' ? (block.selected ? parts.map(text => ({text, lang:'en'})) : englishSpeechChunks(block.el))
       : profile.speechChunks(block.text);
