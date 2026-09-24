@@ -23,6 +23,9 @@ body.db-paccayaniddeso-reader-standard .db-bookmark-button{order:7!important}
 body.db-paccayaniddeso-reader-standard .db-searchbox{order:8!important}
 body.db-paccayaniddeso-reader-standard .db-search-status{order:9!important}
 @media(max-width:760px){
+  body.db-paccayaniddeso-reader-standard .app-brand-title{display:none!important}
+  body.db-paccayaniddeso-reader-standard .app-brand{flex:0 0 30px!important}
+  body.db-paccayaniddeso-reader-standard .db-readaloud-button{width:30px!important;min-width:30px!important;padding:3px!important}
   body.db-paccayaniddeso-reader-standard .db-searchbox{order:20!important;flex:1 1 100%!important;width:100%!important;max-width:100%!important}
   body.db-paccayaniddeso-reader-standard .db-searchbox input{flex:1 1 auto!important;min-width:0!important;width:auto!important;max-width:none!important}
   body.db-paccayaniddeso-reader-standard .db-search-status{order:21!important}
