@@ -53,14 +53,48 @@
     return voice;
   }
 
+  function prepareSpeechText(text) {
+    // Web Speech does not reliably support SSML phonemes. Use the unambiguous
+    // homophone 葬 (zàng) in speech input only; the visible book retains 藏.
+    return String(text || '').replace(/([律经經论論])藏/g, '$1葬');
+  }
+
+  function splitText(text) {
+    const pieces = String(text || '').match(/[^。！？；]+[。！？；]?/gu) || [text];
+    const out = [];
+    pieces.forEach(piece => {
+      let rest = piece.trim();
+      while (rest.length > 180) {
+        let cut = Math.max(rest.lastIndexOf('，', 180), rest.lastIndexOf('、', 180), rest.lastIndexOf(' ', 180));
+        if (cut < 60) cut = 180;
+        out.push(rest.slice(0, cut + 1));
+        rest = rest.slice(cut + 1).trim();
+      }
+      if (rest) out.push(rest);
+    });
+    return out;
+  }
+
+  function makeUtterance(text, rate, voices, choice) {
+    const utterance = new SpeechSynthesisUtterance(prepareSpeechText(text));
+    utterance.lang = 'zh-CN';
+    utterance.rate = Number(rate) || 1;
+    const voice = chooseVoice(voices, choice);
+    if (voice) utterance.voice = voice;
+    return utterance;
+  }
+
   global.DhammaBooksReadAloudVoice = Object.freeze({
-    version: '1.0.1',
+    version: '1.0.2',
     defaults: DEFAULTS,
     chineseVoices,
     preferredMaleVoice,
     chooseVoice,
     load,
     save,
-    applyToUtterance
+    applyToUtterance,
+    prepareSpeechText,
+    splitText,
+    makeUtterance
   });
 })(window);

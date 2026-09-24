@@ -45,4 +45,4 @@ mark.search-hit{background:#ffe68a}.hidden{display:none!important}
 const $=id=>document.getElementById(id),root=document.documentElement,store='pamc-bhikkhupatimokkha:';let size=+(localStorage.getItem(store+'size')||18);function setSize(v){size=Math.max(15,Math.min(27,v));root.style.setProperty('--book-font',size+'px');localStorage.setItem(store+'size',size)}setSize(size);$('fontMinus').onclick=()=>setSize(size-1);$('fontPlus').onclick=()=>setSize(size+1);
 $('contentsBtn').onclick=()=>{$('contents').classList.remove('collapsed');$('contents').scrollIntoView({behavior:'smooth'})};$('tocToggle').onclick=()=>{const c=$('contents').classList.toggle('collapsed');$('tocToggle').textContent=c?'展开':'收起'};
 $('dictClose').onclick=()=>$('dictModal').classList.remove('open');
-</script><script src="dhamma-books-read-aloud-standard.js?v=1.0.1"></script><script src="vinaya-chinese-read-aloud.js?v=1.0.1"></script></body></html>
+</script><script src="dhamma-books-read-aloud-standard.js?v=1.0.2"></script><script src="vinaya-chinese-read-aloud.js?v=1.0.2"></script></body></html>
