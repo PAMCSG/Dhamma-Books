@@ -131,8 +131,27 @@
     const el = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
     const text = selection.toString().replace(/\s+/g, ' ').trim();
     if (!el || !root.contains(el) || !text) return null;
-    const block = {el:el.closest('p.text-block,h2.section-heading,h3.minor-heading,h3.sub-heading') || el, text, pali:paliOnly(el, text)};
+    const block = {el:el.closest('p.text-block,h2.section-heading,h3.minor-heading,h3.sub-heading') || el,
+      text, pali:!!el.closest('.pali-word') || paliOnly(el, text), selected:true};
     return block.pali && readPaliSelect.value !== 'yes' ? null : block;
+  }
+  function englishSpeechChunks(el) {
+    const runs = [];
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        return node.parentElement?.closest('rt,.pinyin,.fn-marker,.footnote-ref,.page-anchor,button,[hidden],[aria-hidden="true"]')
+          ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      const lang = readPaliSelect.value === 'yes' && node.parentElement.closest('.pali-word') ? 'latin' : 'en';
+      const last = runs[runs.length - 1];
+      if (last?.lang === lang) last.text += node.textContent;
+      else runs.push({text:node.textContent, lang});
+    }
+    return runs.flatMap(run => profile.splitText(run.text.replace(/\s+/g, ' ').trim())
+      .filter(Boolean).map(text => ({text, lang:run.lang})));
   }
   function speakNext(runToken) {
     if (runToken !== token) return;
@@ -162,7 +181,9 @@
     current.classList.add('db-readaloud-current');
     current.scrollIntoView({behavior:'smooth', block:'center'});
     const parts = profile.splitText(block.text);
-    chunks = block.pali ? parts.map(text => ({text, lang:'latin'})) : mode() === 'en' ? parts.map(text => ({text, lang:'en'})) : profile.speechChunks(block.text);
+    chunks = block.pali ? parts.map(text => ({text, lang:'latin'}))
+      : mode() === 'en' ? (block.selected ? parts.map(text => ({text, lang:'en'})) : englishSpeechChunks(block.el))
+      : profile.speechChunks(block.text);
     chunkIndex = 0;
     status.textContent = mode() === 'en' ? `Reading passage ${blockIndex + 1} of ${blocks.length}` : `正在朗读第 ${blockIndex + 1} 段，共 ${blocks.length} 段`;
     speakNext(runToken);
