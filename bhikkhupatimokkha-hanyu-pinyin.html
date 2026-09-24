@@ -411,7 +411,7 @@ $('dictClose').onclick=()=>$('dictModal').classList.remove('open');
   });
   header.addEventListener('pointerup',()=>{drag=null;});header.addEventListener('pointercancel',()=>{drag=null;});
 })();</script>
-<script src="dhamma-books-read-aloud-standard.js?v=1.0.2"></script>\n<script id="read-aloud-script">
+<script src="dhamma-books-read-aloud-standard.js?v=1.1.0"></script>\n<script id="read-aloud-script">
 (()=>{
   'use strict';
   const synth=window.speechSynthesis,panel=document.getElementById('read-aloud-panel'),openButton=document.getElementById('readAloudBtn'),closeButton=document.getElementById('read-aloud-close'),startButton=document.getElementById('read-aloud-start'),pauseButton=document.getElementById('read-aloud-pause'),stopButton=document.getElementById('read-aloud-stop'),rateSelect=document.getElementById('read-aloud-rate'),voiceSelect=document.getElementById('read-aloud-voice'),status=document.getElementById('read-aloud-status'),reader=document.getElementById('reader-main'),header=document.querySelector('.topbar');
@@ -432,7 +432,7 @@ $('dictClose').onclick=()=>$('dictModal').classList.remove('open');
   function chosenVoice(){return voiceProfile?.chooseVoice(synth.getVoices(),voiceSelect.value)||synth.getVoices().find(v=>v.voiceURI===voiceSelect.value)||synth.getVoices().find(v=>/^zh-(CN|SG)/i.test(v.lang))||null}
   function populateVoices(){const voices=(voiceProfile?.chineseVoices(synth.getVoices())||synth.getVoices().filter(v=>/^zh/i.test(v.lang)));voiceSelect.replaceChildren(new Option('Male voice preferred (if available)','__male__'),new Option('Automatic',''),...voices.map(v=>new Option(`${v.name} (${v.lang})`,v.voiceURI)));voiceSelect.value=voices.some(v=>v.voiceURI===voiceSettings.voice)||voiceSettings.voice===''||voiceSettings.voice==='__male__'?voiceSettings.voice:'__male__'}
   function speakChunk(runToken){if(runToken!==token)return;if(chunkIndex>=chunks.length){blockIndex++;return speakBlock(runToken)}voiceSettings={voice:voiceSelect.value};const utterance=voiceProfile.makeUtterance(chunks[chunkIndex++],rateSelect.value,synth.getVoices(),voiceSettings.voice);utterance.onend=()=>speakChunk(runToken);utterance.onerror=event=>{if(event.error!=='canceled'&&event.error!=='interrupted')finish('A reading error occurred. Please try again.')};synth.speak(utterance)}
-  function speakBlock(runToken){if(runToken!==token)return;if(blockIndex>=blocks.length)return finish();clearHighlight();const block=blocks[blockIndex];current=block.el;current.classList.add('read-aloud-current');current.scrollIntoView({behavior:'smooth',block:'center'});chunks=splitText(block.text);chunkIndex=0;status.textContent=`Reading passage ${blockIndex+1} of ${blocks.length}`;speakChunk(runToken)}
+  function speakBlock(runToken){if(runToken!==token)return;if(blockIndex>=blocks.length)return finish();clearHighlight();const block=blocks[blockIndex];current=block.el;current.classList.add('read-aloud-current');current.scrollIntoView({behavior:'smooth',block:'center'});chunks=window.DhammaBooksReadAloudVoice.speechChunks(block.text);chunkIndex=0;status.textContent=`Reading passage ${blockIndex+1} of ${blocks.length}`;speakChunk(runToken)}
   function start(){if(!supported)return;token++;synth.cancel();clearHighlight();const selection=selectedChinese();if(selection){blocks=[selection];blockIndex=0;getSelection()?.removeAllRanges()}else{blocks=readableBlocks();const offset=(header?.getBoundingClientRect().height||0)+8;blockIndex=blocks.findIndex(x=>x.el.getBoundingClientRect().bottom>offset);if(blockIndex<0)blockIndex=0}if(!blocks.length)return finish('No readable Chinese text was found here.');paused=false;pauseButton.textContent='Pause';setControls(true);speakBlock(token)}
   function togglePause(){if(!supported||!synth.speaking)return;if(paused){synth.resume();paused=false;pauseButton.textContent='Pause';status.textContent=`Continuing passage ${blockIndex+1} of ${blocks.length}`}else{synth.pause();paused=true;pauseButton.textContent='Resume';status.textContent='Paused'}}
   function stop(){token++;finish('Stopped.')}
@@ -440,5 +440,6 @@ $('dictClose').onclick=()=>$('dictModal').classList.remove('open');
   if(supported){populateVoices();if('onvoiceschanged' in synth)synth.onvoiceschanged=populateVoices}else{openButton.disabled=true;openButton.title='Read-aloud is not supported by this browser';status.classList.add('read-aloud-unavailable');status.textContent='Read-aloud is not supported by this browser. Please use the latest Chrome, Edge, or Safari.'}
 })();
 </script>
+<script src="dhamma-books-pali-inline.js?v=1.0.0"></script>
 </body>
 </html>

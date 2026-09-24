@@ -75,17 +75,43 @@
     return out;
   }
 
-  function makeUtterance(text, rate, voices, choice) {
-    const utterance = new SpeechSynthesisUtterance(prepareSpeechText(text));
-    utterance.lang = 'zh-CN';
+  function speechChunks(text) {
+    const chunks=[];
+    const latin=/[\p{Script=Latin}][\p{Script=Latin}\p{Mark}'’\-]*(?:[\s,;:–—.]+[\p{Script=Latin}][\p{Script=Latin}\p{Mark}'’\-]*)*/gu;
+    for(const piece of splitText(text)){
+      let last=0;
+      for(const match of piece.matchAll(latin)){
+        const before=piece.slice(last,match.index).replace(/[()（）]/g,'').trim();
+        if(before)chunks.push({text:before,lang:'zh'});
+        chunks.push({text:match[0].trim(),lang:'latin'});
+        last=match.index+match[0].length;
+      }
+      const after=piece.slice(last).replace(/[()（）]/g,'').trim();
+      if(after)chunks.push({text:after,lang:'zh'});
+    }
+    return chunks;
+  }
+
+  function latinVoice(voices) {
+    const english=Array.from(voices||[]).filter(voice=>/^en[-_]/i.test(voice.lang));
+    return english.find(voice=>/^en[-_]IN/i.test(voice.lang))
+      ||english.find(voice=>/^en[-_]GB/i.test(voice.lang))
+      ||english[0]||null;
+  }
+
+  function makeUtterance(chunk, rate, voices, choice) {
+    const text=typeof chunk==='string'?chunk:chunk.text;
+    const isLatin=typeof chunk!=='string'&&chunk.lang==='latin';
+    const utterance = new SpeechSynthesisUtterance(isLatin?text:prepareSpeechText(text));
+    utterance.lang = isLatin?'en-IN':'zh-CN';
     utterance.rate = Number(rate) || 1;
-    const voice = chooseVoice(voices, choice);
+    const voice = isLatin?latinVoice(voices):chooseVoice(voices, choice);
     if (voice) utterance.voice = voice;
     return utterance;
   }
 
   global.DhammaBooksReadAloudVoice = Object.freeze({
-    version: '1.0.2',
+    version: '1.1.0',
     defaults: DEFAULTS,
     chineseVoices,
     preferredMaleVoice,
@@ -95,6 +121,7 @@
     applyToUtterance,
     prepareSpeechText,
     splitText,
+    speechChunks,
     makeUtterance
   });
 })(window);
