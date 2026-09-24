@@ -53,6 +53,11 @@
   button.setAttribute('aria-pressed', 'false');
   button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6.5 9H3v6h3.5L11 19V5Z"></path><path d="M15 9a4 4 0 0 1 0 6"></path><path d="M18 6a8 8 0 0 1 0 12"></path></svg>';
   fontPlus.insertAdjacentElement('afterend', button);
+  if (bookName === 'paccayaniddeso.html' || bookName === 'paccayaniddeso-chinese.html') {
+    const controls = document.getElementById('db-standard-controls');
+    const bookmark = document.getElementById('db-bookmark-button');
+    if (controls && bookmark) controls.insertBefore(button, bookmark);
+  }
 
   const panel = document.createElement('aside');
   panel.id = 'db-readaloud-panel';

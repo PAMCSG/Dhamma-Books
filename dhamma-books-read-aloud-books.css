@@ -19,7 +19,7 @@ body.db-daily-chants-standard .db-bookmark-button{order:7}
 body.db-daily-chants-standard .db-searchbox{order:8}
 body.db-paccayaniddeso-reader-standard .db-standard-controls{display:contents!important}
 body.db-paccayaniddeso-reader-standard .db-readaloud-button{order:6!important;flex:0 0 auto!important}
-body.db-paccayaniddeso-reader-standard .db-bookmark-button{order:7!important}
+body.db-paccayaniddeso-reader-standard :is(.db-bookmark-button,#db-bookmark-button,#bookmarkBtn){order:7!important}
 body.db-paccayaniddeso-reader-standard .db-searchbox{order:8!important}
 body.db-paccayaniddeso-reader-standard .db-search-status{order:9!important}
 @media(max-width:760px){
