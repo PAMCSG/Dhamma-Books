@@ -5,7 +5,7 @@
   const profile = window.DhammaBooksReadAloudVoice;
   const topbar = document.querySelector('.topbar,.toolbar,header');
   const fontPlus = document.getElementById('fontPlus') || document.getElementById('larger');
-  if (!synth || !profile || !topbar || !fontPlus || document.getElementById('dbReadAloudButton')) return;
+  if (!synth || !profile || !topbar || !fontPlus) return;
 
   const supported = Boolean(window.SpeechSynthesisUtterance);
   const genericBlockSelector = [
@@ -46,16 +46,19 @@
     '.footnote-popup','.popup','.proof-panel','.search-results','nav','header','.topbar'
   ].join(',');
 
-  const button = document.createElement('button');
-  button.id = 'dbReadAloudButton';
-  button.className = 'db-readaloud-button';
-  button.type = 'button';
-  button.setAttribute('aria-controls', 'db-readaloud-panel');
-  button.setAttribute('aria-expanded', 'false');
-  button.setAttribute('aria-pressed', 'false');
-  button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6.5 9H3v6h3.5L11 19V5Z"></path><path d="M15 9a4 4 0 0 1 0 6"></path><path d="M18 6a8 8 0 0 1 0 12"></path></svg>';
-  fontPlus.insertAdjacentElement('afterend', button);
-  if (bookName === 'paccayaniddeso.html' || bookName === 'paccayaniddeso-chinese.html') {
+  let button = document.getElementById('dbReadAloudButton');
+  if (!button) {
+    button = document.createElement('button');
+    button.id = 'dbReadAloudButton';
+    button.className = 'db-readaloud-button';
+    button.type = 'button';
+    button.setAttribute('aria-controls', 'db-readaloud-panel');
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-pressed', 'false');
+    button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6.5 9H3v6h3.5L11 19V5Z"></path><path d="M15 9a4 4 0 0 1 0 6"></path><path d="M18 6a8 8 0 0 1 0 12"></path></svg>';
+    fontPlus.insertAdjacentElement('afterend', button);
+  }
+  if ((bookName === 'paccayaniddeso.html' || bookName === 'paccayaniddeso-chinese.html') && button.parentElement !== document.getElementById('db-standard-controls')) {
     const controls = document.getElementById('db-standard-controls');
     const bookmark = document.getElementById('db-bookmark-button');
     if (controls && bookmark) controls.insertBefore(button, bookmark);

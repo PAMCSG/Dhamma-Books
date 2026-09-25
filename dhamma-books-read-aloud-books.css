@@ -1,7 +1,10 @@
 .db-readaloud-button{display:inline-flex;align-items:center;justify-content:center;min-width:44px}
 .db-readaloud-button svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.db-readaloud-button[aria-pressed="true"]{background:#fff!important;color:#67462f!important}
+.db-readaloud-button[aria-pressed="true"],body .db-standard-controls .db-readaloud-button[aria-pressed="true"]{background:#fff!important;color:#67462f!important}
 body.db-daily-chants-burmese-standard .db-readaloud-button{order:5!important}
+body.db-daily-chants-burmese-standard .db-readaloud-button{border:1px solid rgba(255,255,255,.55)!important;border-radius:7px!important;background:rgba(255,255,255,.12)!important;color:#fff!important;padding:6px 9px!important;font:inherit!important;font-size:13px!important;cursor:pointer!important}
+body.db-daily-chants-burmese-standard .db-readaloud-button:hover{background:rgba(255,255,255,.22)!important}
+body.db-daily-chants-burmese-standard .db-readaloud-button[aria-pressed="true"]{background:#fff!important;color:#67462f!important}
 body.db-daily-chants-burmese-standard .db-bookmark-button{order:6!important}
 body.db-daily-chants-burmese-standard .db-searchbox{order:7!important}
 body.db-daily-chants-burmese-standard .db-search-status{order:8!important}
