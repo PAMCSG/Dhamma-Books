@@ -20,7 +20,7 @@ When a shared asset changes, update its versioned URL in each affected HTML file
 
 The final header structure must be present in the initial HTML and styled correctly on the first paint. JavaScript may enhance the existing controls, but it must not briefly show an old or duplicate header and replace it after loading. There must be no old-header flash when first entering a book.
 
-The optional Read Aloud control is a progressive enhancement and may be inserted by the shared Read Aloud module after A+. Its absence before the module loads is not an old-header flash. The module must never create a duplicate control.
+The Read Aloud control must be present in the initial HTML immediately after A+ whenever the book supports speech. The shared module attaches behaviour to that existing button and may create it only as a defensive fallback for an older page. A header that first paints without the button and then reflows when JavaScript inserts it is an old-header flash defect. The module must never create a duplicate control.
 
 ## 2. Screen header
 
