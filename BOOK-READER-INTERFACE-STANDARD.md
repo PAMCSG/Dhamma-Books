@@ -501,3 +501,8 @@ Test every improved or newly added book at desktop width and at a narrow mobile 
 Use this instruction:
 
 > Improve `<book filename>` to conform to `BOOK-READER-INTERFACE-STANDARD.md`. Use `dhammapada-pali-chinese.html` as the approved implementation example and `daily-chants-burmese.html` as the mobile sticky-header and Contents-window behaviour reference. Change only the interface items required by the standard; preserve all book content and unrelated features. Test against the acceptance checklist and update the implementation status before opening a pull request.
+
+### Source typography and cover cache (2026-09)
+
+- Use the right half of the PDF first-page spread for the cover and reference a newly named asset when replacing a previously published cover. Update both index and reader references.
+- Preserve each source line break and indentation in a converted legacy-font reader. Preserve emphatic spans in their source positions; use the source PDF to proof Pali and Burmese ligatures.
