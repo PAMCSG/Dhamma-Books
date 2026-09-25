@@ -32,9 +32,10 @@
   };
   const bookName = location.pathname.split('/').pop() || '';
   const bookConfig = bookConfigs[bookName] || {};
-  const azureBurmeseTrial = bookName === 'daily-chants-burmese.html';
+  const azureBurmeseEnabled = /burmese/i.test(bookName);
   const blockSelector = bookConfig.blocks || genericBlockSelector;
   const voiceStorageKey = 'pamc-dhamma-books:read-aloud-language-voices-v1';
+  const burmeseDefaultMigrationKey = 'pamc-dhamma-books:burmese-default-thiha-v1';
   const excludedSelector = [
     'rt','.pinyin','.fn-marker','.footnote-ref','.fn-link','.page-anchor','.page-tag',
     '.verse-number','.gatha-no','button','script','style','[hidden]','[aria-hidden="true"]',
@@ -220,15 +221,24 @@
   function populateVoices() {
     const language = interfaceLanguage(), l = labels[language], voices = availableVoices(language);
     const saved = profile.load();
-    const previous = voiceSelect.dataset.language === language ? voiceSelect.value : (loadLanguageVoice(language) || (language === 'zh' ? saved.voice : ''));
-    const onlineOptions = language === 'my' && azureBurmeseTrial ? [
+    let previous = voiceSelect.dataset.language === language ? voiceSelect.value : (loadLanguageVoice(language) || (language === 'zh' ? saved.voice : ''));
+    if (language === 'my' && azureBurmeseEnabled) {
+      try {
+        if (localStorage.getItem(burmeseDefaultMigrationKey) !== 'done') {
+          previous = '__azure_thiha__';
+          saveLanguageVoice('my', previous);
+          localStorage.setItem(burmeseDefaultMigrationKey, 'done');
+        }
+      } catch (_) {}
+    }
+    const onlineOptions = language === 'my' && azureBurmeseEnabled ? [
       new Option(l.onlineVoiceFemale,'__azure_nilar__'),
       new Option(l.onlineVoiceMale,'__azure_thiha__')
     ] : [];
-    const automaticLabel = language === 'my' && !voices.length && !azureBurmeseTrial ? l.unavailableVoice : l.automatic;
+    const automaticLabel = language === 'my' && !voices.length && !azureBurmeseEnabled ? l.unavailableVoice : l.automatic;
     voiceSelect.replaceChildren(new Option(automaticLabel,''), ...onlineOptions, ...voices.map(voice => new Option(`${voice.name} (${voice.lang})`,voice.voiceURI)));
-    const voiceExists = voices.some(voice => voice.voiceURI === previous) || (azureBurmeseTrial && ['__azure_nilar__','__azure_thiha__'].includes(previous));
-    voiceSelect.value = voiceExists ? previous : (language === 'my' && azureBurmeseTrial ? '__azure_nilar__' : '');
+    const voiceExists = voices.some(voice => voice.voiceURI === previous) || (azureBurmeseEnabled && ['__azure_nilar__','__azure_thiha__'].includes(previous));
+    voiceSelect.value = voiceExists ? previous : (language === 'my' && azureBurmeseEnabled ? '__azure_thiha__' : '');
     voiceSelect.dataset.language = language;
     const paliVoices = profile.paliVoices(synth.getVoices()), paliPrevious = paliVoiceSelect.dataset.ready ? paliVoiceSelect.value : saved.paliVoice;
     paliVoiceSelect.replaceChildren(new Option(l.indic,'__indic__'),new Option(l.english,'__english__'),...paliVoices.map(voice => new Option(`${voice.name} (${voice.lang})`,voice.voiceURI)));
@@ -297,6 +307,7 @@
       onlineAudio.playbackRate = Number(rateSelect.value) || 1;
       onlineAudio.onended = () => { stopOnlineAudio(); speakNext(runToken); };
       onlineAudio.onerror = () => finish(labels.my.onlineError);
+      if (paused) return;
       await onlineAudio.play();
     } catch (_) {
       if (runToken === token) finish(labels.my.onlineError);
@@ -313,14 +324,14 @@
     }
     const utterance = new SpeechSynthesisUtterance(chunk.text), voices = availableVoices(chunk.lang);
     const voice = voices.find(item => item.voiceURI === voiceSelect.value) || voices[0];
-    if (chunk.lang === 'my' && azureBurmeseTrial && (voiceSelect.value.startsWith('__azure_') || !voice)) {
+    if (chunk.lang === 'my' && azureBurmeseEnabled && (voiceSelect.value.startsWith('__azure_') || !voice)) {
       speakOnlineBurmese(chunk.text, runToken, voiceSelect.value); return;
     }
     utterance.lang = voice?.lang || (chunk.lang === 'zh' ? 'zh-CN' : chunk.lang === 'my' ? 'my-MM' : 'en-GB');
     utterance.rate = Number(rateSelect.value) || 1; if (voice) utterance.voice = voice;
     utterance.onend = () => speakNext(runToken);
     utterance.onerror = event => { if (!['canceled','interrupted'].includes(event.error)) finish(labels[interfaceLanguage()].error); };
-    synth.speak(utterance);
+    synth.speak(utterance); if (paused) synth.pause();
   }
   function speakBlock(runToken) {
     if (runToken !== token) return;
@@ -340,7 +351,7 @@
   }
   function start() {
     if (!supported) return;
-    if (interfaceLanguage() === 'my' && !azureBurmeseTrial && !availableVoices('my').length) {
+    if (interfaceLanguage() === 'my' && !azureBurmeseEnabled && !availableVoices('my').length) {
       resetSpeechSynthesis(); clearHighlight(); setControls(false); status.textContent = labels.my.noVoice; return;
     }
     token++; resetSpeechSynthesis(); clearHighlight(); const selection = selectedText(); blocks = readableBlocks();
@@ -361,14 +372,29 @@
   function readSelection() {
     if (!supported) return; const selection = selectedText();
     if (!selection) { status.textContent = labels[interfaceLanguage()].noSelection; return; }
-    if (interfaceLanguage() === 'my' && !azureBurmeseTrial && !availableVoices('my').length) {
+    if (interfaceLanguage() === 'my' && !azureBurmeseEnabled && !availableVoices('my').length) {
       resetSpeechSynthesis(); clearHighlight(); setControls(false); status.textContent = labels.my.noVoice; return;
     }
     token++; resetSpeechSynthesis(); clearHighlight(); blocks = [selection]; blockIndex = 0; paused = false; pauseButton.textContent = labels[interfaceLanguage()].pause; setControls(true); preserveSelection(selection); speakBlock(token);
   }
 
-  button.addEventListener('click', () => { if (panel.hidden) { refreshLanguage(); setPanelTop(); panel.hidden = false; } else panel.hidden = true; button.setAttribute('aria-expanded',String(!panel.hidden)); button.setAttribute('aria-pressed',String(!panel.hidden)); });
-  closeButton.addEventListener('click', () => { panel.hidden = true; button.setAttribute('aria-expanded','false'); button.setAttribute('aria-pressed','false'); });
+  function pauseReading() {
+    if (!active || paused) return;
+    if (onlineAudio) onlineAudio.pause(); else synth.pause();
+    paused = true;
+    pauseButton.textContent = labels[interfaceLanguage()].resume;
+  }
+  function hidePanel() {
+    pauseReading();
+    panel.hidden = true;
+    button.setAttribute('aria-expanded','false');
+    button.setAttribute('aria-pressed','false');
+  }
+  button.addEventListener('click', () => {
+    if (panel.hidden) { refreshLanguage(); setPanelTop(); panel.hidden = false; button.setAttribute('aria-expanded','true'); button.setAttribute('aria-pressed','true'); }
+    else hidePanel();
+  });
+  closeButton.addEventListener('click', hidePanel);
   startButton.addEventListener('click', start); selectionButton.addEventListener('click', readSelection); stopButton.addEventListener('click', () => finish(labels[interfaceLanguage()].stopped));
   pauseButton.addEventListener('click', () => {
     if (onlineAudio) { if (paused) onlineAudio.play().catch(() => finish(labels.my.onlineError)); else onlineAudio.pause(); }

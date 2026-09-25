@@ -254,13 +254,25 @@
     setControls(true);
     speakBlock(token);
   }
+  function pauseReading() {
+    if (paused || pauseButton.disabled) return;
+    synth.pause();
+    paused = true;
+    pauseButton.textContent = labels[mode()].resume;
+  }
+  function hidePanel() {
+    pauseReading();
+    panel.hidden = true;
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-pressed', 'false');
+  }
   button.addEventListener('click', () => {
     if (panel.hidden) { refreshLanguage(); setTop(); panel.hidden = false; }
-    else panel.hidden = true;
+    else hidePanel();
     button.setAttribute('aria-expanded', String(!panel.hidden));
     button.setAttribute('aria-pressed', String(!panel.hidden));
   });
-  close.addEventListener('click', () => { panel.hidden = true; button.setAttribute('aria-expanded', 'false'); button.setAttribute('aria-pressed', 'false'); });
+  close.addEventListener('click', hidePanel);
   startButton.addEventListener('click', start);
   selectionButton.addEventListener('click', readSelection);
   stopButton.addEventListener('click', () => finish(labels[mode()].stopped));
