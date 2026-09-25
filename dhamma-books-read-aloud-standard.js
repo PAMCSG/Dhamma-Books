@@ -147,9 +147,12 @@
     const text=typeof chunk==='string'?chunk:chunk.text;
     const isLatin=typeof chunk!=='string'&&chunk.lang==='latin';
     const voice = isLatin?choosePaliVoice(voices, paliChoice):chooseVoice(voices, choice);
+    // Indic speech engines may spell capitalised Pāḷi as initials. Lowercase
+    // only the spoken Pāḷi copy; the visible book text remains unchanged.
+    const spokenText=isLatin?text.toLocaleLowerCase():text;
     const utterance = new SpeechSynthesisUtterance(isLatin && !voice
-      ? text.replace(/[ṃṁ]/gu,'m').normalize('NFD').replace(/[\u0300-\u036f]/gu,'')
-      : isLatin ? text : prepareSpeechText(text));
+      ? spokenText.replace(/[ṃṁ]/gu,'m').normalize('NFD').replace(/[\u0300-\u036f]/gu,'')
+      : isLatin ? spokenText : prepareSpeechText(spokenText));
     // Keep the chosen Chinese speed; Pāli passages have a gentler pace.
     const selectedRate = Number(rate) || 1;
     utterance.rate = isLatin ? selectedRate * 0.85 : selectedRate;
