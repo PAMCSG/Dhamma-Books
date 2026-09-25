@@ -510,3 +510,7 @@ Use this instruction:
 ### Legacy Burmese font conversion checks (2026-09-26)
 
 For PDFs using `Win---Researcher2`, `WinResearcher`, `WinKalaw`, or `WinTaungyi`, inspect the actual encoded glyph in its matching font before assigning Unicode. In this book the legacy `ç` glyph is Burmese punctuation `၊`; treating it as a vowel mark creates incorrect text throughout the reader. Check extracted PDF overprints and Unicode mark order separately. Automated checks of cluster validity do not establish word-by-word textual accuracy; compare suspicious passages against the rendered source PDF.
+
+### Source signatures and invocations
+
+Keep a right-aligned editor/compiler signature right-aligned (for this book, `စီစဉ်သူများ`). Render a source invocation such as `နမော တဿ ဘဂဝတော အရဟတော သမ္မာသမ္ဗုဒ္ဓဿ` as a visibly larger, centered bold heading. Preserve source Pāli emphasis within explanatory prose and keep the font-size control effective on every reader line.
