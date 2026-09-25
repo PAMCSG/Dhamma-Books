@@ -18,7 +18,9 @@ Every reader using the repository-wide standard cover card must also load `dhamm
 
 When a shared asset changes, update its versioned URL in each affected HTML file so deployed browsers do not reuse an older cached copy.
 
-The final header structure must be present in the initial HTML and styled correctly on the first paint. JavaScript may enhance the existing controls, but it must not briefly show an old or duplicate header and replace it after loading. There must be no old-header flash when first entering a book.
+The complete final header structure must be present in the initial HTML and styled correctly on the first paint. This includes the logo, book name, Contents, language controls, A−, A+, Read Aloud when supported, Book Mark, Search field and Search button. JavaScript may attach behaviour, update labels and enhance these existing controls, but it must not create, move, replace or reveal the normal header controls after the first paint. A header that initially omits any normal control and then changes width, wrapping or alignment when JavaScript adds it is a screen-header flash defect.
+
+Shared modules may retain control creation only as a defensive compatibility fallback for an older unconverted page. This fallback is not an approved implementation pattern for a new or amended book. Before delivery, inspect the book's initial HTML and confirm that every visible header control occurs exactly once; do not rely only on the final DOM after JavaScript has run.
 
 The Read Aloud control must be present in the initial HTML immediately after A+ whenever the book supports speech. The shared module attaches behaviour to that existing button and may create it only as a defensive fallback for an older page. A header that first paints without the button and then reflows when JavaScript inserts it is an old-header flash defect. The module must never create a duplicate control.
 
@@ -111,11 +113,11 @@ When any of these shared files changes, update the versioned URL in every affect
 
 ### Header position
 
-The Read Aloud button is inserted immediately after A+ and before Book Mark. Every supported book must define an explicit flex order for the dynamically inserted button and, when necessary, increment the existing Book Mark and Search orders. The final sequence is always:
+The Read Aloud button is present in the initial HTML immediately after A+ and before Book Mark. Every supported book must define the required flex order for the existing button and, when necessary, set the Book Mark and Search orders. The final sequence is always:
 
 `A− → A+ → Read Aloud → Book Mark → Search`
 
-Verify this order on desktop and mobile after the module has loaded. A dynamically inserted control with an unspecified default order is a defect.
+Verify this order both before and after the module loads, on desktop and mobile. A normal control that depends on dynamic insertion, or any control with an unspecified order that causes header reflow, is a defect.
 
 Follow the Pāḷi Chanting Book active-state treatment: while the Read Aloud popup is open, the header button has a solid white background and a brown speaker icon. Closing the popup restores the normal inactive header style. This appearance must not be overridden by a book-specific header stylesheet; Daily Chants Burmese and all legacy Read Aloud buttons follow the same state.
 
