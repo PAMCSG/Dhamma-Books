@@ -117,6 +117,8 @@ The Read Aloud button is inserted immediately after A+ and before Book Mark. Eve
 
 Verify this order on desktop and mobile after the module has loaded. A dynamically inserted control with an unspecified default order is a defect.
 
+Follow the Pāḷi Chanting Book active-state treatment: while the Read Aloud popup is open, the header button has a solid white background and a brown speaker icon. Closing the popup restores the normal inactive header style. This appearance must not be overridden by a book-specific header stylesheet; Daily Chants Burmese and all legacy Read Aloud buttons follow the same state.
+
 ### Voice assignment
 
 Assign voices by the semantic language of each text run, not merely by the presence of a Pāli diacritic somewhere in its containing paragraph.
@@ -133,6 +135,8 @@ Assign voices by the semantic language of each text run, not merely by the prese
 For a mixed English–Pāli paragraph, first classify the paragraph as English when meaningful English remains after marked Pāli spans are removed. Then split its text nodes into English and marked-Pāli speech runs. Do not classify the complete paragraph as Pāli simply because it contains `.pali-word` elements or Pāli diacritics. Do not force the complete mixed paragraph through one English voice either. Apply the corresponding rule to Chinese–Pāli and Burmese–Pāli text.
 
 The `Read Pāli text` setting controls fully Pāli passages. Selecting `No` must not omit an English, Chinese or Burmese paragraph merely because that paragraph contains inline Pāli terms.
+
+Before sending a Pāli run to an Indic voice, convert only its spoken copy to lowercase. This prevents speech engines from treating capitalised headings or words as abbreviations and spelling them letter by letter. Preserve the visible capitalization and all Pāli diacritics in the book.
 
 ### Starting point and selected text
 
