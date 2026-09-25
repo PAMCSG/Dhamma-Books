@@ -3,7 +3,7 @@
 **Status:** Approved standard for every current and future reader book in `PAMCSG/Dhamma-Books`  
 **Approved reference implementation:** `dhammapada-pali-chinese.html`  
 **Behaviour reference:** `daily-chants-burmese.html`  
-**Last consolidated:** 22 September 2026
+**Last consolidated:** 25 September 2026
 
 This is the normative interface standard for improving an existing book or adding a new book. Apply it one book at a time. Do not change book wording, translations, paragraph order, images, tables, footnotes, PCED data or unrelated styling merely to make the interface conform.
 
@@ -94,6 +94,95 @@ Follow the displayed Daily Chants English state treatment: Contents is a navigat
 - They must also resize the Contents heading and Contents entries.
 - Do not hard-code descendant font sizes in a way that prevents them from following the book's font-size setting.
 - Preserve the selected size consistently while the reader remains in use, according to the book's established storage behaviour.
+
+## 3A. Read Aloud standard
+
+### Approved behaviour pattern
+
+`mindfulness-of-breathing.html` is the approved reference for a multilingual book containing English or Chinese prose with inline Pāli terms. A structurally similar book, including `the-only-way-for-realization-of-nibbana.html`, must reuse this pattern. Do not create a new book-specific voice rule merely because the title, paragraph classes or quantity of Pāli vocabulary differs.
+
+The shared implementation consists of:
+
+- `dhamma-books-read-aloud-standard.js` for the stored settings and Pāli voice/fallback profile;
+- `dhamma-books-read-aloud-universal.js` for the controls, readable blocks, selection, highlighting and speech sequence; and
+- `dhamma-books-read-aloud-books.css` for the control and panel appearance and each header's explicit control order.
+
+When any of these shared files changes, update the versioned URL in every affected book. Never reuse the same cache version for changed code.
+
+### Header position
+
+The Read Aloud button is inserted immediately after A+ and before Book Mark. Every supported book must define an explicit flex order for the dynamically inserted button and, when necessary, increment the existing Book Mark and Search orders. The final sequence is always:
+
+`A− → A+ → Read Aloud → Book Mark → Search`
+
+Verify this order on desktop and mobile after the module has loaded. A dynamically inserted control with an unspecified default order is a defect.
+
+### Voice assignment
+
+Assign voices by the semantic language of each text run, not merely by the presence of a Pāli diacritic somewhere in its containing paragraph.
+
+| Visible text | Required voice |
+| --- | --- |
+| Ordinary English text | Selected English voice |
+| A marked inline Pāli term inside English prose | Selected Pāli voice |
+| A fully Pāli passage | Selected Pāli voice |
+| Ordinary Chinese text | Selected Chinese voice |
+| A marked inline Pāli term inside Chinese prose | Selected Pāli voice |
+| Burmese text | Selected Burmese voice |
+
+For a mixed English–Pāli paragraph, first classify the paragraph as English when meaningful English remains after marked Pāli spans are removed. Then split its text nodes into English and marked-Pāli speech runs. Do not classify the complete paragraph as Pāli simply because it contains `.pali-word` elements or Pāli diacritics. Do not force the complete mixed paragraph through one English voice either. Apply the corresponding rule to Chinese–Pāli and Burmese–Pāli text.
+
+The `Read Pāli text` setting controls fully Pāli passages. Selecting `No` must not omit an English, Chinese or Burmese paragraph merely because that paragraph contains inline Pāli terms.
+
+### Starting point and selected text
+
+- `Start from Here` / `从此处开始` begins at the first word actually selected and continues through the remaining readable text in document order. It must not return to the beginning of that sentence or paragraph.
+- `Read Selected Text` / `朗读所选文字` reads only the exact selected text.
+- Opening the Read Aloud panel must not discard an existing selection.
+- While reading from a selection, keep that selection visible and preserve it where the browser permits.
+- Highlight the passage currently being spoken, and scroll only when that passage is outside the visible reading area. Do not move the book to an unrelated location.
+- If a selected block is excluded from the normal sequence, continue with the next readable block rather than falling back to the beginning of the book.
+
+### Language switching and saved voices
+
+Every book's actual language controls must trigger a Read Aloud refresh. This includes book-specific IDs such as `#langEn` and `#langZh`, not only generic `.lang-button` or `[data-lang]` controls. After a language change:
+
+- panel labels follow the active interface language;
+- the ordinary voice list contains voices for the active book language;
+- the previously selected voice for that language is restored when available; and
+- the saved Pāli voice remains independent of the English, Chinese or Burmese voice.
+
+### Burmese online voices
+
+Every Burmese book using Read Aloud uses the shared Cloudflare-to-Azure Speech service rather than depending on a Burmese voice being installed on the reader's device. The ordinary Burmese voice menu must provide both supported Azure voices:
+
+- `my-MM-ThihaNeural` — male; the default Burmese voice;
+- `my-MM-NilarNeural` — female; available as an alternative.
+
+The Azure subscription key remains only in the encrypted Cloudflare Worker secret. It must never be committed to the repository, embedded in a book, shown in a screenshot or sent in chat. Pāli passages remain controlled separately by the Pāli voice setting.
+
+### Closing the panel
+
+Closing the Read Aloud panel—either with its × button or by pressing the header Read Aloud button again—must immediately pause active reading. It must not continue speaking while its controls are hidden. Reopening the panel shows the paused state and permits the reader to resume, stop or restart.
+
+### Consistency and non-regression rule
+
+Before adding a book-specific condition, compare the book's structure with an already approved reference. If the same semantic pattern exists, reuse the same classifier and speech-run logic. A book-specific exception is permitted only when the DOM structure genuinely cannot be represented by the shared configuration; document the reason beside the exception.
+
+For every Read Aloud change, test at least:
+
+- [ ] icon order on desktop and mobile;
+- [ ] an English-only sentence;
+- [ ] an English sentence containing one or more marked Pāli terms;
+- [ ] a fully Pāli passage with `Read Pāli text` set to both `No` and `Yes`;
+- [ ] Chinese or Burmese prose when present;
+- [ ] switching languages while the Read Aloud panel is open;
+- [ ] closing the panel pauses speech and reopening it permits Resume;
+- [ ] Burmese books default to Microsoft Thiha and also offer Microsoft Nilar;
+- [ ] `Start from Here` from the middle of a sentence;
+- [ ] `Read Selected Text` with an exact partial selection;
+- [ ] current-passage highlighting and scrolling; and
+- [ ] JavaScript syntax, cache-version changes and the amended-files ZIP.
 
 ## 4. Contents panel
 
