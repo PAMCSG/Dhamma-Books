@@ -282,7 +282,7 @@
   }
   async function speakOnlineBurmese(text, runToken) {
     try {
-      const response = await fetch('/api/burmese-tts', {
+      const response = await fetch('https://pamc-burmese-tts.pamc-yfl.workers.dev/api/burmese-tts', {
         method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({text})
       });
       if (!response.ok || runToken !== token) throw new Error(`Burmese TTS ${response.status}`);
