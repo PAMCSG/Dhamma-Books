@@ -86,7 +86,7 @@
   const labels = {
     zh:{title:'中文朗读',button:'朗读',close:'关闭朗读控制',start:'从此处开始',selection:'朗读所选文字',restart:'重新开始',pause:'暂停',resume:'继续',stop:'停止',rate:'速度',voice:'中文声音',automatic:'自动选择',paliVoice:'巴利语声音',indic:'优先印度语系声音（如有）',english:'英语声音',readPali:'朗读巴利经文',no:'不朗读',yes:'朗读',ready:'选择起点或所选文字；註释按钮和弹窗将略过。',done:'朗读完成。',stopped:'已停止朗读。',error:'朗读发生错误，请再试一次。',empty:'此处没有可朗读的内容。',noSelection:'请先选择要朗读的文字。'},
     en:{title:'Read Aloud',button:'Read aloud',close:'Close read-aloud controls',start:'Start from Here',selection:'Read Selected Text',restart:'Restart',pause:'Pause',resume:'Resume',stop:'Stop',rate:'Speed',voice:'English voice',automatic:'Automatic',paliVoice:'Pāli voice',indic:'Indic voice preferred (if available)',english:'English voice',readPali:'Read Pāli text',no:'No',yes:'Yes',ready:'Choose a starting point or selected text. Notes and popups are skipped.',done:'Reading complete.',stopped:'Reading stopped.',error:'A reading error occurred. Please try again.',empty:'No readable text here.',noSelection:'Please select the text to read first.'},
-    my:{title:'အသံဖြင့်ဖတ်ရန်',button:'အသံဖြင့်ဖတ်ရန်',close:'ပိတ်ရန်',start:'ဤနေရာမှစရန်',selection:'ရွေးထားသောစာကိုဖတ်ရန်',restart:'ပြန်စရန်',pause:'ခဏရပ်ရန်',resume:'ဆက်ဖတ်ရန်',stop:'ရပ်ရန်',rate:'အမြန်နှုန်း',voice:'မြန်မာအသံ',automatic:'အလိုအလျောက်',onlineVoice:'Microsoft Nilar အွန်လိုင်းအသံ',unavailableVoice:'မြန်မာအသံ မရှိပါ',paliVoice:'ပါဠိအသံ',indic:'အိန္ဒိယဘာသာအသံကို ဦးစားပေးရန်',english:'အင်္ဂလိပ်အသံ',readPali:'ပါဠိစာကိုဖတ်ရန်',no:'မဖတ်ပါ',yes:'ဖတ်ပါ',ready:'စတင်မည့်နေရာ သို့မဟုတ် ရွေးထားသောစာကို ရွေးပါ။',done:'ဖတ်ပြီးပါပြီ။',stopped:'ဖတ်ခြင်းရပ်လိုက်ပါပြီ။',error:'ဖတ်ရာတွင် အမှားဖြစ်ပါသည်။',onlineError:'အွန်လိုင်း မြန်မာအသံကို မရရှိနိုင်ပါ။ နောက်မှ ထပ်မံကြိုးစားပါ။',noVoice:'ဤစက် သို့မဟုတ် ဘရောက်ဇာတွင် မြန်မာအသံ မရှိပါ။',empty:'ဖတ်ရန်စာမရှိပါ။',noSelection:'ဖတ်ရန်စာကို အရင်ရွေးပါ။'}
+    my:{title:'အသံဖြင့်ဖတ်ရန်',button:'အသံဖြင့်ဖတ်ရန်',close:'ပိတ်ရန်',start:'ဤနေရာမှစရန်',selection:'ရွေးထားသောစာကိုဖတ်ရန်',restart:'ပြန်စရန်',pause:'ခဏရပ်ရန်',resume:'ဆက်ဖတ်ရန်',stop:'ရပ်ရန်',rate:'အမြန်နှုန်း',voice:'မြန်မာအသံ',automatic:'အလိုအလျောက်',onlineVoiceFemale:'Microsoft Nilar (အမျိုးသမီး)',onlineVoiceMale:'Microsoft Thiha (အမျိုးသား)',unavailableVoice:'မြန်မာအသံ မရှိပါ',paliVoice:'ပါဠိအသံ',indic:'အိန္ဒိယဘာသာအသံကို ဦးစားပေးရန်',english:'အင်္ဂလိပ်အသံ',readPali:'ပါဠိစာကိုဖတ်ရန်',no:'မဖတ်ပါ',yes:'ဖတ်ပါ',ready:'စတင်မည့်နေရာ သို့မဟုတ် ရွေးထားသောစာကို ရွေးပါ။',done:'ဖတ်ပြီးပါပြီ။',stopped:'ဖတ်ခြင်းရပ်လိုက်ပါပြီ။',error:'ဖတ်ရာတွင် အမှားဖြစ်ပါသည်။',onlineError:'အွန်လိုင်း မြန်မာအသံကို မရရှိနိုင်ပါ။ နောက်မှ ထပ်မံကြိုးစားပါ။',noVoice:'ဤစက် သို့မဟုတ် ဘရောက်ဇာတွင် မြန်မာအသံ မရှိပါ။',empty:'ဖတ်ရန်စာမရှိပါ။',noSelection:'ဖတ်ရန်စာကို အရင်ရွေးပါ။'}
   };
   let current = null, blocks = [], blockIndex = 0, chunks = [], chunkIndex = 0, token = 0, paused = false, active = false;
   let onlineAudio = null, onlineAudioUrl = '';
@@ -221,10 +221,13 @@
     const language = interfaceLanguage(), l = labels[language], voices = availableVoices(language);
     const saved = profile.load();
     const previous = voiceSelect.dataset.language === language ? voiceSelect.value : (loadLanguageVoice(language) || (language === 'zh' ? saved.voice : ''));
-    const onlineOptions = language === 'my' && azureBurmeseTrial ? [new Option(l.onlineVoice,'__azure_nilar__')] : [];
+    const onlineOptions = language === 'my' && azureBurmeseTrial ? [
+      new Option(l.onlineVoiceFemale,'__azure_nilar__'),
+      new Option(l.onlineVoiceMale,'__azure_thiha__')
+    ] : [];
     const automaticLabel = language === 'my' && !voices.length && !azureBurmeseTrial ? l.unavailableVoice : l.automatic;
     voiceSelect.replaceChildren(new Option(automaticLabel,''), ...onlineOptions, ...voices.map(voice => new Option(`${voice.name} (${voice.lang})`,voice.voiceURI)));
-    const voiceExists = voices.some(voice => voice.voiceURI === previous) || (azureBurmeseTrial && previous === '__azure_nilar__');
+    const voiceExists = voices.some(voice => voice.voiceURI === previous) || (azureBurmeseTrial && ['__azure_nilar__','__azure_thiha__'].includes(previous));
     voiceSelect.value = voiceExists ? previous : (language === 'my' && azureBurmeseTrial ? '__azure_nilar__' : '');
     voiceSelect.dataset.language = language;
     const paliVoices = profile.paliVoices(synth.getVoices()), paliPrevious = paliVoiceSelect.dataset.ready ? paliVoiceSelect.value : saved.paliVoice;
@@ -280,10 +283,11 @@
     });
     return chunks.filter(chunk => chunk.text);
   }
-  async function speakOnlineBurmese(text, runToken) {
+  async function speakOnlineBurmese(text, runToken, selectedVoice) {
     try {
+      const voice = selectedVoice === '__azure_thiha__' ? 'my-MM-ThihaNeural' : 'my-MM-NilarNeural';
       const response = await fetch('https://pamc-burmese-tts.pamc-yfl.workers.dev/api/burmese-tts', {
-        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({text})
+        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({text,voice})
       });
       if (!response.ok || runToken !== token) throw new Error(`Burmese TTS ${response.status}`);
       const blob = await response.blob();
@@ -309,8 +313,8 @@
     }
     const utterance = new SpeechSynthesisUtterance(chunk.text), voices = availableVoices(chunk.lang);
     const voice = voices.find(item => item.voiceURI === voiceSelect.value) || voices[0];
-    if (chunk.lang === 'my' && azureBurmeseTrial && (voiceSelect.value === '__azure_nilar__' || !voice)) {
-      speakOnlineBurmese(chunk.text, runToken); return;
+    if (chunk.lang === 'my' && azureBurmeseTrial && (voiceSelect.value.startsWith('__azure_') || !voice)) {
+      speakOnlineBurmese(chunk.text, runToken, voiceSelect.value); return;
     }
     utterance.lang = voice?.lang || (chunk.lang === 'zh' ? 'zh-CN' : chunk.lang === 'my' ? 'my-MM' : 'en-GB');
     utterance.rate = Number(rateSelect.value) || 1; if (voice) utterance.voice = voice;
