@@ -506,3 +506,7 @@ Use this instruction:
 
 - Use the right half of the PDF first-page spread for the cover and reference a newly named asset when replacing a previously published cover. Update both index and reader references.
 - Preserve each source line break and indentation in a converted legacy-font reader. Preserve emphatic spans in their source positions; use the source PDF to proof Pali and Burmese ligatures.
+
+### Legacy Burmese font conversion checks (2026-09-26)
+
+For PDFs using `Win---Researcher2`, `WinResearcher`, `WinKalaw`, or `WinTaungyi`, inspect the actual encoded glyph in its matching font before assigning Unicode. In this book the legacy `ç` glyph is Burmese punctuation `၊`; treating it as a vowel mark creates incorrect text throughout the reader. Check extracted PDF overprints and Unicode mark order separately. Automated checks of cluster validity do not establish word-by-word textual accuracy; compare suspicious passages against the rendered source PDF.
