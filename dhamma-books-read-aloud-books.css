@@ -21,6 +21,11 @@ body.db-only-way-reader-standard .db-searchbox{order:8}
 body.db-daily-chants-standard .db-readaloud-button{order:6}
 body.db-daily-chants-standard .db-bookmark-button{order:7}
 body.db-daily-chants-standard .db-searchbox{order:8}
+/* Pāḷi Chanting Book: A−, A+, Read Aloud, Book Mark, Search. */
+body.db-pali-chanting-reader-standard .db-readaloud-button{order:6!important}
+body.db-pali-chanting-reader-standard #bookmarkBtn{order:7!important}
+body.db-pali-chanting-reader-standard>.topbar .searchbox{order:8!important}
+body.db-pali-chanting-reader-standard .db-readaloud-button[aria-pressed="true"]{background:#fff!important;color:#67462f!important}
 body.db-paccayaniddeso-reader-standard .db-standard-controls{display:contents!important}
 body.db-paccayaniddeso-reader-standard .db-readaloud-button{order:6!important;flex:0 0 auto!important}
 body.db-paccayaniddeso-reader-standard :is(.db-bookmark-button,#db-bookmark-button,#bookmarkBtn){order:7!important}
