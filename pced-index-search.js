@@ -1,4 +1,4 @@
-/* PCED landing-page search v1.7.6 — exact Pāli/diacritic-aware and multilingual. */
+/* PCED landing-page search v1.7.7 — exact Pāli/diacritic-aware and multilingual. */
 (function (global) {
   'use strict';
 
@@ -139,24 +139,26 @@
       resolution: displayResolution };
   }
 
-  function renderGrammarNote(result) {
+  function renderGrammarNote(result, priority) {
+    const zh = priority === 'zh';
+    const analysis = value => esc(global.PCEDLookupCore?.localizedAnalysisText?.(value, priority) || value);
     const grammar = result?.grammar;
     if (!grammar) {
       if (result?.mode !== 'inflected') return '';
       const head = result.heads?.[0];
       const lemma = dictionary[head]?.headword || result.resolvedForm || head;
-      return '<div class="note"><b>Inflected form:</b> ' + esc(result.clicked || '') +
+      return '<div class="note"><b>' + (zh ? '词形变化：' : 'Inflected form:') + '</b> ' + esc(result.clicked || '') +
         ' → <b>' + esc(lemma || '') + '</b>' +
-        (result.rule ? '<br><span class="lookup-rule">' + esc(result.rule) + '</span>' : '') +
+        (result.rule ? '<br><span class="lookup-rule">' + analysis(result.rule) + '</span>' : '') +
         '</div>';
     }
     const lemma = dictionary[grammar.lemmaHead]?.headword || grammar.lemma;
-    return '<div class="note grammar-analysis"><b>Verb form:</b> ' + esc(result.clicked || grammar.surface) +
+    return '<div class="note grammar-analysis"><b>' + (zh ? '动词词形：' : 'Verb form:') + '</b> ' + esc(result.clicked || grammar.surface) +
       ' → <b>' + esc(lemma) + '</b>' +
-      (grammar.label ? '<br><span class="lookup-rule">' + esc(grammar.label) + '</span>' : '') +
-      (grammar.meaning ? '<br><span class="lookup-rule">Meaning: “' + esc(grammar.meaning) + '”</span>' : '') +
-      (grammar.formation ? '<br><span class="lookup-rule">Formation: ' + esc(grammar.formation) + '</span>' : '') +
-      (grammar.sourceNote ? '<br><span class="lookup-rule">Note: ' + esc(grammar.sourceNote) + '</span>' : '') +
+      (grammar.label ? '<br><span class="lookup-rule">' + analysis(grammar.label) + '</span>' : '') +
+      (grammar.meaning ? '<br><span class="lookup-rule">' + (zh ? '含义：' : 'Meaning: ') + '“' + analysis(grammar.meaning) + '”</span>' : '') +
+      (grammar.formation ? '<br><span class="lookup-rule">' + (zh ? '构词：' : 'Formation: ') + analysis(grammar.formation) + '</span>' : '') +
+      (grammar.sourceNote ? '<br><span class="lookup-rule">' + (zh ? '注：' : 'Note: ') + analysis(grammar.sourceNote) + '</span>' : '') +
       '</div>';
   }
 
@@ -379,7 +381,7 @@
         ? '<div class="note"><b>Diacritic-insensitive Pāli search:</b> ' + esc(query) +
           ' matched all exact spellings with possible Pāli diacritics.</div>' : '';
       return { query, heads: pali.heads, kind: 'pali', priority,
-        html: note + renderGrammarNote(pali.resolution) +
+        html: note + renderGrammarNote(pali.resolution, priority) +
           pali.heads.map(head => renderHead(head, priority)).join('') };
     }
     // A query made entirely of Roman Pāli characters is a headword request.
@@ -456,7 +458,7 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.6' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.7' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

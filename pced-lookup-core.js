@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.6 — 2026-09-29
+ * Version 3.9.7 — 2026-09-29
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.6';
+  const VERSION = '3.9.7';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -66,6 +66,42 @@
     'agacchi': Object.freeze([Object.freeze({ form: 'gacchati', label: 'Ajjatanī (aorist), third-person singular: went', family: 'Kaccāyana verb form', preferLemma: true })]),
     'agacchuṃ': Object.freeze([Object.freeze({ form: 'gacchati', label: 'Ajjatanī (aorist), third-person plural: went', family: 'Kaccāyana verb form', preferLemma: true })])
   });
+
+  // Keep resolver labels unchanged; translate only their display text.
+  function localizedAnalysisText(value, language = 'en') {
+    const text = String(value || '');
+    if (language !== 'zh' || !text) return text;
+    const translations = {
+      'Rājādigaṇa, genitive/dative singular: of/to the king': 'Rājādigaṇa（王等组），单数属格／与格：王的／给王',
+      'verified inflection': '已核实的词形变化',
+      'aorist 3rd person plural → present headword': '不定过去时第三人称复数 → 现在时词典原形',
+      'dictionary-attested past / aorist form': '词典中有记载的过去时／不定过去时形式',
+      'absolutive: having agreed/promised': '独立分词：已经同意／承诺',
+      'Hiyyattanī, third-person singular: went': 'Hiyyattanī（过去未完成时），第三人称单数：去了',
+      'Hiyyattanī, third-person plural: went': 'Hiyyattanī（过去未完成时），第三人称复数：去了',
+      'Ajjatanī (aorist), third-person singular: went': 'Ajjatanī（不定过去时），第三人称单数：去了',
+      'Ajjatanī (aorist), third-person plural: went': 'Ajjatanī（不定过去时），第三人称复数：去了',
+      'Third-person singular, present active': '现在时主动语态，第三人称单数',
+      'Third-person plural, present passive': '现在时被动语态，第三人称复数',
+      'Third-person plural, present verb': '现在时动词，第三人称复数',
+      'Third-person plural, future verb': '未来时动词，第三人称复数',
+      'goes': '去', 'are seen; appear': '被看见；出现',
+      'ñc = ṃ + c (niggahīta assimilation)': 'ñc = ṃ + c（鼻音同化）'
+    };
+    if (translations[text]) return translations[text];
+    const caseMatch = text.match(/^(Nominative|Vocative|Accusative|Instrumental|Dative|Ablative|Genitive|Locative) (Singular|Plural)$/i);
+    if (caseMatch) {
+      const cases = { nominative: '主格', vocative: '呼格', accusative: '宾格', instrumental: '具格',
+        dative: '与格', ablative: '从格', genitive: '属格', locative: '处格' };
+      return (caseMatch[2].toLowerCase() === 'singular' ? '单数' : '复数') + cases[caseMatch[1].toLowerCase()];
+    }
+    const verbMatch = text.match(/^third-person plural, (present|future)$/i);
+    if (verbMatch) return (verbMatch[1].toLowerCase() === 'future' ? '未来时' : '现在时') + '，第三人称复数';
+    if (/^-[a-zāīūṅñṭḍṇḷṃ]+ → (?:-[a-zāīūṅñṭḍṇḷṃ]+|PCED citation -[a-zāīūṅñṭḍṇḷṃ]+)$/iu.test(text)) {
+      return '词尾变化：' + text.replace('PCED citation', 'PCED 词典原形');
+    }
+    return text;
+  }
 
   // These complete PCED headwords are absent from the reduced web extract but
   // are present in PCED 2.0.5.0 and in the project's verified Inflection
@@ -1069,6 +1105,7 @@
     approvedTermMatches,
     classifySourceEntry,
     dictionaryGroups,
+    localizedAnalysisText,
     inflectionParadigm,
     verifiedDecompositions: BUILTIN_DECOMPOSITIONS
   });

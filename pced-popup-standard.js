@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.7 — 2026-09-29 */
+/* PAMC cross-book PCED popup standard v1.8.8 — 2026-09-29 */
 (function () {
   'use strict';
 
@@ -50,8 +50,7 @@
   function ensureMorphology() {
     if (morphologyPromise) return morphologyPromise;
     const load = (filename, version) => new Promise(resolve => {
-      const existing = document.querySelector('script[src*="' + filename + '"]');
-      if (existing) { resolve(); return; }
+      // Reload a shared script when the book HTML supplied an older version.
       const loader = document.createElement('script');
       loader.src = new URL(filename + '?v=' + version, script?.src || location.href).href;
       loader.addEventListener('load', resolve, { once: true });
@@ -60,7 +59,7 @@
     });
     morphologyPromise = Promise.resolve()
       .then(() => window.KaccayanaDeclension?.VERSION === '1.5.1' ? null : load('kaccayana-declension.js', '1.5.1'))
-      .then(() => core()?.version === '3.9.6' ? null : load('pced-lookup-core.js', '3.9.6'))
+      .then(() => core()?.version === '3.9.7' ? null : load('pced-lookup-core.js', '3.9.7'))
       .then(() => window.PaliLookupMorphology ? null : load('pali-lookup-morphology.js', '2.0-unicode-trial'))
       .then(() => window.PaliLookupMorphology || null);
     return morphologyPromise;
@@ -306,20 +305,22 @@
       ? suppliedRows : approvedWordRows(surface, result)).filter(isSingleWordRecord);
     const shown = heads.map(head => dictionary()[head]?.headword || head).join(', ');
     const parts = (result.components || []).map(item => item.surface).join(' + ');
+    const zh = primaryLanguage === 'zh';
+    const analysis = value => esc(core()?.localizedAnalysisText?.(value, primaryLanguage) || value);
     let note = '';
     if (result.mode === 'exact' && result.grammar) {
       const grammar = result.grammar;
       const lemma = dictionary()[grammar.lemmaHead]?.headword || grammar.lemma;
-      note = '<div class="note grammar-analysis"><b>Verb form:</b> ' + esc(surface) +
+      note = '<div class="note grammar-analysis"><b>' + (zh ? '动词词形：' : 'Verb form:') + '</b> ' + esc(surface) +
         ' → <b>' + esc(lemma) + '</b>' +
-        (grammar.label ? '<br><span class="lookup-rule">' + esc(grammar.label) + '</span>' : '') +
-        (grammar.meaning ? '<br><span class="lookup-rule">Meaning: “' + esc(grammar.meaning) + '”</span>' : '') +
-        (grammar.formation ? '<br><span class="lookup-rule">Formation: ' + esc(grammar.formation) + '</span>' : '') +
-        (grammar.sourceNote ? '<br><span class="lookup-rule">Note: ' + esc(grammar.sourceNote) + '</span>' : '') +
+        (grammar.label ? '<br><span class="lookup-rule">' + analysis(grammar.label) + '</span>' : '') +
+        (grammar.meaning ? '<br><span class="lookup-rule">' + (zh ? '含义：' : 'Meaning: ') + '“' + analysis(grammar.meaning) + '”</span>' : '') +
+        (grammar.formation ? '<br><span class="lookup-rule">' + (zh ? '构词：' : 'Formation: ') + analysis(grammar.formation) + '</span>' : '') +
+        (grammar.sourceNote ? '<br><span class="lookup-rule">' + (zh ? '注：' : 'Note: ') + analysis(grammar.sourceNote) + '</span>' : '') +
         '</div>';
-    } else if (result.mode === 'inflected') note = '<div class="note"><b>Inflected form:</b> ' + esc(surface) +
+    } else if (result.mode === 'inflected') note = '<div class="note"><b>' + (zh ? '词形变化：' : 'Inflected form:') + '</b> ' + esc(surface) +
       ' → <b>' + esc(dictionary()[heads[0]]?.headword || result.resolvedForm || shown) + '</b>' +
-      (result.rule ? '<br><span class="lookup-rule">' + esc(result.rule) + '</span>' : '') + '</div>';
+      (result.rule ? '<br><span class="lookup-rule">' + analysis(result.rule) + '</span>' : '') + '</div>';
     else if (result.mode === 'alias' || result.mode === 'related') note = '<div class="note"><b>PCED form:</b> ' +
       esc(surface) + ' → <b>' + esc(shown) + '</b></div>';
     else if (result.mode === 'compound' || result.mode === 'sandhi' || parts) note = '<div class="note"><b>' +
@@ -613,6 +614,10 @@
   function preferredDictionaryLanguage() {
     if (mode === 'reader' || chineseTipitakaEnabledForBook()) return 'zh';
     const language = contextLanguage().split('-')[0];
+    if (language === 'zh') return 'zh';
+    // A Pāli word inside a Chinese book may itself have `lang="pi"`.
+    if (['pi', 'pli', 'pali', ''].includes(language) &&
+        /^zh(?:-|$)/i.test(document.documentElement.lang || '')) return 'zh';
     return ['en', 'my'].includes(language) ? language : 'en';
   }
 
