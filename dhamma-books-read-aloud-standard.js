@@ -41,38 +41,44 @@
   function makePanelMovable(panel, handle, toolbar) {
     if (!panel || !handle || panel.dataset.readAloudMovable) return;
     panel.dataset.readAloudMovable = 'true';
-    handle.style.cursor = 'grab';
+    const cursorTargets = [handle, ...handle.querySelectorAll('h2')];
+    function showMoveCursor(cursor) {
+      cursorTargets.forEach(target => target.style.setProperty('cursor', cursor, 'important'));
+    }
+    showMoveCursor('move');
     handle.style.touchAction = 'none';
     handle.title = 'Drag to move / 拖动以移动朗读窗口';
     handle.tabIndex = 0;
     handle.setAttribute('aria-label', 'Move read-aloud window with arrow keys / 使用方向键移动朗读窗口');
 
-    const margin = 8;
     let moved = false;
     let pointerId = null;
     let offsetX = 0;
     let offsetY = 0;
     let naturalWidth = null;
-    const clamp = (value, low, high) => Math.min(Math.max(value, low), high);
-    function bounds() {
-      const top = toolbar?.getBoundingClientRect().bottom || 0;
-      const minTop = Math.min(Math.max(margin, top + margin), Math.max(margin, innerHeight - 60));
-      return { minTop, maxTop: Math.max(minTop, innerHeight - 60) };
-    }
+    const dragCursorStyle = document.createElement('style');
+    dragCursorStyle.textContent = 'html, html * { cursor: grabbing !important; }';
     function place(x, y) {
-      const { minTop, maxTop } = bounds();
       if (naturalWidth === null) naturalWidth = panel.getBoundingClientRect().width;
       panel.style.boxSizing = 'border-box';
-      panel.style.width = `${Math.min(naturalWidth, innerWidth - margin * 2)}px`;
-      const left = clamp(x, margin, Math.max(margin, innerWidth - panel.getBoundingClientRect().width - margin));
-      const top = clamp(y, minTop, maxTop);
-      panel.style.left = `${Math.round(left)}px`;
-      panel.style.top = `${Math.round(top)}px`;
+      panel.style.width = `${Math.min(naturalWidth, innerWidth - 16)}px`;
+      panel.style.left = `${Math.round(x)}px`;
+      panel.style.top = `${Math.round(y)}px`;
       panel.style.right = 'auto';
-      panel.style.maxHeight = `${Math.max(52, innerHeight - top - margin)}px`;
+      panel.style.maxHeight = `${Math.max(52, innerHeight - y - 8)}px`;
       panel.style.overflow = 'auto';
       moved = true;
     }
+    // If the title bar is entirely outside the viewport, the read-aloud icon
+    // can still close and reopen the panel to restore its original position.
+    new MutationObserver(() => {
+      if (panel.hidden || !moved) return;
+      const rect = handle.getBoundingClientRect();
+      if (rect.right > 0 && rect.left < innerWidth && rect.bottom > 0 && rect.top < innerHeight) return;
+      for (const property of ['left', 'top', 'right', 'width', 'maxHeight', 'overflow', 'boxSizing']) panel.style[property] = '';
+      moved = false;
+      naturalWidth = null;
+    }).observe(panel, { attributes: true, attributeFilter: ['hidden'] });
     handle.addEventListener('pointerdown', event => {
       if (event.button !== 0 || event.target.closest('button,a,input,select,textarea')) return;
       const rect = panel.getBoundingClientRect();
@@ -80,7 +86,8 @@
       offsetX = event.clientX - rect.left;
       offsetY = event.clientY - rect.top;
       handle.setPointerCapture(pointerId);
-      handle.style.cursor = 'grabbing';
+      showMoveCursor('grabbing');
+      document.head.append(dragCursorStyle);
       event.preventDefault();
     });
     handle.addEventListener('pointermove', event => {
@@ -89,7 +96,8 @@
     function endDrag(event) {
       if (event.pointerId !== pointerId) return;
       pointerId = null;
-      handle.style.cursor = 'grab';
+      showMoveCursor('move');
+      dragCursorStyle.remove();
       if (handle.hasPointerCapture(event.pointerId)) handle.releasePointerCapture(event.pointerId);
     }
     handle.addEventListener('pointerup', endDrag);
@@ -103,10 +111,7 @@
       event.preventDefault();
     });
     addEventListener('resize', () => {
-      if (moved) {
-        const rect = panel.getBoundingClientRect();
-        place(rect.left, rect.top);
-      }
+      if (moved) panel.style.width = `${Math.min(naturalWidth, innerWidth - 16)}px`;
     }, { passive: true });
   }
 
