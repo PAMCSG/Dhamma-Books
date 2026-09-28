@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.8 — 2026-09-29 */
+/* PAMC cross-book PCED popup standard v1.8.9 — 2026-09-29 */
 (function () {
   'use strict';
 
@@ -59,7 +59,7 @@
     });
     morphologyPromise = Promise.resolve()
       .then(() => window.KaccayanaDeclension?.VERSION === '1.5.1' ? null : load('kaccayana-declension.js', '1.5.1'))
-      .then(() => core()?.version === '3.9.7' ? null : load('pced-lookup-core.js', '3.9.7'))
+      .then(() => core()?.version === '3.9.8' ? null : load('pced-lookup-core.js', '3.9.8'))
       .then(() => window.PaliLookupMorphology ? null : load('pali-lookup-morphology.js', '2.0-unicode-trial'))
       .then(() => window.PaliLookupMorphology || null);
     return morphologyPromise;
@@ -266,7 +266,10 @@
     ).join(' ');
     let content = '';
     for (const group of paradigm.groups || []) {
-      content += '<div class="pced-inflection-group"><b>' + esc(localizedGroupLabel(group.label, primaryLanguage, group, paradigm.lemma)) + '</b>';
+      const groupLabel = paradigm.kind === 'verb'
+        ? core().localizedVerbGroupLabel(group.label, primaryLanguage)
+        : localizedGroupLabel(group.label, primaryLanguage, group, paradigm.lemma);
+      content += '<div class="pced-inflection-group"><b>' + esc(groupLabel) + '</b>';
       if (group.rows) {
         const hasPlural = group.rows.some(row => row.plural?.length);
         content += '<div class="pced-inflection-table-wrap"><table class="pced-inflection-table">' +
@@ -282,7 +285,8 @@
     }
     if (paradigm.formSystem === 'kaccayana') {
       if (paradigm.kind === 'verb') {
-        content += '<div class="pced-inflection-caution">动词词形 / Verb forms: ' + esc(paradigm.formSource) + '</div>';
+        content += '<div class="pced-inflection-caution">' + (primaryLanguage === 'zh' ? '动词词形来源：' : 'Verb forms: ') +
+          esc(primaryLanguage === 'zh' ? paradigm.formSourceZh : paradigm.formSource) + '</div>';
       } else {
         content += '<div class="pced-inflection-caution">性别及词干识别 / Gender and stem identification: ' + esc(paradigm.classificationSource || 'Pali Lookup version 2.0') + '</div>' +
           '<div class="pced-inflection-caution">变格组及词形 / Declension group and forms: ' + esc(paradigm.formSource) + '</div>';

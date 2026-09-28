@@ -1,4 +1,4 @@
-/* PCED landing-page search v1.7.7 — exact Pāli/diacritic-aware and multilingual. */
+/* PCED landing-page search v1.7.8 — exact Pāli/diacritic-aware and multilingual. */
 (function (global) {
   'use strict';
 
@@ -248,7 +248,10 @@
     ).join(' ');
     let content = '';
     for (const group of paradigm.groups || []) {
-      content += '<div class="pced-inflection-group"><b>' + esc(localizedGroupLabel(group.label, priority, group, paradigm.lemma)) + '</b>';
+      const groupLabel = paradigm.kind === 'verb'
+        ? global.PCEDLookupCore.localizedVerbGroupLabel(group.label, priority)
+        : localizedGroupLabel(group.label, priority, group, paradigm.lemma);
+      content += '<div class="pced-inflection-group"><b>' + esc(groupLabel) + '</b>';
       if (group.rows) {
         const hasPlural = group.rows.some(row => row.plural?.length);
         content += '<div class="pced-inflection-table-wrap"><table class="pced-inflection-table">' +
@@ -262,7 +265,8 @@
     }
     if (paradigm.formSystem === 'kaccayana') {
       if (paradigm.kind === 'verb') {
-        content += '<div class="pced-inflection-caution">动词词形 / Verb forms: ' + esc(paradigm.formSource) + '</div>';
+        content += '<div class="pced-inflection-caution">' + (priority === 'zh' ? '动词词形来源：' : 'Verb forms: ') +
+          esc(priority === 'zh' ? paradigm.formSourceZh : paradigm.formSource) + '</div>';
       } else {
         content += '<div class="pced-inflection-caution">性别及词干识别 / Gender and stem identification: ' + esc(paradigm.classificationSource || 'Pali Lookup version 2.0') + '</div>' +
           '<div class="pced-inflection-caution">变格组及词形 / Declension group and forms: ' + esc(paradigm.formSource) + '</div>';
@@ -458,7 +462,7 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.7' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.8' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

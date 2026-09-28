@@ -23,10 +23,13 @@ The teacher's 13 groups are a pedagogical synthesis of the Kaccāyana tradition,
 not a verbatim 13-item chapter in the root grammar. Some tables also expressly
 refer to Rūpasiddhi; the interface therefore calls the output “Kaccāyana-based”.
 
-For verbs, Bhante U Janakābhivaṃsa's uploaded verb-ending table supplies the
-eight tense/mood ending sets, while the *Ākhyāta Kappa* supplies their rules and
-examples. PCED dictionary entries supply explicitly attested lexical past
-forms. These three roles must remain distinguishable.
+For verbs, PCED identifies the lemma and explicitly labels some past forms.
+The lookup's regular ending templates generate possible forms from that lemma;
+they are not a transcription of Bhante U Janakābhivaṃsa's declension note.
+The *Ākhyāta Kappa* supplies grammatical rules and examples. In particular,
+rule 504 explains the Ajjatanī third-plural ending `-iṃsu`. Complete forms
+`vihariṃsu` and `ussahiṃsu` are separately attested in DN 5; their stems are
+not inferred merely by applying the ending rule.
 
 ## Runtime decision sequence
 
@@ -46,16 +49,26 @@ forms. These three roles must remain distinguishable.
    maintained teacher/Kaccāyana family before considering noun declension.
 3. Generate regular present, imperative, optative, future, participle,
    absolutive and infinitive groups only for a reliably identified verb.
-4. For irregular and transformed past systems, prefer complete maintained
-   teacher/Kaccāyana forms.
+4. For irregular and transformed past systems, prefer complete attested
+   Kaccāyana forms and individually checked canonical examples.
 5. Additionally index only forms explicitly labelled `【过】`, `【過】`,
    `[aor]`, `[aorist]`, or `[past]` inside the PCED verb entry.
 6. Never infer an irregular past stem from the present spelling alone. Do not
    extract translated prose or accept a past candidate by substring matching.
+7. Map the verified DN 5 forms `vihariṃsu` → `viharati` and `ussahiṃsu` →
+   `ussahati` only when the destination lemma exists in PCED. Display these
+   complete forms in their own attested Ajjatanī third-plural group. Do not
+   apply `-iṃsu` to arbitrary dictionary lemmas.
 
 For a recognized verb display:
 
-`动词词形 / Verb forms: Bhante U Janakābhivaṃsa’s verb table; Kaccāyana Pāli Vyākaraṇaṁ, Ākhyāta Kappa`
+The verb source line is assembled for the forms actually shown. Regular
+templates are attributed to the PCED lemma; explicit PCED past citations,
+maintained Kaccāyana examples, and the DN 5 / rule 504 third-plural forms
+appear there only when present in that lemma's table.
+
+In Chinese priority and Chinese books, the verb group headings and this
+source explanation display in Chinese. The Pāli word forms stay in Pāli.
 
 Explicit PCED past citations are placed in:
 

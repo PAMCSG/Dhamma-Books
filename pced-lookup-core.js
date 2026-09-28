@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.7 — 2026-09-29
+ * Version 3.9.8 — 2026-09-29
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.7';
+  const VERSION = '3.9.8';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -59,6 +59,17 @@
       form: 'paṭissuṇāti', label: 'absolutive: having agreed/promised',
       family: 'verified verb form', preferLemma: true
     })]),
+    // Both complete forms occur in DN 5. Kaccāyana, Ākhyāta 504 explains
+    // the Ajjatanī third-plural -uṃ → -iṃsu ending. Do not invert this
+    // spelling for arbitrary verbs: the stem must be established separately.
+    'vihariṃsu': Object.freeze([Object.freeze({
+      form: 'viharati', label: 'Ajjatanī (aorist), third-person plural (DN 5; Kaccāyana 504)',
+      family: 'text-attested Kaccāyana verb form', preferLemma: true
+    })]),
+    'ussahiṃsu': Object.freeze([Object.freeze({
+      form: 'ussahati', label: 'Ajjatanī (aorist), third-person plural (DN 5; Kaccāyana 504)',
+      family: 'text-attested Kaccāyana verb form', preferLemma: true
+    })]),
     'agamā': Object.freeze([Object.freeze({ form: 'gacchati', label: 'Hiyyattanī, third-person singular: went', family: 'Kaccāyana verb form', preferLemma: true })]),
     'agamū': Object.freeze([Object.freeze({ form: 'gacchati', label: 'Hiyyattanī, third-person plural: went', family: 'Kaccāyana verb form', preferLemma: true })]),
     'agamī': Object.freeze([Object.freeze({ form: 'gacchati', label: 'Ajjatanī (aorist), third-person singular: went', family: 'Kaccāyana verb form', preferLemma: true })]),
@@ -81,6 +92,7 @@
       'Hiyyattanī, third-person plural: went': 'Hiyyattanī（过去未完成时），第三人称复数：去了',
       'Ajjatanī (aorist), third-person singular: went': 'Ajjatanī（不定过去时），第三人称单数：去了',
       'Ajjatanī (aorist), third-person plural: went': 'Ajjatanī（不定过去时），第三人称复数：去了',
+      'Ajjatanī (aorist), third-person plural (DN 5; Kaccāyana 504)': 'Ajjatanī（不定过去时），第三人称复数（《长部》第 5 经；迦旃延第 504 则）',
       'Third-person singular, present active': '现在时主动语态，第三人称单数',
       'Third-person plural, present passive': '现在时被动语态，第三人称复数',
       'Third-person plural, present verb': '现在时动词，第三人称复数',
@@ -101,6 +113,28 @@
       return '词尾变化：' + text.replace('PCED citation', 'PCED 词典原形');
     }
     return text;
+  }
+
+  function localizedVerbGroupLabel(label, language = 'en') {
+    const value = String(label || '');
+    if (language !== 'zh') return value;
+    const labels = {
+      'Present: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl': '现在时：第三人称单数、复数；第二人称单数、复数；第一人称单数、复数',
+      'Present (Vattamānā): 3sg, 3pl, 2sg, 2pl, 1sg, 1pl': '现在时（Vattamānā）：第三人称单数、复数；第二人称单数、复数；第一人称单数、复数',
+      'Past imperfect (Hiyyattanī)': '过去未完成时（Hiyyattanī）',
+      'Aorist / recent past (Ajjatanī)': '不定过去时（Ajjatanī）',
+      'Ajjatanī / Aorist (dictionary-attested)': '不定过去时（Ajjatanī；PCED 词典记载）',
+      'Ajjatanī / Aorist, third-person plural (DN 5; Kaccāyana 504)': '不定过去时（Ajjatanī），第三人称复数（《长部》第 5 经；迦旃延第 504 则）',
+      'Imperative': '命令式',
+      'Imperative (Pañcamī)': '命令式（Pañcamī）',
+      'Optative': '祈愿式',
+      'Optative (Sattamī)': '祈愿式（Sattamī）',
+      'Future': '未来时',
+      'Future (Bhavissanti)': '未来时（Bhavissanti）',
+      'Present participle': '现在分词',
+      'Absolutive / infinitive': '独立分词／不定式'
+    };
+    return labels[value] || value;
   }
 
   // These complete PCED headwords are absent from the reduced web extract but
@@ -142,6 +176,13 @@
       Object.freeze({ label: 'Optative (Sattamī)', forms: Object.freeze(['gaccheyya', 'gaccheyyuṃ', 'gaccheyyāsi', 'gaccheyyātha', 'gaccheyyāmi', 'gaccheyyāma']) }),
       Object.freeze({ label: 'Future (Bhavissanti)', forms: Object.freeze(['gacchissati', 'gacchissanti', 'gacchissasi', 'gacchissatha', 'gacchissāmi', 'gacchissāma']) })
     ])
+  });
+
+  // These forms are verified in DN 5. Rule 504 accounts for the third-plural
+  // ending; the complete stems are checked against the text and PCED lemmas.
+  const TEXT_ATTESTED_AORIST_PLURAL = Object.freeze({
+    viharati: 'vihariṃsu',
+    ussahati: 'ussahiṃsu'
   });
 
   // Curated analyses are reserved for forms whose inherited dictionary
@@ -1078,6 +1119,32 @@
         else verbGroups.push(pastGroup);
       }
     }
+    if (verbGroups.length && TEXT_ATTESTED_AORIST_PLURAL[lemma]) {
+      const form = TEXT_ATTESTED_AORIST_PLURAL[lemma];
+      const existingPast = verbGroups.some(group => /past|aorist|ajjatanī|hiyyattanī/i.test(group.label) && group.forms?.includes(form));
+      if (!existingPast) {
+        const group = { label: 'Ajjatanī / Aorist, third-person plural (DN 5; Kaccāyana 504)', forms: [form] };
+        const futureIndex = verbGroups.findIndex(item => /^Future/.test(item.label));
+        if (futureIndex >= 0) verbGroups.splice(futureIndex, 0, group);
+        else verbGroups.push(group);
+      }
+    }
+    const verbSource = verbGroups.length ? [
+      KACCAYANA_VERB_PARADIGMS[lemma]
+        ? 'Maintained Kaccāyana verb examples (Ākhyāta chapter)'
+        : 'Regular forms generated from the PCED verb lemma',
+      ...(attestedPast.length ? ['Past forms explicitly cited in PCED'] : []),
+      ...(TEXT_ATTESTED_AORIST_PLURAL[lemma]
+        ? ['Third-person plural attested in DN 5; -iṃsu ending in Kaccāyana Ākhyāta rule 504'] : [])
+    ].join('; ') : '';
+    const verbSourceZh = verbGroups.length ? [
+      KACCAYANA_VERB_PARADIGMS[lemma]
+        ? '《迦旃延巴利文法》动词篇中已核实的动词例子'
+        : '规则词形依 PCED 动词词典原形生成',
+      ...(attestedPast.length ? ['过去时词形由 PCED 词典明确记载'] : []),
+      ...(TEXT_ATTESTED_AORIST_PLURAL[lemma]
+        ? ['第三人称复数见《长部》第 5 经；-iṃsu 词尾见《迦旃延巴利文法》动词篇第 504 则'] : [])
+    ].join('；') : '';
     const verified = verifiedFormsForLemma(lemma, options);
     if (!nounGroups.length && !verbGroups.length && !verified.length) return null;
     return {
@@ -1088,8 +1155,9 @@
       generated: !!(verbGroups.length || nounGroups.length),
       formSystem: verbGroups.length ? 'kaccayana' : kaccayana?.groups?.length ? 'kaccayana' : reliableNounGroups?.length ? 'pali-lookup' : 'generated',
       formSource: verbGroups.length
-        ? 'Bhante U Janakābhivaṃsa’s verb table; Kaccāyana Pāli Vyākaraṇaṁ, Ākhyāta Kappa'
+        ? verbSource
         : kaccayana?.formSource || (reliableNounGroups?.length ? 'Pali Lookup version 2.0' : ''),
+      formSourceZh: verbSourceZh,
       classificationSource: kaccayana?.classificationSource || '',
       morphologySource: reliableNounGroups?.length ? global.PaliLookupMorphology?.source : ''
     };
@@ -1106,6 +1174,7 @@
     classifySourceEntry,
     dictionaryGroups,
     localizedAnalysisText,
+    localizedVerbGroupLabel,
     inflectionParadigm,
     verifiedDecompositions: BUILTIN_DECOMPOSITIONS
   });
