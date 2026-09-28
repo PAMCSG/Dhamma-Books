@@ -37,6 +37,79 @@
     return next;
   }
 
+  // Keep each book's read-aloud controls movable without changing speech playback.
+  function makePanelMovable(panel, handle, toolbar) {
+    if (!panel || !handle || panel.dataset.readAloudMovable) return;
+    panel.dataset.readAloudMovable = 'true';
+    handle.style.cursor = 'grab';
+    handle.style.touchAction = 'none';
+    handle.title = 'Drag to move / 拖动以移动朗读窗口';
+    handle.tabIndex = 0;
+    handle.setAttribute('aria-label', 'Move read-aloud window with arrow keys / 使用方向键移动朗读窗口');
+
+    const margin = 8;
+    let moved = false;
+    let pointerId = null;
+    let offsetX = 0;
+    let offsetY = 0;
+    let naturalWidth = null;
+    const clamp = (value, low, high) => Math.min(Math.max(value, low), high);
+    function bounds() {
+      const top = toolbar?.getBoundingClientRect().bottom || 0;
+      const minTop = Math.min(Math.max(margin, top + margin), Math.max(margin, innerHeight - 60));
+      return { minTop, maxTop: Math.max(minTop, innerHeight - 60) };
+    }
+    function place(x, y) {
+      const { minTop, maxTop } = bounds();
+      if (naturalWidth === null) naturalWidth = panel.getBoundingClientRect().width;
+      panel.style.boxSizing = 'border-box';
+      panel.style.width = `${Math.min(naturalWidth, innerWidth - margin * 2)}px`;
+      const left = clamp(x, margin, Math.max(margin, innerWidth - panel.getBoundingClientRect().width - margin));
+      const top = clamp(y, minTop, maxTop);
+      panel.style.left = `${Math.round(left)}px`;
+      panel.style.top = `${Math.round(top)}px`;
+      panel.style.right = 'auto';
+      panel.style.maxHeight = `${Math.max(52, innerHeight - top - margin)}px`;
+      panel.style.overflow = 'auto';
+      moved = true;
+    }
+    handle.addEventListener('pointerdown', event => {
+      if (event.button !== 0 || event.target.closest('button,a,input,select,textarea')) return;
+      const rect = panel.getBoundingClientRect();
+      pointerId = event.pointerId;
+      offsetX = event.clientX - rect.left;
+      offsetY = event.clientY - rect.top;
+      handle.setPointerCapture(pointerId);
+      handle.style.cursor = 'grabbing';
+      event.preventDefault();
+    });
+    handle.addEventListener('pointermove', event => {
+      if (event.pointerId === pointerId) place(event.clientX - offsetX, event.clientY - offsetY);
+    });
+    function endDrag(event) {
+      if (event.pointerId !== pointerId) return;
+      pointerId = null;
+      handle.style.cursor = 'grab';
+      if (handle.hasPointerCapture(event.pointerId)) handle.releasePointerCapture(event.pointerId);
+    }
+    handle.addEventListener('pointerup', endDrag);
+    handle.addEventListener('pointercancel', endDrag);
+    handle.addEventListener('keydown', event => {
+      const step = event.shiftKey ? 48 : 16;
+      const delta = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[event.key];
+      if (!delta || event.target !== handle) return;
+      const rect = panel.getBoundingClientRect();
+      place(rect.left + delta[0], rect.top + delta[1]);
+      event.preventDefault();
+    });
+    addEventListener('resize', () => {
+      if (moved) {
+        const rect = panel.getBoundingClientRect();
+        place(rect.left, rect.top);
+      }
+    }, { passive: true });
+  }
+
   function applyToUtterance(utterance, voices, settings) {
     const voice = chooseVoice(voices, settings.voice);
     if (voice) utterance.voice = voice;
@@ -210,6 +283,10 @@
     choosePaliVoice,
     paliBlocks,
     makeUtterance,
-    speakWithFallback
+    speakWithFallback,
+    makePanelMovable
   });
+  // The two Hanyu Pinyin editions include their read-aloud panels in the HTML.
+  const inlinePanel = document.getElementById('read-aloud-panel');
+  if (inlinePanel) makePanelMovable(inlinePanel, inlinePanel.querySelector('.read-aloud-panel-head'), document.querySelector('.topbar'));
 })(window);

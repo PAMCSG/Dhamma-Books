@@ -74,6 +74,7 @@
     + '<label for="db-readaloud-voice"></label><select id="db-readaloud-voice"></select><label for="db-readaloud-pali-voice"></label><select id="db-readaloud-pali-voice"></select>'
     + '<label for="db-readaloud-read-pali"></label><select id="db-readaloud-read-pali"><option value="no"></option><option value="yes"></option></select></div><p class="db-readaloud-status" role="status" aria-live="polite"></p>';
   topbar.insertAdjacentElement('afterend', panel);
+  profile.makePanelMovable(panel, panel.querySelector('.db-readaloud-head'), topbar);
 
   const get = selector => panel.querySelector(selector);
   const title = get('h2');

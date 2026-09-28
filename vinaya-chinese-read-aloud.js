@@ -26,6 +26,7 @@
   const reader=document.getElementById('reader-main');
   const header=document.querySelector('.topbar');
   if(!panel||!openButton||!reader)return;
+  window.DhammaBooksReadAloudVoice?.makePanelMovable(panel,panel.querySelector('.read-aloud-panel-head'),header);
   const supported=Boolean(synth&&window.SpeechSynthesisUtterance);
   const blockSelector='.chapter-title,.section-title,.book-heading,.source-paragraph,.single-text,.numbered-item,.rule-item,.ch10-chinese-line,.source-meaning,.opening-quotation,.copyright-line,.copyright-notice li,.translation-cell,.zh-text,.chinese-cell,.prose-zh-cell';
   const excludedSelector='rt,.pinyin,.heading-en,.toc-en,.pali-source-line,.ch10-pali-line,.pali-cell,.footnote-ref,button,[hidden],[aria-hidden="true"],.proof-marker';
