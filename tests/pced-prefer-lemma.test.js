@@ -11,7 +11,9 @@ const dictionary = {
   'paṭissutvā': { headword: 'paṭissutvā', zh: [], en: [], my: [{ definition: 'surface entry' }] },
   'paṭissuṇitvā': { headword: 'paṭissuṇitvā', zh: [], en: [], my: [{ definition: 'surface entry' }] },
   'paṭissuṇāti': { headword: 'paṭissuṇāti', zh: [], en: [{ definition: 'agrees; promises' }], my: [] },
-  gacchati: { headword: 'gacchati', zh: [], en: [{ definition: 'goes' }], my: [] }
+  gacchati: { headword: 'gacchati', zh: [], en: [{ definition: 'goes' }], my: [] },
+  rāja: { headword: 'rāja', zh: [], en: [{ definition: 'king' }], my: [] },
+  rañño: { headword: 'rañño', zh: [], en: [{ definition: 'of the king' }], my: [] }
 };
 const options = { dictionary, index: core.createExactIndex(dictionary) };
 
@@ -25,5 +27,10 @@ for (const surface of ['paṭisuṇitvā', 'paṭissuṇitvā', 'paṭissutvā']
 
 const ordinaryExact = core.resolve('gacchati', options);
 assert.deepStrictEqual(Array.from(ordinaryExact.heads), ['gacchati'], 'ordinary exact lookup changed');
+
+const kingGenitive = core.resolve('rañño', options);
+assert.strictEqual(kingGenitive.mode, 'inflected');
+assert.deepStrictEqual(Array.from(kingGenitive.heads), ['rāja']);
+assert.strictEqual(kingGenitive.resolvedForm, 'rāja');
 
 console.log('Verified preferLemma override and ordinary exact-first lookup.');

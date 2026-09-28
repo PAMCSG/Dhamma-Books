@@ -1,4 +1,4 @@
-/* PAMC Kaccayana-based nominal declension generator v1.5.0 — 2026-09-20
+/* PAMC Kaccayana-based nominal declension generator v1.5.1 — 2026-09-29
  *
  * Classification input: Pali Lookup 2.0 morphology (lemma, gender, stem class).
  * Forms: Bhante U Janakabhivamsa, "13 Groups - List of Declension" (July 2019),
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '1.5.0';
+  const VERSION = '1.5.1';
   const SOURCE = "Bhante U Janakābhivaṃsa’s Kaccāyana-based 13 Groups of Declension";
   const GROUPS = Object.freeze({
     1: 'Purisādigaṇa', 2: 'Cittādigaṇa', 3: 'Kaññādigaṇa', 4: 'Pumādigaṇa',
@@ -83,13 +83,52 @@
     return null;
   }
   function specialGroup5(lemma) {
-    if (lemma !== 'rāja') return null;
-    return explicit(5, 'Masculine noun, special "a" declension', 'm', [
-      [['rājā'], ['rājāno']], [['rāja', 'rājā'], ['rājāno']], [['rājānaṃ', 'rājaṃ'], ['rājāno']],
-      [['raññā', 'rājinā', 'rājena'], ['rājūhi', 'rājūbhi', 'rājehi', 'rājebhi']],
-      [['rañño', 'rājino'], ['raññaṃ', 'rājūnaṃ', 'rājānaṃ']], [['raññā'], ['rājūhi', 'rājūbhi', 'rājehi', 'rājebhi']],
-      [['rañño', 'rājino'], ['raññaṃ', 'rājūnaṃ', 'rājānaṃ']], [['raññe', 'rājini'], ['rājesu', 'rājūsu']]
-    ], 'The teacher lists brahma, atta, sakha and ātuma as similar; they remain on fallback until separately verified.');
+    // Kaccāyana Nāma, Brahmattasakharājādito (§188–190), and the distinct
+    // rāja/atta/sakha rules; alternatives are checked against Duroiselle's
+    // Practical Grammar §§151, 154–156 and Niruttidīpanī, Rājādiyuvādigaṇarāsi.
+    const forms = {
+      rāja: [
+        [['rājā'], ['rājāno']], [['rāja', 'rājā'], ['rājāno']], [['rājānaṃ', 'rājaṃ'], ['rājāno']],
+        [['raññā', 'rājena', 'rājinā'], ['rājūhi', 'rājūbhi', 'rājehi', 'rājebhi']],
+        [['rañño', 'rājino'], ['raññaṃ', 'rājūnaṃ', 'rājānaṃ']],
+        [['raññā', 'rājasmā', 'rājamhā'], ['rājūhi', 'rājūbhi', 'rājehi', 'rājebhi']],
+        [['rañño', 'rājino'], ['raññaṃ', 'rājūnaṃ', 'rājānaṃ']], [['raññe', 'rājini'], ['rājūsu', 'rājesu']]
+      ],
+      brahma: [
+        [['brahmā'], ['brahmāno', 'brahmā']], [['brahme'], ['brahmāno', 'brahmā']], [['brahmānaṃ', 'brahmaṃ'], ['brahmāno']],
+        [['brahmanā', 'brahmunā'], ['brahmehi', 'brahmebhi', 'brahmūhi', 'brahmūbhi']],
+        [['brahmuno', 'brahmassa'], ['brahmānaṃ', 'brahmūnaṃ']],
+        [['brahmanā', 'brahmunā', 'brahmasmā', 'brahmamhā'], ['brahmehi', 'brahmebhi', 'brahmūhi', 'brahmūbhi']],
+        [['brahmuno', 'brahmassa'], ['brahmānaṃ', 'brahmūnaṃ']],
+        [['brahme', 'brahmani', 'brahmasmiṃ', 'brahmamhi'], ['brahmesu']]
+      ],
+      atta: [
+        [['attā'], ['attāno']], [['atta', 'attā'], ['attāno']], [['attānaṃ', 'attaṃ'], ['attāno', 'atte']],
+        [['attanā', 'attena'], ['attanehi', 'attanebhi', 'attehi', 'attebhi']],
+        [['attano', 'attassa'], ['attānaṃ']],
+        [['attanā', 'attasmā', 'attamhā'], ['attanehi', 'attanebhi', 'attehi', 'attebhi']],
+        [['attano', 'attassa'], ['attānaṃ']], [['attani', 'attasmiṃ', 'attamhi', 'atte'], ['attanesu', 'attesu']]
+      ],
+      sakha: [
+        [['sakhā'], ['sakhāno', 'sakhāyo', 'sakhino', 'sakhāro']],
+        [['sakha', 'sakhā', 'sakhe'], ['sakhāno', 'sakhāyo', 'sakhino', 'sakhāro']],
+        [['sakhānaṃ', 'sakhaṃ', 'sakhāraṃ'], ['sakhāno', 'sakhāyo', 'sakhino', 'sakhāro', 'sakhāre']],
+        [['sakhinā', 'sakhārena', 'sakhena'], ['sakhārehi', 'sakhārebhi', 'sakhehi', 'sakhebhi']],
+        [['sakhissa', 'sakhino'], ['sakhārānaṃ', 'sakhānaṃ', 'sakhīnaṃ']],
+        [['sakhinā', 'sakhismā', 'sakhimhā', 'sakhārasmā', 'sakhāramhā', 'sakhārā'], ['sakhārehi', 'sakhārebhi', 'sakhehi', 'sakhebhi']],
+        [['sakhissa', 'sakhino'], ['sakhārānaṃ', 'sakhānaṃ', 'sakhīnaṃ']],
+        [['sakhe'], ['sakhāresu', 'sakhesu']]
+      ],
+      ātuma: [
+        [['ātumā'], ['ātumāno']], [['ātuma', 'ātumā'], ['ātumāno']], [['ātumānaṃ', 'ātumaṃ'], ['ātumāno']],
+        [['ātumanā', 'ātumena'], ['ātumanehi', 'ātumanebhi', 'ātumehi', 'ātumebhi']],
+        [['ātumano', 'ātumassa'], ['ātumānaṃ']],
+        [['ātumanā', 'ātumasmā', 'ātumamhā'], ['ātumanehi', 'ātumanebhi', 'ātumehi', 'ātumebhi']],
+        [['ātumano', 'ātumassa'], ['ātumānaṃ']],
+        [['ātumani', 'ātumasmiṃ', 'ātumamhi', 'ātume'], ['ātumanesu', 'ātumesu']]
+      ]
+    };
+    return forms[lemma] ? explicit(5, 'Masculine noun, Rājādigaṇa irregular declension', 'm', forms[lemma]) : null;
   }
   // Manogaṇa is a closed lexical class in the teacher's table. Do not assign
   // Group 6 merely because another word has the same final vowel or a Pali
@@ -543,7 +582,7 @@
   // printed teacher tables say "same as ..." so future code can inspect eight
   // concrete rows instead of having to interpret cross-references again.
   const REFERENCE_LEMMAS = Object.freeze([
-    'purisa', 'citta', 'kamma', 'kaññā', 'puma', 'yuva', 'addhā', 'rāja',
+    'purisa', 'citta', 'kamma', 'kaññā', 'puma', 'yuva', 'addhā', 'rāja', 'brahma', 'atta', 'sakha', 'ātuma',
     'mana', 'vaca', 'vaco', 'bila', 'thāma', 'āpa', 'nadī', 'māṇavī', 'gahapatānī',
     ...SABBANAMA_MEMBERS, 'satthu', 'mātu', 'jetu', 'bhātu', 'pitu',
     'ratti', 'aggi', 'aṭṭhi', 'daṇḍī', 'sukhakārī', 'bhikkhu', 'cakkhu',
@@ -562,6 +601,10 @@
 
   function paradigm(lemma, morphology) {
     lemma = String(lemma || '').normalize('NFC').toLowerCase();
+    // PCED also lists some already declined forms as independent headwords.
+    // Show their verified noun table while retaining their dictionary entry.
+    lemma = ({ rājā: 'rāja', rañño: 'rāja', rājino: 'rāja',
+      brahmā: 'brahma', attā: 'atta', sakhā: 'sakha', ātumā: 'ātuma' })[lemma] || lemma;
     const result = (groups, classificationSource = 'Pali Lookup version 2.0') => ({ lemma, groups, formSystem: 'kaccayana', formSource: SOURCE, classificationSource });
     const records = morphology?.entries?.[lemma];
     const record = Array.isArray(records) ? records.find(item => item?.r && item?.s) : null;

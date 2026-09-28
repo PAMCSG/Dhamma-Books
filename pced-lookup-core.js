@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.5 — 2026-09-24
+ * Version 3.9.6 — 2026-09-29
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.5';
+  const VERSION = '3.9.6';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -43,6 +43,10 @@
   // is the narrow exception: it keeps an attested surface-form entry from
   // hiding its verified lemma analysis.
   const BUILTIN_INFLECTIONS = Object.freeze({
+    'rañño': Object.freeze([Object.freeze({
+      form: 'rāja', label: 'Rājādigaṇa, genitive/dative singular: of/to the king',
+      family: 'verified noun form', preferLemma: true
+    })]),
     'paṭisuṇitvā': Object.freeze([Object.freeze({
       form: 'paṭissuṇāti', label: 'absolutive: having agreed/promised',
       family: 'verified verb form', preferLemma: true

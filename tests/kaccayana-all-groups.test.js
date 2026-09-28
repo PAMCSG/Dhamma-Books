@@ -8,6 +8,21 @@ vm.runInContext(fs.readFileSync(require.resolve('../kaccayana-declension.js'), '
 const K = context.window.KaccayanaDeclension;
 const tables = K.expandedReference();
 
+for (const lemma of ['rāja', 'brahma', 'atta', 'sakha', 'ātuma']) {
+  const group = K.paradigm(lemma, null)?.groups?.[0];
+  assert.strictEqual(group?.teacherGroupNumber, 5, `${lemma}: missing Rājādigaṇa`);
+  assert.strictEqual(group.rows.length, 8, `${lemma}: incomplete case table`);
+  assert(group.rows.every(row => row.singular.length && row.plural.length), `${lemma}: missing number`);
+}
+assert(K.paradigm('rāja', null).groups[0].rows[6].singular.includes('rañño'));
+assert(K.paradigm('brahma', null).groups[0].rows[0].singular.includes('brahmā'));
+assert(K.paradigm('atta', null).groups[0].rows[4].singular.includes('attano'));
+assert(K.paradigm('sakha', null).groups[0].rows[0].plural.includes('sakhāyo'));
+assert(K.paradigm('ātuma', null).groups[0].rows[0].plural.includes('ātumāno'));
+for (const [surface, lemma] of Object.entries({ rājā: 'rāja', rañño: 'rāja', attā: 'atta', brahmā: 'brahma', sakhā: 'sakha', ātumā: 'ātuma' })) {
+  assert.strictEqual(K.paradigm(surface, null)?.lemma, lemma, `${surface}: wrong case table`);
+}
+
 for (let number = 1; number <= 13; number += 1) {
   assert(Object.values(tables).some(table =>
     table.groups.some(group => group.teacherGroupNumber === number)), `missing group ${number}`);

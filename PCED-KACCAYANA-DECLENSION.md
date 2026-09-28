@@ -97,7 +97,11 @@ For a fallback table retain:
   `nt.x` without a stem, but its declension follows the regular neuter
   `a`-stem Cittādigaṇa paradigm.
 - Group 4: explicit teacher paradigms for `puma`, `yuva` and `addhāna`.
-- Group 5: explicit teacher paradigm for `rāja`.
+- Group 5: explicit eight-case singular/plural tables for `rāja`, `brahma`,
+  `atta`, `sakha`, and `ātuma`. Already declined dictionary headwords
+  `rājā`, `brahmā`, `attā`, `sakhā`, `ātumā`, and `rañño` display their
+  corresponding Rājādigaṇa table. The verified form `rañño` resolves to
+  `rāja` even when PCED also has an exact surface-form entry.
 - Group 6: the closed `mana`/Manogaṇa list, plus separately classified
   Manogaṇādigaṇa reference types `bila`, `thāma`, and `āpa`.
 - Groups 7 and 8: feminine `ī` and listed `inī` classes. Every Group 8 row is
