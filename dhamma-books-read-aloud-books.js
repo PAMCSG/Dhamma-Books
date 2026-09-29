@@ -91,7 +91,7 @@
     populateVoices();
     if (!active) status.textContent = supported ? l.ready : l.unavailable;
   }
-  function clearHighlight() { current?.classList.remove('db-readaloud-current'); current = null; }
+  function clearHighlight() { speakingHighlight.clear(); current?.classList.remove('db-readaloud-current'); current = null; }
   function setControls(on) {
     active = on;
     pauseButton.disabled = !on;
@@ -114,6 +114,8 @@
     return copy.textContent.replace(/\s+/g, ' ').trim();
   }
   const excludedSelector = 'rt,.pinyin,.fn-marker,.footnote-ref,.page-anchor,button,[hidden],[aria-hidden="true"]';
+  const speakingHighlight = profile.createSpeechHighlighter?.(excludedSelector)
+    || {activate(){},show(){return false},clear(){}};
   function paliOnly(el, text) {
     if (mode() === 'zh') return !/[\u3400-\u9fff]/u.test(text) && /[\p{Script=Latin}]/u.test(text)
       && (el.querySelector('.pali-word') || /[āīūṅñṭḍṇḷṃ]/iu.test(text));
@@ -185,6 +187,7 @@
     if (runToken !== token) return;
     if (chunkIndex >= chunks.length) { blockIndex++; return speakBlock(runToken); }
     const chunk = chunks[chunkIndex++];
+    current?.classList.toggle('db-readaloud-current', !speakingHighlight.show(chunk.text));
     let utterance;
     if (chunk.lang === 'en') {
       utterance = new SpeechSynthesisUtterance(chunk.text);
@@ -214,6 +217,7 @@
     current = block.el;
     current.classList.add('db-readaloud-current');
     keepCurrentVisible(current);
+    speakingHighlight.activate(block.el, block.highlightRange || (block.selected ? block.range : null));
     const parts = block.pali ? profile.paliSpeechChunks(block.text) : profile.splitText(block.text);
     chunks = block.pali ? parts.map(text => ({text, lang:'latin'}))
       : mode() === 'en' ? (block.selected ? parts.map(text => ({text, lang:'en'})) : englishSpeechChunks(block.el))
@@ -235,7 +239,12 @@
       if (blockIndex < 0) blockIndex = 0;
       else {
         const remainder = textFromSelectionStart(selected, blocks[blockIndex]);
-        if (remainder) blocks[blockIndex] = {...blocks[blockIndex], text:remainder, selected:true};
+        if (remainder) {
+          const highlightRange = document.createRange();
+          highlightRange.selectNodeContents(blocks[blockIndex].el);
+          highlightRange.setStart(selected.range.startContainer,selected.range.startOffset);
+          blocks[blockIndex] = {...blocks[blockIndex], text:remainder, selected:true,highlightRange};
+        }
       }
     } else blockIndex = Math.max(0, blocks.findIndex(block => block.el.getBoundingClientRect().bottom > offset));
     if (!blocks.length) return finish(labels[mode()].empty);

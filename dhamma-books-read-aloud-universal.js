@@ -41,6 +41,8 @@
     '.verse-number','.gatha-no','button','script','style','[hidden]','[aria-hidden="true"]',
     '.proof-marker','.nissaya-button'
   ].join(',');
+  const speakingHighlight = profile.createSpeechHighlighter?.(excludedSelector)
+    || {activate(){},show(){return false},clear(){}};
   const ignoredAncestorSelector = [
     '.contents','.contents-panel','.patis-contents','.toc','.cover','.cover-card','.modal',
     '.footnote-popup','.popup','.proof-panel','.search-results','nav','header','.topbar'
@@ -249,7 +251,7 @@
     paliVoiceSelect.value = paliVoices.some(voice => voice.voiceURI === paliPrevious) || paliPrevious === '__english__' ? paliPrevious : '__indic__';
     paliVoiceSelect.dataset.ready = 'true';
   }
-  function clearHighlight() { current?.classList.remove('db-readaloud-current'); current = null; }
+  function clearHighlight() { speakingHighlight.clear(); current?.classList.remove('db-readaloud-current'); current = null; }
   function setControls(on) { active = on; pauseButton.disabled = !on; stopButton.disabled = !on; startButton.textContent = on ? labels[interfaceLanguage()].restart : labels[interfaceLanguage()].start; }
   function stopOnlineAudio() {
     if (onlineAudio) {
@@ -321,6 +323,7 @@
     if (runToken !== token) return;
     if (chunkIndex >= chunks.length) { blockIndex++; return speakBlock(runToken); }
     const chunk = chunks[chunkIndex++];
+    current?.classList.toggle('db-readaloud-current', !speakingHighlight.show(chunk.text));
     if (chunk.lang === 'latin') {
       profile.speakWithFallback(synth, chunk, rateSelect.value, synth.getVoices(), voiceSelect.value, paliVoiceSelect.value,
         () => speakNext(runToken), () => finish(labels[interfaceLanguage()].error));
@@ -341,6 +344,7 @@
     if (runToken !== token) return;
     if (blockIndex >= blocks.length) return finish();
     clearHighlight(); const block = blocks[blockIndex]; current = block.el; current.classList.add('db-readaloud-current'); keepCurrentVisible(current);
+    speakingHighlight.activate(block.el, block.highlightRange || (block.selected ? block.range : null));
     const inlineChunks = inlineLanguageChunks(block);
     if (inlineChunks) chunks = inlineChunks;
     else if (block.lang === 'pali') chunks = profile.paliSpeechChunks(block.text).filter(Boolean).map(text => ({text,lang:'latin'}));
@@ -364,7 +368,12 @@
       if (blockIndex < 0) return finish(labels[interfaceLanguage()].empty);
       if (blocks[blockIndex].el.contains(selection.range.startContainer)) {
         const remainder = contentFromSelectionStart(selection, blocks[blockIndex]);
-        if (remainder.text) blocks[blockIndex] = {...blocks[blockIndex],text:remainder.text,speechRoot:remainder.speechRoot,selected:true};
+        if (remainder.text) {
+          const highlightRange = document.createRange();
+          highlightRange.selectNodeContents(blocks[blockIndex].el);
+          highlightRange.setStart(selection.range.startContainer,selection.range.startOffset);
+          blocks[blockIndex] = {...blocks[blockIndex],text:remainder.text,speechRoot:remainder.speechRoot,selected:true,highlightRange};
+        }
       }
       preserveSelection(selection);
     } else {

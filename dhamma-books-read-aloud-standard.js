@@ -271,8 +271,72 @@
     play(false);
   }
 
+  // Highlight the exact spoken chunk without wrapping or changing the book's
+  // text nodes. This preserves word-click lookup, annotations and selection.
+  function createSpeechHighlighter(excludedSelector) {
+    const name = 'db-readaloud-speaking';
+    const available = Boolean(global.CSS?.highlights && global.Highlight);
+    if (available && !document.getElementById('db-speech-highlight-style')) {
+      const style = document.createElement('style');
+      style.id = 'db-speech-highlight-style';
+      style.textContent = '::highlight(db-readaloud-speaking){background:#ffd66a;color:inherit}';
+      document.head.append(style);
+    }
+    let block = null, positions = [], source = '', cursor = 0;
+    const normalize = value => String(value || '').normalize('NFC')
+      .replace(/([律经經论論])葬/g, '$1藏').replace(/[\s()（）]/gu, '').toLocaleLowerCase();
+    function clear() {
+      if (available) global.CSS.highlights.delete(name);
+      block = null; positions = []; source = ''; cursor = 0;
+    }
+    function activate(el, limit) {
+      clear();
+      block = el;
+      if (!available || !el) return;
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      let node;
+      while ((node = walker.nextNode())) {
+        if (node.parentElement?.closest(excludedSelector) || !node.data) continue;
+        if (limit && !limit.intersectsNode(node)) continue;
+        const first = limit?.startContainer === node ? limit.startOffset : 0;
+        const last = limit?.endContainer === node ? limit.endOffset : node.data.length;
+        for (let offset = first; offset < last;) {
+          const char = String.fromCodePoint(node.data.codePointAt(offset));
+          const width = char.length;
+          if (normalize(char)) {
+            source += normalize(char);
+            positions.push({node, start:offset, end:offset + width});
+          }
+          offset += width;
+        }
+      }
+    }
+    function show(text) {
+      if (!available || !block) return false;
+      global.CSS.highlights.delete(name);
+      const wanted = normalize(text);
+      if (!wanted) return false;
+      let start = source.indexOf(wanted, cursor);
+      if (start < 0) start = source.indexOf(wanted);
+      if (start < 0 || !positions[start + wanted.length - 1]) return false;
+      cursor = start + wanted.length;
+      const first = positions[start], last = positions[cursor - 1];
+      const range = document.createRange();
+      range.setStart(first.node, first.start);
+      range.setEnd(last.node, last.end);
+      global.CSS.highlights.set(name, new global.Highlight(range));
+      const rect = range.getBoundingClientRect();
+      const top = document.querySelector('.topbar,.toolbar,header')?.getBoundingClientRect().bottom || 0;
+      if (rect.height && (rect.top < top + 8 || rect.top > global.innerHeight - 60)) {
+        global.scrollBy({top:rect.top - top - 36,behavior:'smooth'});
+      }
+      return true;
+    }
+    return {activate, show, clear};
+  }
+
   global.DhammaBooksReadAloudVoice = Object.freeze({
-    version: '1.4.5',
+    version: '1.4.7',
     defaults: DEFAULTS,
     chineseVoices,
     chooseVoice,
@@ -289,6 +353,7 @@
     paliBlocks,
     makeUtterance,
     speakWithFallback,
+    createSpeechHighlighter,
     makePanelMovable
   });
   // The two Hanyu Pinyin editions include their read-aloud panels in the HTML.
