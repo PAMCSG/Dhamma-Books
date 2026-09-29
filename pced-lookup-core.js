@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.15 — 2026-09-29
+ * Version 3.9.16 — 2026-09-29
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.15';
+  const VERSION = '3.9.16';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -322,6 +322,20 @@
       lemma: 'dissati',
       label: 'Third-person plural, present passive',
       meaning: 'are seen; appear'
+    })
+  });
+
+  // PCED's [brū+a+hi] is a verbal formation, not a compound of brū and hi.
+  // Keep the exact brūhi record visible while explaining its imperative form.
+  const EXACT_VERB_FORMS = Object.freeze({
+    'brūhi': Object.freeze({
+      lemma: 'brūti', label: 'Second-person singular imperative of √brū',
+      labelZh: '√brū 的命令式第二人称单数',
+      meaning: 'say!; tell!', meaningZh: '说吧；请说',
+      formation: 'brū + a + hi (PCED Myanmar grammar)',
+      formationZh: 'brū + a + hi（PCED 缅文语法条目）',
+      sourceNote: 'Compare the present forms brūti and bravīti.',
+      sourceNoteZh: '参见现在时词形 brūti 和 bravīti。'
     })
   });
 
@@ -761,6 +775,7 @@
     const addEntryDecomposition = result => {
       if (result.heads.length !== 1 || result.components.length) return result;
       const head = result.heads[0];
+      if (EXACT_VERB_FORMS[cleanWord(head)]) return result;
       // The maintained standard table takes precedence over formulas embedded
       // in individual dictionary records, which occasionally use a stem form
       // that differs from the approved display analysis (for example mano).
@@ -785,6 +800,10 @@
     const verifiedCandidates = verifiedInflectionCandidates(normalized, options);
     const attestedPastHeads = explicitPastIndex(context.dictionary).get(normalized) || [];
     if (exactHeads.length) {
+      const exactVerbForm = EXACT_VERB_FORMS[normalized];
+      if (exactVerbForm) return finish({
+        ...base, mode: 'exact', tier: 1, heads: exactHeads, grammar: exactVerbForm
+      });
       for (const candidate of verifiedCandidates.filter(item => item.preferLemma)) {
         const heads = context.exact(candidate.form);
         if (!heads.length) continue;
@@ -828,6 +847,11 @@
       const mapped = formsFromMap(map, normalized);
       const heads = mapped.flatMap(context.exact);
       if (heads.length) {
+        const exactVerbForm = EXACT_VERB_FORMS[cleanWord(mapped[0])];
+        if (exactVerbForm) return finish({
+          ...base, mode: 'exact', tier: 2, heads,
+          resolvedForm: cleanWord(mapped[0]), grammar: exactVerbForm
+        });
         return finish(addEntryDecomposition({
           ...base, mode: label.includes('related') ? 'related' : 'alias', tier: 2,
           heads, resolvedForm: cleanWord(mapped[0]), notes: [`${clicked} → ${mapped.join(', ')} (${label})`]

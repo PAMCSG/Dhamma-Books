@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.18 — 2026-09-29 */
+/* PAMC cross-book PCED popup standard v1.8.19 — 2026-09-29 */
 (function () {
   'use strict';
 
@@ -59,7 +59,7 @@
     });
     morphologyPromise = Promise.resolve()
       .then(() => window.KaccayanaDeclension?.VERSION === '1.5.1' ? null : load('kaccayana-declension.js', '1.5.1'))
-      .then(() => core()?.version === '3.9.15' ? null : load('pced-lookup-core.js', '3.9.15'))
+      .then(() => core()?.version === '3.9.16' ? null : load('pced-lookup-core.js', '3.9.16'))
       .then(() => window.PaliLookupMorphology ? null : load('pali-lookup-morphology.js', '2.0-unicode-trial'))
       .then(() => window.PaliLookupMorphology || null);
     return morphologyPromise;
@@ -430,10 +430,10 @@
       const lemma = dictionary()[grammar.lemmaHead]?.headword || grammar.lemma;
       note = '<div class="note grammar-analysis"><b>' + (zh ? '动词词形：' : 'Verb form:') + '</b> ' + esc(surface) +
         ' → <b>' + esc(lemma) + '</b>' +
-        (grammar.label ? '<br><span class="lookup-rule">' + analysis(grammar.label) + '</span>' : '') +
-        (grammar.meaning ? '<br><span class="lookup-rule">' + (zh ? '含义：' : 'Meaning: ') + '“' + analysis(grammar.meaning) + '”</span>' : '') +
-        (grammar.formation ? '<br><span class="lookup-rule">' + (zh ? '构词：' : 'Formation: ') + analysis(grammar.formation) + '</span>' : '') +
-        (grammar.sourceNote ? '<br><span class="lookup-rule">' + (zh ? '注：' : 'Note: ') + analysis(grammar.sourceNote) + '</span>' : '') +
+        (grammar.label ? '<br><span class="lookup-rule">' + analysis(zh ? grammar.labelZh || grammar.label : grammar.label) + '</span>' : '') +
+        (grammar.meaning ? '<br><span class="lookup-rule">' + (zh ? '含义：' : 'Meaning: ') + '“' + analysis(zh ? grammar.meaningZh || grammar.meaning : grammar.meaning) + '”</span>' : '') +
+        (grammar.formation ? '<br><span class="lookup-rule">' + (zh ? '词形构成：' : 'Form: ') + analysis(zh ? grammar.formationZh || grammar.formation : grammar.formation) + '</span>' : '') +
+        (grammar.sourceNote ? '<br><span class="lookup-rule">' + (zh ? '注：' : 'Note: ') + analysis(zh ? grammar.sourceNoteZh || grammar.sourceNote : grammar.sourceNote) + '</span>' : '') +
         '</div>';
     } else if (result.mode === 'inflected') note = '<div class="note"><b>' + (zh ? '词形变化：' : 'Inflected form:') + '</b> ' + esc(surface) +
       ' → <b>' + esc(dictionary()[heads[0]]?.headword || result.resolvedForm || shown) + '</b>' +
