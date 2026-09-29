@@ -32,7 +32,7 @@ headwords; the supplied examples are not attributed to Bhante U
 Janakābhivaṃsa's separate noun-declension note.
 The *Ākhyāta Kappa* supplies grammatical rules and examples. In particular,
 rule 504 explains the Ajjatanī third-plural ending `-iṃsu`. Complete forms
-`vihariṃsu` and `ussahiṃsu` are separately attested in DN 5; their stems are
+`vihariṃsu` and `ussahiṃsu` are separately verified in Pāli; their stems are
 not inferred merely by applying the ending rule.
 
 ## Runtime decision sequence
@@ -53,8 +53,10 @@ not inferred merely by applying the ending rule.
    maintained Kaccāyana/supplied-table family before considering noun declension.
 3. After that identification, generate regular present, Ajjatanī, future,
    imperative, optative, passive, participle, absolutive and infinitive groups
-   using the supplied table's regular patterns. Keep the existing popup group
-   headings and chips; do not render the PDF's person-by-number grids.
+   using the supplied table's regular patterns. The finite groups list third,
+   second and first person in both singular and plural, with the supplied
+   alternatives. Keep the existing popup group headings and word chips;
+   label each person without rendering the PDF's grids.
    In particular, retain the long ā in `suṇāsi` and `suṇātha`; show the
    six person/number endings, possible regular aorists, and the table's
    imperative first-person forms. The PDF's initial a- aorists are modelled
@@ -68,24 +70,26 @@ not inferred merely by applying the ending rule.
    `[aor]`, `[aorist]`, or `[past]` inside the PCED verb entry.
 6. Never infer an irregular past stem from the present spelling alone. Do not
    extract translated prose or accept a past candidate by substring matching.
-7. Map the verified DN 5 forms `vihariṃsu` → `viharati` and `ussahiṃsu` →
+7. Map the verified forms `vihariṃsu` → `viharati` and `ussahiṃsu` →
    `ussahati` only when the destination lemma exists in PCED. Display these
-   complete forms in their own attested Ajjatanī third-plural group. Do not
+   complete forms in the Ajjatanī third-person plural position. Do not
    apply `-iṃsu` to arbitrary dictionary lemmas.
 
 For a recognized verb display:
 
 The verb source line is assembled for the forms actually shown. The supplied
 PDF's regular patterns and exact exceptional examples, explicit PCED past
-citations, maintained Kaccāyana examples, and the DN 5 / rule 504 third-plural
-forms are distinguished there.
+citations, maintained Kaccāyana examples, and separately verified third-plural
+forms are distinguished there. The popup does not name the text containing
+the verb.
 
 In Chinese priority and Chinese books, the verb group headings and this
 source explanation display in Chinese. The Pāli word forms stay in Pāli.
 
-Explicit PCED past citations are placed in:
-
-`Ajjatanī / Aorist (dictionary-attested)`
+Explicit PCED past citations already represented in the six Ajjatanī positions
+stay there. Other citations appear under “Other PCED past citations” within
+the same Ajjatanī group. Where the supplied PDF does not give a complete
+pattern for an exceptional verb, only sourced forms are shown.
 
 ## Closed teacher groups
 

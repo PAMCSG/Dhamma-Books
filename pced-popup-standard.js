@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.10 — 2026-09-29 */
+/* PAMC cross-book PCED popup standard v1.8.11 — 2026-09-29 */
 (function () {
   'use strict';
 
@@ -59,7 +59,7 @@
     });
     morphologyPromise = Promise.resolve()
       .then(() => window.KaccayanaDeclension?.VERSION === '1.5.1' ? null : load('kaccayana-declension.js', '1.5.1'))
-      .then(() => core()?.version === '3.9.9' ? null : load('pced-lookup-core.js', '3.9.9'))
+      .then(() => core()?.version === '3.9.10' ? null : load('pced-lookup-core.js', '3.9.10'))
       .then(() => window.PaliLookupMorphology ? null : load('pali-lookup-morphology.js', '2.0-unicode-trial'))
       .then(() => window.PaliLookupMorphology || null);
     return morphologyPromise;
@@ -270,7 +270,11 @@
         ? core().localizedVerbGroupLabel(group.label, primaryLanguage)
         : localizedGroupLabel(group.label, primaryLanguage, group, paradigm.lemma);
       content += '<div class="pced-inflection-group"><b>' + esc(groupLabel) + '</b>';
-      if (group.rows) {
+      if (group.persons?.length) {
+        content += group.persons.map(item => '<div class="pced-form-list"><strong class="pced-person-label">' +
+          esc(core().localizedVerbPersonLabel(item.person, primaryLanguage)) + ':</strong> ' +
+          chips(item.forms) + '</div>').join('');
+      } else if (group.rows) {
         const hasPlural = group.rows.some(row => row.plural?.length);
         content += '<div class="pced-inflection-table-wrap"><table class="pced-inflection-table">' +
           '<thead><tr><th>' + esc(ui.case) + '</th><th>' + esc(ui.singular) + '</th>' +

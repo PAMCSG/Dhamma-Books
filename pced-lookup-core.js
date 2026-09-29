@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.9 — 2026-09-29
+ * Version 3.9.10 — 2026-09-29
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.9';
+  const VERSION = '3.9.10';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -59,15 +59,15 @@
       form: 'paṭissuṇāti', label: 'absolutive: having agreed/promised',
       family: 'verified verb form', preferLemma: true
     })]),
-    // Both complete forms occur in DN 5. Kaccāyana, Ākhyāta 504 explains
-    // the Ajjatanī third-plural -uṃ → -iṃsu ending. Do not invert this
+    // Both complete forms are verified in a Pāli text. Kaccāyana, Ākhyāta
+    // 504 explains the Ajjatanī third-plural -uṃ → -iṃsu ending. Do not invert this
     // spelling for arbitrary verbs: the stem must be established separately.
     'vihariṃsu': Object.freeze([Object.freeze({
-      form: 'viharati', label: 'Ajjatanī (aorist), third-person plural (DN 5; Kaccāyana 504)',
+      form: 'viharati', label: 'Ajjatanī (aorist), third-person plural',
       family: 'text-attested Kaccāyana verb form', preferLemma: true
     })]),
     'ussahiṃsu': Object.freeze([Object.freeze({
-      form: 'ussahati', label: 'Ajjatanī (aorist), third-person plural (DN 5; Kaccāyana 504)',
+      form: 'ussahati', label: 'Ajjatanī (aorist), third-person plural',
       family: 'text-attested Kaccāyana verb form', preferLemma: true
     })]),
     'agamā': Object.freeze([Object.freeze({ form: 'gacchati', label: 'Hiyyattanī, third-person singular: went', family: 'Kaccāyana verb form', preferLemma: true })]),
@@ -92,7 +92,7 @@
       'Hiyyattanī, third-person plural: went': 'Hiyyattanī（过去未完成时），第三人称复数：去了',
       'Ajjatanī (aorist), third-person singular: went': 'Ajjatanī（不定过去时），第三人称单数：去了',
       'Ajjatanī (aorist), third-person plural: went': 'Ajjatanī（不定过去时），第三人称复数：去了',
-      'Ajjatanī (aorist), third-person plural (DN 5; Kaccāyana 504)': 'Ajjatanī（不定过去时），第三人称复数（《长部》第 5 经；迦旃延第 504 则）',
+      'Ajjatanī (aorist), third-person plural': 'Ajjatanī（不定过去时），第三人称复数',
       'Third-person singular, present active': '现在时主动语态，第三人称单数',
       'Third-person plural, present passive': '现在时被动语态，第三人称复数',
       'Third-person plural, present verb': '现在时动词，第三人称复数',
@@ -126,7 +126,6 @@
       'Ajjatanī / Aorist (dictionary-attested)': '不定过去时（Ajjatanī；PCED 词典记载）',
       'Ajjatanī / Aorist (regular possibilities from verb table)': '不定过去时（Ajjatanī；依动词表推算的可能词形）',
       'Ajjatanī / Aorist (uploaded verb table)': '不定过去时（Ajjatanī；所提供的动词表）',
-      'Ajjatanī / Aorist, third-person plural (DN 5; Kaccāyana 504)': '不定过去时（Ajjatanī），第三人称复数（《长部》第 5 经；迦旃延第 504 则）',
       'Imperative': '命令式',
       'Imperative (Pañcamī)': '命令式（Pañcamī）',
       'Optative': '祈愿式',
@@ -135,9 +134,24 @@
       'Future (Bhavissanti)': '未来时（Bhavissanti）',
       'Present participle': '现在分词',
       'Passive present (regular possibilities from verb table)': '现在时被动语态（依动词表推算的可能词形）',
+      'Absolutive / gerund': '独立分词／动名词',
+      'Infinitive': '不定式',
       'Absolutive / infinitive': '独立分词／不定式'
     };
     return labels[value] || value;
+  }
+
+  const VERB_PERSON_LABELS = Object.freeze({
+    thirdSingular: Object.freeze({ en: 'Third person singular', zh: '第三人称单数' }),
+    thirdPlural: Object.freeze({ en: 'Third person plural', zh: '第三人称复数' }),
+    secondSingular: Object.freeze({ en: 'Second person singular', zh: '第二人称单数' }),
+    secondPlural: Object.freeze({ en: 'Second person plural', zh: '第二人称复数' }),
+    firstSingular: Object.freeze({ en: 'First person singular', zh: '第一人称单数' }),
+    firstPlural: Object.freeze({ en: 'First person plural', zh: '第一人称复数' }),
+    other: Object.freeze({ en: 'Other PCED past citations', zh: '其他 PCED 词典记载的过去时词形' })
+  });
+  function localizedVerbPersonLabel(person, language = 'en') {
+    return VERB_PERSON_LABELS[person]?.[language === 'zh' ? 'zh' : 'en'] || person;
   }
 
   // These complete PCED headwords are absent from the reduced web extract but
@@ -172,16 +186,46 @@
   // Sources: Kaccāyana Pāli Vyākaraṇaṁ §§418–419, 476, 517, 519.
   const KACCAYANA_VERB_PARADIGMS = Object.freeze({
     'gacchati': Object.freeze([
-      Object.freeze({ label: 'Present (Vattamānā): 3sg, 3pl, 2sg, 2pl, 1sg, 1pl', forms: Object.freeze(['gacchati', 'gacchanti', 'gacchasi', 'gacchatha', 'gacchāmi', 'gacchāma']) }),
-      Object.freeze({ label: 'Past imperfect (Hiyyattanī)', forms: Object.freeze(['agamā', 'agamū']) }),
-      Object.freeze({ label: 'Aorist / recent past (Ajjatanī)', forms: Object.freeze(['agamī', 'agamuṃ', 'agacchi', 'agacchuṃ']) }),
-      Object.freeze({ label: 'Imperative (Pañcamī)', forms: Object.freeze(['gacchatu', 'gacchantu', 'gacchāhi', 'gacchatha']) }),
-      Object.freeze({ label: 'Optative (Sattamī)', forms: Object.freeze(['gaccheyya', 'gaccheyyuṃ', 'gaccheyyāsi', 'gaccheyyātha', 'gaccheyyāmi', 'gaccheyyāma']) }),
-      Object.freeze({ label: 'Future (Bhavissanti)', forms: Object.freeze(['gacchissati', 'gacchissanti', 'gacchissasi', 'gacchissatha', 'gacchissāmi', 'gacchissāma']) })
+      Object.freeze({ label: 'Present (Vattamānā): 3sg, 3pl, 2sg, 2pl, 1sg, 1pl', persons: Object.freeze([
+        { person: 'thirdSingular', forms: ['gacchati', 'gacche'] }, { person: 'thirdPlural', forms: ['gacchanti', 'gacchare'] },
+        { person: 'secondSingular', forms: ['gacchasi'] }, { person: 'secondPlural', forms: ['gacchatha'] },
+        { person: 'firstSingular', forms: ['gacchāmi', 'gacche'] }, { person: 'firstPlural', forms: ['gacchāma'] }
+      ]) }),
+      Object.freeze({ label: 'Past imperfect (Hiyyattanī)', persons: Object.freeze([
+        { person: 'thirdSingular', forms: ['agamā', 'agacchā', 'gacchā', 'agaccha', 'gaccha'] },
+        { person: 'thirdPlural', forms: ['agamū', 'agacchū', 'gacchū', 'agacchu', 'gacchu'] },
+        { person: 'secondSingular', forms: ['agaccho', 'gaccho', 'agaccha', 'gaccha', 'agacchi', 'gacchi'] },
+        { person: 'secondPlural', forms: ['agacchattha', 'gacchattha', 'agacchatha', 'gacchatha'] },
+        { person: 'firstSingular', forms: ['agacchaṃ', 'gacchaṃ'] },
+        { person: 'firstPlural', forms: ['agacchamhā', 'gacchamhā'] }
+      ]) }),
+      Object.freeze({ label: 'Aorist / recent past (Ajjatanī)', persons: Object.freeze([
+        Object.freeze({ person: 'thirdSingular', forms: Object.freeze(['agamī', 'agacchī', 'gacchī', 'agacchi', 'gacchi']) }),
+        Object.freeze({ person: 'thirdPlural', forms: Object.freeze(['agamuṃ', 'agacchuṃ', 'gacchuṃ', 'agacchiṃsu', 'gacchiṃsu']) }),
+        Object.freeze({ person: 'secondSingular', forms: Object.freeze(['agaccho', 'gaccho', 'agaccha', 'gaccha', 'agacchi', 'gacchi']) }),
+        Object.freeze({ person: 'secondPlural', forms: Object.freeze(['agacchittha', 'gacchittha']) }),
+        Object.freeze({ person: 'firstSingular', forms: Object.freeze(['agacchiṃ', 'gacchiṃ']) }),
+        Object.freeze({ person: 'firstPlural', forms: Object.freeze(['agacchimhā', 'gacchimhā', 'agacchimha', 'gacchimha']) })
+      ]) }),
+      Object.freeze({ label: 'Imperative (Pañcamī)', persons: Object.freeze([
+        { person: 'thirdSingular', forms: ['gacchatu', 'gacche'] }, { person: 'thirdPlural', forms: ['gacchantu'] },
+        { person: 'secondSingular', forms: ['gacchāhi', 'gaccha', 'gacchassu'] }, { person: 'secondPlural', forms: ['gacchatha'] },
+        { person: 'firstSingular', forms: ['gacchāmi', 'gacche'] }, { person: 'firstPlural', forms: ['gacchāma'] }
+      ]) }),
+      Object.freeze({ label: 'Optative (Sattamī)', persons: Object.freeze([
+        { person: 'thirdSingular', forms: ['gaccheyya', 'gacche'] }, { person: 'thirdPlural', forms: ['gaccheyyuṃ'] },
+        { person: 'secondSingular', forms: ['gaccheyyāsi', 'gacche'] }, { person: 'secondPlural', forms: ['gaccheyyātha'] },
+        { person: 'firstSingular', forms: ['gaccheyyāmi', 'gacche'] }, { person: 'firstPlural', forms: ['gaccheyyāma'] }
+      ]) }),
+      Object.freeze({ label: 'Future (Bhavissanti)', persons: Object.freeze([
+        { person: 'thirdSingular', forms: ['gacchissati'] }, { person: 'thirdPlural', forms: ['gacchissanti'] },
+        { person: 'secondSingular', forms: ['gacchissasi'] }, { person: 'secondPlural', forms: ['gacchissatha'] },
+        { person: 'firstSingular', forms: ['gacchissāmi'] }, { person: 'firstPlural', forms: ['gacchissāma'] }
+      ]) })
     ])
   });
 
-  // These forms are verified in DN 5. Rule 504 accounts for the third-plural
+  // These forms are individually verified. Rule 504 accounts for the third-plural
   // ending; the complete stems are checked against the text and PCED lemmas.
   const TEXT_ATTESTED_AORIST_PLURAL = Object.freeze({
     viharati: 'vihariṃsu',
@@ -194,18 +238,45 @@
   // Do not apply the regular -oti template to hoti: it produces false forms.
   const VERB_TABLE_EXCEPTIONS = Object.freeze({
     hoti: Object.freeze([
-      Object.freeze({ label: 'Present: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl', forms: Object.freeze(['hoti', 'honti', 'hosi', 'hottha', 'homi', 'homa']) }),
-      Object.freeze({ label: 'Ajjatanī / Aorist (uploaded verb table)', forms: Object.freeze(['ahosi', 'ahesuṃ', 'ahuvā', 'ahuvattha', 'ahusittha', 'ahosiṃ', 'ahuṃ', 'ahosimha', 'ahumha']) }),
-      Object.freeze({ label: 'Imperative', forms: Object.freeze(['hotu', 'hontu', 'hohi', 'hotha', 'homi', 'homa']) })
+      Object.freeze({ label: 'Present: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl', persons: Object.freeze([
+        { person: 'thirdSingular', forms: ['hoti'] }, { person: 'thirdPlural', forms: ['honti'] },
+        { person: 'secondSingular', forms: ['hosi'] }, { person: 'secondPlural', forms: ['hottha'] },
+        { person: 'firstSingular', forms: ['homi'] }, { person: 'firstPlural', forms: ['homa'] }
+      ]) }),
+      Object.freeze({ label: 'Ajjatanī / Aorist (uploaded verb table)', persons: Object.freeze([
+        Object.freeze({ person: 'thirdSingular', forms: Object.freeze(['ahosi']) }),
+        Object.freeze({ person: 'thirdPlural', forms: Object.freeze(['ahesuṃ']) }),
+        Object.freeze({ person: 'secondSingular', forms: Object.freeze(['ahuvā', 'ahosi']) }),
+        Object.freeze({ person: 'secondPlural', forms: Object.freeze(['ahuvattha', 'ahusittha']) }),
+        Object.freeze({ person: 'firstSingular', forms: Object.freeze(['ahosiṃ', 'ahuṃ']) }),
+        Object.freeze({ person: 'firstPlural', forms: Object.freeze(['ahosimha', 'ahumha']) })
+      ]) }),
+      Object.freeze({ label: 'Imperative', persons: Object.freeze([
+        { person: 'thirdSingular', forms: ['hotu'] }, { person: 'thirdPlural', forms: ['hontu'] },
+        { person: 'secondSingular', forms: ['hohi'] }, { person: 'secondPlural', forms: ['hotha'] },
+        { person: 'firstSingular', forms: ['homi'] }, { person: 'firstPlural', forms: ['homa'] }
+      ]) })
     ]),
     atthi: Object.freeze([
-      Object.freeze({ label: 'Present: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl', forms: Object.freeze(['atthi', 'santi', 'asi', 'attha', 'asmi', 'amhi', 'asma', 'amha']) })
+      Object.freeze({ label: 'Present: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl', persons: Object.freeze([
+        { person: 'thirdSingular', forms: ['atthi'] }, { person: 'thirdPlural', forms: ['santi'] },
+        { person: 'secondSingular', forms: ['asi'] }, { person: 'secondPlural', forms: ['attha'] },
+        { person: 'firstSingular', forms: ['asmi', 'amhi'] }, { person: 'firstPlural', forms: ['asma', 'amha'] }
+      ]) })
     ]),
     brūti: Object.freeze([
-      Object.freeze({ label: 'Present: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl', forms: Object.freeze(['brūti', 'brūvanti', 'brūsi', 'brūtha', 'brūmi', 'brūma']) })
+      Object.freeze({ label: 'Present: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl', persons: Object.freeze([
+        { person: 'thirdSingular', forms: ['brūti'] }, { person: 'thirdPlural', forms: ['brūvanti'] },
+        { person: 'secondSingular', forms: ['brūsi'] }, { person: 'secondPlural', forms: ['brūtha'] },
+        { person: 'firstSingular', forms: ['brūmi'] }, { person: 'firstPlural', forms: ['brūma'] }
+      ]) })
     ]),
     hanti: Object.freeze([
-      Object.freeze({ label: 'Present: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl', forms: Object.freeze(['hanati', 'hanti', 'hananti', 'hanasi', 'hanatha', 'hanāmi', 'hanāma']) })
+      Object.freeze({ label: 'Present: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl', persons: Object.freeze([
+        { person: 'thirdSingular', forms: ['hanati', 'hanti'] }, { person: 'thirdPlural', forms: ['hananti'] },
+        { person: 'secondSingular', forms: ['hanasi'] }, { person: 'secondPlural', forms: ['hanatha'] },
+        { person: 'firstSingular', forms: ['hanāmi'] }, { person: 'firstPlural', forms: ['hanāma'] }
+      ]) })
     ])
   });
 
@@ -1085,9 +1156,14 @@
 
   function verbParadigm(lemma, grammarText) {
     const maintained = KACCAYANA_VERB_PARADIGMS[lemma];
-    if (maintained) return maintained.map(group => ({ label: group.label, forms: uniqueForms(group.forms) }));
+    const copyGroup = group => ({
+      label: group.label,
+      forms: uniqueForms(group.forms || group.persons?.flatMap(item => item.forms) || []),
+      ...(group.persons ? { persons: group.persons.map(item => ({ person: item.person, forms: [...item.forms] })) } : {})
+    });
+    if (maintained) return maintained.map(copyGroup);
     const exception = VERB_TABLE_EXCEPTIONS[lemma];
-    if (exception) return exception.map(group => ({ label: group.label, forms: uniqueForms(group.forms) }));
+    if (exception) return exception.map(copyGroup);
     const ending = ['āti', 'ati', 'eti', 'oti'].find(value => lemma.endsWith(value));
     if (!ending || !/(?:\bkri\b|ကြိ|【(?:过|現|现|命|独)|\b(?:pr|imper|opt|fut|aor|ger|inf)\s*[．.]|\b(?:goes|does|makes|becomes)\b)/i.test(grammarText)) return [];
     const stem = lemma.slice(0, -ending.length);
@@ -1099,44 +1175,71 @@
           ? ['āti', 'anti', 'āsi', 'ātha', 'āmi', 'āma']
           : ['ati', 'anti', 'asi', 'atha', 'āmi', 'āma'];
     const futureMarker = ending === 'eti' ? 'ess' : 'iss';
-    const imperativeEndings = ending === 'eti'
-      ? ['etu', 'entu', 'ehi', 'etha', 'emi', 'ema']
-      : ending === 'oti'
-        ? ['otu', 'ontu', 'ohi', 'otha', 'omi', 'oma']
-        : ending === 'āti'
-          ? ['ātu', 'antu', 'a', 'āhi', 'ātha', 'āmi', 'āma']
-          : ['atu', 'antu', 'a', 'āhi', 'atha', 'āmi', 'āma'];
     const group = (label, forms) => ({ label, forms: uniqueForms(forms) });
+    const personGroup = (label, persons) => ({
+      label, persons,
+      forms: uniqueForms(persons.flatMap(item => item.forms))
+    });
+    const personKeys = ['thirdSingular', 'thirdPlural', 'secondSingular', 'secondPlural', 'firstSingular', 'firstPlural'];
+    const personsFromEndings = values => personKeys.map((person, index) => ({ person, forms: [stem + values[index]] }));
+    const imperative = ending === 'eti'
+      ? [['etu'], ['entu'], ['ehi'], ['etha'], ['emi'], ['ema']]
+      : ending === 'oti'
+        ? [['otu'], ['ontu'], ['ohi'], ['otha'], ['omi'], ['oma']]
+        : ending === 'āti'
+          ? [['ātu'], ['antu'], ['a', 'āhi'], ['ātha'], ['āmi'], ['āma']]
+          : [['atu'], ['antu'], ['a', 'āhi'], ['atha'], ['āmi'], ['āma']];
+    const imperativePersons = personKeys.map((person, index) => ({
+      person, forms: imperative[index].map(value => stem + value)
+    }));
     // The PDF gives paca, ṭhape and ṭhapaya as separate aorist patterns.
     // An initial a- is exemplified for paca only, so do not impose it on
     // arbitrary prefixed verbs (for example ussahati).
-    let past = [];
+    let pastPersons = [];
     if (ending === 'eti') {
-      past = ['esi', 'esiṃsu', 'esuṃ', 'eso', 'esittha', 'esiṃ', 'esimha', 'esimhā'].map(value => stem + value);
+      pastPersons = [
+        ['thirdSingular', ['esi']], ['thirdPlural', ['esiṃsu', 'esuṃ']],
+        ['secondSingular', ['eso']], ['secondPlural', ['esittha']],
+        ['firstSingular', ['esiṃ']], ['firstPlural', ['esimha', 'esimhā']]
+      ];
     } else if (ending === 'ati' || ending === 'āti') {
-      past = ['i', 'ī', 'iṃsu', 'uṃ', 'o', 'ittha', 'iṃ', 'imha', 'imhā'].map(value => stem + value);
-      if (lemma === 'pacati') past.push(...past.map(value => 'a' + value));
+      pastPersons = [
+        ['thirdSingular', ['i', 'ī']], ['thirdPlural', ['iṃsu', 'uṃ']],
+        ['secondSingular', ['o']], ['secondPlural', ['ittha']],
+        ['firstSingular', ['iṃ']], ['firstPlural', ['imha', 'imhā']]
+      ];
     }
-    // The two complete DN 5 third-plural forms have their own verified
-    // group; remove them from the pattern-generated group to keep the source
-    // distinction visible in the unchanged popup presentation.
-    past = past.filter(form => form !== TEXT_ATTESTED_AORIST_PLURAL[lemma]);
+    pastPersons = pastPersons.map(([person, suffixes]) => {
+      const forms = suffixes.map(value => stem + value);
+      if (lemma === 'pacati') forms.push(...forms.map(value => 'a' + value));
+      return { person, forms: uniqueForms(forms) };
+    });
+    // The verified third-plural words belong inside the complete Ajjatanī
+    // person pattern. The source line identifies them as text-attested.
+    if (TEXT_ATTESTED_AORIST_PLURAL[lemma]) {
+      const plural = pastPersons.find(item => item.person === 'thirdPlural');
+      if (plural) plural.forms = uniqueForms([...plural.forms, TEXT_ATTESTED_AORIST_PLURAL[lemma]]);
+    }
     const groups = [
-      group('Present: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl', endings.map(value => stem + value)),
-      ...(past.length ? [group('Ajjatanī / Aorist (regular possibilities from verb table)', past)] : []),
-      group('Future', ['ati', 'anti', 'asi', 'atha', 'āmi', 'āma'].map(value => stem + futureMarker + value)),
-      group('Imperative', imperativeEndings.map(value => stem + value)),
-      group('Optative', ['eyya', 'eyyuṃ', 'eyyāsi', 'eyyātha', 'eyyāmi', 'eyyāma'].map(value => stem + value)),
-      ...(ending !== 'oti' ? [group('Passive present (regular possibilities from verb table)',
-        ['īyati', 'īyanti', 'īyasi', 'īyatha', 'īyāmi', 'īyāma'].map(value => stem + value))] : []),
+      personGroup('Present: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl', personsFromEndings(endings)),
+      ...(pastPersons.length ? [personGroup('Ajjatanī / Aorist (regular possibilities from verb table)', pastPersons)] : []),
+      personGroup('Future', personsFromEndings(['ati', 'anti', 'asi', 'atha', 'āmi', 'āma']
+        .map(value => futureMarker + value))),
+      personGroup('Imperative', imperativePersons),
+      personGroup('Optative', personsFromEndings(['eyya', 'eyyuṃ', 'eyyāsi', 'eyyātha', 'eyyāmi', 'eyyāma'])),
+      ...(ending !== 'oti' ? [personGroup('Passive present (regular possibilities from verb table)',
+        personsFromEndings(['īyati', 'īyanti', 'īyasi', 'īyatha', 'īyāmi', 'īyāma']))] : []),
       group('Present participle', [stem + 'anta', stem + 'amāna']),
-      group('Absolutive / infinitive', ending === 'eti'
-        ? [stem + 'etvā', stem + 'etvāna', stem + 'etūna', stem + 'etuṃ']
-        : ending === 'oti' ? [stem + 'otvā', stem + 'otuṃ']
-          : [stem + 'itvā', stem + 'itvāna', stem + 'itūna', stem + 'ituṃ'])
+      group('Absolutive / gerund', ending === 'eti'
+        ? [stem + 'etvā', stem + 'etvāna', stem + 'etūna']
+        : ending === 'oti' ? [stem + 'otvā']
+          : [stem + 'itvā', stem + 'itvāna', stem + 'itūna']),
+      group('Infinitive', [stem + (ending === 'eti' ? 'etuṃ' : ending === 'oti' ? 'otuṃ' : 'ituṃ')])
     ];
-    if (lemma === 'hanati') groups[0] = group(groups[0].label,
-      ['hanati', 'hanti', 'hananti', 'hanasi', 'hanatha', 'hanāmi', 'hanāma']);
+    if (lemma === 'hanati') groups[0] = personGroup(groups[0].label, [
+      { person: 'thirdSingular', forms: ['hanati', 'hanti'] },
+      ...groups[0].persons.slice(1)
+    ]);
     return groups;
   }
 
@@ -1162,20 +1265,16 @@
         .flatMap(group => group.forms || []));
       const additional = attestedPast.filter(form => !existingPast.has(form));
       if (additional.length) {
-        const futureIndex = verbGroups.findIndex(group => /^Future/.test(group.label));
-        const pastGroup = { label: 'Ajjatanī / Aorist (dictionary-attested)', forms: additional };
-        if (futureIndex >= 0) verbGroups.splice(futureIndex, 0, pastGroup);
-        else verbGroups.push(pastGroup);
-      }
-    }
-    if (verbGroups.length && TEXT_ATTESTED_AORIST_PLURAL[lemma]) {
-      const form = TEXT_ATTESTED_AORIST_PLURAL[lemma];
-      const existingPast = verbGroups.some(group => /past|aorist|ajjatanī|hiyyattanī/i.test(group.label) && group.forms?.includes(form));
-      if (!existingPast) {
-        const group = { label: 'Ajjatanī / Aorist, third-person plural (DN 5; Kaccāyana 504)', forms: [form] };
-        const futureIndex = verbGroups.findIndex(item => /^Future/.test(item.label));
-        if (futureIndex >= 0) verbGroups.splice(futureIndex, 0, group);
-        else verbGroups.push(group);
+        const pastPattern = verbGroups.find(group => /aorist|ajjatanī/i.test(group.label) && group.persons);
+        if (pastPattern) {
+          pastPattern.persons.push({ person: 'other', forms: additional });
+          pastPattern.forms = uniqueForms([...pastPattern.forms, ...additional]);
+        } else {
+          const futureIndex = verbGroups.findIndex(group => /^Future/.test(group.label));
+          const pastGroup = { label: 'Ajjatanī / Aorist (dictionary-attested)', forms: additional };
+          if (futureIndex >= 0) verbGroups.splice(futureIndex, 0, pastGroup);
+          else verbGroups.push(pastGroup);
+        }
       }
     }
     const verbSource = verbGroups.length ? [
@@ -1188,7 +1287,7 @@
             : 'Possible regular forms generated from the supplied 02 Pali Grammar table - Verbs.pdf, pp. 1–4, and the PCED verb lemma',
       ...(attestedPast.length ? ['Past forms explicitly cited in PCED'] : []),
       ...(TEXT_ATTESTED_AORIST_PLURAL[lemma]
-        ? ['Third-person plural attested in DN 5; -iṃsu ending in Kaccāyana Ākhyāta rule 504'] : [])
+        ? ['Third-person plural form separately verified in a Pāli text'] : [])
     ].join('; ') : '';
     const verbSourceZh = verbGroups.length ? [
       KACCAYANA_VERB_PARADIGMS[lemma]
@@ -1200,7 +1299,7 @@
             : '可能的规则词形依据所提供的《02 Pali Grammar table - Verbs.pdf》第 1–4 页及 PCED 动词词典原形推算',
       ...(attestedPast.length ? ['过去时词形由 PCED 词典明确记载'] : []),
       ...(TEXT_ATTESTED_AORIST_PLURAL[lemma]
-        ? ['第三人称复数见《长部》第 5 经；-iṃsu 词尾见《迦旃延巴利文法》动词篇第 504 则'] : [])
+        ? ['第三人称复数词形另经巴利文核实'] : [])
     ].join('；') : '';
     const verified = verifiedFormsForLemma(lemma, options);
     if (!nounGroups.length && !verbGroups.length && !verified.length) return null;
@@ -1234,6 +1333,7 @@
     dictionaryGroups,
     localizedAnalysisText,
     localizedVerbGroupLabel,
+    localizedVerbPersonLabel,
     inflectionParadigm,
     verifiedDecompositions: BUILTIN_DECOMPOSITIONS
   });

@@ -1,4 +1,4 @@
-/* PCED landing-page search v1.7.8 — exact Pāli/diacritic-aware and multilingual. */
+/* PCED landing-page search v1.7.9 — exact Pāli/diacritic-aware and multilingual. */
 (function (global) {
   'use strict';
 
@@ -252,7 +252,11 @@
         ? global.PCEDLookupCore.localizedVerbGroupLabel(group.label, priority)
         : localizedGroupLabel(group.label, priority, group, paradigm.lemma);
       content += '<div class="pced-inflection-group"><b>' + esc(groupLabel) + '</b>';
-      if (group.rows) {
+      if (group.persons?.length) {
+        content += group.persons.map(item => '<div class="pced-form-list"><strong class="pced-person-label">' +
+          esc(global.PCEDLookupCore.localizedVerbPersonLabel(item.person, priority)) + ':</strong> ' +
+          chips(item.forms) + '</div>').join('');
+      } else if (group.rows) {
         const hasPlural = group.rows.some(row => row.plural?.length);
         content += '<div class="pced-inflection-table-wrap"><table class="pced-inflection-table">' +
           '<thead><tr><th>' + esc(ui.case) + '</th><th>' + esc(ui.singular) + '</th>' +
@@ -462,7 +466,7 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.8' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.9' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
