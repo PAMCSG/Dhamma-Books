@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.20 — 2026-09-29 */
+/* PAMC cross-book PCED popup standard v1.8.21 — 2026-09-29 */
 (function () {
   'use strict';
 
@@ -89,19 +89,6 @@
     zh: '中文', en: 'English', my: 'Burmese', ja: 'Japanese',
     vi: 'Vietnamese', ko: 'Korean', other: 'Other'
   });
-  function googleTranslateLink(definition, sourceLanguage, targetLanguage) {
-    const template = document.createElement('template');
-    template.innerHTML = String(definition || '');
-    const text = String(template.content.textContent || '').trim();
-    const params = new URLSearchParams({
-      sl: ['zh', 'en', 'my', 'ja', 'vi', 'ko'].includes(sourceLanguage) ? sourceLanguage : 'auto',
-      tl: targetLanguage === 'zh' ? 'zh-CN' : 'en',
-      text,
-      op: 'translate'
-    });
-    return 'https://translate.google.com/?' + params.toString();
-  }
-
   function groupTitle(group) {
     return LANGUAGE_TITLES[group?.key] || String(group?.title || 'Other')
       .replace(/^中文\s*\/\s*Chinese$/i, '中文')
@@ -111,14 +98,9 @@
       .replace(/^한국어\s*\/\s*Korean$/i, 'Korean');
   }
 
-  function renderDictionaryItem(item, language) {
-    return '<div class="pced-dictionary-item" data-source-language="' + esc(language || 'other') + '">' +
-      '<div class="source">' + esc(item.source_label || item.source || '') + '</div>' +
-      '<div class="definition">' + (item.definition || '') + '</div>' +
-      '<div class="pced-translation-actions" aria-label="Translate this PCED definition">' +
-      (language === 'zh' ? '' : '<a href="' + esc(googleTranslateLink(item.definition, language, 'zh')) + '" target="_blank" rel="noopener noreferrer">Google 译成中文 ↗</a>') +
-      (language === 'en' ? '' : '<a href="' + esc(googleTranslateLink(item.definition, language, 'en')) + '" target="_blank" rel="noopener noreferrer">Google Translate to English ↗</a>') +
-      '</div></div>';
+  function renderDictionaryItem(item) {
+    return '<div class="source">' + esc(item.source_label || item.source || '') + '</div>' +
+      '<div class="definition">' + (item.definition || '') + '</div>';
   }
 
   function isSingleWordRecord(row) {
@@ -192,7 +174,7 @@
       html += '<div class="group-title" data-language="' + esc(group.key || 'other') + '">' +
         esc(groupTitle(group)) + '</div>';
       if (group.key === 'zh' && approved) html += approved;
-      for (const item of group.entries) html += renderDictionaryItem(item, group.key);
+      for (const item of group.entries) html += renderDictionaryItem(item);
     }
     return html + '</div>';
   }
@@ -1306,10 +1288,6 @@
         }
         .source{color:#846b58!important;font-family:Arial,"Microsoft YaHei","Noto Sans Myanmar",sans-serif!important;font-size:14px!important;font-weight:600!important;line-height:1.45!important;margin:7px 0 2px!important}
         .definition{color:var(--pamc-popup-ink)!important;font-family:Georgia,"Times New Roman","Noto Serif SC","Songti SC",SimSun,"Myanmar Text","Noto Sans Myanmar",serif!important;font-size:18px!important;line-height:1.65!important}
-        .pced-dictionary-item{padding:2px 0 8px!important;border-bottom:1px solid #eee3d8!important}
-        .pced-translation-actions{display:flex!important;gap:6px!important;flex-wrap:wrap!important;margin-top:6px!important}
-        .pced-translation-actions a{display:inline-block!important;padding:4px 8px!important;border:1px solid #b98f6d!important;border-radius:6px!important;background:#fff5e9!important;color:#68442f!important;text-decoration:none!important;font:600 12px/1.35 Arial,"Microsoft YaHei",sans-serif!important}
-        .pced-translation-actions a:hover,.pced-translation-actions a:focus{background:#ead8c3!important;text-decoration:underline!important}
         #dictModal .panel-body .headword,#lookupModal .panel-body .headword,#pced-modal .pced-body .headword{font-family:Georgia,"Times New Roman",serif!important;font-size:27px!important;font-weight:700!important;line-height:1.2!important}
         #dictModal .panel-body .group-title,#lookupModal .panel-body .group-title,#pced-modal .pced-body .group-title{font-family:Georgia,"Times New Roman","Noto Serif SC",SimSun,serif!important;font-size:22px!important;font-weight:700!important;line-height:1.25!important}
         #dictModal .panel-body .source,#lookupModal .panel-body .source,#pced-modal .pced-body .source{font-family:Arial,"Microsoft YaHei","Noto Sans Myanmar",sans-serif!important;font-size:14px!important;line-height:1.45!important}
