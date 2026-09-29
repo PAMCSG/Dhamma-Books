@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.10 — 2026-09-29
+ * Version 3.9.13 — 2026-09-29
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -225,12 +225,22 @@
         { person: 'firstSingular', forms: ['gaccheyyāmi', 'gacche'] }, { person: 'firstPlural', forms: ['gaccheyyāma'] }
       ]) }),
       Object.freeze({ label: 'Future (Bhavissanti)', persons: Object.freeze([
-        { person: 'thirdSingular', forms: ['gacchissati'] }, { person: 'thirdPlural', forms: ['gacchissanti'] },
+        { person: 'thirdSingular', forms: ['gacchissati'] }, { person: 'thirdPlural', forms: ['gacchissanti', 'gacchissare'] },
         { person: 'secondSingular', forms: ['gacchissasi'] }, { person: 'secondPlural', forms: ['gacchissatha'] },
         { person: 'firstSingular', forms: ['gacchissāmi'] }, { person: 'firstPlural', forms: ['gacchissāma'] }
       ]) })
     ])
   });
+
+  // The asterisks on printed pp. 602–606 mark departures from the
+  // ordinary vibhatti endings. Keep the lookup forms unadorned and add the
+  // mark only to the Kaccāyana source display, so searches still use Pāli words.
+  const KACCAYANA_STARRED_GACCHATI = new Set([
+    'gacche', 'gacchare', 'gaccha', 'gacchassu',
+    'agaccha', 'agacchu', 'gacchu', 'agacchi', 'gacchi',
+    'agacchatha', 'agacchiṃsu', 'gacchiṃsu',
+    'agacchimha', 'gacchimha', 'gacchissare'
+  ]);
 
   // These forms are individually verified. Rule 504 accounts for the third-plural
   // ending; the complete stems are checked against the text and PCED lemmas.
@@ -1311,7 +1321,10 @@
         sourceZh: '《迦旃延巴利文法》动词篇，第 602–606 页（例词；* 号为特殊词形）',
         groups: KACCAYANA_VERB_PARADIGMS[lemma].map(group => ({
           label: group.label,
-          persons: group.persons.map(item => ({ person: item.person, forms: [...item.forms] }))
+          persons: group.persons.map(item => ({
+            person: item.person,
+            forms: item.forms.map(form => KACCAYANA_STARRED_GACCHATI.has(form) ? '*' + form : form)
+          }))
         }))
       });
     }
