@@ -24,8 +24,12 @@ not a verbatim 13-item chapter in the root grammar. Some tables also expressly
 refer to Rūpasiddhi; the interface therefore calls the output “Kaccāyana-based”.
 
 For verbs, PCED identifies the lemma and explicitly labels some past forms.
-The lookup's regular ending templates generate possible forms from that lemma;
-they are not a transcription of Bhante U Janakābhivaṃsa's declension note.
+The user-supplied _02 Pali Grammar table - Verbs.pdf_ (2019, six pages)
+supplies the present, Ajjatanī, future, imperative, optative, passive and
+absolutive/infinitive patterns used after PCED identifies a verb. Pattern-
+generated forms remain possible forms, not separately confirmed dictionary
+headwords; the supplied examples are not attributed to Bhante U
+Janakābhivaṃsa's separate noun-declension note.
 The *Ākhyāta Kappa* supplies grammatical rules and examples. In particular,
 rule 504 explains the Ajjatanī third-plural ending `-iṃsu`. Complete forms
 `vihariṃsu` and `ussahiṃsu` are separately attested in DN 5; their stems are
@@ -46,11 +50,20 @@ not inferred merely by applying the ending rule.
 
 1. Resolve the entered or clicked form to an attested PCED verb headword.
 2. Identify a finite verb from explicit PCED grammatical evidence or a
-   maintained teacher/Kaccāyana family before considering noun declension.
-3. Generate regular present, imperative, optative, future, participle,
-   absolutive and infinitive groups only for a reliably identified verb.
+   maintained Kaccāyana/supplied-table family before considering noun declension.
+3. After that identification, generate regular present, Ajjatanī, future,
+   imperative, optative, passive, participle, absolutive and infinitive groups
+   using the supplied table's regular patterns. Keep the existing popup group
+   headings and chips; do not render the PDF's person-by-number grids.
+   In particular, retain the long ā in `suṇāsi` and `suṇātha`; show the
+   six person/number endings, possible regular aorists, and the table's
+   imperative first-person forms. The PDF's initial a- aorists are modelled
+   only for its `pacati` example, not blindly added to prefixed stems.
 4. For irregular and transformed past systems, prefer complete attested
-   Kaccāyana forms and individually checked canonical examples.
+   Kaccāyana forms and the supplied table's exact `hoti`, `atthi`, `brūti`,
+   `hanti` and `hanati` examples. Do not use regular `-oti` derivation for
+   `hoti` (it yields spurious forms such as `hissati`). The PDF's `hoti`
+   person-pronoun cells are inconsistent, so use the forms without pronouns.
 5. Additionally index only forms explicitly labelled `【过】`, `【過】`,
    `[aor]`, `[aorist]`, or `[past]` inside the PCED verb entry.
 6. Never infer an irregular past stem from the present spelling alone. Do not
@@ -62,10 +75,10 @@ not inferred merely by applying the ending rule.
 
 For a recognized verb display:
 
-The verb source line is assembled for the forms actually shown. Regular
-templates are attributed to the PCED lemma; explicit PCED past citations,
-maintained Kaccāyana examples, and the DN 5 / rule 504 third-plural forms
-appear there only when present in that lemma's table.
+The verb source line is assembled for the forms actually shown. The supplied
+PDF's regular patterns and exact exceptional examples, explicit PCED past
+citations, maintained Kaccāyana examples, and the DN 5 / rule 504 third-plural
+forms are distinguished there.
 
 In Chinese priority and Chinese books, the verb group headings and this
 source explanation display in Chinese. The Pāli word forms stay in Pāli.
@@ -180,7 +193,9 @@ these JavaScript files changes.
 
 | Input | Resolution | Evidence |
 | --- | --- | --- |
-| `gacchati` | verb, never noun | maintained teacher/Kaccāyana family |
+| `gacchati` | verb, never noun | maintained Kaccāyana family |
+| `pacati`, `suṇāti`, `ṭhapeti` | verb | supplied table's regular examples and person endings |
+| `hoti`, `atthi`, `brūti`, `hanti` | verb | supplied table's exact exceptional examples |
 | `gacchi` | `gacchati` | explicit PCED `【过】` form |
 | `agamā`, `agamū` | `gacchati` | Kaccāyana Hiyyattanī |
 | `agamī`, `agamuṃ`, `agacchi`, `agacchuṃ` | `gacchati` | Kaccāyana Ajjatanī |

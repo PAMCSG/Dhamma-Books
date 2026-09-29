@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.8 — 2026-09-29
+ * Version 3.9.9 — 2026-09-29
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.8';
+  const VERSION = '3.9.9';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -124,6 +124,8 @@
       'Past imperfect (Hiyyattanī)': '过去未完成时（Hiyyattanī）',
       'Aorist / recent past (Ajjatanī)': '不定过去时（Ajjatanī）',
       'Ajjatanī / Aorist (dictionary-attested)': '不定过去时（Ajjatanī；PCED 词典记载）',
+      'Ajjatanī / Aorist (regular possibilities from verb table)': '不定过去时（Ajjatanī；依动词表推算的可能词形）',
+      'Ajjatanī / Aorist (uploaded verb table)': '不定过去时（Ajjatanī；所提供的动词表）',
       'Ajjatanī / Aorist, third-person plural (DN 5; Kaccāyana 504)': '不定过去时（Ajjatanī），第三人称复数（《长部》第 5 经；迦旃延第 504 则）',
       'Imperative': '命令式',
       'Imperative (Pañcamī)': '命令式（Pañcamī）',
@@ -132,6 +134,7 @@
       'Future': '未来时',
       'Future (Bhavissanti)': '未来时（Bhavissanti）',
       'Present participle': '现在分词',
+      'Passive present (regular possibilities from verb table)': '现在时被动语态（依动词表推算的可能词形）',
       'Absolutive / infinitive': '独立分词／不定式'
     };
     return labels[value] || value;
@@ -183,6 +186,27 @@
   const TEXT_ATTESTED_AORIST_PLURAL = Object.freeze({
     viharati: 'vihariṃsu',
     ussahati: 'ussahiṃsu'
+  });
+
+  // Complete exceptional paradigms transcribed from the user's
+  // "02 Pali Grammar table - Verbs.pdf", pp. 5–6. Its hoti rows misplace
+  // some pronouns; the listed forms are ordered by person without pronouns.
+  // Do not apply the regular -oti template to hoti: it produces false forms.
+  const VERB_TABLE_EXCEPTIONS = Object.freeze({
+    hoti: Object.freeze([
+      Object.freeze({ label: 'Present: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl', forms: Object.freeze(['hoti', 'honti', 'hosi', 'hottha', 'homi', 'homa']) }),
+      Object.freeze({ label: 'Ajjatanī / Aorist (uploaded verb table)', forms: Object.freeze(['ahosi', 'ahesuṃ', 'ahuvā', 'ahuvattha', 'ahusittha', 'ahosiṃ', 'ahuṃ', 'ahosimha', 'ahumha']) }),
+      Object.freeze({ label: 'Imperative', forms: Object.freeze(['hotu', 'hontu', 'hohi', 'hotha', 'homi', 'homa']) })
+    ]),
+    atthi: Object.freeze([
+      Object.freeze({ label: 'Present: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl', forms: Object.freeze(['atthi', 'santi', 'asi', 'attha', 'asmi', 'amhi', 'asma', 'amha']) })
+    ]),
+    brūti: Object.freeze([
+      Object.freeze({ label: 'Present: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl', forms: Object.freeze(['brūti', 'brūvanti', 'brūsi', 'brūtha', 'brūmi', 'brūma']) })
+    ]),
+    hanti: Object.freeze([
+      Object.freeze({ label: 'Present: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl', forms: Object.freeze(['hanati', 'hanti', 'hananti', 'hanasi', 'hanatha', 'hanāmi', 'hanāma']) })
+    ])
   });
 
   // Curated analyses are reserved for forms whose inherited dictionary
@@ -1062,6 +1086,8 @@
   function verbParadigm(lemma, grammarText) {
     const maintained = KACCAYANA_VERB_PARADIGMS[lemma];
     if (maintained) return maintained.map(group => ({ label: group.label, forms: uniqueForms(group.forms) }));
+    const exception = VERB_TABLE_EXCEPTIONS[lemma];
+    if (exception) return exception.map(group => ({ label: group.label, forms: uniqueForms(group.forms) }));
     const ending = ['āti', 'ati', 'eti', 'oti'].find(value => lemma.endsWith(value));
     if (!ending || !/(?:\bkri\b|ကြိ|【(?:过|現|现|命|独)|\b(?:pr|imper|opt|fut|aor|ger|inf)\s*[．.]|\b(?:goes|does|makes|becomes)\b)/i.test(grammarText)) return [];
     const stem = lemma.slice(0, -ending.length);
@@ -1069,26 +1095,49 @@
       ? ['eti', 'enti', 'esi', 'etha', 'emi', 'ema']
       : ending === 'oti'
         ? ['oti', 'onti', 'osi', 'otha', 'omi', 'oma']
-        : [ending, 'anti', 'asi', 'atha', 'āmi', 'āma'];
+        : ending === 'āti'
+          ? ['āti', 'anti', 'āsi', 'ātha', 'āmi', 'āma']
+          : ['ati', 'anti', 'asi', 'atha', 'āmi', 'āma'];
     const futureMarker = ending === 'eti' ? 'ess' : 'iss';
     const imperativeEndings = ending === 'eti'
-      ? ['etu', 'entu', 'ehi', 'etha']
+      ? ['etu', 'entu', 'ehi', 'etha', 'emi', 'ema']
       : ending === 'oti'
-        ? ['otu', 'ontu', 'ohi', 'otha']
+        ? ['otu', 'ontu', 'ohi', 'otha', 'omi', 'oma']
         : ending === 'āti'
-          ? ['ātu', 'antu', 'āhi', 'ātha']
-          : ['atu', 'antu', 'āhi', 'atha'];
+          ? ['ātu', 'antu', 'a', 'āhi', 'ātha', 'āmi', 'āma']
+          : ['atu', 'antu', 'a', 'āhi', 'atha', 'āmi', 'āma'];
     const group = (label, forms) => ({ label, forms: uniqueForms(forms) });
-    return [
+    // The PDF gives paca, ṭhape and ṭhapaya as separate aorist patterns.
+    // An initial a- is exemplified for paca only, so do not impose it on
+    // arbitrary prefixed verbs (for example ussahati).
+    let past = [];
+    if (ending === 'eti') {
+      past = ['esi', 'esiṃsu', 'esuṃ', 'eso', 'esittha', 'esiṃ', 'esimha', 'esimhā'].map(value => stem + value);
+    } else if (ending === 'ati' || ending === 'āti') {
+      past = ['i', 'ī', 'iṃsu', 'uṃ', 'o', 'ittha', 'iṃ', 'imha', 'imhā'].map(value => stem + value);
+      if (lemma === 'pacati') past.push(...past.map(value => 'a' + value));
+    }
+    // The two complete DN 5 third-plural forms have their own verified
+    // group; remove them from the pattern-generated group to keep the source
+    // distinction visible in the unchanged popup presentation.
+    past = past.filter(form => form !== TEXT_ATTESTED_AORIST_PLURAL[lemma]);
+    const groups = [
       group('Present: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl', endings.map(value => stem + value)),
+      ...(past.length ? [group('Ajjatanī / Aorist (regular possibilities from verb table)', past)] : []),
+      group('Future', ['ati', 'anti', 'asi', 'atha', 'āmi', 'āma'].map(value => stem + futureMarker + value)),
       group('Imperative', imperativeEndings.map(value => stem + value)),
       group('Optative', ['eyya', 'eyyuṃ', 'eyyāsi', 'eyyātha', 'eyyāmi', 'eyyāma'].map(value => stem + value)),
-      group('Future', ['ati', 'anti', 'asi', 'atha', 'āmi', 'āma'].map(value => stem + futureMarker + value)),
+      ...(ending !== 'oti' ? [group('Passive present (regular possibilities from verb table)',
+        ['īyati', 'īyanti', 'īyasi', 'īyatha', 'īyāmi', 'īyāma'].map(value => stem + value))] : []),
       group('Present participle', [stem + 'anta', stem + 'amāna']),
       group('Absolutive / infinitive', ending === 'eti'
-        ? [stem + 'etvā', stem + 'etuṃ']
-        : ending === 'oti' ? [stem + 'otvā', stem + 'otuṃ'] : [stem + 'itvā', stem + 'ituṃ'])
+        ? [stem + 'etvā', stem + 'etvāna', stem + 'etūna', stem + 'etuṃ']
+        : ending === 'oti' ? [stem + 'otvā', stem + 'otuṃ']
+          : [stem + 'itvā', stem + 'itvāna', stem + 'itūna', stem + 'ituṃ'])
     ];
+    if (lemma === 'hanati') groups[0] = group(groups[0].label,
+      ['hanati', 'hanti', 'hananti', 'hanasi', 'hanatha', 'hanāmi', 'hanāma']);
+    return groups;
   }
 
   function inflectionParadigm(head, entry, options = {}) {
@@ -1132,7 +1181,11 @@
     const verbSource = verbGroups.length ? [
       KACCAYANA_VERB_PARADIGMS[lemma]
         ? 'Maintained Kaccāyana verb examples (Ākhyāta chapter)'
-        : 'Regular forms generated from the PCED verb lemma',
+        : VERB_TABLE_EXCEPTIONS[lemma]
+          ? 'Exceptional forms in the supplied 02 Pali Grammar table - Verbs.pdf, pp. 5–6'
+          : lemma.endsWith('oti')
+            ? 'Regular forms generated from the PCED verb lemma'
+            : 'Possible regular forms generated from the supplied 02 Pali Grammar table - Verbs.pdf, pp. 1–4, and the PCED verb lemma',
       ...(attestedPast.length ? ['Past forms explicitly cited in PCED'] : []),
       ...(TEXT_ATTESTED_AORIST_PLURAL[lemma]
         ? ['Third-person plural attested in DN 5; -iṃsu ending in Kaccāyana Ākhyāta rule 504'] : [])
@@ -1140,7 +1193,11 @@
     const verbSourceZh = verbGroups.length ? [
       KACCAYANA_VERB_PARADIGMS[lemma]
         ? '《迦旃延巴利文法》动词篇中已核实的动词例子'
-        : '规则词形依 PCED 动词词典原形生成',
+        : VERB_TABLE_EXCEPTIONS[lemma]
+          ? '所提供的《02 Pali Grammar table - Verbs.pdf》第 5–6 页中列出的特殊动词词形'
+          : lemma.endsWith('oti')
+            ? '规则词形依 PCED 动词词典原形生成'
+            : '可能的规则词形依据所提供的《02 Pali Grammar table - Verbs.pdf》第 1–4 页及 PCED 动词词典原形推算',
       ...(attestedPast.length ? ['过去时词形由 PCED 词典明确记载'] : []),
       ...(TEXT_ATTESTED_AORIST_PLURAL[lemma]
         ? ['第三人称复数见《长部》第 5 经；-iṃsu 词尾见《迦旃延巴利文法》动词篇第 504 则'] : [])
@@ -1152,7 +1209,9 @@
       kind: verbGroups.length ? 'verb' : nounGroups.length ? 'noun' : 'verified',
       verified,
       groups: verbGroups.length ? verbGroups : nounGroups,
-      generated: !!(verbGroups.length || nounGroups.length),
+      generated: verbGroups.length
+        ? !(KACCAYANA_VERB_PARADIGMS[lemma] || VERB_TABLE_EXCEPTIONS[lemma])
+        : !!nounGroups.length,
       formSystem: verbGroups.length ? 'kaccayana' : kaccayana?.groups?.length ? 'kaccayana' : reliableNounGroups?.length ? 'pali-lookup' : 'generated',
       formSource: verbGroups.length
         ? verbSource
