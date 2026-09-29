@@ -256,12 +256,29 @@
         esc(global.PCEDLookupCore.localizedVerbPersonLabel(item.person, priority)) + ': ' + chips(item.forms) + '</div>';
       return html;
     };
+    const verbCategory = label => {
+      const value = String(label || '').toLowerCase();
+      if (/participle|passive|infinitive|gerund/.test(value)) return '';
+      if (/hiyyattanī/.test(value)) return 'hiyyattanī';
+      if (/ajjatanī|aorist/.test(value)) return 'ajjatanī';
+      if (/parokkhā/.test(value)) return 'parokkhā';
+      if (/kālātipatti/.test(value)) return 'kālātipatti';
+      if (/imperative|pañcamī/.test(value)) return 'imperative';
+      if (/optative|sattamī/.test(value)) return 'optative';
+      if (/future|bhavissanti/.test(value)) return 'future';
+      if (/present|vattamānā/.test(value)) return 'present';
+      return '';
+    };
     let content = '';
     for (const group of paradigm.groups || []) {
       const groupLabel = paradigm.kind === 'verb'
         ? global.PCEDLookupCore.localizedVerbGroupLabel(group.label, priority)
         : localizedGroupLabel(group.label, priority, group, paradigm.lemma);
+      const category = paradigm.kind === 'verb' ? verbCategory(group.label) : '';
+      const alternate = category && paradigm.attanopadaGroups?.find(item => verbCategory(item.label) === category);
       content += '<div class="pced-inflection-group"><b>' + esc(groupLabel) + '</b>';
+      if (alternate) content += ' <button type="button" class="pced-attanopada-toggle" aria-expanded="false">' +
+        esc(priority === 'zh' ? 'Attanopada 词形' : 'Attanopada forms') + '</button>';
       if (group.persons?.length) {
         content += compactPersons(group.persons);
       } else if (group.rows) {
@@ -272,6 +289,12 @@
           group.rows.map(row => '<tr><th>' + esc(caseLabel(row.label)) + '</th><td>' + chips(row.singular) +
             '</td>' + (hasPlural ? '<td>' + chips(row.plural) + '</td>' : '') + '</tr>').join('') + '</tbody></table></div>';
       } else content += '<div class="pced-form-list">' + chips(group.forms) + '</div>';
+      if (alternate) content += '<div class="pced-attanopada-panel" hidden>' +
+        compactPersons(alternate.persons) +
+        (alternate.endingsOnly ? '<div class="pced-inflection-caution">' +
+          esc(priority === 'zh' ? '仅列 Kaccāyana 词尾；此动词的完整词形尚未核实。' :
+            'Kaccāyana endings only; complete forms for this verb are not verified.') + '</div>' : '') +
+        '</div>';
       if (group.note) content += '<div class="pced-inflection-caution">' + esc(group.note) + '</div>';
       content += '</div>';
     }
@@ -464,6 +487,14 @@
     document.getElementById('pced-close')?.addEventListener('click', closeModal);
     modal?.addEventListener('click', event => { if (event.target === modal) closeModal(); });
     modal?.addEventListener('click', event => {
+      const alternate = event.target.closest?.('.pced-attanopada-toggle');
+      if (alternate) {
+        const panel = alternate.closest('.pced-inflection-group')?.querySelector('.pced-attanopada-panel');
+        const opening = !!panel?.hidden;
+        if (panel) panel.hidden = !opening;
+        alternate.setAttribute('aria-expanded', String(opening));
+        return;
+      }
       const toggle = event.target.closest?.('.pced-inflection-toggle');
       if (!toggle) return;
       const panel = toggle.nextElementSibling;
@@ -474,7 +505,7 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.10' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.12' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

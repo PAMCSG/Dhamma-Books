@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.12 — 2026-09-29 */
+/* PAMC cross-book PCED popup standard v1.8.14 — 2026-09-29 */
 (function () {
   'use strict';
 
@@ -59,7 +59,7 @@
     });
     morphologyPromise = Promise.resolve()
       .then(() => window.KaccayanaDeclension?.VERSION === '1.5.1' ? null : load('kaccayana-declension.js', '1.5.1'))
-      .then(() => core()?.version === '3.9.10' ? null : load('pced-lookup-core.js', '3.9.10'))
+      .then(() => core()?.version === '3.9.11' ? null : load('pced-lookup-core.js', '3.9.11'))
       .then(() => window.PaliLookupMorphology ? null : load('pali-lookup-morphology.js', '2.0-unicode-trial'))
       .then(() => window.PaliLookupMorphology || null);
     return morphologyPromise;
@@ -274,12 +274,29 @@
         esc(core().localizedVerbPersonLabel(item.person, primaryLanguage)) + ': ' + chips(item.forms) + '</div>';
       return html;
     };
+    const verbCategory = label => {
+      const value = String(label || '').toLowerCase();
+      if (/participle|passive|infinitive|gerund/.test(value)) return '';
+      if (/hiyyattanī/.test(value)) return 'hiyyattanī';
+      if (/ajjatanī|aorist/.test(value)) return 'ajjatanī';
+      if (/parokkhā/.test(value)) return 'parokkhā';
+      if (/kālātipatti/.test(value)) return 'kālātipatti';
+      if (/imperative|pañcamī/.test(value)) return 'imperative';
+      if (/optative|sattamī/.test(value)) return 'optative';
+      if (/future|bhavissanti/.test(value)) return 'future';
+      if (/present|vattamānā/.test(value)) return 'present';
+      return '';
+    };
     let content = '';
     for (const group of paradigm.groups || []) {
       const groupLabel = paradigm.kind === 'verb'
         ? core().localizedVerbGroupLabel(group.label, primaryLanguage)
         : localizedGroupLabel(group.label, primaryLanguage, group, paradigm.lemma);
+      const category = paradigm.kind === 'verb' ? verbCategory(group.label) : '';
+      const alternate = category && paradigm.attanopadaGroups?.find(item => verbCategory(item.label) === category);
       content += '<div class="pced-inflection-group"><b>' + esc(groupLabel) + '</b>';
+      if (alternate) content += ' <button type="button" class="pced-attanopada-toggle" aria-expanded="false">' +
+        esc(primaryLanguage === 'zh' ? 'Attanopada 词形' : 'Attanopada forms') + '</button>';
       if (group.persons?.length) {
         content += compactPersons(group.persons);
       } else if (group.rows) {
@@ -292,6 +309,12 @@
       } else {
         content += '<div class="pced-form-list">' + chips(group.forms) + '</div>';
       }
+      if (alternate) content += '<div class="pced-attanopada-panel" hidden>' +
+        compactPersons(alternate.persons) +
+        (alternate.endingsOnly ? '<div class="pced-inflection-caution">' +
+          esc(primaryLanguage === 'zh' ? '仅列 Kaccāyana 词尾；此动词的完整词形尚未核实。' :
+            'Kaccāyana endings only; complete forms for this verb are not verified.') + '</div>' : '') +
+        '</div>';
       if (group.note) content += '<div class="pced-inflection-caution">' + esc(group.note) + '</div>';
       content += '</div>';
     }
@@ -1289,6 +1312,10 @@
         .pced-inflection-toggle[aria-expanded="true"]{background:#9a6b49!important;color:#fff!important}
         .pced-inflection-panel{margin-top:8px!important;padding:10px 12px!important;border:1px solid var(--pamc-popup-line)!important;border-radius:9px!important;background:#fffaf5!important;color:var(--pamc-popup-ink)!important;font:14px/1.5 Arial,"Microsoft YaHei",sans-serif!important}
         .pced-inflection-panel[hidden]{display:none!important}
+        .pced-attanopada-toggle{margin-left:7px!important;padding:2px 7px!important;border:1px solid #b98f6d!important;border-radius:6px!important;background:#fff!important;color:#68442f!important;font:600 12px/1.3 Arial,"Microsoft YaHei",sans-serif!important;cursor:pointer!important}
+        .pced-attanopada-toggle[aria-expanded="true"]{background:#9a6b49!important;color:#fff!important}
+        .pced-attanopada-panel{margin:5px 0 2px!important;padding:6px 8px!important;border-left:2px solid #b98f6d!important;background:#fff5e9!important}
+        .pced-attanopada-panel[hidden]{display:none!important}
         .pced-inflection-group+.pced-inflection-group{margin-top:10px!important}
         .pced-form-list{margin-top:4px!important}
         .pced-form-chip{display:inline-block!important;margin:2px 3px 2px 0!important;padding:2px 6px!important;border-radius:5px!important;background:#f1e3d4!important;color:#174f7a!important;font-family:Georgia,"Times New Roman",serif!important;font-size:15px!important}
@@ -1378,6 +1405,16 @@
     // its modal. This makes the real page integration deterministic instead
     // of depending only on attribute-observer timing.
     document.addEventListener('click', event => {
+      const attanopadaToggle = event.target.closest?.('.pced-attanopada-toggle');
+      if (attanopadaToggle) {
+        event.preventDefault();
+        event.stopPropagation();
+        const panel = attanopadaToggle.closest('.pced-inflection-group')?.querySelector('.pced-attanopada-panel');
+        const opening = !!panel?.hidden;
+        if (panel) panel.hidden = !opening;
+        attanopadaToggle.setAttribute('aria-expanded', String(opening));
+        return;
+      }
       const inflectionToggle = event.target.closest?.('.pced-inflection-toggle');
       if (inflectionToggle) {
         event.preventDefault();

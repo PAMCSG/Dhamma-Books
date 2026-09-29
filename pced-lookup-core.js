@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.10';
+  const VERSION = '3.9.11';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -118,7 +118,13 @@
   function localizedVerbGroupLabel(label, language = 'en') {
     const value = String(label || '');
     if (language !== 'zh') return value;
+    if (value.endsWith(' (endings only)')) return localizedVerbGroupLabel(value.slice(0, -15), language) + '（仅词尾）';
     const labels = {
+      'Present (Vattamānā)': '现在时（Vattamānā）',
+      'Parokkhā': '未亲见过去时（Parokkhā）',
+      'Hiyyattanī': '过去未完成时（Hiyyattanī）',
+      'Ajjatanī': '不定过去时（Ajjatanī）',
+      'Kālātipatti': '未实现条件式（Kālātipatti）',
       'Present: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl': '现在时：第三人称单数、复数；第二人称单数、复数；第一人称单数、复数',
       'Present (Vattamānā): 3sg, 3pl, 2sg, 2pl, 1sg, 1pl': '现在时（Vattamānā）：第三人称单数、复数；第二人称单数、复数；第一人称单数、复数',
       'Past imperfect (Hiyyattanī)': '过去未完成时（Hiyyattanī）',
@@ -1243,6 +1249,47 @@
     return groups;
   }
 
+  // Kaccāyana, Ākhyāta §§423–430 (printed pp. 588–592), gives the
+  // Attanopada endings. Complete gacchati examples are on pp. 603–606.
+  // Only the predictable -ati patterns are composed for other lemmas;
+  // older past stems and irregular verbs must not be invented from -ti.
+  function attanopadaParadigm(lemma, verbGroups) {
+    if (!verbGroups.length) return [];
+    const keys = ['thirdSingular', 'thirdPlural', 'secondSingular', 'secondPlural', 'firstSingular', 'firstPlural'];
+    const group = (label, cells, endingsOnly = false) => ({
+      label: endingsOnly ? label + ' (endings only)' : label,
+      persons: keys.map((person, index) => ({ person, forms: cells[index] })),
+      endingsOnly
+    });
+    const suffixes = [
+      ['Parokkhā', ['ttha', 're', 'ttho', 'vho', 'iṃ', 'mhe']],
+      ['Hiyyattanī', ['ttha', 'tthuṃ', 'se', 'vhaṃ', 'iṃ', 'mhase']],
+      ['Ajjatanī', ['ā', 'ū', 'se', 'vhaṃ', 'aṃ', 'mhe']],
+      ['Kālātipatti', ['ssatha', 'ssiṃsu', 'ssase', 'ssavhe', 'ssaṃ', 'ssāmhase']]
+    ];
+    if (lemma === 'gacchati') return [
+      group('Present (Vattamānā)', [['gacchate'], ['gacchante', 'gacchare'], ['gacchase'], ['gacchavhe'], ['gacche'], ['gacchāmhe']]),
+      group('Parokkhā', [['jagamittha'], ['jagamire'], ['jagamittho'], ['jagamivho'], ['jagamiṃ'], ['jagamimhe']]),
+      group('Hiyyattanī', [['agacchattha', 'gacchattha'], ['agacchatthuṃ', 'gacchatthuṃ'], ['agacchase', 'gacchase'], ['agacchavhaṃ', 'gacchavhaṃ'], ['agacchiṃ', 'gacchiṃ'], ['agacchamhase', 'gacchamhase']]),
+      group('Ajjatanī', [['agacchā', 'gacchā', 'agacchittha', 'gacchittha'], ['agacchū', 'gacchū'], ['agacchise', 'gacchise'], ['agacchivhaṃ', 'gacchivhaṃ'], ['agacchaṃ', 'gacchaṃ', 'agaccha', 'gaccha'], ['agacchimhe', 'gacchimhe']]),
+      group('Imperative (Pañcamī)', [['gacchataṃ'], ['gacchantaṃ'], ['gacchassu'], ['gacchavho'], ['gacche'], ['gacchāmase']]),
+      group('Optative (Sattamī)', [['gacchetha'], ['gaccheraṃ'], ['gacchetho'], ['gaccheyyāvho'], ['gaccheyyaṃ', 'gacche'], ['gaccheyyāmhe']]),
+      group('Future (Bhavissanti)', [['gacchissate'], ['gacchissante', 'gacchissare'], ['gacchissase'], ['gacchissavhe'], ['gacchissaṃ'], ['gacchissāmhe']]),
+      group('Kālātipatti', [['agacchissatha', 'gacchissatha'], ['agacchissiṃsu', 'gacchissiṃsu'], ['agacchissase', 'gacchissase'], ['agacchissavhe', 'gacchissavhe'], ['agacchissaṃ', 'gacchissaṃ'], ['agacchissāmhase', 'gacchissāmhase']])
+    ];
+    if (!lemma.endsWith('ati') || VERB_TABLE_EXCEPTIONS[lemma]) return [];
+    const stem = lemma.slice(0, -3);
+    const compose = endings => endings.map(ending => [stem + ending]);
+    return [
+      group('Present (Vattamānā)', compose(['ate', 'ante', 'ase', 'avhe', 'e', 'āmhe'])),
+      ...suffixes.slice(0, 3).map(([label, endings]) => group(label, endings.map(ending => ['-' + ending]), true)),
+      group('Imperative (Pañcamī)', compose(['ataṃ', 'antaṃ', 'assu', 'avho', 'e', 'āmase'])),
+      group('Optative (Sattamī)', compose(['etha', 'eraṃ', 'etho', 'eyyāvho', 'eyyaṃ', 'eyyāmhe'])),
+      group('Future (Bhavissanti)', compose(['issate', 'issante', 'issase', 'issavhe', 'issaṃ', 'issāmhe'])),
+      group('Kālātipatti', suffixes[3][1].map(ending => ['-' + ending]), true)
+    ];
+  }
+
   function inflectionParadigm(head, entry, options = {}) {
     const lemma = cleanWord(head);
     if (!lemma || !entry) return null;
@@ -1255,6 +1302,7 @@
     const nounGroups = kaccayana?.groups || reliableNounGroups ||
       (global.PaliLookupMorphology ? [] : nounParadigm(lemma, grammarText));
     const verbGroups = verbParadigm(lemma, grammarText);
+    const attanopadaGroups = attanopadaParadigm(lemma, verbGroups);
     const attestedPast = explicitPastForms(entry);
     if (verbGroups.length && attestedPast.length) {
       // A form can legitimately be syncretic (for example cintesi is both
@@ -1308,6 +1356,8 @@
       kind: verbGroups.length ? 'verb' : nounGroups.length ? 'noun' : 'verified',
       verified,
       groups: verbGroups.length ? verbGroups : nounGroups,
+      attanopadaGroups,
+      attanopadaGenerated: lemma !== 'gacchati',
       generated: verbGroups.length
         ? !(KACCAYANA_VERB_PARADIGMS[lemma] || VERB_TABLE_EXCEPTIONS[lemma])
         : !!nounGroups.length,
