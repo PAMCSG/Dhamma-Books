@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.14 — 2026-09-29
+ * Version 3.9.15 — 2026-09-29
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.14';
+  const VERSION = '3.9.15';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -34,6 +34,7 @@
   // Verified whole-word spelling variants. A mapped form is accepted only
   // when it is an exact PCED headword in the host dictionary.
   const BUILTIN_ALIASES = Object.freeze({
+    'bruhi': Object.freeze(['brūhi']),
     'vīriyindriya': Object.freeze(['viriyindriya'])
   });
 
@@ -43,12 +44,6 @@
   // is the narrow exception: it keeps an attested surface-form entry from
   // hiding its verified lemma analysis.
   const BUILTIN_INFLECTIONS = Object.freeze({
-    // Maṅgala Sutta's "brūhi maṅgalamuttamaṃ": brū + imperative -hi.
-    // Its PCED citation form is brūti; do not generalize this to -ūhi nouns.
-    'brūhi': Object.freeze([Object.freeze({
-      form: 'brūti', label: 'Imperative, second-person singular: tell; speak',
-      family: 'text-attested verb form', preferLemma: true
-    })]),
     'rañño': Object.freeze([Object.freeze({
       form: 'rāja', label: 'Rājādigaṇa, genitive/dative singular: of/to the king',
       family: 'verified noun form', preferLemma: true
@@ -94,7 +89,6 @@
       'aorist 3rd person plural → present headword': '不定过去时第三人称复数 → 现在时词典原形',
       'dictionary-attested past / aorist form': '词典中有记载的过去时／不定过去时形式',
       'absolutive: having agreed/promised': '独立分词：已经同意／承诺',
-      'Imperative, second-person singular: tell; speak': '命令式第二人称单数：请说',
       'Hiyyattanī, third-person singular: went': 'Hiyyattanī（过去未完成时），第三人称单数：去了',
       'Hiyyattanī, third-person plural: went': 'Hiyyattanī（过去未完成时），第三人称复数：去了',
       'Ajjatanī (aorist), third-person singular: went': 'Ajjatanī（不定过去时），第三人称单数：去了',
@@ -169,10 +163,24 @@
   }
 
   // These complete PCED headwords are absent from the reduced web extract but
-  // are present in PCED 2.0.5.0 and in the project's verified Inflection
-  // Master. Keep them as exact noun headwords; never redirect them to a
-  // similarly-spelled verb or to an unrelated substring result.
+  // are present in PCED 2.0.5.0 or the project's verified Inflection Master.
+  // Keep them as exact headwords, never unrelated substring results.
   const BUILTIN_EXACT_HEADWORDS = Object.freeze({
+    // PCED 2.0.5.0 has brūhi as its own entry in both Myanmar sources.
+    // Do not redirect the exact headword to the related verb brūti.
+    'brūhi': Object.freeze({
+      headword: 'brūhi', zh: Object.freeze([]), en: Object.freeze([]),
+      my: Object.freeze([
+        Object.freeze({
+          source: 'B', source_label: 'Pali Word Grammar from Pali Myanmar Dictionary',
+          definition: 'brūhi (ကြိ) [brū+a+hi] [ဗြူ+အ+ဟိ]'
+        }),
+        Object.freeze({
+          source: 'K', source_label: 'Tipiṭaka Pāḷi-Myanmar Dictionary တိပိဋက-ပါဠိမြန်မာ အဘိဓာန်',
+          definition: 'brūhi — ဆိုလော၊ ဟောတော်မူပါလော။ ဗြဝီတိ-ကြည့်။'
+        })
+      ]), vi: Object.freeze([]), other: Object.freeze([])
+    }),
     jetu: Object.freeze({
       headword: 'jetu', zh: Object.freeze([]),
       en: Object.freeze([Object.freeze({
