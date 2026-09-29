@@ -53,10 +53,11 @@ not inferred merely by applying the ending rule.
    maintained Kaccāyana/supplied-table family before considering noun declension.
 3. After that identification, generate regular present, Ajjatanī, future,
    imperative, optative, passive, participle, absolutive and infinitive groups
-   using the supplied table's regular patterns. The finite groups list third,
-   second and first person in both singular and plural, with the supplied
-   alternatives. Keep the existing popup group headings and word chips;
-   label each person without rendering the PDF's grids.
+   using the supplied table's regular patterns. The finite groups list third
+   singular, third plural, second singular, second plural, first singular and
+   first plural in that order. Keep one compact line of the existing word
+   chips: separate positions with `;` and alternatives within a position with
+   ` / `. Do not render the PDF's grids or six labelled rows.
    In particular, retain the long ā in `suṇāsi` and `suṇātha`; show the
    six person/number endings, possible regular aorists, and the table's
    imperative first-person forms. The PDF's initial a- aorists are modelled

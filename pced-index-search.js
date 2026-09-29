@@ -1,4 +1,4 @@
-/* PCED landing-page search v1.7.9 — exact Pāli/diacritic-aware and multilingual. */
+/* PCED landing-page search v1.7.10 — exact Pāli/diacritic-aware and multilingual. */
 (function (global) {
   'use strict';
 
@@ -246,6 +246,16 @@
     const chips = forms => (forms || []).map(form =>
       '<span class="pced-form-chip">' + esc(form) + '</span>'
     ).join(' ');
+    const compactPersons = persons => {
+      const positions = persons.filter(item => item.person !== 'other');
+      const other = persons.filter(item => item.person === 'other');
+      let html = '<div class="pced-form-list">' + positions.map(item =>
+        chips([(item.forms || []).join(' / ')])
+      ).join('; ') + '</div>';
+      for (const item of other) html += '<div class="pced-form-list">' +
+        esc(global.PCEDLookupCore.localizedVerbPersonLabel(item.person, priority)) + ': ' + chips(item.forms) + '</div>';
+      return html;
+    };
     let content = '';
     for (const group of paradigm.groups || []) {
       const groupLabel = paradigm.kind === 'verb'
@@ -253,9 +263,7 @@
         : localizedGroupLabel(group.label, priority, group, paradigm.lemma);
       content += '<div class="pced-inflection-group"><b>' + esc(groupLabel) + '</b>';
       if (group.persons?.length) {
-        content += group.persons.map(item => '<div class="pced-form-list"><strong class="pced-person-label">' +
-          esc(global.PCEDLookupCore.localizedVerbPersonLabel(item.person, priority)) + ':</strong> ' +
-          chips(item.forms) + '</div>').join('');
+        content += compactPersons(group.persons);
       } else if (group.rows) {
         const hasPlural = group.rows.some(row => row.plural?.length);
         content += '<div class="pced-inflection-table-wrap"><table class="pced-inflection-table">' +
@@ -466,7 +474,7 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.9' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.10' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

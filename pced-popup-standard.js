@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.11 — 2026-09-29 */
+/* PAMC cross-book PCED popup standard v1.8.12 — 2026-09-29 */
 (function () {
   'use strict';
 
@@ -264,6 +264,16 @@
     const chips = forms => (forms || []).map(form =>
       '<span class="pced-form-chip">' + esc(form) + '</span>'
     ).join(' ');
+    const compactPersons = persons => {
+      const positions = persons.filter(item => item.person !== 'other');
+      const other = persons.filter(item => item.person === 'other');
+      let html = '<div class="pced-form-list">' + positions.map(item =>
+        chips([(item.forms || []).join(' / ')])
+      ).join('; ') + '</div>';
+      for (const item of other) html += '<div class="pced-form-list">' +
+        esc(core().localizedVerbPersonLabel(item.person, primaryLanguage)) + ': ' + chips(item.forms) + '</div>';
+      return html;
+    };
     let content = '';
     for (const group of paradigm.groups || []) {
       const groupLabel = paradigm.kind === 'verb'
@@ -271,9 +281,7 @@
         : localizedGroupLabel(group.label, primaryLanguage, group, paradigm.lemma);
       content += '<div class="pced-inflection-group"><b>' + esc(groupLabel) + '</b>';
       if (group.persons?.length) {
-        content += group.persons.map(item => '<div class="pced-form-list"><strong class="pced-person-label">' +
-          esc(core().localizedVerbPersonLabel(item.person, primaryLanguage)) + ':</strong> ' +
-          chips(item.forms) + '</div>').join('');
+        content += compactPersons(group.persons);
       } else if (group.rows) {
         const hasPlural = group.rows.some(row => row.plural?.length);
         content += '<div class="pced-inflection-table-wrap"><table class="pced-inflection-table">' +
