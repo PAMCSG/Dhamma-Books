@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.19 — 2026-09-29 */
+/* PAMC cross-book PCED popup standard v1.8.20 — 2026-09-29 */
 (function () {
   'use strict';
 
@@ -89,9 +89,18 @@
     zh: '中文', en: 'English', my: 'Burmese', ja: 'Japanese',
     vi: 'Vietnamese', ko: 'Korean', other: 'Other'
   });
-  const dictionaryTranslationCache = new Map();
-  const TRANSLATION_ENDPOINT = mode === 'reader' ? '/api/dictionary-translate'
-    : (script?.dataset?.pcedTranslationUrl || 'https://tipitaka-reader.pages.dev/api/dictionary-translate');
+  function googleTranslateLink(definition, sourceLanguage, targetLanguage) {
+    const template = document.createElement('template');
+    template.innerHTML = String(definition || '');
+    const text = String(template.content.textContent || '').trim();
+    const params = new URLSearchParams({
+      sl: ['zh', 'en', 'my', 'ja', 'vi', 'ko'].includes(sourceLanguage) ? sourceLanguage : 'auto',
+      tl: targetLanguage === 'zh' ? 'zh-CN' : 'en',
+      text,
+      op: 'translate'
+    });
+    return 'https://translate.google.com/?' + params.toString();
+  }
 
   function groupTitle(group) {
     return LANGUAGE_TITLES[group?.key] || String(group?.title || 'Other')
@@ -107,66 +116,9 @@
       '<div class="source">' + esc(item.source_label || item.source || '') + '</div>' +
       '<div class="definition">' + (item.definition || '') + '</div>' +
       '<div class="pced-translation-actions" aria-label="Translate this PCED definition">' +
-      (language === 'zh' ? '' : '<button type="button" data-pced-translate="zh">译成中文</button>') +
-      (language === 'en' ? '' : '<button type="button" data-pced-translate="en">Translate to English</button>') +
-      '</div><div class="pced-translation-result" aria-live="polite" hidden></div></div>';
-  }
-
-  async function translateDictionaryDefinition(button) {
-    const item = button.closest('.pced-dictionary-item');
-    const result = item?.querySelector('.pced-translation-result');
-    const text = item?.querySelector('.definition')?.textContent?.trim();
-    const target = button.dataset.pcedTranslate;
-    const source = item?.dataset.sourceLanguage || 'other';
-    if (!result || !text || !['zh', 'en'].includes(target)) return;
-    const key = [source, target, text].join('\u241f');
-    const label = target === 'zh' ? '中文 · 机器翻译' : 'English · Machine translation';
-    const show = value => {
-      result.hidden = false;
-      result.replaceChildren();
-      const heading = document.createElement('strong');
-      heading.textContent = label;
-      const body = document.createElement('div');
-      body.textContent = value;
-      result.append(heading, body);
-    };
-    if (dictionaryTranslationCache.has(key)) { show(dictionaryTranslationCache.get(key)); return; }
-    result.hidden = false;
-    result.textContent = target === 'zh' ? '正在翻译…' : 'Translating…';
-    item.querySelectorAll('[data-pced-translate]').forEach(control => { control.disabled = true; });
-    try {
-      let translated = '';
-      // The on-device API works without a server for supported desktop browsers.
-      // Myanmar is not supported there, so use the server for that language.
-      if (source !== 'my' && source !== 'other' && 'Translator' in self) {
-        try {
-          const availability = await Translator.availability({ sourceLanguage: source, targetLanguage: target });
-          if (availability === 'available') {
-            const translator = await Translator.create({ sourceLanguage: source, targetLanguage: target });
-            try { translated = await translator.translate(text); }
-            finally { translator.destroy?.(); }
-          }
-        } catch (_) { /* Use the server below. */ }
-      }
-      if (!translated) {
-        const response = await fetch(TRANSLATION_ENDPOINT, {
-          method: 'POST', credentials: mode === 'reader' ? 'include' : 'omit',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({ text, source_language: source, target_language: target })
-        });
-        const payload = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(payload.error || ('HTTP ' + response.status));
-        translated = String(payload.translation || '').trim();
-      }
-      if (!translated) throw new Error('Empty translation');
-      dictionaryTranslationCache.set(key, translated);
-      show(translated);
-    } catch (_) {
-      result.textContent = target === 'zh'
-        ? '目前无法翻译。请稍后再试。' : 'Translation is unavailable at the moment. Please try again later.';
-    } finally {
-      item.querySelectorAll('[data-pced-translate]').forEach(control => { control.disabled = false; });
-    }
+      (language === 'zh' ? '' : '<a href="' + esc(googleTranslateLink(item.definition, language, 'zh')) + '" target="_blank" rel="noopener noreferrer">Google 译成中文 ↗</a>') +
+      (language === 'en' ? '' : '<a href="' + esc(googleTranslateLink(item.definition, language, 'en')) + '" target="_blank" rel="noopener noreferrer">Google Translate to English ↗</a>') +
+      '</div></div>';
   }
 
   function isSingleWordRecord(row) {
@@ -1356,10 +1308,8 @@
         .definition{color:var(--pamc-popup-ink)!important;font-family:Georgia,"Times New Roman","Noto Serif SC","Songti SC",SimSun,"Myanmar Text","Noto Sans Myanmar",serif!important;font-size:18px!important;line-height:1.65!important}
         .pced-dictionary-item{padding:2px 0 8px!important;border-bottom:1px solid #eee3d8!important}
         .pced-translation-actions{display:flex!important;gap:6px!important;flex-wrap:wrap!important;margin-top:6px!important}
-        .pced-translation-actions button{padding:4px 8px!important;border:1px solid #b98f6d!important;border-radius:6px!important;background:#fff5e9!important;color:#68442f!important;font:600 12px/1.35 Arial,"Microsoft YaHei",sans-serif!important;cursor:pointer!important}
-        .pced-translation-actions button:disabled{opacity:.6!important;cursor:wait!important}
-        .pced-translation-result{margin:7px 0!important;padding:8px 10px!important;border-left:3px solid #b98f6d!important;background:#fff8ee!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;font:16px/1.6 Arial,"Microsoft YaHei","Noto Sans Myanmar",sans-serif!important}
-        .pced-translation-result[hidden]{display:none!important}
+        .pced-translation-actions a{display:inline-block!important;padding:4px 8px!important;border:1px solid #b98f6d!important;border-radius:6px!important;background:#fff5e9!important;color:#68442f!important;text-decoration:none!important;font:600 12px/1.35 Arial,"Microsoft YaHei",sans-serif!important}
+        .pced-translation-actions a:hover,.pced-translation-actions a:focus{background:#ead8c3!important;text-decoration:underline!important}
         #dictModal .panel-body .headword,#lookupModal .panel-body .headword,#pced-modal .pced-body .headword{font-family:Georgia,"Times New Roman",serif!important;font-size:27px!important;font-weight:700!important;line-height:1.2!important}
         #dictModal .panel-body .group-title,#lookupModal .panel-body .group-title,#pced-modal .pced-body .group-title{font-family:Georgia,"Times New Roman","Noto Serif SC",SimSun,serif!important;font-size:22px!important;font-weight:700!important;line-height:1.25!important}
         #dictModal .panel-body .source,#lookupModal .panel-body .source,#pced-modal .pced-body .source{font-family:Arial,"Microsoft YaHei","Noto Sans Myanmar",sans-serif!important;font-size:14px!important;line-height:1.45!important}
@@ -1493,13 +1443,6 @@
     // its modal. This makes the real page integration deterministic instead
     // of depending only on attribute-observer timing.
     document.addEventListener('click', event => {
-      const translateButton = event.target.closest?.('[data-pced-translate]');
-      if (translateButton?.closest('.pced-dictionary-item')) {
-        event.preventDefault();
-        event.stopPropagation();
-        translateDictionaryDefinition(translateButton);
-        return;
-      }
       const specialToggle = event.target.closest?.('.pced-special-toggle');
       if (specialToggle) {
         event.preventDefault();
