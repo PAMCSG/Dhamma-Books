@@ -298,6 +298,19 @@
       if (group.note) content += '<div class="pced-inflection-caution">' + esc(group.note) + '</div>';
       content += '</div>';
     }
+    for (const special of paradigm.specialSources || []) {
+      const source = priority === 'zh' ? special.sourceZh : special.source;
+      content += '<div class="pced-special-source"><button type="button" class="pced-special-toggle" ' +
+        'aria-expanded="false">' + esc(priority === 'zh' ? '特殊词形 — ' : 'Special forms — ') +
+        esc(source) + '</button><div class="pced-special-panel" hidden>';
+      for (const group of special.groups) {
+        content += '<div class="pced-inflection-group"><b>' +
+          esc(global.PCEDLookupCore.localizedVerbGroupLabel(group.label, priority)) + '</b>' +
+          (group.persons?.length ? compactPersons(group.persons) :
+            '<div class="pced-form-list">' + chips(group.forms) + '</div>') + '</div>';
+      }
+      content += '</div></div>';
+    }
     if (paradigm.formSystem === 'kaccayana') {
       if (paradigm.kind === 'verb') {
         content += '<div class="pced-inflection-caution">' + (priority === 'zh' ? '动词词形来源：' : 'Verb forms: ') +
@@ -487,6 +500,14 @@
     document.getElementById('pced-close')?.addEventListener('click', closeModal);
     modal?.addEventListener('click', event => { if (event.target === modal) closeModal(); });
     modal?.addEventListener('click', event => {
+      const special = event.target.closest?.('.pced-special-toggle');
+      if (special) {
+        const panel = special.nextElementSibling;
+        const opening = !!panel?.hidden;
+        if (panel) panel.hidden = !opening;
+        special.setAttribute('aria-expanded', String(opening));
+        return;
+      }
       const alternate = event.target.closest?.('.pced-attanopada-toggle');
       if (alternate) {
         const panel = alternate.closest('.pced-inflection-group')?.querySelector('.pced-attanopada-panel');
@@ -505,7 +526,7 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.12' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.13' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

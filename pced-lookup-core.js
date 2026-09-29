@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.11';
+  const VERSION = '3.9.12';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -132,6 +132,7 @@
       'Ajjatanī / Aorist (dictionary-attested)': '不定过去时（Ajjatanī；PCED 词典记载）',
       'Ajjatanī / Aorist (regular possibilities from verb table)': '不定过去时（Ajjatanī；依动词表推算的可能词形）',
       'Ajjatanī / Aorist (uploaded verb table)': '不定过去时（Ajjatanī；所提供的动词表）',
+      'Past forms recorded in PCED': 'PCED 词典记载的过去时词形',
       'Imperative': '命令式',
       'Imperative (Pañcamī)': '命令式（Pañcamī）',
       'Optative': '祈愿式',
@@ -1167,11 +1168,10 @@
       forms: uniqueForms(group.forms || group.persons?.flatMap(item => item.forms) || []),
       ...(group.persons ? { persons: group.persons.map(item => ({ person: item.person, forms: [...item.forms] })) } : {})
     });
-    if (maintained) return maintained.map(copyGroup);
     const exception = VERB_TABLE_EXCEPTIONS[lemma];
     if (exception) return exception.map(copyGroup);
     const ending = ['āti', 'ati', 'eti', 'oti'].find(value => lemma.endsWith(value));
-    if (!ending || !/(?:\bkri\b|ကြိ|【(?:过|現|现|命|独)|\b(?:pr|imper|opt|fut|aor|ger|inf)\s*[．.]|\b(?:goes|does|makes|becomes)\b)/i.test(grammarText)) return [];
+    if (!ending || (!maintained && !/(?:\bkri\b|ကြိ|【(?:过|現|现|命|独)|\b(?:pr|imper|opt|fut|aor|ger|inf)\s*[．.]|\b(?:goes|does|makes|becomes)\b)/i.test(grammarText))) return [];
     const stem = lemma.slice(0, -ending.length);
     const endings = ending === 'eti'
       ? ['eti', 'enti', 'esi', 'etha', 'emi', 'ema']
@@ -1304,48 +1304,46 @@
     const verbGroups = verbParadigm(lemma, grammarText);
     const attanopadaGroups = attanopadaParadigm(lemma, verbGroups);
     const attestedPast = explicitPastForms(entry);
+    const specialSources = [];
+    if (verbGroups.length && KACCAYANA_VERB_PARADIGMS[lemma]) {
+      specialSources.push({
+        source: 'Kaccāyana Pāli Vyākaraṇaṁ, Ākhyāta, printed pp. 602–606 (worked examples; starred forms are exceptional)',
+        sourceZh: '《迦旃延巴利文法》动词篇，第 602–606 页（例词；* 号为特殊词形）',
+        groups: KACCAYANA_VERB_PARADIGMS[lemma].map(group => ({
+          label: group.label,
+          persons: group.persons.map(item => ({ person: item.person, forms: [...item.forms] }))
+        }))
+      });
+    }
     if (verbGroups.length && attestedPast.length) {
-      // A form can legitimately be syncretic (for example cintesi is both
-      // present 2sg and an attested aorist 3sg). Only deduplicate against an
-      // existing past group, not against the whole conjugation table.
+      // Keep dictionary citations separate from the PDF-derived six positions.
       const existingPast = new Set(verbGroups
         .filter(group => /past|aorist|ajjatanī|hiyyattanī/i.test(group.label))
         .flatMap(group => group.forms || []));
       const additional = attestedPast.filter(form => !existingPast.has(form));
       if (additional.length) {
-        const pastPattern = verbGroups.find(group => /aorist|ajjatanī/i.test(group.label) && group.persons);
-        if (pastPattern) {
-          pastPattern.persons.push({ person: 'other', forms: additional });
-          pastPattern.forms = uniqueForms([...pastPattern.forms, ...additional]);
-        } else {
-          const futureIndex = verbGroups.findIndex(group => /^Future/.test(group.label));
-          const pastGroup = { label: 'Ajjatanī / Aorist (dictionary-attested)', forms: additional };
-          if (futureIndex >= 0) verbGroups.splice(futureIndex, 0, pastGroup);
-          else verbGroups.push(pastGroup);
-        }
+        specialSources.push({
+          source: 'PCED dictionary entry (past forms explicitly cited)',
+          sourceZh: 'PCED 词典条目（明确记载的过去时词形）',
+          groups: [{ label: 'Past forms recorded in PCED', forms: additional }]
+        });
       }
     }
     const verbSource = verbGroups.length ? [
-      KACCAYANA_VERB_PARADIGMS[lemma]
-        ? 'Maintained Kaccāyana verb examples (Ākhyāta chapter)'
-        : VERB_TABLE_EXCEPTIONS[lemma]
+      VERB_TABLE_EXCEPTIONS[lemma]
           ? 'Exceptional forms in the supplied 02 Pali Grammar table - Verbs.pdf, pp. 5–6'
           : lemma.endsWith('oti')
             ? 'Regular forms generated from the PCED verb lemma'
-            : 'Possible regular forms generated from the supplied 02 Pali Grammar table - Verbs.pdf, pp. 1–4, and the PCED verb lemma',
-      ...(attestedPast.length ? ['Past forms explicitly cited in PCED'] : []),
+            : 'Possible finite and passive forms from 02 Pali Grammar table - Verbs.pdf, pp. 1–4; absolutive and infinitive from p. 5; present participle is an additional regular pattern applied to the PCED lemma',
       ...(TEXT_ATTESTED_AORIST_PLURAL[lemma]
         ? ['Third-person plural form separately verified in a Pāli text'] : [])
     ].join('; ') : '';
     const verbSourceZh = verbGroups.length ? [
-      KACCAYANA_VERB_PARADIGMS[lemma]
-        ? '《迦旃延巴利文法》动词篇中已核实的动词例子'
-        : VERB_TABLE_EXCEPTIONS[lemma]
+      VERB_TABLE_EXCEPTIONS[lemma]
           ? '所提供的《02 Pali Grammar table - Verbs.pdf》第 5–6 页中列出的特殊动词词形'
           : lemma.endsWith('oti')
             ? '规则词形依 PCED 动词词典原形生成'
-            : '可能的规则词形依据所提供的《02 Pali Grammar table - Verbs.pdf》第 1–4 页及 PCED 动词词典原形推算',
-      ...(attestedPast.length ? ['过去时词形由 PCED 词典明确记载'] : []),
+            : '有限动词及被动式的可能词形依据《02 Pali Grammar table - Verbs.pdf》第 1–4 页；独立分词及不定式依据第 5 页；现在分词另依规则词干推算',
       ...(TEXT_ATTESTED_AORIST_PLURAL[lemma]
         ? ['第三人称复数词形另经巴利文核实'] : [])
     ].join('；') : '';
@@ -1356,10 +1354,11 @@
       kind: verbGroups.length ? 'verb' : nounGroups.length ? 'noun' : 'verified',
       verified,
       groups: verbGroups.length ? verbGroups : nounGroups,
+      specialSources,
       attanopadaGroups,
       attanopadaGenerated: lemma !== 'gacchati',
       generated: verbGroups.length
-        ? !(KACCAYANA_VERB_PARADIGMS[lemma] || VERB_TABLE_EXCEPTIONS[lemma])
+        ? !VERB_TABLE_EXCEPTIONS[lemma]
         : !!nounGroups.length,
       formSystem: verbGroups.length ? 'kaccayana' : kaccayana?.groups?.length ? 'kaccayana' : reliableNounGroups?.length ? 'pali-lookup' : 'generated',
       formSource: verbGroups.length

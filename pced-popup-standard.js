@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.14 — 2026-09-29 */
+/* PAMC cross-book PCED popup standard v1.8.15 — 2026-09-29 */
 (function () {
   'use strict';
 
@@ -59,7 +59,7 @@
     });
     morphologyPromise = Promise.resolve()
       .then(() => window.KaccayanaDeclension?.VERSION === '1.5.1' ? null : load('kaccayana-declension.js', '1.5.1'))
-      .then(() => core()?.version === '3.9.11' ? null : load('pced-lookup-core.js', '3.9.11'))
+      .then(() => core()?.version === '3.9.12' ? null : load('pced-lookup-core.js', '3.9.12'))
       .then(() => window.PaliLookupMorphology ? null : load('pali-lookup-morphology.js', '2.0-unicode-trial'))
       .then(() => window.PaliLookupMorphology || null);
     return morphologyPromise;
@@ -317,6 +317,19 @@
         '</div>';
       if (group.note) content += '<div class="pced-inflection-caution">' + esc(group.note) + '</div>';
       content += '</div>';
+    }
+    for (const special of paradigm.specialSources || []) {
+      const source = primaryLanguage === 'zh' ? special.sourceZh : special.source;
+      content += '<div class="pced-special-source"><button type="button" class="pced-special-toggle" ' +
+        'aria-expanded="false">' + esc(primaryLanguage === 'zh' ? '特殊词形 — ' : 'Special forms — ') +
+        esc(source) + '</button><div class="pced-special-panel" hidden>';
+      for (const group of special.groups) {
+        content += '<div class="pced-inflection-group"><b>' +
+          esc(core().localizedVerbGroupLabel(group.label, primaryLanguage)) + '</b>' +
+          (group.persons?.length ? compactPersons(group.persons) :
+            '<div class="pced-form-list">' + chips(group.forms) + '</div>') + '</div>';
+      }
+      content += '</div></div>';
     }
     if (paradigm.formSystem === 'kaccayana') {
       if (paradigm.kind === 'verb') {
@@ -1316,6 +1329,10 @@
         .pced-attanopada-toggle[aria-expanded="true"]{background:#9a6b49!important;color:#fff!important}
         .pced-attanopada-panel{margin:5px 0 2px!important;padding:6px 8px!important;border-left:2px solid #b98f6d!important;background:#fff5e9!important}
         .pced-attanopada-panel[hidden]{display:none!important}
+        .pced-special-source{margin-top:12px!important;padding-top:8px!important;border-top:1px solid #d8bda5!important}
+        .pced-special-toggle{max-width:100%!important;padding:4px 7px!important;border:1px solid #b98f6d!important;border-radius:6px!important;background:#fff5e9!important;color:#68442f!important;font:600 12px/1.35 Arial,"Microsoft YaHei",sans-serif!important;text-align:left!important;cursor:pointer!important}
+        .pced-special-panel{margin-top:7px!important;padding:6px 8px!important;border-left:2px solid #b98f6d!important}
+        .pced-special-panel[hidden]{display:none!important}
         .pced-inflection-group+.pced-inflection-group{margin-top:10px!important}
         .pced-form-list{margin-top:4px!important}
         .pced-form-chip{display:inline-block!important;margin:2px 3px 2px 0!important;padding:2px 6px!important;border-radius:5px!important;background:#f1e3d4!important;color:#174f7a!important;font-family:Georgia,"Times New Roman",serif!important;font-size:15px!important}
@@ -1405,6 +1422,16 @@
     // its modal. This makes the real page integration deterministic instead
     // of depending only on attribute-observer timing.
     document.addEventListener('click', event => {
+      const specialToggle = event.target.closest?.('.pced-special-toggle');
+      if (specialToggle) {
+        event.preventDefault();
+        event.stopPropagation();
+        const panel = specialToggle.nextElementSibling;
+        const opening = !!panel?.hidden;
+        if (panel) panel.hidden = !opening;
+        specialToggle.setAttribute('aria-expanded', String(opening));
+        return;
+      }
       const attanopadaToggle = event.target.closest?.('.pced-attanopada-toggle');
       if (attanopadaToggle) {
         event.preventDefault();
