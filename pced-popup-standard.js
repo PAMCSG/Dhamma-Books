@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.22 — 2026-10-01 */
+/* PAMC cross-book PCED popup standard v1.8.24 — 2026-10-01 */
 (function () {
   'use strict';
 
@@ -160,20 +160,42 @@
       }).join('') + '</div>';
   }
 
+  function otherDictionaryRows(surface, result) {
+    const records = window.PCEDApprovedTerms?.records || [];
+    const direct = directPublishedRows(surface, records)
+      .filter(row => String(row.status || '').trim() === '另加字典');
+    // Prefer the queried form's own definition over a lemma's description.
+    const rows = direct.length ? direct : (core()?.approvedTermMatches(surface, result, {
+      approvedTerms: records, includeAllStatuses: true
+    }) || []);
+    return uniqueTermRows(rows).filter(row => !Number(row.deleted) &&
+      isSingleWordRecord(row) && String(row.status || '').trim() === '另加字典');
+  }
+
+  function renderOtherDictionary(rows) {
+    if (!rows.length) return '';
+    return '<div class="group-title" data-language="other-dictionary">Other Dictionary 其它字典</div>' +
+      rows.map(row => '<div class="approved-term-block other-dictionary-entry">' +
+        '<div class="source">' + esc(row.pali) + (row.source ? ' — ' + esc(row.source) : '') + '</div>' +
+        '<div class="definition" style="white-space:pre-wrap">' +
+        approvedChineseHtml(row.chinese_html, row.chinese) + '</div></div>').join('');
+  }
+
+  function renderPublishedBlocks(rows, surface) {
+    return renderApprovedBlock(rows.filter(row => APPROVED.has(String(row.status || '').trim())), surface) +
+      renderOtherDictionary(otherDictionaryRows(surface, resolution(surface)));
+  }
+
   function renderEntry(head, approvedRows, surface, includeApproved, primaryLanguage) {
     const entry = dictionary()[head];
     if (!entry) return '';
     const groups = core()?.dictionaryGroups(entry, primaryLanguage) || [];
     let html = '<div class="entry"><div class="headword">' + esc(entry.headword || head) + '</div>';
-    const approved = includeApproved ? renderApprovedBlock(approvedRows, surface) : '';
-    const hasChinese = groups.some(group => group.key === 'zh');
-    if (approved && !hasChinese) {
-      html += '<div class="group-title" data-language="zh">中文</div>' + approved;
-    }
+    const approved = includeApproved ? renderPublishedBlocks(approvedRows, surface) : '';
+    if (approved) html += (approvedRows.length ? '<div class="group-title" data-language="zh-tipitaka">汉译巴利三藏</div>' : '') + approved;
     for (const group of groups) {
       html += '<div class="group-title" data-language="' + esc(group.key || 'other') + '">' +
         esc(groupTitle(group)) + '</div>';
-      if (group.key === 'zh' && approved) html += approved;
       for (const item of group.entries) html += renderDictionaryItem(item);
     }
     return html + '</div>';
@@ -379,7 +401,7 @@
       esc(parts || shown) + '</b></div>';
 
     if (!heads.length) {
-      const approved = renderApprovedBlock(approvedRows, surface);
+      const approved = renderPublishedBlocks(approvedRows, surface);
       const approvedEntry = approved
         ? '<div class="entry"><div class="headword">' + esc(surface) + '</div>' +
           '<div class="group-title" data-language="zh">中文</div>' + approved + '</div>' : '';
@@ -1477,3 +1499,4 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })();
+

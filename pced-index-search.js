@@ -403,14 +403,39 @@
           esc(row.source) + '）</span>' : '') + '</div></div>').join('') + '</div>';
   }
 
-  function renderHead(key, priority) {
+  function otherRowsForQuery(key) {
+    const records = global.PCEDApprovedTerms?.records || [];
+    const exact = String(key).trim().toLowerCase().normalize('NFC');
+    const direct = records.filter(row => String(row.pali || '').split(/\s*[,;/；，]\s*/)
+      .some(form => form.trim().toLowerCase().normalize('NFC') === exact));
+    const matches = direct.some(row => row.status === '另加字典' && !Number(row.deleted)) ? direct :
+      (global.PCEDLookupCore?.approvedTermMatches(key, resolve(key), {
+        approvedTerms: records, includeAllStatuses: true
+      }) || []);
+    const seen = new Set();
+    return matches.filter(row => {
+      const signature = [row.pali, row.chinese, row.source].join('\u241f');
+      if (Number(row.deleted) || !row.chinese || String(row.status || '').trim() !== '另加字典' || seen.has(signature)) return false;
+      seen.add(signature); return true;
+    });
+  }
+
+  function renderOtherRows(rows) {
+    if (!rows.length) return '';
+    return '<div class="group-title" data-language="other-dictionary">Other Dictionary 其它字典</div>' +
+      rows.map(row => '<div class="approved-term-block other-dictionary-entry"><div class="source">' +
+        esc(row.pali) + (row.source ? ' — ' + esc(row.source) : '') + '</div>' +
+        '<div class="definition" style="white-space:pre-wrap">' + esc(row.chinese) + '</div></div>').join('');
+  }
+
+  function renderHead(key, priority, otherHtml = '') {
     const entry = dictionary[key];
     if (!entry) return '';
     const groups = global.PCEDLookupCore?.dictionaryGroups(entry, priority) || [];
     const approved = priority === 'zh' ? renderApprovedRows(approvedRowsForHead(key)) : '';
     return '<div class="entry"><div class="headword">' + esc(entry.headword || key) + '</div>' +
       renderInflectionPanel(key, priority) +
-      approved +
+      approved + otherHtml +
       groups.map(group => '<div class="group-title" data-language="' + esc(group.key) + '">' +
         esc(languageTitles[group.key] || group.title || 'Other') + '</div>' +
         group.entries.map(item => '<div class="source">' + esc(item.source_label || item.source || '') + '</div>' +
@@ -434,12 +459,14 @@
           ' matched all exact spellings with possible Pāli diacritics.</div>' : '';
       return { query, heads: pali.heads, kind: 'pali', priority,
         html: note + renderGrammarNote(pali.resolution, priority) +
-          pali.heads.map(head => renderHead(head, priority)).join('') };
+          pali.heads.map((head, index) => renderHead(head, priority, index === 0 ? renderOtherRows(otherRowsForQuery(query)) : '')).join('') };
     }
     // A query made entirely of Roman Pāli characters is a headword request.
     // If exact/verified Pāli lookup found nothing, do not reinterpret the same
     // letters as a substring inside unrelated dictionary definitions.
     if (PALI_ONLY.test(query)) {
+      const other = renderOtherRows(otherRowsForQuery(query));
+      if (other) return { query, heads: [], kind: 'pali', priority, html: '<div class="entry"><div class="headword">' + esc(query) + '</div>' + other + '</div>' };
       return { query, heads: [], kind: 'none', priority,
         html: '<div class="note"><b>No reliable PCED entry was found for ' + esc(query) + '.</b></div>' };
     }
@@ -526,9 +553,10 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.13' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.14' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })(window);
+
