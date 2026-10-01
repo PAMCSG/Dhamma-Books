@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.16 — 2026-09-29
+ * Version 3.9.17 — 2026-10-01
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.16';
+  const VERSION = '3.9.17';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -377,6 +377,13 @@
   }
 
   function createExactIndex(dictionary) {
+    // Include the maintained exact entries before indexing. Otherwise the
+    // first resolve() adds them after a host has built its index, leaving
+    // that supplied index permanently incomplete. Plain-letter searches
+    // then rebuild the whole dictionary for every diacritic candidate.
+    for (const [key, entry] of Object.entries(BUILTIN_EXACT_HEADWORDS)) {
+      if (dictionary && !dictionary[key]) dictionary[key] = entry;
+    }
     const index = new Map();
     for (const key of Object.keys(dictionary || {})) {
       const normalized = cleanWord(key);
@@ -603,11 +610,18 @@
     for (const [key, entry] of Object.entries(BUILTIN_EXACT_HEADWORDS)) {
       if (!dictionary[key]) dictionary[key] = entry;
     }
-    // A supplied index may have been created before the reduced dictionary was
-    // completed above. Rebuild it whenever one of these exact keys is absent.
+    // A host may retain an index created before these entries were added,
+    // including when an older lookup core was replaced after page load.
+    // Complete that same index once instead of rescanning the dictionary on
+    // every resolve() call during a plain-letter diacritic search.
     let index = options.index;
-    if (!index || Object.keys(BUILTIN_EXACT_HEADWORDS).some(key => !(index.get(key) || []).length)) {
-      index = createExactIndex(dictionary);
+    if (!index) index = createExactIndex(dictionary);
+    else {
+      for (const key of Object.keys(BUILTIN_EXACT_HEADWORDS)) {
+        const normalized = cleanWord(key);
+        const heads = index.get(normalized) || [];
+        if (!heads.includes(key)) index.set(normalized, [...heads, key]);
+      }
     }
     const exact = form => (index.get(cleanWord(form)) || []).slice();
     return { dictionary, index, exact };
