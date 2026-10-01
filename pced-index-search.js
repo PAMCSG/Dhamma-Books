@@ -1,4 +1,4 @@
-/* PCED landing-page search v1.7.10 — exact Pāli/diacritic-aware and multilingual. */
+/* PCED landing-page search v1.7.15 — exact Pāli/diacritic-aware and multilingual. */
 (function (global) {
   'use strict';
 
@@ -22,6 +22,23 @@
   const esc = value => String(value ?? '').replace(/[&<>"']/g, character => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[character]));
+
+  function approvedChineseHtml(html, plain) {
+    if (!String(html || '').trim()) return esc(plain);
+    const template = document.createElement('template');
+    template.innerHTML = String(html);
+    const output = document.createElement('div');
+    const copy = (node, parent) => {
+      if (node.nodeType === Node.TEXT_NODE) { parent.appendChild(document.createTextNode(node.data)); return; }
+      if (node.nodeType !== Node.ELEMENT_NODE || /^(SCRIPT|STYLE|IFRAME|OBJECT|EMBED)$/.test(node.tagName)) return;
+      if (node.tagName === 'BR') { parent.appendChild(document.createElement('br')); return; }
+      const target = /^(STRONG|B)$/.test(node.tagName) ? document.createElement('strong') : parent;
+      if (target !== parent) parent.appendChild(target);
+      [...node.childNodes].forEach(child => copy(child, target));
+    };
+    [...template.content.childNodes].forEach(node => copy(node, output));
+    return output.innerHTML;
+  }
 
   function plainText(value) {
     const holder = document.createElement('div');
@@ -399,7 +416,7 @@
     return '<div class="group-title" data-language="zh-tipitaka">汉译巴利三藏</div>' +
       '<div class="approved-term-block"><div class="source approved-term-title">玛欣德尊者和译藏团队</div>' +
       rows.map(row => '<div class="approved-term-row"><div class="definition approved-term-definition">' +
-        esc(row.chinese) + (row.source ? '<span class="source approved-term-source">（出处：' +
+        approvedChineseHtml(row.chinese_html, row.chinese) + (row.source ? '<span class="source approved-term-source">（出处：' +
           esc(row.source) + '）</span>' : '') + '</div></div>').join('') + '</div>';
   }
 
@@ -425,7 +442,7 @@
     return '<div class="group-title" data-language="other-dictionary">Other Dictionary 其它字典</div>' +
       rows.map(row => '<div class="approved-term-block other-dictionary-entry"><div class="source">' +
         esc(row.pali) + (row.source ? ' — ' + esc(row.source) : '') + '</div>' +
-        '<div class="definition" style="white-space:pre-wrap">' + esc(row.chinese) + '</div></div>').join('');
+        '<div class="definition" style="white-space:pre-wrap">' + approvedChineseHtml(row.chinese_html, row.chinese) + '</div></div>').join('');
   }
 
   function renderHead(key, priority, otherHtml = '') {
@@ -553,10 +570,11 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.14' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.15' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })(window);
+
 
