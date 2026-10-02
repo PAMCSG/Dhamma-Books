@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.29 — 2026-10-01 */
+/* PAMC cross-book PCED popup standard v1.8.30 — 2026-10-01 */
 (function () {
   'use strict';
 
@@ -215,17 +215,17 @@
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 90000);
         try {
-          // Use the same-origin protected translation route.
-          const response = await fetch('/api/pali-translate', {
-            method: 'POST', credentials: 'include', signal: controller.signal,
+          // GitHub Pages uses the dedicated Cloudflare translation Worker.
+          const response = await fetch('https://pamc-dhamma-translate.pamc-yfl.workers.dev/api/pali-translate', {
+            method: 'POST', credentials: 'omit', signal: controller.signal,
             headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
             body: JSON.stringify({ task: 'dictionary-definition', text: parts[index],
               source_language: state.language, target_language: target,
               headword: state.headword, dictionary_source: state.source,
               part_number: index + 1, part_count: parts.length })
           });
-          if ([401, 403].includes(response.status) || !/application\/json/i.test(response.headers.get('Content-Type') || '')) {
-            throw new Error('Please sign in to Dhamma Books, then try this translation again.');
+          if (!/application\/json/i.test(response.headers.get('Content-Type') || '')) {
+            throw new Error('The translation server returned an unexpected response (HTTP ' + response.status + '). Please check the Worker deployment.');
           }
           const result = await response.json();
           if (!response.ok) throw new Error(result.error || ('Translation failed (HTTP ' + response.status + ').'));
@@ -1057,7 +1057,7 @@
       pali: row.pali, chinese: row.chinese, status: row.status
     }));
     try {
-      const response = await fetch('/api/pali-translate', { method: 'POST', credentials: 'include',
+      const response = await fetch('https://pamc-dhamma-translate.pamc-yfl.workers.dev/api/pali-translate', { method: 'POST', credentials: 'omit',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ text: surface, mode: modeName, confirmed_terms: confirmed }) });
       const json = await response.json();
@@ -1689,6 +1689,7 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })();
+
 
 
 
