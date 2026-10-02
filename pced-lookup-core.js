@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.20 — 2026-10-01
+ * Version 3.9.21 — 2026-10-01
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.20';
+  const VERSION = '3.9.21';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -1354,10 +1354,12 @@
   }
 
   function inflectionParadigm(head, entry, options = {}) {
-    const lemma = cleanWord(head);
+    let lemma = cleanWord(head);
     if (!lemma || !entry) return null;
     const grammarText = inflectionGrammarText(entry);
-    const kaccayana = global.KaccayanaDeclension?.paradigm?.(lemma, global.PaliLookupMorphology);
+    const kaccayana = verbParadigm(lemma, grammarText).length ? null :
+      global.KaccayanaDeclension?.paradigm?.(lemma, global.PaliLookupMorphology);
+    if (kaccayana?.lemma) lemma = kaccayana.lemma;
     const reliableNounGroups = paliLookupNounParadigm(lemma);
     // Once the Pali Lookup morphology dataset is present, never guess a
     // noun's gender from its final letter.  Unknown nouns get no generated
@@ -1453,6 +1455,7 @@
     verifiedDecompositions: BUILTIN_DECOMPOSITIONS
   });
 })(window);
+
 
 
 

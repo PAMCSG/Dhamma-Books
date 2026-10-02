@@ -599,7 +599,7 @@
     mātu: Object.freeze([{ r: true, i: 'f.p', s: 'māt' }])
   }) });
 
-  function paradigm(lemma, morphology) {
+  function directParadigm(lemma, morphology) {
     lemma = String(lemma || '').normalize('NFC').toLowerCase();
     // PCED also lists some already declined forms as independent headwords.
     // Show their verified noun table while retaining their dictionary entry.
@@ -652,6 +652,43 @@
     return result(groups);
   }
 
+  // Keep exact dictionary lookup separate from reverse table selection.
+  // Candidate stems are accepted only when the complete queried form occurs
+  // in a classified declension table; suffix guesses alone are insufficient.
+  function paradigm(surface, morphology) {
+    const word = String(surface || '').normalize('NFC').toLowerCase();
+    const direct = directParadigm(word, morphology);
+    if (direct) return direct;
+    const candidates = new Set(REFERENCE_LEMMAS);
+    for (const item of global.PCEDLookupCore?.inflectionCandidates?.(word) || []) {
+      if (item.form) candidates.add(item.form);
+    }
+    const matches = [];
+    const seen = new Set();
+    for (const lemma of candidates) {
+      const table = directParadigm(lemma, morphology);
+      if (!table || seen.has(table.lemma)) continue;
+      const cases = [];
+      for (const group of table.groups || []) for (const row of group.rows || []) {
+        for (const number of ['singular', 'plural']) {
+          if ((row[number] || []).some(form => String(form).normalize('NFC').toLowerCase() === word))
+            cases.push(row.label + ' (' + number + ')');
+        }
+      }
+      if (!cases.length) continue;
+      seen.add(table.lemma);
+      matches.push({ table, cases });
+    }
+    if (!matches.length) return null;
+    const first = matches[0].table;
+    return { ...first, surface: word,
+      matchedLemmas: matches.map(item => item.table.lemma),
+      groups: matches.flatMap(({ table, cases }) => table.groups.map(group => ({
+        ...group, label: word + ' → ' + table.lemma + ': ' + group.label,
+        note: [group.note, 'Matched form / 所查词形: ' + cases.join('; ')].filter(Boolean).join(' ')
+      }))) };
+  }
+
   function expandedReference() {
     const tables = {};
     for (const lemma of REFERENCE_LEMMAS) {
@@ -666,3 +703,4 @@
     expandedReference
   });
 })(window);
+
