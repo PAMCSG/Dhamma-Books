@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.21 — 2026-10-01
+ * Version 3.9.22 — 2026-10-01
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.21';
+  const VERSION = '3.9.22';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -166,6 +166,11 @@
   // are present in PCED 2.0.5.0 or the project's verified Inflection Master.
   // Keep them as exact headwords, never unrelated substring results.
   const BUILTIN_EXACT_HEADWORDS = Object.freeze({
+    // Original PCED 2.0.5 records restored from the official pali-h/cidian
+    // (blob 03444838c76cb59c7b60d2097b4bcc6783d34b48). Preserve all homographs.
+    "vacati": {"headword": "vacati", "zh": [], "en": [], "my": [{"source": "B", "source_label": "Pali Word Grammar from Pali Myanmar Dictionary", "headword": "vacati", "definition": "vacati(kri)<br>  ဝစတိ(ကြိ)<br>  «vaca+a+ti. nīti, dhātu. 31. vatti-saṃ. vaccai, vayai, vaai-prā, addhamāgadhi.»<br>  [ဝစ+အ+တိ။ နီတိ၊ ဓာတု။ ၃၁။ ဝတ္တိ-သံ။ ဝစ္စဣ၊ ဝယဣ၊ ဝအဣ-ပြာ၊ အဒ္ဓမာဂဓိ။]"}, {"source": "K", "source_label": "Tipiṭaka Pāḷi-Myanmar Dictionary တိပိဋက-ပါဠိမြန်မာ အဘိဓာန်", "headword": "vacati", "definition": "ဝစတိ(ကြိ)<br>  [ဝစ+အ+တိ။ နီတိ၊ ဓာတု။ ၃၁။ ဝတ္တိ-သံ။ ဝစ္စဣ၊ ဝယဣ၊ ဝအဣ-ပြာ၊ အဒ္ဓမာဂဓိ။]<br>  (၁) ပြော-ဟော-ဆို-၏။ ဝတ္တီ-လည်းကြည့်။ (၂) တင့်တယ်၏။"}, {"source": "R", "source_label": "U Hau Sein’s Pāḷi-Myanmar Dictionary ပါဠိမြန်မာ အဘိဓာန်(ဦးဟုတ်စိန်)", "headword": "vacati", "definition": "ဝစတိ\t (√ဝစ်)<br>ဆို၏။"}], "vi": [], "other": []},
+    "vatti": {"headword": "vatti", "zh": [], "en": [{"source": "C", "source_label": "Concise Pali-English Dictionary by A.P. Buddhadatta Mahathera", "headword": "vatti", "definition": "[aor. of vattati] existed; happened; took place; went on."}, {"source": "P", "source_label": "PTS Pali-English dictionary The Pali Text Society’s Pali-English dictionary", "headword": "vatti", "definition": "[Vedic vakti, <em>vac</em>] to speak, say, call; pres. not found (for which vadati); fut. 1<sup>st</sup> sg. <i>vakkhāmi</i> J.I,346; 3<sup>rd</sup> <i>vakkhati</i> S.I,142; J.I,356; II,40; VI,352; VbhA.51; 1<sup>st</sup> pl. <i>vakkhāma</i> S.IV,72; M.III,207; Vism.170, 446; 3<sup>rd</sup> <i>vakkhanti</i> Vin.II,1; pte. fut. <i>vakkhamāna</i> PvA.18. -- aor. 1<sup>st</sup> sg. <i>avacaṁ</i> J.III,280; DhA.III,194, & <i>avocaṁ</i> Th.2, 124; Vv 79<sup>7</sup>; S.I,10; DhA.III,285; 2<sup>nd</sup> <i>avaca</i> Th.2, 415, <i>avoca</i> Dh.133, & <i>avacāsi</i> Vv 35<sup>7</sup>; 53<sup>9</sup>; 3<sup>rd</sup> <i>avaca</i> J.I,294; Pv.II,3<sup>19</sup>; PvA.65 (mā a.); <i>avoca</i> Th.2, 494; S.I,150; Sn.p. 78; J.II,160; PvA.6, 31, 49, & <i>avacāsi</i> J.VI,525; 1<sup>st</sup> pl. <i>avacumha </i>&<i> avocumha</i> M.II,91; III,15; 2<sup>nd</sup> <i>avacuttha</i> Vin.I,75 (mā a.); II,297; J.II,48; DhA.I,73; IV,228, & <i>avocuttha</i> J.I,176; Miln.9; 3<sup>rd</sup> pl. <i>avacuṁ</i> J.V,260, & <i>avocuṁ</i> M.II,147. -- inf. <i>vattuṁ</i> Sn.431; J.VI,351; Vism.522=VbhA.130 (vattukāma); SnA 414; DA.I,109; DhA.I,329; II,5. -- ger. <i>vatvā</i> SnA 398; PvA.68, 73, & <i>vatvāna</i> Sn.p. 78. ‹-› grd. <i>vattabba</i> Miln.276 (kiṁ vattabbaṁ what is there to be said about it? i. e. it goes without saying); SnA 123, 174, 178; PvA.12, 27, 92. -- ppr. med. <i>vuccamāna</i> Vin.I,60; III,221; PvA.13. -- Pass. <i>vuccati</i> D.I,168, 245; Dh.63; Mhvs 9, 9; 34, 81 (vuccate, v. l. uccate); J.I,129 (vuccare, 3<sup>rd</sup> pl.); PvA.24, 34, 63, 76; -- pp. <i>vutta</i> (q. v.). -- Caus. <i>vāceti</i> to make speak, i. e. to read out; to cause to read; also to teach, to instruct Sn.1018, 1020; J.I,452 (read); PvA.97. -- pp. <i>vācita</i> (q. v.). ‹-› Desid. <i>vavakkhati</i> (see Geiger, P.Gr. § 184=Sk. vivakṣati) to wish to call D.II,256.  <i>Vattika=vatika</i> Nd<sup>1</sup> 89 (having the habit of horses, elephants etc.). (Page 598)"}, {"source": "I", "source_label": "Pali-Dictionary Vipassana Research Institute", "headword": "vatti", "definition": "To speak, to say; to speak to, address"}], "my": [{"source": "B", "source_label": "Pali Word Grammar from Pali Myanmar Dictionary", "headword": "vatti", "definition": "vatti(kri)<br>  ဝတ္တိ(ကြိ)<br>  «vatu(vattu)+ī»<br>  [ဝတု(ဝတ္တု)+ဤ]"}, {"source": "B", "source_label": "Pali Word Grammar from Pali Myanmar Dictionary", "headword": "vatti", "definition": "vatti(kri)<br>  ဝတ္တိ(ကြိ)<br>  «vatu(vattu)+ṇe+ī. curādi. nīti,dhātu.3va9.»<br>  [ဝတု(ဝတ္တု)+ဏေ+ဤ။ စုရာဒိ။ နီတိ၊ဓာတု။၃ဝ၉။]"}, {"source": "B", "source_label": "Pali Word Grammar from Pali Myanmar Dictionary", "headword": "vatti", "definition": "vatti(kri)<br>  ဝတ္တိ(ကြိ)<br>  «vaca+ti. vattītivadati. nīti, dhātu,31. nipātanaca-ta-pru. ī asārattha, 3. 2-nitea vattietāyātivācāhu saddanīticharā nitea rhilerā.»<br>  [ဝစ+တိ။ ဝတ္တီတိဝဒတိ။ နီတိ၊ ဓာတု၊၃၁။ နိပါတနသုတ်ဖြင့်စ-ကိုတ-ပြု။ ဤ အလိုသာရတ္ထ၊ ၃။ ၂-၌ ဝတ္တိဧတာယာတိဝါစာဟု သဒ္ဒနီတိဆရာတော်တို့ လက်ထက်၌ ပါဌ်ရှိလေရာသည်။]"}, {"source": "K", "source_label": "Tipiṭaka Pāḷi-Myanmar Dictionary တိပိဋက-ပါဠိမြန်မာ အဘိဓာန်", "headword": "vatti", "definition": "ဝတ္တိ(ကြိ)<br>  [ဝစ+တိ။ ဝတ္တီတိဝဒတိ။ နီတိ၊ ဓာတု၊၃၁။ နိပါတနသုတ်ဖြင့်စ-ကိုတ-ပြု။ ဤ အလိုသာရတ္ထ၊ ၃။ ၂-၌ ဝတ္တိဧတာယာတိဝါစာဟု သဒ္ဒနီတိဆရာတော်တို့ လက်ထက်၌ ပါဌ်ရှိလေရာသည်။]<br>  ပြော-ဆို-၏။"}, {"source": "K", "source_label": "Tipiṭaka Pāḷi-Myanmar Dictionary တိပိဋက-ပါဠိမြန်မာ အဘိဓာန်", "headword": "vatti", "definition": "ဝတ္တိ(ကြိ)<br>  [ဝတု(ဝတ္တု)+ဏေ+ဤ။ စုရာဒိ။ နီတိ၊ဓာတု။၃ဝ၉။]<br>  ဟော-ဆို-ပြီ။"}, {"source": "K", "source_label": "Tipiṭaka Pāḷi-Myanmar Dictionary တိပိဋက-ပါဠိမြန်မာ အဘိဓာန်", "headword": "vatti", "definition": "ဝတ္တိ(ကြိ)<br>  [ဝတု(ဝတ္တု)+ဤ]<br>  (၁) ဖြစ်ပြီ။ (၂) ကျင့်-ဖြည့်ကျင့်-ပြီ။"}, {"source": "R", "source_label": "U Hau Sein’s Pāḷi-Myanmar Dictionary ပါဠိမြန်မာ အဘိဓာန်(ဦးဟုတ်စိန်)", "headword": "vatti", "definition": "ဝတ္တိ\t(ဣ) <br>နံ့သာပျောင်း။"}], "vi": [], "other": [{"source": "L", "source_label": "빨한 P.T.S. 사전 — Korean PTS dictionary", "headword": "vatti", "definition": "[Vedic vakti, vac] 발설하다, 말하다, 부르다; 과거형은 발견되지 않음 (for which vadati); fut. 1st sg. vakkhāmi J I.346; 3rd vakkhati S I.142; J I.356; II.40; VI.352; VbhA 51; 1st pl. vakkhāma S IV.72; M III.207; Vism 170, 446; 3rd vakkhanti Vin II.1; pte. fut. vakkhamāna PvA 18. -- aor. 1st sg. avacaṃ J III.280; DhA III.194, & avocaṃ Th 2, 124; Vv 797; S I.10; DhA III.285; 2nd avaca Th 2, 415, avoca Dh 133, & avacāsi Vv 357; 539; 3rd avaca J I.294; Pv II.319; PvA 65 (mā a.); avoca Th 2, 494; S I.150; Sn p. 78; J II.160; PvA 6, 31, 49, & avacāsi J VI.525; 1st pl. avacumha & avocumha M II.91; III.15; 2nd avacuttha Vin I.75 (mā a.); II.297; J II.48; DhA I.73; IV.228, & avocuttha J I.176; Miln 9; 3rd pl. avacuṃ J V.260, & avocuṃ M II.147. -- inf. vattuṃ Sn 431; J VI.351; Vism 522=VbhA 130 (vattukāma); SnA 414; DA I.109; DhA I.329; II.5. -- ger. vatvā SnA 398; PvA 68, 73, & vatvāna Sn p. 78. ‹-› grd. vattabba Miln 276 (kiṃ vattabbaṃ 그것에 관해 말할 것이 무에 있는가? 즉 그것은 말 없이 지나간다); SnA 123, 174, 178; PvA 12, 27, 92. -- ppr. med. vuccamāna Vin I.60; III.221; PvA 13. -- Pass. vuccati D I.168, 245; Dh 63; Mhvs 9, 9; 34, 81 (vuccate, v. l. uccate); J I.129 (vuccare, 3rd pl.); PvA 24, 34, 63, 76; -- pp. vutta (q. v.). -- Caus. vāceti 말하게 하다, 즉 소리내어 읽다; 읽게 g다; 가르치다, 지시하다 Sn 1018, 1020; J I.452 (read); PvA 97. -- pp. vācita (q. v.). ‹-› Desid. vavakkhati (see Geiger, P.Gr. § 184=Sk. vivakṣati) 부르고 싶어하다 D II.256. Nd1 89 (말, 코끼리 등의 습관이 있는.)."}]},
+
     // PCED 2.0.5.0 has brūhi as its own entry in both Myanmar sources.
     // Do not redirect the exact headword to the related verb brūti.
     'brūhi': Object.freeze({
@@ -643,7 +648,12 @@
         if (!heads.includes(key)) index.set(normalized, [...heads, key]);
       }
     }
-    const exact = form => (index.get(cleanWord(form)) || []).slice();
+    const exact = form => {
+      const word = cleanWord(form);
+      const heads = (index.get(word) || []).filter(head => dictionary[head]);
+      if (dictionary[word] && !heads.includes(word)) heads.unshift(word);
+      return heads;
+    };
     return { dictionary, index, exact };
   }
 
@@ -1455,6 +1465,7 @@
     verifiedDecompositions: BUILTIN_DECOMPOSITIONS
   });
 })(window);
+
 
 
 
