@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.23 — 2026-10-01
+ * Version 3.9.24 — 2026-10-01
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.23';
+  const VERSION = '3.9.24';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -863,6 +863,21 @@
       }));
     }
 
+    const speechMatches = speechFormMatches(normalized);
+    // A plain-letter speech query may recover an exact diacritic spelling.
+    // Preserve that dictionary entry before falling back to its verb family.
+    const speechExactHeads = [...new Set(speechMatches.flatMap(match =>
+      (match.forms || []).flatMap(context.exact)))];
+    if (speechExactHeads.length) return finish({
+      ...base, mode: 'exact', tier: 1, heads: speechExactHeads, grammar: null
+    });
+    const speechHeads = [...new Set(speechMatches.flatMap(match => context.exact(match.lemma)))];
+    if (speechHeads.length) return finish({
+      ...base, mode: 'inflected', tier: 3, heads: speechHeads,
+      resolvedForm: speechHeads[0], rule: 'Speech verb family / 说话动词词形组',
+      family: 'speech verb', notes: [`${clicked} → ${speechHeads.join(', ')}`]
+    });
+
     for (const [map, label] of [
       [options.fallbackAliases, 'verified fallback headword'],
       [options.aliases, 'verified headword'],
@@ -1377,9 +1392,9 @@
     const groups = [
       { label: 'Speech sense / 说话义 — dictionary citation / 词典原形', forms: ['vatti'],
         note: '√vac. PTS says the present is not found and refers to vadati; Myanmar sources also record vatti as a verb. No regular present or imperative paradigm is inferred. / PTS 注明现在时未见，另参 vadati；缅文词典也收录 vatti 动词条目。此处不推造规则现在时或命令式。' },
-      finite('Future (PCED-attested) / 未来时（PCED 记载）',
-        [['vakkhati'], ['vakkhanti'], ['—'], ['—'], ['vakkhāmi'], ['vakkhāma']],
-        'Order: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl. — = not supplied by this PCED record. / 顺序：第三人称单、复数；第二人称单、复数；第一人称单、复数。— 表示此条目未列出。'),
+      finite('Future (PCED and grammatical paradigm) / 未来时（PCED 与语法词形表）',
+        [['vakkhati'], ['vakkhanti'], ['vakkhasi'], ['vakkhatha'], ['vakkhāmi'], ['vakkhāma']],
+        'Order: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl. Second-person forms are supplied by the grammatical vakkhati paradigm. / 顺序：第三人称单、复数；第二人称单、复数；第一人称单、复数。第二人称词形依据 vakkhati 语法变位表补充。'),
       finite('Aorist (PCED-attested) / 不定过去时（PCED 记载）',
         [['avaca', 'avoca', 'avacāsi'], ['avacuṁ', 'avocuṁ'], ['avaca', 'avoca', 'avacāsi'], ['avacuttha', 'avocuttha'], ['avacaṁ', 'avocaṁ'], ['avacumha', 'avocumha']],
         'Order: 3sg, 3pl, 2sg, 2pl, 1sg, 1pl. Some forms occur in more than one person. / 顺序：第三人称单、复数；第二人称单、复数；第一人称单、复数。部分词形可用于不同人称。'),
@@ -1388,6 +1403,9 @@
       { label: 'Gerundive / 应当分词', forms: ['vattabba'] },
       { label: 'Future participle / 未来分词', forms: ['vakkhamāna'] },
       { label: 'Present middle participle / 现在中间态分词', forms: ['vuccamāna'] },
+      { ...finite('Passive present paradigm / 被动现在时变位表',
+        [['vuccati'], ['vuccanti'], ['vuccasi'], ['vuccatha'], ['vuccāmi'], ['vuccāma']],
+        'Complete conjugation from the vucca- passive stem; each position is not individually claimed as text-attested. / 依 vucca- 被动词干列出的完整变位；不表示每一位置都已在经文中核实。'), generated: true },
       { label: 'Passive present / 被动现在时', forms: ['vuccati', 'vuccate', 'uccate', 'vuccare'],
         note: 'vuccati, vuccate, uccate: third singular; vuccare: third plural. / vuccati、vuccate、uccate：第三人称单数；vuccare：第三人称复数。' },
       { label: 'Past participle / 过去分词', forms: ['vutta'] },
@@ -1400,12 +1418,12 @@
       lemma, kind: 'verb', verified: [], groups, specialSources: [],
       attanopadaGroups: [], attanopadaGenerated: false, generated: false,
       formSystem: 'pced',
-      formSource: 'PCED 2.0.5 — PTS Pali-English Dictionary, vatti (p. 598); Concise Pali-English Dictionary, vatti; original Myanmar dictionary records.',
-      formSourceZh: 'PCED 2.0.5 — PTS 巴英词典 vatti（第 598 页）；简明巴英词典 vatti；原缅文词典条目。'
+      formSource: 'PCED 2.0.5 — PTS Pali-English Dictionary, vatti (p. 598); Concise Pali-English Dictionary, vatti; original Myanmar dictionary records; vakkhati future paradigm (Digital Pāli Dictionary).',
+      formSourceZh: 'PCED 2.0.5 — PTS 巴英词典 vatti（第 598 页）；简明巴英词典 vatti；原缅文词典条目；vakkhati 未来时变位表（Digital Pāli Dictionary）。'
     };
   }
 
-  function inflectionParadigm(head, entry, options = {}) {
+  function baseInflectionParadigm(head, entry, options = {}) {
     let lemma = cleanWord(head);
     if (!lemma || !entry) return null;
     const pcedSpeech = pcedSpeechParadigm(lemma);
@@ -1492,6 +1510,104 @@
     };
   }
 
+
+  function speechFamilies() {
+    const vac = pcedSpeechParadigm('vatti');
+    const vad = { lemma: 'vadati', kind: 'verb', groups: verbParadigm('vadati', 'kri'),
+      attanopadaGroups: attanopadaParadigm('vadati', verbParadigm('vadati', 'kri')) };
+    return [{ root: 'vac', lemma: 'vatti', paradigm: vac }, { root: 'vad', lemma: 'vadati', paradigm: vad }];
+  }
+
+  function speechFormMatches(surface) {
+    const word = cleanWord(surface);
+    const fold = value => cleanWord(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ṃ/g, 'm');
+    const plain = !/[āīūṅñṭḍṇḷṃ]/.test(word);
+    const same = form => cleanWord(form) === word || (plain && fold(form) === fold(word));
+    const matches = [];
+    for (const family of speechFamilies()) {
+      for (const group of family.paradigm.groups) {
+        // Derived verbs keep their own conjugation, not the parent speech table.
+        if (/Derived verbs|Separate meaning/.test(group.label)) continue;
+        const positions = (group.persons || []).filter(position => position.forms.some(form => same(form)));
+        if ((group.forms || []).some(form => same(form)) || positions.length) {
+          matches.push({ ...family, label: group.label, forms: (group.forms || []).filter(same), persons: positions.map(position => position.person), generated: family.root === 'vad' || !!group.generated });
+        }
+      }
+      if (family.root === 'vac' && word === 'vacati') matches.push({ ...family, label: 'Dictionary citation / 词典原形', persons: [], generated: false });
+      for (const group of family.paradigm.attanopadaGroups || []) {
+        if (group.endingsOnly) continue;
+        const positions = (group.persons || []).filter(position => position.forms.some(form => same(form)));
+        if (positions.length) matches.push({ ...family, label: group.label + ' — Attanopada', forms: positions.flatMap(position => position.forms.filter(same)), persons: positions.map(position => position.person), generated: true });
+      }
+    }
+    return matches;
+  }
+
+  function dictionaryRoot(entry) {
+    const roots = new Set();
+    // Only dedicated root data or explicitly marked roots near the beginning
+    // of a definition. Never infer a root from an arbitrary word ending.
+    const add = value => {
+      const word = String(value || '').replace(/^√/, '').trim().toLowerCase();
+      if (/^[a-zāīūṅñṭḍṇḷṃ]+$/.test(word)) roots.add(word);
+    };
+    add(entry?.root);
+    for (const record of entryRecords(entry)) {
+      add(record.root);
+      const text = String(record.definition || '').replace(/<[^>]*>/g, ' ').trim();
+      const explicit = text.slice(0, 100).match(/√\s*([a-zāīūṅñṭḍṇḷṃ]+)/gi) || [];
+      for (const value of explicit) add(value.replace(/\s/g, ''));
+      // PCED Myanmar grammar: a bare root + affix + ending, without prefixes.
+      if (record.source === 'B' && /\bkri\b|ကြိ/.test(text)) {
+        const formula = text.match(/«\s*([a-zāīūṅñṭḍṇḷṃ]+)\s*\+\s*(?:a|ya|ṇe|ṇaya)\s*\+\s*(?:ti|te)\b/i);
+        if (formula) add(formula[1]);
+      }
+    }
+    return [...roots];
+  }
+
+  function inflectionParadigm(head, entry, options = {}) {
+    const surface = cleanWord(options.surface || head);
+    const headword = cleanWord(head);
+    const matches = speechFormMatches(surface);
+    const family = matches.find(match => match.lemma === headword) || matches[0];
+    let result;
+    if (family) {
+      const dictionary = options.dictionary || {};
+      const familyEntry = dictionary[family.lemma] || BUILTIN_EXACT_HEADWORDS[family.lemma];
+      const direct = baseInflectionParadigm(head, entry, options);
+      if (direct?.kind === 'noun' && headword !== family.lemma) {
+        result = { ...direct, specialSources: [...(direct.specialSources || []), {
+          source: 'Related speech verb family (noun declension retained)',
+          sourceZh: '相关说话动词词形组（保留此词的名词变格）', groups: family.paradigm.groups
+        }] };
+      } else if (family.root === 'vac') result = pcedSpeechParadigm('vatti');
+      else if (familyEntry || headword === 'vadati') result = baseInflectionParadigm('vadati', { ...(familyEntry || entry), entries: [...((familyEntry || entry)?.entries || []), { definition: 'kri — verified √vad speech verb' }] }, options);
+    }
+    if (!result) result = baseInflectionParadigm(head, entry, options);
+    if (!result) return null;
+    const familyRoot = family?.root || ({ vāceti: 'vac', vavakkhati: 'vac', vadati: 'vad', vacati: 'vac', vatti: 'vac' })[headword];
+    const roots = familyRoot ? [familyRoot] : dictionaryRoot(entry);
+    const analyses = matches.map(match => ({ label: match.label, persons: match.persons, generated: match.generated }));
+    if (!analyses.length) {
+      for (const group of result.groups || []) {
+        const positions = (group.persons || []).filter(position => position.forms.some(form => cleanWord(form) === surface));
+        if (positions.length) analyses.push({ label: group.label, persons: positions.map(position => position.person), generated: !!result.generated });
+        for (const row of group.rows || []) for (const number of ['singular', 'plural']) {
+          if ((row[number] || []).some(form => cleanWord(form) === surface)) analyses.push({ label: row.label + ' (' + number + ')', persons: [], generated: !!result.generated });
+        }
+      }
+    }
+    if (surface === 'vatti') analyses.push({ label: 'Separate meaning: aorist of vattati / 另一义：vattati 的不定过去时', persons: [], generated: false });
+    const stems = result.kind === 'noun'
+      ? [...new Set((global.PaliLookupMorphology?.entries?.[result.lemma] || [])
+          .map(record => record.s).filter(value => typeof value === 'string' && value.trim()))]
+      : [];
+    return { ...result, queriedForm: options.surface || head, roots, stems,
+      rootSource: familyRoot ? 'PCED speech root family / PCED 说话动词词根组' : roots.length ? 'PCED explicit root or grammar formula / PCED 明确词根或语法构词式' : '',
+      queriedAnalyses: analyses };
+  }
+
   global.PCEDLookupCore = Object.freeze({
     version: VERSION,
     normalizeForMatch,
@@ -1509,6 +1625,7 @@
     verifiedDecompositions: BUILTIN_DECOMPOSITIONS
   });
 })(window);
+
 
 
 

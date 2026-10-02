@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.27 — 2026-10-01 */
+/* PAMC cross-book PCED popup standard v1.8.28 — 2026-10-01 */
 (function () {
   'use strict';
 
@@ -62,7 +62,7 @@
     });
     morphologyPromise = Promise.resolve()
       .then(() => window.KaccayanaDeclension?.VERSION === '1.5.1' ? null : load('kaccayana-declension.js', '1.5.1'))
-      .then(() => core()?.version === '3.9.23' ? null : load('pced-lookup-core.js', '3.9.23'))
+      .then(() => core()?.version === '3.9.24' ? null : load('pced-lookup-core.js', '3.9.24'))
       .then(() => window.PaliLookupMorphology ? null : load('pali-lookup-morphology.js', '2.0-unicode-trial'))
       .then(() => window.PaliLookupMorphology || null);
     return morphologyPromise;
@@ -425,20 +425,20 @@
     return withTeacherGroup(localized, language, groupNumber);
   }
 
-  function renderInflectionPanel(head, primaryLanguage = 'en') {
+  function renderInflectionPanel(head, primaryLanguage = 'en', surface = head) {
     const data = dictionary();
     const options = standardOptions();
     const mappedLemmas = (options.inflections?.[head] || []).map(item =>
       typeof item === 'string' ? item : item?.form
     ).filter(Boolean);
-    if (mappedLemmas.length && !window.PaliLookupMorphology) return '';
+
     // Prefer the resolver's canonical headword. A surface such as gacchati is
     // also a valid inflection of gacchanta, but its exact verb analysis must
     // not be replaced by the Group 13 present-participle noun paradigm.
     const candidates = [head, ...mappedLemmas.filter(lemma => lemma !== head)];
     let paradigm = null;
     for (const lemma of candidates) {
-      paradigm = core()?.inflectionParadigm?.(lemma, data[lemma] || data[head], options);
+      paradigm = core()?.inflectionParadigm?.(lemma, data[lemma] || data[head], { ...options, surface });
       if (paradigm?.groups?.length) break;
     }
     if (!paradigm) return '';
@@ -470,7 +470,20 @@
       if (/present|vattamānā/.test(value)) return 'present';
       return '';
     };
-    let content = '';
+    const rootText = paradigm.roots?.length
+      ? paradigm.roots.map(root => '√' + root).join(' / ')
+      : (primaryLanguage === 'zh' ? '词根未确认' : 'Root not confirmed');
+    let content = '<div class="pced-inflection-metadata">' +
+      '<div><b>' + (primaryLanguage === 'zh' ? '所查词形：' : 'Queried form: ') + '</b>' + esc(paradigm.queriedForm || surface) + '</div>' +
+      '<div><b>' + (primaryLanguage === 'zh' ? '词根：' : 'Root: ') + '</b>' + esc(rootText) + '</div>' +
+      '<div><b>' + (primaryLanguage === 'zh' ? '词典原形／词形组：' : 'Dictionary base / form family: ') + '</b>' + esc(paradigm.lemma || head) + '</div>' +
+      (paradigm.stems?.length ? '<div><b>' + (primaryLanguage === 'zh' ? '词干（Pali Lookup）：' : 'Stem (Pali Lookup): ') + '</b>' + esc(paradigm.stems.join(' / ')) + '</div>' : '') +
+      (paradigm.rootSource ? '<div class="pced-inflection-caution">' + esc(paradigm.rootSource) + '</div>' : '') +
+      (paradigm.queriedAnalyses || []).map(item => '<div><b>' +
+        (primaryLanguage === 'zh' ? '词形分析：' : 'Analysis: ') + '</b>' +
+        esc(core().localizedVerbGroupLabel(item.label, primaryLanguage)) +
+        (item.persons?.length ? ' — ' + esc(item.persons.map(person => core().localizedVerbPersonLabel(person, primaryLanguage)).join(' / ')) : '') +
+        (item.generated ? ' ' + (primaryLanguage === 'zh' ? '（依规则推算）' : '(pattern-derived)') : '') + '</div>').join('') + '</div>';
     for (const group of paradigm.groups || []) {
       const groupLabel = paradigm.kind === 'verb'
         ? core().localizedVerbGroupLabel(group.label, primaryLanguage)
@@ -573,7 +586,7 @@
       return note + approvedEntry + '<div class="note"><b>No reliable PCED entry was found for ' +
         esc(surface) + '.</b><br>Only exact headwords, verified forms, conservative inflections, and verified compound or sandhi analyses were accepted.</div>';
     }
-    return note + renderInflectionPanel(heads[0], primaryLanguage) + heads.map((head, index) =>
+    return note + renderInflectionPanel(heads[0], primaryLanguage, surface) + heads.map((head, index) =>
       renderEntry(head, approvedRows, surface, index === 0, primaryLanguage)).join('');
   }
 
@@ -1675,6 +1688,7 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })();
+
 
 
 

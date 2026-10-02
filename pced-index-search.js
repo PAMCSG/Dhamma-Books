@@ -1,4 +1,4 @@
-/* PCED landing-page search v1.7.18 — exact Pāli/diacritic-aware and multilingual. */
+/* PCED landing-page search v1.7.19 — exact Pāli/diacritic-aware and multilingual. */
 (function (global) {
   'use strict';
 
@@ -129,8 +129,8 @@
     };
     // A plain-ASCII query may immediately find an exact dictionary spelling
     // through the folded index (for example patissutva → paṭissutvā). Resolve
-    // that recovered spelling as well: the exact surface entry may have a
-    // curated preferLemma mapping that must replace the surface-only result.
+    // that recovered spelling as well, retaining exact entries ahead of
+    // related citation forms and grammatical analysis.
     for (const candidate of foldedExactHeads) {
       const candidateResult = resolve(candidate);
       heads.push(...(candidateResult?.allHeads || candidateResult?.heads || []));
@@ -149,9 +149,13 @@
         rememberResolution(candidateResult);
       }
     }
-    const displayHeads = displayResolution?.mode === 'inflected' && displayResolution?.heads?.length
-      ? (displayResolution.allHeads || displayResolution.heads)
-      : heads;
+    const exactSpellingHeads = unique(foldedExactHeads);
+    if (exactSpellingHeads.length) displayResolution = resolve(exactSpellingHeads[0]);
+    const displayHeads = exactSpellingHeads.length
+      ? [...exactSpellingHeads, ...heads]
+      : displayResolution?.mode === 'inflected' && displayResolution?.heads?.length
+        ? (displayResolution.allHeads || displayResolution.heads)
+        : heads;
     return { heads: unique(displayHeads), mode: displayHeads.length ? 'plain-pali' : (result?.mode || 'none'), marked: false,
       resolution: displayResolution };
   }
@@ -242,7 +246,7 @@
     return withTeacherGroup(localized, language, groupNumber);
   }
 
-  function renderInflectionPanel(head, priority = 'en') {
+  function renderInflectionPanel(head, priority = 'en', surface = head) {
     const inflections = global.PCEDStandardData?.inflections;
     const mappedLemmas = (inflections?.[head] || []).map(item =>
       typeof item === 'string' ? item : item?.form
@@ -254,7 +258,7 @@
     const candidates = [head, ...mappedLemmas.filter(lemma => lemma !== head)];
     let paradigm = null;
     for (const lemma of candidates) {
-      paradigm = global.PCEDLookupCore?.inflectionParadigm?.(lemma, dictionary[lemma], { inflections });
+      paradigm = global.PCEDLookupCore?.inflectionParadigm?.(lemma, dictionary[lemma], { inflections, dictionary, surface });
       if (paradigm) break;
     }
     if (!paradigm) return '';
@@ -286,7 +290,20 @@
       if (/present|vattamānā/.test(value)) return 'present';
       return '';
     };
-    let content = '';
+    const rootText = paradigm.roots?.length
+      ? paradigm.roots.map(root => '√' + root).join(' / ')
+      : (priority === 'zh' ? '词根未确认' : 'Root not confirmed');
+    let content = '<div class="pced-inflection-metadata">' +
+      '<div><b>' + (priority === 'zh' ? '所查词形：' : 'Queried form: ') + '</b>' + esc(paradigm.queriedForm || surface) + '</div>' +
+      '<div><b>' + (priority === 'zh' ? '词根：' : 'Root: ') + '</b>' + esc(rootText) + '</div>' +
+      '<div><b>' + (priority === 'zh' ? '词典原形／词形组：' : 'Dictionary base / form family: ') + '</b>' + esc(paradigm.lemma || head) + '</div>' +
+      (paradigm.stems?.length ? '<div><b>' + (priority === 'zh' ? '词干（Pali Lookup）：' : 'Stem (Pali Lookup): ') + '</b>' + esc(paradigm.stems.join(' / ')) + '</div>' : '') +
+      (paradigm.rootSource ? '<div class="pced-inflection-caution">' + esc(paradigm.rootSource) + '</div>' : '') +
+      (paradigm.queriedAnalyses || []).map(item => '<div><b>' +
+        (priority === 'zh' ? '词形分析：' : 'Analysis: ') + '</b>' +
+        esc(global.PCEDLookupCore.localizedVerbGroupLabel(item.label, priority)) +
+        (item.persons?.length ? ' — ' + esc(item.persons.map(person => global.PCEDLookupCore.localizedVerbPersonLabel(person, priority)).join(' / ')) : '') +
+        (item.generated ? ' ' + (priority === 'zh' ? '（依规则推算）' : '(pattern-derived)') : '') + '</div>').join('') + '</div>';
     for (const group of paradigm.groups || []) {
       const groupLabel = paradigm.kind === 'verb'
         ? global.PCEDLookupCore.localizedVerbGroupLabel(group.label, priority)
@@ -453,7 +470,7 @@
         '<div class="definition" style="white-space:pre-wrap">' + approvedChineseHtml(row.chinese_html, row.chinese) + '</div></div>').join('');
   }
 
-  function renderHead(key, priority, otherHtml = '', otherRelatedHtml = '') {
+  function renderHead(key, priority, otherHtml = '', otherRelatedHtml = '', surface = key) {
     const entry = dictionary[key];
     if (!entry) return '';
     const groups = global.PCEDLookupCore?.dictionaryGroups(entry, priority) || [];
@@ -462,7 +479,7 @@
     const relatedRows = approvedRows.filter(row => row.match === 'inflected');
     const related = relatedRows.length ? '<div class="group-title">Related forms / 相关词形（非精确匹配）</div>' + renderApprovedRows(relatedRows) : '';
     return '<div class="entry"><div class="headword">' + esc(entry.headword || key) + '</div>' +
-      renderInflectionPanel(key, priority) +
+      renderInflectionPanel(key, priority, surface) +
       approved + otherHtml +
       groups.map(group => '<div class="group-title" data-language="' + esc(group.key) + '">' +
         esc(languageTitles[group.key] || group.title || 'Other') + '</div>' +
@@ -486,7 +503,7 @@
           ' matched all exact spellings with possible Pāli diacritics.</div>' : '';
       return { query, heads: pali.heads, kind: 'pali', priority,
         html: note + renderGrammarNote(pali.resolution, priority) +
-          pali.heads.map((head, index) => renderHead(head, priority, index === 0 ? renderOtherRows(otherRowsForQuery(query).filter(row => row.match !== 'inflected')) : '', index === 0 && otherRowsForQuery(query).some(row => row.match === 'inflected') ? '<div class="group-title">Related forms / 相关词形（非精确匹配）</div>' + renderOtherRows(otherRowsForQuery(query).filter(row => row.match === 'inflected')) : '')).join('') };
+          pali.heads.map((head, index) => renderHead(head, priority, index === 0 ? renderOtherRows(otherRowsForQuery(query).filter(row => row.match !== 'inflected')) : '', index === 0 && otherRowsForQuery(query).some(row => row.match === 'inflected') ? '<div class="group-title">Related forms / 相关词形（非精确匹配）</div>' + renderOtherRows(otherRowsForQuery(query).filter(row => row.match === 'inflected')) : '', query)).join('') };
     }
     // A query made entirely of Roman Pāli characters is a headword request.
     // If exact/verified Pāli lookup found nothing, do not reinterpret the same
@@ -580,12 +597,13 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.18' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.19' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })(window);
+
 
 
 
