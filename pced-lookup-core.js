@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.17 — 2026-10-01
+ * Version 3.9.18 — 2026-10-01
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.17';
+  const VERSION = '3.9.18';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -328,6 +328,26 @@
   // PCED's [brū+a+hi] is a verbal formation, not a compound of brū and hi.
   // Keep the exact brūhi record visible while explaining its imperative form.
   const EXACT_VERB_FORMS = Object.freeze({
+    'modataṃ': Object.freeze({
+      lemma: 'modati', label: 'Third-person singular imperative, Attanopada (Pañcamī)',
+      labelZh: '命令式（Pañcamī）· 自言（Attanopada）· 第三人称单数',
+      meaning: 'let him rejoice; may you rejoice (respectful address)',
+      meaningZh: '愿他欢喜；愿您欢喜（尊称用法）',
+      formation: 'moda + taṃ; PCED root formula: mud + a + taṃ',
+      formationZh: 'moda + taṃ；PCED 词根构成：mud + a + taṃ',
+      sourceNote: 'PCED Myanmar grammar entry; -taṃ is the third-person singular Attanopada imperative ending.',
+      sourceNoteZh: '依据 PCED 缅文语法条目；-taṃ 是自言命令式第三人称单数词尾。'
+    }),
+    'yajataṃ': Object.freeze({
+      lemma: 'yajati', label: 'Third-person singular imperative, Attanopada (Pañcamī)',
+      labelZh: '命令式（Pañcamī）· 自言（Attanopada）· 第三人称单数',
+      meaning: 'let him perform the sacrifice; please perform the sacrifice (respectful address)',
+      meaningZh: '愿他举行祭祀；请您举行祭祀（尊称用法）',
+      formation: 'yaja + taṃ; PCED root formula: yaj + a + taṃ',
+      formationZh: 'yaja + taṃ；PCED 词根构成：yaj + a + taṃ',
+      sourceNote: 'PCED Myanmar grammar entry; -taṃ is the third-person singular Attanopada imperative ending.',
+      sourceNoteZh: '依据 PCED 缅文语法条目；-taṃ 是自言命令式第三人称单数词尾。'
+    }),
     'brūhi': Object.freeze({
       lemma: 'brūti', label: 'Second-person singular imperative of √brū',
       labelZh: '√brū 的命令式第二人称单数',
@@ -1453,3 +1473,4 @@
     verifiedDecompositions: BUILTIN_DECOMPOSITIONS
   });
 })(window);
+
