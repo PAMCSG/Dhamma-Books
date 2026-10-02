@@ -1,4 +1,4 @@
-/* PCED landing-page search v1.7.15 — exact Pāli/diacritic-aware and multilingual. */
+/* PCED landing-page search v1.7.18 — exact Pāli/diacritic-aware and multilingual. */
 (function (global) {
   'use strict';
 
@@ -328,7 +328,10 @@
       }
       content += '</div></div>';
     }
-    if (paradigm.formSystem === 'kaccayana') {
+    if (paradigm.formSystem === 'pced') {
+      content += '<div class="pced-inflection-caution">' +
+        esc(priority === 'zh' ? paradigm.formSourceZh : paradigm.formSource) + '</div>';
+    } else if (paradigm.formSystem === 'kaccayana') {
       if (paradigm.kind === 'verb') {
         content += '<div class="pced-inflection-caution">' + (priority === 'zh' ? '动词词形来源：' : 'Verb forms: ') +
           esc(priority === 'zh' ? paradigm.formSourceZh : paradigm.formSource) + '</div>';
@@ -577,12 +580,13 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.17' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.18' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })(window);
+
 
 
 

@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.26 — 2026-10-01 */
+/* PAMC cross-book PCED popup standard v1.8.27 — 2026-10-01 */
 (function () {
   'use strict';
 
@@ -62,7 +62,7 @@
     });
     morphologyPromise = Promise.resolve()
       .then(() => window.KaccayanaDeclension?.VERSION === '1.5.1' ? null : load('kaccayana-declension.js', '1.5.1'))
-      .then(() => core()?.version === '3.9.17' ? null : load('pced-lookup-core.js', '3.9.17'))
+      .then(() => core()?.version === '3.9.23' ? null : load('pced-lookup-core.js', '3.9.23'))
       .then(() => window.PaliLookupMorphology ? null : load('pali-lookup-morphology.js', '2.0-unicode-trial'))
       .then(() => window.PaliLookupMorphology || null);
     return morphologyPromise;
@@ -514,7 +514,10 @@
       }
       content += '</div></div>';
     }
-    if (paradigm.formSystem === 'kaccayana') {
+    if (paradigm.formSystem === 'pced') {
+      content += '<div class="pced-inflection-caution">' +
+        esc(primaryLanguage === 'zh' ? paradigm.formSourceZh : paradigm.formSource) + '</div>';
+    } else if (paradigm.formSystem === 'kaccayana') {
       if (paradigm.kind === 'verb') {
         content += '<div class="pced-inflection-caution">' + (primaryLanguage === 'zh' ? '动词词形来源：' : 'Verb forms: ') +
           esc(primaryLanguage === 'zh' ? paradigm.formSourceZh : paradigm.formSource) + '</div>';
@@ -1672,6 +1675,7 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })();
+
 
 
 
