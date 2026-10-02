@@ -374,6 +374,12 @@
     return { matches, total };
   }
 
+  function renderDictionaryDefinition(item, language, headword) {
+    return global.PCEDDefinitionTranslation?.renderItem(item, language, headword) ||
+      '<div class="source">' + esc(item.source_label || item.source || '') + '</div>' +
+      '<div class="definition">' + (item.definition || '') + '</div>';
+  }
+
   function renderRecords(records, priority) {
     const groups = new Map();
     for (const item of records) {
@@ -388,8 +394,7 @@
       const items = groups.get(bucket);
       return (
       '<div class="group-title" data-language="' + esc(bucket) + '">' + esc(languageTitles[bucket] || 'Other') + '</div>' +
-      items.map(item => '<div class="source">' + esc(item.source_label || item.source || '') + '</div>' +
-        '<div class="definition">' + (item.definition || '') + '</div>').join('')
+      items.map(item => renderDictionaryDefinition(item, bucket, '')).join('')
       );
     }).join('');
   }
@@ -458,8 +463,7 @@
       approved + otherHtml +
       groups.map(group => '<div class="group-title" data-language="' + esc(group.key) + '">' +
         esc(languageTitles[group.key] || group.title || 'Other') + '</div>' +
-        group.entries.map(item => '<div class="source">' + esc(item.source_label || item.source || '') + '</div>' +
-          '<div class="definition">' + (item.definition || '') + '</div>').join('')).join('') + related + otherRelatedHtml + '</div>';
+        group.entries.map(item => renderDictionaryDefinition(item, group.key, entry.headword || key)).join('')).join('') + related + otherRelatedHtml + '</div>';
   }
 
   function renderLanguageResult(result, priority) {
@@ -573,12 +577,13 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.16' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.17' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })(window);
+
 
 
 

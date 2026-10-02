@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.25 — 2026-10-01 */
+/* PAMC cross-book PCED popup standard v1.8.26 — 2026-10-01 */
 (function () {
   'use strict';
 
@@ -13,6 +13,9 @@
   const popupStack = [];
   const POPUP_Z_BASE = 2147483000;
   let mobileHeaderSnapshot = null;
+  const definitionTranslationStates = new Map();
+  const definitionTranslationIds = new Map();
+  let definitionTranslationSequence = 0;
 
   const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -98,10 +101,162 @@
       .replace(/^한국어\s*\/\s*Korean$/i, 'Korean');
   }
 
-  function renderDictionaryItem(item) {
-    return '<div class="source">' + esc(item.source_label || item.source || '') + '</div>' +
-      '<div class="definition">' + (item.definition || '') + '</div>';
+  function definitionTranslationEnabled() {
+    return true;
   }
+
+  function dictionaryDefinitionText(html) {
+    const container = document.createElement('div');
+    container.innerHTML = String(html || '');
+    container.querySelectorAll('br').forEach(node => node.replaceWith('\n'));
+    container.querySelectorAll('p,div,li').forEach(node => node.append('\n'));
+    return (container.textContent || '').replace(/\u00a0/g, ' ').trim();
+  }
+
+  function definitionTranslationState(item, language, headword) {
+    const text = dictionaryDefinitionText(item.definition);
+    const source = String(item.source_label || item.source || '');
+    const key = JSON.stringify([language, headword, source, text]);
+    if (!definitionTranslationStates.has(key)) {
+      const state = { id: 'pced-definition-' + (++definitionTranslationSequence),
+        text, source, language, headword, translations: new Map(), parts: new Map(),
+        target: '', pending: false, part: 0, total: 0, error: '' };
+      definitionTranslationStates.set(key, state);
+      definitionTranslationIds.set(state.id, state);
+    }
+    return definitionTranslationStates.get(key);
+  }
+
+  function definitionTranslationHtml(state) {
+    if (!state.target) return '';
+    const translated = state.translations.get(state.target);
+    const title = state.target === 'zh' ? '中文 · AI 暂译' : 'English · AI Translation';
+    return '<div class="pced-definition-translation-title">' + esc(title) + '</div>' +
+      (state.pending ? '<div role="status">Translating this definition…' +
+          (state.total > 1 ? ' (' + state.part + '/' + state.total + ')' : '') + '</div>' :
+        state.error ? '<div role="status">' + esc(state.error) + '</div>' :
+          '<div class="pced-definition-translation-text" lang="' + state.target + '">' + esc(translated || '') + '</div>');
+  }
+
+  function renderDictionaryItem(item, language = 'other', headword = '') {
+    const source = '<div class="source">' + esc(item.source_label || item.source || '') + '</div>';
+    const definition = '<div class="definition">' + (item.definition || '') + '</div>';
+    if (!definitionTranslationEnabled() || !dictionaryDefinitionText(item.definition)) return source + definition;
+    const state = definitionTranslationState(item, language, headword);
+    const buttons = [['zh', '译中文', 'Chinese'], ['en', 'English', 'English']]
+      .filter(([target]) => target !== language).map(([target, label, name]) =>
+        '<button type="button" data-pced-definition-target="' + target + '" aria-label="Translate this definition into ' + name + '"' +
+        ' aria-pressed="' + String(state.target === target) + '"' + (state.pending ? ' disabled' : '') + '>' + label + '</button>').join('');
+    return '<div class="pced-dictionary-item" data-pced-definition-id="' + state.id + '" data-pced-definition-language="' + esc(language) + '">' +
+      '<div class="pced-definition-source-row">' + source +
+        '<div class="pced-definition-actions">' + buttons + '</div></div>' + definition +
+      '<div class="pced-definition-translation" aria-live="polite"' + (state.target ? '' : ' hidden') + '>' +
+        definitionTranslationHtml(state) + '</div></div>';
+  }
+
+  function paintDefinitionTranslation(state) {
+    document.querySelectorAll('[data-pced-definition-id="' + state.id + '"]').forEach(item => {
+      const output = item.querySelector('.pced-definition-translation');
+      output.hidden = !state.target;
+      output.innerHTML = definitionTranslationHtml(state);
+      item.querySelectorAll('[data-pced-definition-target]').forEach(button => {
+        button.disabled = state.pending;
+        button.setAttribute('aria-pressed', String(button.dataset.pcedDefinitionTarget === state.target));
+      });
+    });
+  }
+
+  function splitDictionaryDefinition(text, maximum = 4500) {
+    const parts = [];
+    let start = 0;
+    while (start < text.length) {
+      let end = Math.min(start + maximum, text.length);
+      if (end < text.length) {
+        const slice = text.slice(start, end);
+        let boundary = slice.lastIndexOf('\n');
+        if (boundary < maximum / 2) {
+          boundary = -1;
+          for (const match of slice.matchAll(/[.!?。！？；;]\s+/g)) boundary = match.index + match[0].length - 1;
+        }
+        if (boundary < maximum / 2) boundary = slice.lastIndexOf(' ');
+        if (boundary >= maximum / 2) end = start + boundary + 1;
+        // Never divide a Unicode surrogate pair between translation requests.
+        if (/^[\uDC00-\uDFFF]$/.test(text[end]) && /^[\uD800-\uDBFF]$/.test(text[end - 1])) end--;
+      }
+      parts.push(text.slice(start, end));
+      start = end;
+    }
+    return parts;
+  }
+
+  async function translateDictionaryDefinition(state, target) {
+    if (state.pending || !['zh', 'en'].includes(target)) return;
+    if (state.target === target) {
+      state.target = '';
+      state.error = '';
+      paintDefinitionTranslation(state);
+      return;
+    }
+    state.target = target;
+    state.error = '';
+    if (state.translations.has(target)) { paintDefinitionTranslation(state); return; }
+    state.pending = true;
+    const parts = splitDictionaryDefinition(state.text);
+    const completed = state.parts.get(target) || [];
+    state.parts.set(target, completed);
+    state.total = parts.length;
+    state.part = 1;
+    paintDefinitionTranslation(state);
+    try {
+      for (let index = 0; index < parts.length; index++) {
+        state.part = index + 1;
+        paintDefinitionTranslation(state);
+        if (completed[index]) continue;
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 90000);
+        try {
+          // Use the same-origin protected translation route.
+          const response = await fetch('/api/pali-translate', {
+            method: 'POST', credentials: 'include', signal: controller.signal,
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ task: 'dictionary-definition', text: parts[index],
+              source_language: state.language, target_language: target,
+              headword: state.headword, dictionary_source: state.source,
+              part_number: index + 1, part_count: parts.length })
+          });
+          if ([401, 403].includes(response.status) || !/application\/json/i.test(response.headers.get('Content-Type') || '')) {
+            throw new Error('Please sign in to Dhamma Books, then try this translation again.');
+          }
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || ('Translation failed (HTTP ' + response.status + ').'));
+          const translated = String(result.translation || '').trim();
+          if (!translated) throw new Error('No definition translation was returned. Upload both amended files and try again.');
+          completed[index] = translated;
+        } finally { clearTimeout(timeout); }
+      }
+      state.translations.set(target, completed.join('\n\n'));
+    } catch (error) {
+      state.error = error.name === 'AbortError' ? 'Translation timed out. Please try again.' : (error.message || 'Translation failed. Please try again.');
+    } finally {
+      state.pending = false;
+      paintDefinitionTranslation(state);
+    }
+  }
+
+  function installDefinitionTranslation() {
+    if (!definitionTranslationEnabled()) return;
+    document.addEventListener('click', event => {
+      const button = event.target.closest?.('[data-pced-definition-target]');
+      if (!button) return;
+      const state = definitionTranslationIds.get(button.closest('.pced-dictionary-item')?.dataset.pcedDefinitionId);
+      if (!state) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      translateDictionaryDefinition(state, button.dataset.pcedDefinitionTarget);
+    }, true);
+  }
+
+  window.PCEDDefinitionTranslation = Object.freeze({ renderItem: renderDictionaryItem });
 
   function isSingleWordRecord(row) {
     return String(row?.pali || '').split(/\s*[,;/；，]\s*/)
@@ -196,7 +351,7 @@
     for (const group of groups) {
       html += '<div class="group-title" data-language="' + esc(group.key || 'other') + '">' +
         esc(groupTitle(group)) + '</div>';
-      for (const item of group.entries) html += renderDictionaryItem(item);
+      for (const item of group.entries) html += renderDictionaryItem(item, group.key || 'other', entry.headword || head);
     }
     if (includeApproved) {
       const related = approvedRows.filter(row => row.match === 'inflected');
@@ -1242,6 +1397,7 @@
   }
 
   function init() {
+    installDefinitionTranslation();
     if (mode === 'index-search') document.body.classList.add('pamc-pced-compact-typography');
     if (isDhammapada()) document.body.classList.add('pamc-dhammapada-popup-standard');
     installDhammapadaContentsNavigation();
@@ -1317,6 +1473,16 @@
         }
         .source{color:#846b58!important;font-family:Arial,"Microsoft YaHei","Noto Sans Myanmar",sans-serif!important;font-size:14px!important;font-weight:600!important;line-height:1.45!important;margin:7px 0 2px!important}
         .definition{color:var(--pamc-popup-ink)!important;font-family:Georgia,"Times New Roman","Noto Serif SC","Songti SC",SimSun,"Myanmar Text","Noto Sans Myanmar",serif!important;font-size:18px!important;line-height:1.65!important}
+        .pced-definition-source-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+        .pced-definition-source-row>.source{flex:1 1 140px}
+        .pced-definition-actions{display:flex;gap:5px;flex-wrap:wrap}
+        .pced-definition-actions button{padding:3px 7px!important;border:1px solid #b98f6d!important;border-radius:5px!important;background:#ead8c3!important;color:#68442f!important;font:600 12px/1.3 Arial,"Microsoft YaHei",sans-serif!important;cursor:pointer!important}
+        .pced-definition-actions button[aria-pressed="true"]{background:#9a6b49!important;color:#fff!important}
+        .pced-definition-actions button:disabled{opacity:.65;cursor:wait!important}
+        .pced-definition-translation{margin:7px 0 12px;padding:8px 10px;border-left:2px solid #b98f6d;background:#f4eee7;border-radius:5px;font:16px/1.65 Arial,"Microsoft YaHei",sans-serif}
+        .pced-definition-translation[hidden]{display:none!important}
+        .pced-definition-translation-title{font-size:12px;font-weight:600;color:#75543d;margin-bottom:4px}
+        .pced-definition-translation-text{white-space:pre-wrap;overflow-wrap:anywhere}
         #dictModal .panel-body .headword,#lookupModal .panel-body .headword,#pced-modal .pced-body .headword{font-family:Georgia,"Times New Roman",serif!important;font-size:27px!important;font-weight:700!important;line-height:1.2!important}
         #dictModal .panel-body .group-title,#lookupModal .panel-body .group-title,#pced-modal .pced-body .group-title{font-family:Georgia,"Times New Roman","Noto Serif SC",SimSun,serif!important;font-size:22px!important;font-weight:700!important;line-height:1.25!important}
         #dictModal .panel-body .source,#lookupModal .panel-body .source,#pced-modal .pced-body .source{font-family:Arial,"Microsoft YaHei","Noto Sans Myanmar",sans-serif!important;font-size:14px!important;line-height:1.45!important}
@@ -1506,5 +1672,6 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })();
+
 
 
