@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.19 — 2026-10-01
+ * Version 3.9.20 — 2026-10-01
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.19';
+  const VERSION = '3.9.20';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -663,12 +663,18 @@
   function explicitPastForms(entry) {
     const forms = [];
     const add = value => {
+      // Abbreviation marks are structural, never disposable punctuation.
+      if (/[~∼～˜…]|^[-–—]|[-–—]$/.test(String(value).trim())) return;
       const form = cleanWord(value);
       if (form && form.length > 2 && PALI_FORM.test(form) && !forms.includes(form)) forms.push(form);
     };
     const take = value => String(value || '').split(/[\s,，、/]+/).slice(0, 4).forEach(add);
     for (const record of entryRecords(entry)) {
-      const text = String(record?.definition || '').replace(/<[^>]*>/g, ' ');
+      const text = String(record?.definition || '').replace(/<[^>]*>/g, ' ')
+        // A tilde/dash may refer to a prefix, stem, or a nested subentry.
+        // Without an explicit expansion, suppress the entire abbreviated token
+        // before either forwards or backwards past-form extraction.
+        .replace(/[~∼～˜…–—-]\s*[a-zāīūṅñṭḍṇḷṃṁŋ-]+/gi, ' ');
       // Some PCED records place the label after the forms:
       // "kari, akāsi,【过】". Limit the backwards match to Pāli tokens so
       // translated prose before the citation cannot become a candidate.
@@ -1447,5 +1453,6 @@
     verifiedDecompositions: BUILTIN_DECOMPOSITIONS
   });
 })(window);
+
 
 
