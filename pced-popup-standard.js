@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.28 — 2026-10-01 */
+/* PAMC cross-book PCED popup standard v1.8.29 — 2026-10-01 */
 (function () {
   'use strict';
 
@@ -62,7 +62,7 @@
     });
     morphologyPromise = Promise.resolve()
       .then(() => window.KaccayanaDeclension?.VERSION === '1.5.1' ? null : load('kaccayana-declension.js', '1.5.1'))
-      .then(() => core()?.version === '3.9.24' ? null : load('pced-lookup-core.js', '3.9.24'))
+      .then(() => core()?.version === '3.9.25' ? null : load('pced-lookup-core.js', '3.9.25'))
       .then(() => window.PaliLookupMorphology ? null : load('pali-lookup-morphology.js', '2.0-unicode-trial'))
       .then(() => window.PaliLookupMorphology || null);
     return morphologyPromise;
@@ -476,7 +476,8 @@
     let content = '<div class="pced-inflection-metadata">' +
       '<div><b>' + (primaryLanguage === 'zh' ? '所查词形：' : 'Queried form: ') + '</b>' + esc(paradigm.queriedForm || surface) + '</div>' +
       '<div><b>' + (primaryLanguage === 'zh' ? '词根：' : 'Root: ') + '</b>' + esc(rootText) + '</div>' +
-      '<div><b>' + (primaryLanguage === 'zh' ? '词典原形／词形组：' : 'Dictionary base / form family: ') + '</b>' + esc(paradigm.lemma || head) + '</div>' +
+      '<div><b>' + (primaryLanguage === 'zh' ? 'PCED 词条：' : 'PCED entry: ') + '</b>' + esc(paradigm.matchedHeadword || head) + '</div>' +
+      (paradigm.familyLabel ? '<div><b>' + (primaryLanguage === 'zh' ? '词形组：' : 'Form family: ') + '</b>' + esc(paradigm.familyLabel) + '</div>' : '') +
       (paradigm.stems?.length ? '<div><b>' + (primaryLanguage === 'zh' ? '词干（Pali Lookup）：' : 'Stem (Pali Lookup): ') + '</b>' + esc(paradigm.stems.join(' / ')) + '</div>' : '') +
       (paradigm.rootSource ? '<div class="pced-inflection-caution">' + esc(paradigm.rootSource) + '</div>' : '') +
       (paradigm.queriedAnalyses || []).map(item => '<div><b>' +
@@ -1688,6 +1689,7 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })();
+
 
 
 

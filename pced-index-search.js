@@ -1,4 +1,4 @@
-/* PCED landing-page search v1.7.19 — exact Pāli/diacritic-aware and multilingual. */
+/* PCED landing-page search v1.7.20 — exact Pāli/diacritic-aware and multilingual. */
 (function (global) {
   'use strict';
 
@@ -149,7 +149,10 @@
         rememberResolution(candidateResult);
       }
     }
-    const exactSpellingHeads = unique(foldedExactHeads);
+    const exactSpellingHeads = unique([
+      ...direct.filter(head => global.PCEDLookupCore.cleanWord(head) === global.PCEDLookupCore.cleanWord(query)),
+      ...foldedExactHeads
+    ]);
     if (exactSpellingHeads.length) displayResolution = resolve(exactSpellingHeads[0]);
     const displayHeads = exactSpellingHeads.length
       ? [...exactSpellingHeads, ...heads]
@@ -296,7 +299,8 @@
     let content = '<div class="pced-inflection-metadata">' +
       '<div><b>' + (priority === 'zh' ? '所查词形：' : 'Queried form: ') + '</b>' + esc(paradigm.queriedForm || surface) + '</div>' +
       '<div><b>' + (priority === 'zh' ? '词根：' : 'Root: ') + '</b>' + esc(rootText) + '</div>' +
-      '<div><b>' + (priority === 'zh' ? '词典原形／词形组：' : 'Dictionary base / form family: ') + '</b>' + esc(paradigm.lemma || head) + '</div>' +
+      '<div><b>' + (priority === 'zh' ? 'PCED 词条：' : 'PCED entry: ') + '</b>' + esc(paradigm.matchedHeadword || head) + '</div>' +
+      (paradigm.familyLabel ? '<div><b>' + (priority === 'zh' ? '词形组：' : 'Form family: ') + '</b>' + esc(paradigm.familyLabel) + '</div>' : '') +
       (paradigm.stems?.length ? '<div><b>' + (priority === 'zh' ? '词干（Pali Lookup）：' : 'Stem (Pali Lookup): ') + '</b>' + esc(paradigm.stems.join(' / ')) + '</div>' : '') +
       (paradigm.rootSource ? '<div class="pced-inflection-caution">' + esc(paradigm.rootSource) + '</div>' : '') +
       (paradigm.queriedAnalyses || []).map(item => '<div><b>' +
@@ -597,12 +601,13 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.19' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.20' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })(window);
+
 
 
 

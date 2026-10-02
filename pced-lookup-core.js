@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.24 — 2026-10-01
+ * Version 3.9.25 — 2026-10-01
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.24';
+  const VERSION = '3.9.25';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -1390,7 +1390,7 @@
       forms: values.flat().filter(form => form !== '—')
     });
     const groups = [
-      { label: 'Speech sense / 说话义 — dictionary citation / 词典原形', forms: ['vatti'],
+      { label: 'Speech sense / 说话义 — dictionary citation / 词典原形', forms: ['vacati', 'vatti'],
         note: '√vac. PTS says the present is not found and refers to vadati; Myanmar sources also record vatti as a verb. No regular present or imperative paradigm is inferred. / PTS 注明现在时未见，另参 vadati；缅文词典也收录 vatti 动词条目。此处不推造规则现在时或命令式。' },
       finite('Future (PCED and grammatical paradigm) / 未来时（PCED 与语法词形表）',
         [['vakkhati'], ['vakkhanti'], ['vakkhasi'], ['vakkhatha'], ['vakkhāmi'], ['vakkhāma']],
@@ -1533,7 +1533,6 @@
           matches.push({ ...family, label: group.label, forms: (group.forms || []).filter(same), persons: positions.map(position => position.person), generated: family.root === 'vad' || !!group.generated });
         }
       }
-      if (family.root === 'vac' && word === 'vacati') matches.push({ ...family, label: 'Dictionary citation / 词典原形', persons: [], generated: false });
       for (const group of family.paradigm.attanopadaGroups || []) {
         if (group.endingsOnly) continue;
         const positions = (group.persons || []).filter(position => position.forms.some(form => same(form)));
@@ -1569,7 +1568,11 @@
   function inflectionParadigm(head, entry, options = {}) {
     const surface = cleanWord(options.surface || head);
     const headword = cleanWord(head);
-    const matches = speechFormMatches(surface);
+    const fold = value => cleanWord(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ṃ/g, 'm');
+    // Each displayed spelling gets its own analysis. An ASCII query vatti
+    // may also list vaṭṭi, but that noun must never inherit the √vac table.
+    const analysisSurface = fold(surface) === fold(headword) ? headword : surface;
+    const matches = speechFormMatches(analysisSurface);
     const family = matches.find(match => match.lemma === headword) || matches[0];
     let result;
     if (family) {
@@ -1598,12 +1601,13 @@
         }
       }
     }
-    if (surface === 'vatti') analyses.push({ label: 'Separate meaning: aorist of vattati / 另一义：vattati 的不定过去时', persons: [], generated: false });
+    if (analysisSurface === 'vatti') analyses.push({ label: 'Separate meaning: aorist of vattati / 另一义：vattati 的不定过去时', persons: [], generated: false });
     const stems = result.kind === 'noun'
       ? [...new Set((global.PaliLookupMorphology?.entries?.[result.lemma] || [])
           .map(record => record.s).filter(value => typeof value === 'string' && value.trim()))]
       : [];
-    return { ...result, queriedForm: options.surface || head, roots, stems,
+    return { ...result, queriedForm: options.surface || head, matchedHeadword: head, roots, stems,
+      familyLabel: family?.root === 'vac' ? '√vac — vacati / vatti (speech / 说话)' : family?.root === 'vad' ? '√vad — vadati' : '',
       rootSource: familyRoot ? 'PCED speech root family / PCED 说话动词词根组' : roots.length ? 'PCED explicit root or grammar formula / PCED 明确词根或语法构词式' : '',
       queriedAnalyses: analyses };
   }
@@ -1625,6 +1629,7 @@
     verifiedDecompositions: BUILTIN_DECOMPOSITIONS
   });
 })(window);
+
 
 
 
