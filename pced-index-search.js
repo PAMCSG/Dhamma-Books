@@ -445,18 +445,21 @@
         '<div class="definition" style="white-space:pre-wrap">' + approvedChineseHtml(row.chinese_html, row.chinese) + '</div></div>').join('');
   }
 
-  function renderHead(key, priority, otherHtml = '') {
+  function renderHead(key, priority, otherHtml = '', otherRelatedHtml = '') {
     const entry = dictionary[key];
     if (!entry) return '';
     const groups = global.PCEDLookupCore?.dictionaryGroups(entry, priority) || [];
-    const approved = priority === 'zh' ? renderApprovedRows(approvedRowsForHead(key)) : '';
+    const approvedRows = priority === 'zh' ? approvedRowsForHead(key) : [];
+    const approved = renderApprovedRows(approvedRows.filter(row => row.match !== 'inflected'));
+    const relatedRows = approvedRows.filter(row => row.match === 'inflected');
+    const related = relatedRows.length ? '<div class="group-title">Related forms / 相关词形（非精确匹配）</div>' + renderApprovedRows(relatedRows) : '';
     return '<div class="entry"><div class="headword">' + esc(entry.headword || key) + '</div>' +
       renderInflectionPanel(key, priority) +
       approved + otherHtml +
       groups.map(group => '<div class="group-title" data-language="' + esc(group.key) + '">' +
         esc(languageTitles[group.key] || group.title || 'Other') + '</div>' +
         group.entries.map(item => '<div class="source">' + esc(item.source_label || item.source || '') + '</div>' +
-          '<div class="definition">' + (item.definition || '') + '</div>').join('')).join('') + '</div>';
+          '<div class="definition">' + (item.definition || '') + '</div>').join('')).join('') + related + otherRelatedHtml + '</div>';
   }
 
   function renderLanguageResult(result, priority) {
@@ -476,7 +479,7 @@
           ' matched all exact spellings with possible Pāli diacritics.</div>' : '';
       return { query, heads: pali.heads, kind: 'pali', priority,
         html: note + renderGrammarNote(pali.resolution, priority) +
-          pali.heads.map((head, index) => renderHead(head, priority, index === 0 ? renderOtherRows(otherRowsForQuery(query)) : '')).join('') };
+          pali.heads.map((head, index) => renderHead(head, priority, index === 0 ? renderOtherRows(otherRowsForQuery(query).filter(row => row.match !== 'inflected')) : '', index === 0 && otherRowsForQuery(query).some(row => row.match === 'inflected') ? '<div class="group-title">Related forms / 相关词形（非精确匹配）</div>' + renderOtherRows(otherRowsForQuery(query).filter(row => row.match === 'inflected')) : '')).join('') };
     }
     // A query made entirely of Roman Pāli characters is a headword request.
     // If exact/verified Pāli lookup found nothing, do not reinterpret the same
@@ -570,11 +573,12 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.15' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.16' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })(window);
+
 
 

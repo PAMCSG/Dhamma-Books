@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.24 — 2026-10-01 */
+/* PAMC cross-book PCED popup standard v1.8.25 — 2026-10-01 */
 (function () {
   'use strict';
 
@@ -182,8 +182,8 @@
   }
 
   function renderPublishedBlocks(rows, surface) {
-    return renderApprovedBlock(rows.filter(row => APPROVED.has(String(row.status || '').trim())), surface) +
-      renderOtherDictionary(otherDictionaryRows(surface, resolution(surface)));
+    return renderApprovedBlock(rows.filter(row => row.match !== 'inflected').filter(row => APPROVED.has(String(row.status || '').trim())), surface) +
+      renderOtherDictionary(otherDictionaryRows(surface, resolution(surface)).filter(row => row.match !== 'inflected'));
   }
 
   function renderEntry(head, approvedRows, surface, includeApproved, primaryLanguage) {
@@ -197,6 +197,13 @@
       html += '<div class="group-title" data-language="' + esc(group.key || 'other') + '">' +
         esc(groupTitle(group)) + '</div>';
       for (const item of group.entries) html += renderDictionaryItem(item);
+    }
+    if (includeApproved) {
+      const related = approvedRows.filter(row => row.match === 'inflected');
+      const otherRelated = otherDictionaryRows(surface, resolution(surface)).filter(row => row.match === 'inflected');
+      if (related.length || otherRelated.length) html +=
+        '<div class="group-title">Related forms / 相关词形（非精确匹配）</div>' +
+        renderApprovedBlock(related, surface) + renderOtherDictionary(otherRelated);
     }
     return html + '</div>';
   }
@@ -1499,4 +1506,5 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })();
+
 

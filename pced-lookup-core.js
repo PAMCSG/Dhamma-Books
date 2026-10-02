@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.18 — 2026-10-01
+ * Version 3.9.19 — 2026-10-01
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.18';
+  const VERSION = '3.9.19';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -838,38 +838,12 @@
       if (exactVerbForm) return finish({
         ...base, mode: 'exact', tier: 1, heads: exactHeads, grammar: exactVerbForm
       });
-      for (const candidate of verifiedCandidates.filter(item => item.preferLemma)) {
-        const heads = context.exact(candidate.form);
-        if (!heads.length) continue;
-        return finish({
-          ...base, mode: 'inflected', tier: 1, heads,
-          resolvedForm: candidate.form, rule: candidate.label, family: candidate.family,
-          notes: [`${clicked} → ${candidate.form} (${candidate.label})`]
-        });
-      }
-      if (attestedPastHeads.length) {
-        return finish({
-          ...base, mode: 'inflected', tier: 1, heads: attestedPastHeads,
-          resolvedForm: cleanWord(attestedPastHeads[0]),
-          rule: 'dictionary-attested past / aorist form',
-          family: 'Kaccāyana past verb',
-          notes: [`${clicked} → ${attestedPastHeads.join(', ')} (dictionary-attested past / aorist form)`]
-        });
-      }
       const grammar = exactVerbAnalysis(normalized, exactHeads, context, options);
-      // A finite inflected verb may itself have a PCED record. Once its
-      // verbal status and singular lemma are verified, show the lemma entry
-      // instead of treating the surface record as an exact lexical headword.
-      // This also prevents compound/root decomposition from being applied to
-      // the inflected surface form.
-      if (grammar?.lemmaHead) {
-        return finish({
-          ...base, mode: 'exact', tier: 1, heads: [grammar.lemmaHead], grammar
-        });
-      }
-      return finish(addEntryDecomposition({
-        ...base, mode: 'exact', tier: 1, heads: exactHeads,
-        grammar: null
+      // Exact surface entries always precede citation-form analysis.
+      return finish(grammar ? {
+        ...base, mode: 'exact', tier: 1, heads: exactHeads, grammar
+      } : addEntryDecomposition({
+        ...base, mode: 'exact', tier: 1, heads: exactHeads, grammar: null
       }));
     }
 
@@ -1473,4 +1447,5 @@
     verifiedDecompositions: BUILTIN_DECOMPOSITIONS
   });
 })(window);
+
 
