@@ -1,0 +1,27 @@
+{
+  "id": "./",
+  "name": "PAMC Dhamma Books",
+  "short_name": "Dhamma Books",
+  "description": "PAMC Dhamma books and chanting books / 帕奥禅修中心佛法书籍及念诵本",
+  "lang": "en",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#633919",
+  "theme_color": "#A8734F",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "dhamma-books-app-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "dhamma-books-app-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,5 +1,18 @@
 # PAMC Dhamma Books
 
+## Installable Dhamma Books web app — 4 October 2026
+
+The catalogue now links `dhamma-books.webmanifest` and provides a bilingual installation panel with the approved open-book and golden Dhamma-wheel icon. The app is named **PAMC Dhamma Books**, launches at the catalogue in standalone mode, and scopes navigation to the current website directory. Relative manifest and asset URLs support both GitHub Pages under `/Dhamma-Books/` and a root deployment.
+
+Installation is offered from the catalogue. `dhamma-books-install.js` uses a browser-provided `beforeinstallprompt` when available and otherwise expands the Android, iPhone/iPad and desktop instructions. It hides the installation panel in standalone mode and after the browser reports successful installation. Browsers choose whether and when to offer their native installation prompt.
+
+This first release is online. It adds no service worker, book download cache, database or second maintained book collection. Both browser readers and installed-app readers use the existing published files. Existing book HTML, navigation links, dictionary assets, read-aloud modules and bookmark storage are unchanged. Installation does not migrate browser bookmarks to a separate storage context if the platform creates one.
+
+The three PNG exports retain the selected icon artwork and provide 192 px, 512 px and Apple 180 px sizes. They declare ordinary icon purpose, not maskable purpose. `INSTALL-WEB-APP.md` contains upload and phone installation instructions. Future changes to the installer JavaScript or CSS must advance their versioned URLs in `index.html`.
+
+Prepared from GitHub main `5b068cce655950ccc097715e69f0a2d31c63c25c` for manual upload. No repository push, pull request, merge or deployment is part of this package.
+
+
 ## 《沙马内勒学处》complete source-book reader — 22 September 2026
 
 `samanera-sikkhapadani.html` is the complete twelve-chapter reader built from the supplied revised Word source. It is listed beside 《比库巴帝摩卡》 under `玛欣德尊者译著 Dhamma Books authored or translated by Venerable Mahinda` → `戒律 The Code of Monastic Discipline`. The opening order is the separately stored actual cover, publication details, copyright conditions, opening canonical quotation, the fixed-height scrolling Contents window, 序言、凡例, all twelve chapters, 词语汇解 and 主要参考资料.

@@ -1,0 +1,69 @@
+/* Dhamma Books catalogue installation panel v1.0.0 */
+.db-app-install {
+  margin: 16px auto 0;
+  max-width: 720px;
+  padding: 14px;
+  border: 1px solid #dfcbbb;
+  border-radius: 14px;
+  background: #fffdf9;
+  color: #302a26;
+  text-align: left;
+  font: 14px/1.5 Arial, "Microsoft YaHei", "PingFang SC", sans-serif;
+}
+.db-app-install[hidden],
+.db-app-install [hidden] { display: none !important; }
+.db-app-install-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.db-app-install-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  flex: 0 0 auto;
+}
+.db-app-install-copy { flex: 1 1 160px; min-width: 0; }
+.db-app-install h2 {
+  margin: 0;
+  color: #7f5134;
+  font: 700 16px/1.4 Arial, "Microsoft YaHei", "PingFang SC", sans-serif;
+}
+.db-app-install-copy p { margin: 5px 0 0; color: #75665d; }
+.db-app-install-button {
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid #7f5134;
+  border-radius: 10px;
+  background: #a8734f;
+  color: #fff;
+  font: 700 14px/1.4 Arial, "Microsoft YaHei", "PingFang SC", sans-serif;
+  cursor: pointer;
+}
+.db-app-install-button:hover { background: #7f5134; }
+.db-app-install-button:disabled { opacity: .65; cursor: default; }
+.db-app-install-guide { margin-top: 10px; }
+.db-app-install-guide summary {
+  min-height: 44px;
+  padding: 10px 0;
+  color: #7f5134;
+  cursor: pointer;
+  font-weight: 700;
+}
+.db-app-install-guide ul { margin: 6px 0; padding-left: 22px; }
+.db-app-install-guide li + li { margin-top: 12px; }
+.db-app-install-guide p { margin: 12px 0 0; color: #75665d; }
+.db-app-install-status { margin: 10px 0 0; color: #75665d; }
+.db-app-install-status:empty { display: none; }
+.db-app-install-button:focus-visible,
+.db-app-install-guide summary:focus-visible {
+  outline: 3px solid #633919;
+  outline-offset: 3px;
+}
+@media (max-width: 420px) {
+  .db-app-install-button { width: 100%; }
+}
+@media (display-mode: standalone) {
+  .db-app-install { display: none; }
+}
