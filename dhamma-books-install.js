@@ -1,4 +1,4 @@
-/* Dhamma Books catalogue installation support v1.1.0 */
+/* Dhamma Books catalogue installation support v1.2.0 */
 (function () {
   'use strict';
 
@@ -24,6 +24,13 @@
     guide.focus();
   }
 
+  function hideGuide() {
+    guide.hidden = true;
+    button.setAttribute('aria-expanded', 'false');
+    status.textContent = '';
+    button.focus();
+  }
+
   window.addEventListener('beforeinstallprompt', function (event) {
     if (panel.hidden) return;
     event.preventDefault();
@@ -38,6 +45,11 @@
   });
 
   button.addEventListener('click', async function () {
+    if (!guide.hidden) {
+      hideGuide();
+      return;
+    }
+
     if (!installPrompt) {
       showGuide();
       return;
@@ -58,7 +70,7 @@
         showGuide('You can install later from your browser menu. / 您可以稍后从浏览器菜单安装。');
       }
     } catch (error) {
-      showGuide('Use your browser menu to install the app. / 请使用浏览器菜单安装应用。');
+      showGuide('Use your browser menu to install the App. / 请使用浏览器菜单安装应用。');
     } finally {
       button.disabled = false;
     }
