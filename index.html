@@ -4,17 +4,17 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1" name="viewport">
 <title>PAMC Dhamma Books / 帕奥禅修中心佛法书籍</title>
-<!-- Dhamma Books web-app installation support v1.0.0 -->
-<link rel="manifest" href="dhamma-books.webmanifest">
+<!-- Dhamma Books web-app installation support v1.1.0 -->
+<link rel="manifest" href="dhamma-books.webmanifest?v=1.1.0">
 <meta name="theme-color" content="#A8734F">
 <meta name="application-name" content="PAMC Dhamma Books">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Dhamma Books">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="apple-touch-icon" sizes="180x180" href="dhamma-books-app-180.png">
-<link rel="icon" type="image/png" sizes="192x192" href="dhamma-books-app-192.png">
-<link rel="stylesheet" href="dhamma-books-install.css?v=1.0.0">
-<script defer src="dhamma-books-install.js?v=1.0.0"></script>
+<link rel="apple-touch-icon" sizes="180x180" href="dhamma-books-app-180.png?v=1.1.0">
+<link rel="icon" type="image/png" sizes="192x192" href="dhamma-books-app-192.png?v=1.1.0">
+<link rel="stylesheet" href="dhamma-books-install.css?v=1.1.0">
+<script defer src="dhamma-books-install.js?v=1.1.0"></script>
 <style>
   :root{
     --paper:#fffdf9;
@@ -452,15 +452,14 @@ code, pre, kbd, samp {
 <div class="intro">Online Dhamma books and chanting books for reading and study. / 在线佛法书籍及念诵本。</div>
 <section class="db-app-install" id="db-app-install" aria-labelledby="db-app-install-title">
   <div class="db-app-install-row">
-    <img class="db-app-install-icon" src="dhamma-books-app-192.png" width="64" height="64" alt="Open Dhamma book with a golden Dhamma wheel">
+    <img class="db-app-install-icon" src="dhamma-books-app-192.png?v=1.1.0" width="64" height="64" alt="Dhamma book with a golden Ashoka lion capital and Dhamma wheel">
     <div class="db-app-install-copy">
-      <h2 id="db-app-install-title">Dhamma Books app / 佛法书籍应用</h2>
+      <h2 id="db-app-install-title">Dhamma Books App / 佛法书籍应用APP</h2>
       <p>Open the book library from your home screen. / 从主屏幕打开书库。</p>
     </div>
-    <button class="db-app-install-button" id="db-app-install-button" type="button" hidden>Install app / 安装应用</button>
+    <button class="db-app-install-button" id="db-app-install-button" type="button" aria-controls="db-app-install-guide" aria-expanded="false" hidden>Install app / 安装应用</button>
   </div>
-  <details class="db-app-install-guide" id="db-app-install-guide">
-    <summary>How to install / 安装方法</summary>
+  <div class="db-app-install-guide" id="db-app-install-guide" role="region" aria-label="Installation steps / 安装步骤" tabindex="-1" hidden>
     <ul>
       <li><strong>Android — Chrome:</strong> Open the browser menu and choose <strong>Install app</strong> or <strong>Install and create shortcut → Install</strong>.<br><span lang="zh-CN">打开 Chrome 菜单，选择“安装应用”，或“安装并创建快捷方式 → 安装”。</span></li>
       <li><strong>iPhone / iPad — Safari:</strong> Tap <strong>Share → Add to Home Screen</strong>. Enable <strong>Open as Web App</strong> if shown, then tap <strong>Add</strong>.<br><span lang="zh-CN">点击“分享 → 添加到主屏幕”。如有“作为网页应用打开”选项，请开启，再点击“添加”。</span></li>
@@ -468,7 +467,7 @@ code, pre, kbd, samp {
     </ul>
     <p>Menu wording varies by browser. If you opened this link inside another app, open it in Chrome or Safari first.<br><span lang="zh-CN">菜单名称可能因浏览器而异。如从其他应用内打开本页，请先用 Chrome 或 Safari 打开。</span></p>
     <p>Connect to the internet to read the latest books. / 请联网阅读最新书籍。</p>
-  </details>
+  </div>
   <p class="db-app-install-status" id="db-app-install-status" role="status" aria-live="polite"></p>
 </section>
 </header>

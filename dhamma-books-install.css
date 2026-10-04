@@ -1,4 +1,4 @@
-/* Dhamma Books catalogue installation panel v1.0.0 */
+/* Dhamma Books catalogue installation panel v1.1.0 */
 .db-app-install {
   margin: 16px auto 0;
   max-width: 720px;
@@ -44,20 +44,13 @@
 .db-app-install-button:hover { background: #7f5134; }
 .db-app-install-button:disabled { opacity: .65; cursor: default; }
 .db-app-install-guide { margin-top: 10px; }
-.db-app-install-guide summary {
-  min-height: 44px;
-  padding: 10px 0;
-  color: #7f5134;
-  cursor: pointer;
-  font-weight: 700;
-}
 .db-app-install-guide ul { margin: 6px 0; padding-left: 22px; }
 .db-app-install-guide li + li { margin-top: 12px; }
 .db-app-install-guide p { margin: 12px 0 0; color: #75665d; }
 .db-app-install-status { margin: 10px 0 0; color: #75665d; }
 .db-app-install-status:empty { display: none; }
 .db-app-install-button:focus-visible,
-.db-app-install-guide summary:focus-visible {
+.db-app-install-guide:focus-visible {
   outline: 3px solid #633919;
   outline-offset: 3px;
 }
