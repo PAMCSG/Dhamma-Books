@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.25 — 2026-10-01
+ * Version 3.9.26 — 2026-10-05
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.25';
+  const VERSION = '3.9.26';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -94,6 +94,7 @@
       'Ajjatanī (aorist), third-person singular: went': 'Ajjatanī（不定过去时），第三人称单数：去了',
       'Ajjatanī (aorist), third-person plural: went': 'Ajjatanī（不定过去时），第三人称复数：去了',
       'Ajjatanī (aorist), third-person plural': 'Ajjatanī（不定过去时），第三人称复数',
+      'Ajjatanī (aorist), third-person plural, passive': 'Ajjatanī（不定过去时），第三人称复数，被动语态',
       'Third-person singular, present active': '现在时主动语态，第三人称单数',
       'Third-person plural, present passive': '现在时被动语态，第三人称复数',
       'Third-person plural, present verb': '现在时动词，第三人称复数',
@@ -681,6 +682,7 @@
     const take = value => String(value || '').split(/[\s,，、/]+/).slice(0, 4).forEach(add);
     for (const record of entryRecords(entry)) {
       const text = String(record?.definition || '').replace(/<[^>]*>/g, ' ')
+        .replace(/．/g, '.')
         // A tilde/dash may refer to a prefix, stem, or a nested subentry.
         // Without an explicit expansion, suppress the entire abbreviated token
         // before either forwards or backwards past-form extraction.
@@ -699,6 +701,12 @@
         let match;
         while ((match = pattern.exec(text))) take(match[1]);
       }
+      // PTS and Mizuno also use unbracketed aor. / aor. pass. citations.
+      // Read only the immediately labelled complete form, never references,
+      // prose, or a lemma in an [aor. of ...] cross-reference.
+      const inlineAorist = /\baor(?:ist)?\s*\.\s*(?:pass(?:ive)?\s*\.\s*)?(?:[123]\s*(?:st|nd|rd|th)?\s*(?:sg|pl)\s*\.\s*)?([a-zāīūṅñṭḍṇḷṃṁŋ]+)(?=[\s,，;；.\]）)]|$)/gi;
+      let inlineMatch;
+      while ((inlineMatch = inlineAorist.exec(text))) add(inlineMatch[1]);
     }
     return forms;
   }
@@ -717,6 +725,44 @@
     return index;
   }
 
+  // Ajjatanī third-plural -iṃsu can use the same stem as singular -i.
+  // Require PCED to attest that singular and its precise -ati lemma. Merely
+  // stripping -iṃsu and finding a plausible headword is insufficient.
+  function dictionaryAoristPluralCandidates(surface, context) {
+    const word = cleanWord(surface);
+    if (!word.endsWith('iṃsu') || word.length <= 6) return [];
+    const stem = word.slice(0, -4);
+    const lemma = stem + 'ati';
+    const lemmaHeads = context.exact(lemma);
+    if (!lemmaHeads.length) return [];
+    const singular = stem + 'i';
+    let attested = (explicitPastIndex(context.dictionary).get(singular) || [])
+      .some(head => cleanWord(head) === lemma);
+    // Reduced book dictionaries may carry only a singular cross-reference:
+    // haññi [aor. of haññati]. Validate the complete target as well.
+    if (!attested) {
+      attested = context.exact(singular).some(head =>
+        entryRecords(context.dictionary[head]).some(record => {
+          const text = normalizeForMatch(String(record?.definition || '')
+            .replace(/<[^>]*>/g, ' ').replace(/．/g, '.'));
+          const match = text.match(/\[\s*aor(?:ist)?(?:\s*\.\s*|\s+)of\s+([a-zāīūṅñṭḍṇḷṃ]+)\s*\]/i);
+          return match && cleanWord(match[1]) === lemma;
+        }));
+    }
+    if (!attested) return [];
+    // Only an explicit passive citation or root + ya formula establishes
+    // voice. Do not borrow a nested passive subentry from an active lemma.
+    const passive = lemmaHeads.some(head => entryRecords(context.dictionary[head])
+      .some(record => {
+        const citation = normalizeForMatch(String(record?.definition || '')
+          .replace(/<[^>]*>/g, ' ')).split(/【(?:过|過)】|\baor[．.]/i)[0].slice(0, 220);
+        return /\bpass(?:ive)?\b|[（(]\s*[a-zāīūṅñṭḍṇḷṃ]+\s*\+\s*ya\s*[）)]/i.test(citation);
+      }));
+    const label = 'Ajjatanī (aorist), third-person plural' + (passive ? ', passive' : '');
+    return [{ form: lemma, label, family: 'dictionary-attested aorist verb',
+      grammar: { surface: word, lemma, lemmaHead: lemmaHeads[0], label, verified: true } }];
+  }
+
   function exactVerbAnalysis(surface, exactHeads, context, options = {}) {
     const word = cleanWord(surface);
     const maintained = options.grammarAnalyses?.[word] ||
@@ -727,6 +773,9 @@
       if (!lemmaHeads.length) return null;
       return { surface: word, ...maintained, lemmaHead: lemmaHeads[0], verified: true };
     }
+
+    const attestedPlural = dictionaryAoristPluralCandidates(word, context)[0];
+    if (attestedPlural) return attestedPlural.grammar;
 
     // Do not guess from -anti alone: nouns such as santi could otherwise be
     // misidentified. Require an exact PCED surface entry explicitly marked as
@@ -785,7 +834,7 @@
       }
     }
     if (!heads.length) {
-      for (const candidate of verifiedInflectionCandidates(form, options)) {
+      for (const candidate of [...verifiedInflectionCandidates(form, options), ...dictionaryAoristPluralCandidates(form, context)]) {
         heads = context.exact(candidate.form);
         if (heads.length) { method = 'inflected'; break; }
       }
@@ -847,7 +896,8 @@
     };
 
     const exactHeads = context.exact(normalized);
-    const verifiedCandidates = verifiedInflectionCandidates(normalized, options);
+    const verifiedCandidates = [...verifiedInflectionCandidates(normalized, options),
+      ...dictionaryAoristPluralCandidates(normalized, context)];
     const attestedPastHeads = explicitPastIndex(context.dictionary).get(normalized) || [];
     if (exactHeads.length) {
       const exactVerbForm = EXACT_VERB_FORMS[normalized];
@@ -904,6 +954,7 @@
         const result = {
           ...base, mode: 'inflected', tier: 3, heads,
           resolvedForm: candidate.form, rule: candidate.label, family: candidate.family,
+          grammar: candidate.grammar || null,
           notes: [`${clicked} → ${candidate.form} (${candidate.label})`]
         };
         return finish(/verb/i.test(candidate.family || '') ? result : addEntryDecomposition(result));
@@ -1629,6 +1680,7 @@
     verifiedDecompositions: BUILTIN_DECOMPOSITIONS
   });
 })(window);
+
 
 
 
