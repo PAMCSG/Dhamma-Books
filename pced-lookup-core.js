@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.27 — 2026-10-05
+ * Version 3.9.28 — 2026-10-05
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.27';
+  const VERSION = '3.9.28';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -916,7 +916,7 @@
     const context = resolutionContext(options);
     const base = {
       version: VERSION, clicked, normalized, mode: 'none', tier: 0,
-      heads: [], components: [], componentHeads: [], allHeads: [], notes: [], attemptedForms: []
+      heads: [], components: [], componentHeads: [], lemmaHeads: [], allHeads: [], notes: [], attemptedForms: []
     };
     if (!normalized) return base;
 
@@ -924,7 +924,14 @@
       result.heads = [...new Set(result.heads || [])];
       result.componentHeads = [...new Set((result.components || []).flatMap(part => part.heads || []))]
         .filter(head => !result.heads.includes(head));
-      result.allHeads = [...result.heads, ...result.componentHeads];
+      // Preserve the exact surface definitions first. When its grammatical
+      // analysis identifies a separately attested verb lemma, display that
+      // lemma's complete PCED entry after the surface entries in every host.
+      result.lemmaHeads = result.mode === 'exact' && result.grammar?.lemma
+        ? context.exact(result.grammar.lemma).filter(head =>
+            !result.heads.includes(head) && !result.componentHeads.includes(head))
+        : [];
+      result.allHeads = [...result.heads, ...result.componentHeads, ...result.lemmaHeads];
       return result;
     };
 
@@ -1755,7 +1762,6 @@
     verifiedDecompositions: BUILTIN_DECOMPOSITIONS
   });
 })(window);
-
 
 
 

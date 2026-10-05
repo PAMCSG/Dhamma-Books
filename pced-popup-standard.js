@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.32 — 2026-10-05 */
+/* PAMC cross-book PCED popup standard v1.8.33 — 2026-10-05 */
 (function () {
   'use strict';
 
@@ -62,7 +62,7 @@
     });
     morphologyPromise = Promise.resolve()
       .then(() => window.KaccayanaDeclension?.VERSION === '1.5.1' ? null : load('kaccayana-declension.js', '1.5.1'))
-      .then(() => core()?.version === '3.9.27' ? null : load('pced-lookup-core.js', '3.9.27'))
+      .then(() => core()?.version === '3.9.28' ? null : load('pced-lookup-core.js', '3.9.28'))
       .then(() => window.PaliLookupMorphology ? null : load('pali-lookup-morphology.js', '2.0-unicode-trial'))
       .then(() => window.PaliLookupMorphology || null);
     return morphologyPromise;
