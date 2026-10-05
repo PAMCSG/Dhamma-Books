@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.26 — 2026-10-05
+ * Version 3.9.27 — 2026-10-05
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,7 +10,7 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.26';
+  const VERSION = '3.9.27';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
@@ -365,6 +365,32 @@
     })
   });
 
+  // Original, complete records from official PCED 2.0.5 cidian
+  // (blob 03444838c76cb59c7b60d2097b4bcc6783d34b48). Reduced web data
+  // can already contain the headword but omit its English/source records.
+  const RESTORED_SOURCE_ENTRIES = Object.freeze({"haññi":{"headword":"haññi","zh":[],"en":[{"source":"C","source_label":"Concise Pali-English Dictionary by A.P. Buddhadatta Mahathera","headword":"haññi","definition":"[aor. of haññati] was killed."}],"my":[{"source":"R","source_label":"U Hau Sein’s Pāḷi-Myanmar Dictionary ပါဠိမြန်မာ အဘိဓာန်(ဦးဟုတ်စိန်)","headword":"haññi","definition":"ဟညိ"}],"vi":[],"other":[]},"lūyiṃsu":{"headword":"lūyiṃsu","zh":[],"en":[],"my":[{"source":"B","source_label":"Pali Word Grammar from Pali Myanmar Dictionary","headword":"lūyiṃsu","definition":"lūyiṃsu(kamma,kri)<br>  လူယိံသု(ကမ္မ၊ကြိ)<br>  [ū+ya+uī]<br>  [လူ+ယ+ဦ]"},{"source":"K","source_label":"Tipiṭaka Pāḷi-Myanmar Dictionary တိပိဋက-ပါဠိမြန်မာ အဘိဓာန်","headword":"lūyiṃsu","definition":"လူယိံသု(ကမ္မ၊ကြိ)<br>  [လူ+ယ+ဦ]<br>  ရိတ်-ဖြတ်-ပယ်-နုတ်-အပ်ကုန်ပြီ။"}],"vi":[],"other":[]},"chijji":{"headword":"chijji","zh":[],"en":[{"source":"C","source_label":"Concise Pali-English Dictionary by A.P. Buddhadatta Mahathera","headword":"chijji","definition":"[aor. of chijjati] was broken."}],"my":[{"source":"B","source_label":"Pali Word Grammar from Pali Myanmar Dictionary","headword":"chijji","definition":"chijji(kri)<br>  ဆိဇ္ဇိ(ကြိ)<br>  [chidi+ya+ī]<br>  [ဆိဒိ+ယ+ဤ]"},{"source":"K","source_label":"Tipiṭaka Pāḷi-Myanmar Dictionary တိပိဋက-ပါဠိမြန်မာ အဘိဓာန်","headword":"chijji","definition":"\"ဆိဇ္ဇိ\t(ကြိ)<br>  [ဆိဒိ+ယ+ဤ]<br>  (က) ပြတ်ပြီ။ (ခ) ပြတ်-ရှ-ကွဲ-ပြီ။ (ဂ) ပြတ်-ကုန်-ခန်း-ပြီ။ (ဃ) စုတ်-ပြတ်-ပြီ။ (င) ပြတ်-စဲ-ရပ်-တိတ်-ဆိတ်-ငြိမ်သက်-ပြီ။ ဆိဇ္ဇတိ-(၁)-ကြည့်။\""},{"source":"R","source_label":"U Hau Sein’s Pāḷi-Myanmar Dictionary ပါဠိမြန်မာ အဘိဓာန်(ဦးဟုတ်စိန်)","headword":"chijji","definition":"ဆိဇ္ဇိ"}],"vi":[],"other":[]},"haññati":{"headword":"haññati","zh":[{"source":"D","source_label":"《巴汉词典》Mahāñāṇo Bhikkhu编著","headword":"haññati","definition":"(han + ya), 被杀，被破坏。 【过】 haññi。 【现分】 haññamāna。(p355)"},{"source":"F","source_label":"《巴汉词典》明法比丘增订","headword":"haññati","definition":"(han+ya), 被杀，被破坏。【过】haññi。【现分】haññamāna。S.42.3./IV,309.︰‘Ime sattā haññantu vā bajjhantu vā ucchijjantu vā vinassantu vā mā ahesuṁ iti vā’ti.(这些有情，当杀！当捕！当斩！当灭！勿使存在。)"}],"en":[{"source":"C","source_label":"Concise Pali-English Dictionary by A.P. Buddhadatta Mahathera","headword":"haññati","definition":"[han + ya] is killed or destroyed haññana : [nt.] torture; distress; killing."},{"source":"P","source_label":"PTS Pali-English dictionary The Pali Text Society's Pali-English dictionary","headword":"haññati","definition":"& hañchati see <i>hanati</i>. (Page 727)"}],"my":[{"source":"R","source_label":"U Hau Sein’s Pāḷi-Myanmar Dictionary ပါဠိမြန်မာ အဘိဓာန်(ဦးဟုတ်စိန်)","headword":"haññati","definition":"ဟညတိ\t (ကမ္မ) (√ဟန်+ယ)<br>သတ်အပ်၏။ ညှဉ်းဆဲအပ်၏။ သတ်ပုတ်အပ်၏။ နှိပ်စက်အပ်၏။"}],"vi":[{"source":"U","source_label":"Pali Viet Dictionary  Bản dịch của ngài Bửu Chơn.","headword":"haññati","definition":"(han+ya) bị giết chết hay bị phá hủy [aor] haññi [prp] hañña, --māna"},{"source":"E","source_label":"Pali Viet Abhidhamma Terms  Từ điển các thuật ngữ Vô Tỷ Pháp của ngài Tịnh Sự, được chép từ phần ghi chú thuật ngữ trong các bản dịch của ngài.","headword":"haññati","definition":"bị làm hại, bị thương tổn"}],"other":[{"source":"L","source_label":"빨한 P.T.S. 사전- 선운사대학원용 (박경숙 박사님 초역; 2013년 1월 편집: 빅쿠 재연, 환성, 성륜, 성각, 진일, 법이, 원경, 대산, 보적, 무진, 원우;  2014년 1월 빅쿠원우교열) words:16233.","headword":"haññati","definition":"& hañchati see hanati."}]},"chijjati":{"headword":"chijjati","zh":[{"source":"D","source_label":"《巴汉词典》Mahāñāṇo Bhikkhu编著","headword":"chijjati","definition":"(chindati 的【被】), 被切割，被打破，被切断。 【过】 chijji。 【现分】 chijjanta, chijjamāna。 【独】 chijjitvā, chijjiya。(p131)"},{"source":"F","source_label":"《巴汉词典》明法比丘增订","headword":"chijjati","definition":"(chindati 的【被】), 被切割，被打破，被切断。【过】chijji。【现分】chijjanta, chijjamāna。【独】chijjitvā, chijjiya。"}],"en":[{"source":"C","source_label":"Concise Pali-English Dictionary by A.P. Buddhadatta Mahathera","headword":"chijjati","definition":"[pass. of chindati] is cut, broken or severed."},{"source":"I","source_label":"Pali-Dictionary Vipassana Research Institute","headword":"chijjati","definition":"see <i>chindati</i>"}],"my":[{"source":"B","source_label":"Pali Word Grammar from Pali Myanmar Dictionary","headword":"chijjati","definition":"chijjati(kri)<br>  ဆိဇ္ဇတိ(ကြိ)<br>  [chidi+ya+ti]<br>  [ဆိဒိ+ယ+တိ]"},{"source":"B","source_label":"Pali Word Grammar from Pali Myanmar Dictionary","headword":"chijjati","definition":"chijjati(kamma,kri)<br>  ဆိဇ္ဇတိ(ကမ္မ၊ကြိ)<br>  [chidi+ya+te. te- ti-pru.]<br>  [ဆိဒိ+ယ+တေ။ တေ-ကို တိ-ပြု။]"},{"source":"K","source_label":"Tipiṭaka Pāḷi-Myanmar Dictionary တိပိဋက-ပါဠိမြန်မာ အဘိဓာန်","headword":"chijjati","definition":"\"ဆိဇ္ဇတိ\t(ကမ္မ၊ကြိ)<br>  [ဆိဒိ+ယ+တေ။ တေ-ကို တိ-ပြု။]<br>  (က) ဖြတ်အပ်၏။ (ခဝ ပယ်-ဖြတ်-အပ်၏။ (ဂ) ခုတ်ဖြတ်-ပိုင်းဖြတ်-လှီးဖြတ်-အပ်၏။\""},{"source":"K","source_label":"Tipiṭaka Pāḷi-Myanmar Dictionary တိပိဋက-ပါဠိမြန်မာ အဘိဓာန်","headword":"chijjati","definition":"\"ဆိဇ္ဇတိ\t(ကြိ)<br>  [ဆိဒိ+ယ+တိ]<br>  (၁) (က) ပြတ်၏။ (ခ) ပြတ်-ကင်း-၏။ (ဂ) ပြတ်-ကင်း-ပျောက်-၏။ (ဃ) ပြတ်-ရှ-ကွဲ-၏။ (င) ပြတ်-ကုန်-ခန်း-၏။ (စ) ပြတ်၏၊ ဆိတ်သုန်း၏။ (ဆ) ကျိုး-ပြတ်-၏။ (ဇ) စုတ်-ပြတ်-၏။ (ဈ) ပြတ်၏၊ ကျ၏၊ ပြတ်ကျ၏။ (ည) ပြီး-ပြတ်-၏။ (ဋ) ပြီးပြတ်-ပြေလည်-ပြေရှင်း-၏။ (ဌ) ပြတ်-စဲ-ရပ်-တိတ်-ဆိတ်-ငြိမ်သက်-၏။ (ဍ) ချုပ်-ပြတ်-၏။ (၂) ပျောက်-ပျက်-ပြယ်-၏။ (၃) ပျောက်-ပြေ-ပြယ်-၏။ (၄) ၂-ဖြာထက်ခြမ်း ဖြန်းဖြန်းကွဲ၏။ (၅) ပျက်စီး၏။\""},{"source":"R","source_label":"U Hau Sein’s Pāḷi-Myanmar Dictionary ပါဠိမြန်မာ အဘိဓာန်(ဦးဟုတ်စိန်)","headword":"chijjati","definition":"ဆိဇ္ဇတိ\t (ကမ္မ) (√ဆိဒ်+ယ)<br>ဖြတ်အပ်၏။ ပြတ်၏။<br>သဒ္ဒေါ ဆိဇ္ဇိ၊ အသံသည် ပျောက်ခဲ့ပြီ။"}],"vi":[{"source":"U","source_label":"Pali Viet Dictionary  Bản dịch của ngài Bửu Chơn.","headword":"chijjati","definition":"(pass của chindati) bị cắt, bị bể tan [aor] chijji [prp] chijjanta, chijjamāna [abs] chijjitvā, chijjiya"}],"other":[]},"lūyati":{"headword":"lūyati","zh":[],"en":[{"source":"C","source_label":"Concise Pali-English Dictionary by A.P. Buddhadatta Mahathera","headword":"lūyati","definition":"[v.] is reaped."},{"source":"I","source_label":"Pali-Dictionary Vipassana Research Institute","headword":"lūyati","definition":"To be cut or reaped"}],"my":[{"source":"B","source_label":"Pali Word Grammar from Pali Myanmar Dictionary","headword":"lūyati","definition":"lūyati(kamma,kri)<br>  လူယတိ(ကမ္မ၊ကြိ)<br>  [ū+ya+te. rū. te- ti-pru. 516. lunāti-mha.]<br>  [လူ+ယ+တေ။ ရူ။ တေ-ကို တိ-ပြု။ ၅၁၆။ လုနာတိ-မှ။]"},{"source":"K","source_label":"Tipiṭaka Pāḷi-Myanmar Dictionary တိပိဋက-ပါဠိမြန်မာ အဘိဓာန်","headword":"lūyati","definition":"လူယတိ(ကမ္မ၊ကြိ)<br>  [လူ+ယ+တေ။ ရူ။ တေ-ကို တိ-ပြု။ ၅၁၆။ လုနာတိ-မှ။]<br>  ရိတ်-ဖြတ်-ပယ်-နုတ်-အပ်၏။"},{"source":"R","source_label":"U Hau Sein’s Pāḷi-Myanmar Dictionary ပါဠိမြန်မာ အဘိဓာန်(ဦးဟုတ်စိန်)","headword":"lūyati","definition":"လူယတိ\t (ကမ္မ) (√လူ+ယ)<br>ရိတ်အပ်၏။ ရိတ်ဖြတ်အပ်၏။"}],"vi":[],"other":[{"source":"L","source_label":"빨한 P.T.S. 사전- 선운사대학원용 (박경숙 박사님 초역; 2013년 1월 편집: 빅쿠 재연, 환성, 성륜, 성각, 진일, 법이, 원경, 대산, 보적, 무진, 원우;  2014년 1월 빅쿠원우교열) words:16233.","headword":"lūyati","definition":": Pass. of lunāti (q. v.)."}]},"lunāti":{"headword":"lunāti","zh":[],"en":[{"source":"C","source_label":"Concise Pali-English Dictionary by A.P. Buddhadatta Mahathera","headword":"lunāti","definition":"[lu + nā] cuts off; mows; reaps."},{"source":"P","source_label":"PTS Pali-English dictionary The Pali Text Society's Pali-English dictionary","headword":"lunāti","definition":"<i> </i>[<em>lū</em>, given as <em>lu</em> at Dhtp 504 (“chedana”) & Dhtm 728 (“paccheda”). For etym. cp. Gr. lu/w to loosen, Lat. luo to pay a fine, Goth. fraliusan to lose; Ger. los, E. lose & loose] to cut, cut off, mow, reap Miln.33 (yavalāvakā yavaṁ lunanti); DhsA.39. -- pp. <i>lūna (</i>&<i> luta)</i>. -- Caus I. <i>lāvayati</i> Mhvs 10, 30; Caus. II. <i>lavāpeti</i> to cause to mow Vin.II,180. -- A Pass. <i>lūyati</i> [fr. <em>lu</em>] is found at D.I,141 (aor. lūyiṁsu) and at corresponding passage Pug.56 (imper. lūyantu, where <i>dubbā</i> is to be corrected to <i>dabbhā</i>). -- See lava, lavaka, lavana, lāyati, lavati. (Page 585)"},{"source":"I","source_label":"Pali-Dictionary Vipassana Research Institute","headword":"lunāti","definition":"To cut, to reap"}],"my":[{"source":"B","source_label":"Pali Word Grammar from Pali Myanmar Dictionary","headword":"lunāti","definition":"lunāti(kri)<br>  လုနာတိ(ကြိ)<br>  [ū+nā+ti. nīti, dhātu. 255. nirutti. 679. lunāti-saṃ. luṇai-prā, addhamāgadhī.]<br>  [လူ+နာ+တိ။ နီတိ၊ ဓာတု။ ၂၅၅။ နိရုတ္တိ။ ၆၇၉။ လုနာတိ-သံ။ လုဏဣ-ပြာ၊ အဒ္ဓမာဂဓီ။]"},{"source":"K","source_label":"Tipiṭaka Pāḷi-Myanmar Dictionary တိပိဋက-ပါဠိမြန်မာ အဘိဓာန်","headword":"lunāti","definition":"လုနာတိ(ကြိ)<br>  [လူ+နာ+တိ။ နီတိ၊ ဓာတု။ ၂၅၅။ နိရုတ္တိ။ ၆၇၉။ လုနာတိ-သံ။ လုဏဣ-ပြာ၊ အဒ္ဓမာဂဓီ။]<br>  ရှ-ရိတ်-ဖြတ်-၏။"},{"source":"R","source_label":"U Hau Sein’s Pāḷi-Myanmar Dictionary ပါဠိမြန်မာ အဘိဓာန်(ဦးဟုတ်စိန်)","headword":"lunāti","definition":"လုနာတိ\t (√လူ)<br>ရိတ်၏။ ရိတ်ဖြတ်၏။"}],"vi":[{"source":"U","source_label":"Pali Viet Dictionary  Bản dịch của ngài Bửu Chơn.","headword":"lunāti","definition":"(lu+nā) chặt đứt, cắt cỏ, gặt lúa oar luni"}],"other":[{"source":"L","source_label":"빨한 P.T.S. 사전- 선운사대학원용 (박경숙 박사님 초역; 2013년 1월 편집: 빅쿠 재연, 환성, 성륜, 성각, 진일, 법이, 원경, 대산, 보적, 무진, 원우;  2014년 1월 빅쿠원우교열) words:16233.","headword":"lunāti","definition":"[lū, given as lu at Dhtp 504 (\"chedana\") & Dhtm 728 (\"paccheda\"). 어원에 관해서는 Gr. lu/w 놓아주다, Lat. luo 벌금을 물다, Goth. fraliusan 홓아주다; Ger. los, E. 잃어버리다 & 놓아주다,와 비교하라] 자르다, 잘라내다, 뽑다, 거두다 Miln 33 (yavalāvakā yavaṃ lunanti); DhsA 39. -- pp. lūna (& luta). -- Caus I. lāvayati Mhvs 10, 30; Caus. II. lavāpeti 뽑게 하다 Vin II.180. -- A Pass. lūyati [fr. lu] is found at D I.141 (aor. lūyiṃsu) and at corresponding passage Pug 56 (imper. lūyantu, where dubbā is to be corrected to dabbhā). -- See lava, lavaka, lavana, lāyati, lavati."}]},"āpajjati":{"headword":"āpajjati","zh":[{"source":"D","source_label":"《巴汉词典》Mahāñāṇo Bhikkhu编著","headword":"āpajjati","definition":"(ā + pad + ya), 进入，遭受，偶遇。(p52)"},{"source":"F","source_label":"《巴汉词典》明法比丘增订","headword":"āpajjati","definition":"(ā+pad去+ya；Sk. āpadyate), 进入(get into)，遭受、陷入(undergo)，偶遇(meet with)。ppr. āpajjanto。pot. āpajjeyya。aor. āpajji & āpādi。3rd pl. āpādu。ger. āpajjitvā。pp. āpanna。caus. āpādeti。āpajja(=āsajja & ālajja)。"}],"en":[{"source":"C","source_label":"Concise Pali-English Dictionary by A.P. Buddhadatta Mahathera","headword":"āpajjati","definition":"[ā + pad + ya] gets into; undergoes; meets with."},{"source":"P","source_label":"PTS Pali-English dictionary The Pali Text Society's Pali-English dictionary","headword":"āpajjati","definition":"[Sk. āpadyate, ā + <em>pad</em>] to get into, to meet with (Acc.); to undergo; to make, produce, exhibit Vin.II,126 (saṁvaraṁ); D.I,222 (pariyeṭṭhiṁ); It.113 (vuddhiṁ); J.I,73; Pug.20, 33 (diṭṭh’ânugatiṁ); PvA.29 (ppr. āpajjanto); DhA.II,71 -- pot. <i>āpajjeyya</i> D.I,119 (musāvādaṁ). -- aor.<i> āpajji</i> J.V,349; PvA.124 (saṅkocaṁ) & <i>āpādi</i> S.I,37; A.II,34; It.85; J.II,293; 3<sup>rd</sup> pl.<i> āpādu </i>D.II,273. -- ger. <i>āpajjitva</i> PvA.22 (saṁvegaṁ), 151. ‹-› pp. <i>āpanna</i> (q. v.). -- Caus. <i>āpādeti</i> (q. v.). -- Note. The reading <i>āpajja</i> in āpajja naṁ It.86 is uncertain (vv. ll. āsajja & ālajja). The id. p. at Vin.II,203 (CV. VII.4, 8) has āsajjanaṁ, for which Bdhgh, on p. 325 has āpajjanaṁ. Cp. pariyāpajjati. (Page 101)"},{"source":"I","source_label":"Pali-Dictionary Vipassana Research Institute","headword":"āpajjati","definition":"To enter, to fall into, to undergo"}],"my":[{"source":"B","source_label":"Pali Word Grammar from Pali Myanmar Dictionary","headword":"āpajjati","definition":"āpajjati(kri)<br>  အာပဇ္ဇတိ(ကြိ)<br>  «ā+pada+ya+ti. padagabhiyaṃ. nīti, dhā.227»<br>  [အာ+ပဒ+ယ+တိ။ ပဒဂဘိယံ။ နီတိ၊ ဓာ။၂၂၇]"},{"source":"K","source_label":"Tipiṭaka Pāḷi-Myanmar Dictionary တိပိဋက-ပါဠိမြန်မာ အဘိဓာန်","headword":"āpajjati","definition":"အာပဇ္ဇတိ(ကြိ)<br>  [အာ+ပဒ+ယ+တိ။ ပဒဂဘိယံ။ နီတိ၊ ဓာ။၂၂၇]<br>  ရောက်၏။"},{"source":"R","source_label":"U Hau Sein’s Pāḷi-Myanmar Dictionary ပါဠိမြန်မာ အဘိဓာန်(ဦးဟုတ်စိန်)","headword":"āpajjati","definition":"အာပဇ္ဇတိ\t (အာ√ပဒ်)<br>ရောက်၏။<br>ဒေါမနဿံ အာပဇ္ဇတိ၊ နှလုံးမသာယာခြင်းသို့ရောက်၏။ စက္ခုန္ဒြိယေ သံဝရံ အာပဇ္ဇတိ၊ စက္ခုန္ဒြေ၌ စောင့်စည်းခြင်းသို့ ရောက်၏။ အာပတ္တိံ အာပဇ္ဇမာနောပိ၊ အာပတ်သို့ ရောက် သော်လည်း။ ဝိဿာသံ အာပဇ္ဇိတွာ၊ အကျွမ်းဝင်ခြင်းသို့ ရောက်၍။"}],"vi":[{"source":"U","source_label":"Pali Viet Dictionary  Bản dịch của ngài Bửu Chơn.","headword":"āpajjati","definition":"(ā+pad+ya) đi vào, chịu, bị (một sự gì), đương đầu với"},{"source":"E","source_label":"Pali Viet Abhidhamma Terms  Từ điển các thuật ngữ Vô Tỷ Pháp của ngài Tịnh Sự, được chép từ phần ghi chú thuật ngữ trong các bản dịch của ngài.","headword":"āpajjati","definition":"mắc vào, bị; tham dự, chịu, chấp nhận"}],"other":[{"source":"L","source_label":"빨한 P.T.S. 사전- 선운사대학원용 (박경숙 박사님 초역; 2013년 1월 편집: 빅쿠 재연, 환성, 성륜, 성각, 진일, 법이, 원경, 대산, 보적, 무진, 원우;  2014년 1월 빅쿠원우교열) words:16233.","headword":"āpajjati","definition":"[Sk. āpadyate, ā + pad] 처하다, ~와 만나다 (acc.); 겪다, 만들다, 생산하다, 보이다 Vin II.126 (saṁvaraṁ); D I.222 (pariyeṭṭhiṁ); It 113 (vuddhiṁ); J I.73; Pug 20, 33 (diṭṭhɔânugatiṁ); PvA 29 (ppr. āpajjanto); DhA II.71 -- pot. āpajjeyya D I.119 (musāvādaṁ). -- aor. āpajji J V.349; PvA 124 (sankocaṁ) & āpādi S I.37; A II.34; It 85; J II.293; 3rd pl. āpādu D II.273. -- ger. āpajjitva PvA 22 (saṁvegaṁ), 151. ‹-› pp. āpanna (q. v.). -- Caus. āpādeti (q. v.). -- Note. The reading āpajja in āpajja naṁ It 86 is uncertain (vv. ll. āsajja & ālajja). The id. p. at Vin II.203 (CV. VII.4, 8) has āsajjanaṁ, for which Bdhgh, on p. 325 has āpajjanaṁ. Cp. pariyāpajjati."}]},"chijjiṃsu":{"headword":"chijjiṃsu","zh":[],"en":[],"my":[{"source":"B","source_label":"Pali Word Grammar from Pali Myanmar Dictionary","headword":"chijjiṃsu","definition":"chijjiṃsu(kri)<br>  ဆိဇ္ဇိံသု(ကြိ)<br>  [chidi+ya+uaṃ]<br>  [ဆိဒိ+ယ+ဥံ]"},{"source":"B","source_label":"Pali Word Grammar from Pali Myanmar Dictionary","headword":"chijjiṃsu","definition":"chijjiṃsu(kamma,kri)<br>  ဆိဇ္ဇိံသု(ကမ္မ၊ကြိ)<br>  [chidi+ya+uaṃ]<br>  [ဆိဒိ+ယ+ဥံ]"},{"source":"K","source_label":"Tipiṭaka Pāḷi-Myanmar Dictionary တိပိဋက-ပါဠိမြန်မာ အဘိဓာန်","headword":"chijjiṃsu","definition":"\"ဆိဇ္ဇိံသု\t(ကမ္မ၊ကြိ)<br>  [ဆိဒိ+ယ+ဥံ]<br>  \tခုတ်ဖြတ်-ပိုင်းဖြတ်-လှီးဖြတ်-အပ်ကုန်ပြီ။ ဆိဇ္ဇတိ-(၂)-ကြည့်။\""},{"source":"K","source_label":"Tipiṭaka Pāḷi-Myanmar Dictionary တိပိဋက-ပါဠိမြန်မာ အဘိဓာန်","headword":"chijjiṃsu","definition":"\"ဆိဇ္ဇိံသု\t(ကြိ)<br>  [ဆိဒိ+ယ+ဥံ]<br>  (က) ပြတ်ကုန်ပြီ။ (ခ) ပြတ်-ကုန်-ခန်း-ကုန်ပြီ။ ဆိဇ္ဇတိ-(၁)-ကြည့်။\""}],"vi":[],"other":[]}});
+  const RESTORED_DICTIONARIES = new WeakSet();
+  function restoreSourceEntries(dictionary) {
+    if (!dictionary || RESTORED_DICTIONARIES.has(dictionary)) return;
+    for (const [head, restored] of Object.entries(RESTORED_SOURCE_ENTRIES)) {
+      const existing = dictionary[head];
+      if (!existing) {
+        dictionary[head] = restored;
+        continue;
+      }
+      const merged = { ...existing };
+      const present = new Set(entryRecords(existing).map(record =>
+        record.source + '\u0000' + String(record.definition || '').trim()));
+      for (const bucket of ['zh', 'en', 'my', 'vi', 'other']) {
+        const additions = restored[bucket].filter(record =>
+          !present.has(record.source + '\u0000' + record.definition.trim()));
+        if (additions.length) merged[bucket] = [...(existing[bucket] || []), ...additions];
+      }
+      dictionary[head] = merged;
+    }
+    RESTORED_DICTIONARIES.add(dictionary);
+  }
+
   const SOURCE_LANGUAGE = Object.freeze({
     A: 'ja', S: 'ja', // Mizuno Hiroshi's Pāli-Japanese dictionaries.
     E: 'vi', Q: 'vi', U: 'vi', // Vietnamese dictionaries in legacy `other` buckets.
@@ -403,6 +429,7 @@
   }
 
   function createExactIndex(dictionary) {
+    restoreSourceEntries(dictionary);
     // Include the maintained exact entries before indexing. Otherwise the
     // first resolve() adds them after a host has built its index, leaving
     // that supplied index permanently incomplete. Plain-letter searches
@@ -633,6 +660,7 @@
 
   function resolutionContext(options) {
     const dictionary = options.dictionary || {};
+    restoreSourceEntries(dictionary);
     for (const [key, entry] of Object.entries(BUILTIN_EXACT_HEADWORDS)) {
       if (!dictionary[key]) dictionary[key] = entry;
     }
@@ -643,7 +671,7 @@
     let index = options.index;
     if (!index) index = createExactIndex(dictionary);
     else {
-      for (const key of Object.keys(BUILTIN_EXACT_HEADWORDS)) {
+      for (const key of [...Object.keys(BUILTIN_EXACT_HEADWORDS), ...Object.keys(RESTORED_SOURCE_ENTRIES)]) {
         const normalized = cleanWord(key);
         const heads = index.get(normalized) || [];
         if (!heads.includes(key)) index.set(normalized, [...heads, key]);
@@ -725,6 +753,39 @@
     return index;
   }
 
+  function isPassiveLemma(entry) {
+    return entryRecords(entry).some(record => {
+      const citation = normalizeForMatch(String(record?.definition || '')
+        .replace(/<[^>]*>/g, ' ')).split(/【(?:过|過)】|\baor[．.]/i)[0].slice(0, 220);
+      return /\bpass(?:ive)?\b|【被】|\bkamma\b|ကမ္မ|[（(]\s*[a-zāīūṅñṭḍṇḷṃ]+\s*\+\s*ya\s*[）)]/i.test(citation);
+    });
+  }
+
+  // A passive is sometimes a labelled subentry in an active verb's record:
+  // lunāti: -- A Pass. lūyati ... (aor. lūyiṃsu). Retain the local
+  // passive lemma rather than assigning the surface to the enclosing verb.
+  const PASSIVE_PAST_INDEX_CACHE = new WeakMap();
+  function passivePastIndex(dictionary) {
+    if (PASSIVE_PAST_INDEX_CACHE.has(dictionary)) return PASSIVE_PAST_INDEX_CACHE.get(dictionary);
+    const index = new Map();
+    for (const entry of Object.values(dictionary)) for (const record of entryRecords(entry)) {
+      const text = String(record.definition || '').replace(/<[^>]*>/g, ' ').replace(/．/g, '.');
+      const pattern = /\bPass(?:ive)?\.\s*([a-zāīūṅñṭḍṇḷṃṁ]+)(?=\s|\[|\()/gi;
+      let match;
+      while ((match = pattern.exec(text))) {
+        const lemma = cleanWord(match[1]);
+        if (!/(?:āti|ati|eti|oti)$/.test(lemma)) continue;
+        const passage = text.slice(pattern.lastIndex).split(/--|‹-›/)[0];
+        for (const form of explicitPastForms({ entries: [{ definition: passage }] })) {
+          if (!index.has(form)) index.set(form, []);
+          if (!index.get(form).includes(lemma)) index.get(form).push(lemma);
+        }
+      }
+    }
+    PASSIVE_PAST_INDEX_CACHE.set(dictionary, index);
+    return index;
+  }
+
   // Ajjatanī third-plural -iṃsu can use the same stem as singular -i.
   // Require PCED to attest that singular and its precise -ati lemma. Merely
   // stripping -iṃsu and finding a plausible headword is insufficient.
@@ -749,15 +810,11 @@
           return match && cleanWord(match[1]) === lemma;
         }));
     }
-    if (!attested) return [];
+    const passiveSubentry = (passivePastIndex(context.dictionary).get(word) || []).includes(lemma);
+    if (!attested && !passiveSubentry) return [];
     // Only an explicit passive citation or root + ya formula establishes
     // voice. Do not borrow a nested passive subentry from an active lemma.
-    const passive = lemmaHeads.some(head => entryRecords(context.dictionary[head])
-      .some(record => {
-        const citation = normalizeForMatch(String(record?.definition || '')
-          .replace(/<[^>]*>/g, ' ')).split(/【(?:过|過)】|\baor[．.]/i)[0].slice(0, 220);
-        return /\bpass(?:ive)?\b|[（(]\s*[a-zāīūṅñṭḍṇḷṃ]+\s*\+\s*ya\s*[）)]/i.test(citation);
-      }));
+    const passive = passiveSubentry || lemmaHeads.some(head => isPassiveLemma(context.dictionary[head]));
     const label = 'Ajjatanī (aorist), third-person plural' + (passive ? ', passive' : '');
     return [{ form: lemma, label, family: 'dictionary-attested aorist verb',
       grammar: { surface: word, lemma, lemmaHead: lemmaHeads[0], label, verified: true } }];
@@ -1489,7 +1546,11 @@
     // noun table until their grammatical class is confirmed.
     const nounGroups = kaccayana?.groups || reliableNounGroups ||
       (global.PaliLookupMorphology ? [] : nounParadigm(lemma, grammarText));
-    const verbGroups = verbParadigm(lemma, grammarText);
+    let verbGroups = verbParadigm(lemma, grammarText);
+    // The lemma may already be passive. Do not passivize it a second time.
+    if (verbGroups.length && isPassiveLemma(entry)) {
+      verbGroups = verbGroups.filter(group => !/^Passive present \(regular/.test(group.label));
+    }
     const attanopadaGroups = attanopadaParadigm(lemma, verbGroups);
     const attestedPast = explicitPastForms(entry);
     const specialSources = [];
@@ -1638,11 +1699,25 @@
       } else if (family.root === 'vac') result = pcedSpeechParadigm('vatti');
       else if (familyEntry || headword === 'vadati') result = baseInflectionParadigm('vadati', { ...(familyEntry || entry), entries: [...((familyEntry || entry)?.entries || []), { definition: 'kri — verified √vad speech verb' }] }, options);
     }
+    let grammar = null;
+    if (!result && options.dictionary) {
+      const context = resolutionContext(options);
+      grammar = exactVerbAnalysis(analysisSurface, context.exact(analysisSurface), context, options);
+      if (grammar && cleanWord(grammar.lemma) !== headword) {
+        // Exact surface definitions remain first in the popup. Its button
+        // uses the independently validated verb lemma and its source entry.
+        const direct = baseInflectionParadigm(head, entry, options);
+        if (direct?.kind === 'noun') result = direct;
+        else result = baseInflectionParadigm(grammar.lemmaHead, context.dictionary[grammar.lemmaHead], options);
+      }
+    }
     if (!result) result = baseInflectionParadigm(head, entry, options);
     if (!result) return null;
     const familyRoot = family?.root || ({ vāceti: 'vac', vavakkhati: 'vac', vadati: 'vad', vacati: 'vac', vatti: 'vac' })[headword];
-    const roots = familyRoot ? [familyRoot] : dictionaryRoot(entry);
-    const analyses = matches.map(match => ({ label: match.label, persons: match.persons, generated: match.generated }));
+    const roots = familyRoot ? [familyRoot] : dictionaryRoot(options.dictionary?.[result.lemma] || entry);
+    const analyses = grammar?.verified
+      ? [{ label: grammar.label, persons: [], generated: false }]
+      : matches.map(match => ({ label: match.label, persons: match.persons, generated: match.generated }));
     if (!analyses.length) {
       for (const group of result.groups || []) {
         const positions = (group.persons || []).filter(position => position.forms.some(form => cleanWord(form) === surface));
@@ -1680,7 +1755,6 @@
     verifiedDecompositions: BUILTIN_DECOMPOSITIONS
   });
 })(window);
-
 
 
 
