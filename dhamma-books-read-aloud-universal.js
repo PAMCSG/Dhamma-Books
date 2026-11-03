@@ -17,6 +17,7 @@
     '.heading-pali','.heading-eng','.heading-zh','.heading-my','li'
   ].join(',');
   const bookConfigs = {
+    'anapana-vipassana-burmese.html': {root:'#readerBody', blocks:'p.source-flow,p.source-signature,.chapter-heading,.source-invocation,.source-line,.gatha-line'},
     'dhammapada-pali-chinese.html': {root:'#reader-main', blocks:'p.source-paragraph,.section-heading,.subsection-heading,h1,h3,h4'},
     'patisambhidamagga.html': {root:'main', blocks:'p.source-paragraph,p.paragraph-text,.section-heading,.subsection-heading,h1,h3,h4'},
     'patisambhidamagga-chinese.html': {root:'#reader-zh', blocks:'p.source-paragraph,.book-body p,.section-heading,.subsection-heading,h1,h3,h4'},
