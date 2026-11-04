@@ -1,0 +1,55 @@
+Dhamma-Books Read Aloud: book-by-book checks
+4 November 2026
+
+Each page passed pause/Continue, same voice/speed, close/reopen, repeated pause, stale-event suppression, and Stop/restart at 1440px and 360px.
+
+01. အာနာပါနဿတိကမ္မဋ္ဌာန်း အားထုတ်ရာတွင် ကြုံတွေ့ရမည့် အခက်အခဲများကို ကျော်လွှားခြင်း - Venerable Agañña
+    aganna-anapanasati-difficulties-burmese.html — desktop/mobile passed; online Burmese audio also checked
+02. အာနာပါနကျင့်စဉ်မှ ဝိပဿနာသို့ · ဖားအောက်တောရဆရာတော်
+    anapana-vipassana-burmese.html — desktop/mobile passed; online Burmese audio also checked
+03. 比库巴帝摩卡 · 汉语拼音中文书籍
+    bhikkhupatimokkha-hanyu-pinyin.html — desktop/mobile passed
+04. 比库巴帝摩卡 · 玛欣德尊者译著
+    bhikkhupatimokkha.html — desktop/mobile passed
+05. ဖားအောက်တောရ ဝတ်ရွတ်စဉ် — Daily Chants (Burmese)
+    daily-chants-burmese-corrected.html — desktop/mobile passed; online Burmese audio also checked
+06. ဖားအောက်တောရ ဝတ်ရွတ်စဉ် — Daily Chants (Burmese)
+    daily-chants-burmese.html — desktop/mobile passed; online Burmese audio also checked
+07. Daily Chants — Pāli & English Reader
+    daily-chants.html — desktop/mobile passed
+08. 法句 · Dhammapada — 巴利、汉译及依词释
+    dhammapada-pali-chinese.html — desktop/mobile passed
+09. Mindfulness of Breathing / 入出息念
+    mindfulness-of-breathing.html — desktop/mobile passed
+10. Paccayaniddeso — 巴利文–中文
+    paccayaniddeso-chinese.html — desktop/mobile passed
+11. Paccayaniddeso — Pāli–English
+    paccayaniddeso.html — desktop/mobile passed
+12. Pāḷi Chanting Book — Pāli–Burmese (09/2026)
+    pali-chanting-book-burmese.html — desktop/mobile passed; online Burmese audio also checked
+13. 巴利课诵本｜巴利—中文｜09/2026
+    pali-chanting-book-chinese.html — desktop/mobile passed
+14. Pāḷi Chanting Book — Pāli–English (09/2026)
+    pali-chanting-book.html — desktop/mobile passed
+15. 辨析道 — 中文版
+    patisambhidamagga-chinese.html — desktop/mobile passed
+16. 辨析道 · Paṭisambhidāmagga — 巴利、汉译
+    patisambhidamagga.html — desktop/mobile passed
+17. 沙马内勒学处 · 汉语拼音 · Sāmaṇera sikkhāpadāni
+    samanera-sikkhapadani-hanyu-pinyin.html — desktop/mobile passed
+18. 沙马内勒学处 · Sāmaṇera sikkhāpadāni
+    samanera-sikkhapadani.html — desktop/mobile passed
+19. 佛陀的十二种恶报 | PAMC Online Books
+    the-buddhas-twelve-kinds-of-evil-retribution.html — desktop/mobile passed
+20. The Only Way for the Realization of Nibbāna / 证悟涅槃的唯一之道
+    the-only-way-for-realization-of-nibbana.html — desktop/mobile passed
+21. The Requisites of Enlightenment / 觉悟资粮
+    the-requisites-of-enlightenment.html — desktop/mobile passed
+22. The Workings of Kamma · Pa-Auk Tawya Sayadaw
+    workings-of-kamma.html — desktop/mobile passed
+23. 止观法要 | PAMC Online Books
+    zhiguan-fayao.html — desktop/mobile passed
+
+Chromium 153; simulated installed voices and online audio; 1440px desktop and 360px touch/mobile layouts. Audible physical-device playback requires confirmation.
+
+Five pages have a pre-existing resultCount search-counter initialization error. It was recorded separately and did not prevent Read Aloud checks. This change does not edit search code.
