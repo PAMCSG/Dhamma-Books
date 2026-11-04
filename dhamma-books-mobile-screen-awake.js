@@ -36,14 +36,14 @@
     });
   });
   pause.addEventListener('click', () => {
-    queueMicrotask(() => { if (speechSynthesis.paused) release(); else if (reading) keepAwake(); });
+    queueMicrotask(() => { if (window.DhammaBooksReadAloudVoice.isSpeechPaused()) release(); else if (reading) keepAwake(); });
   });
   stop.addEventListener('click', () => { reading = false; release(); });
   new MutationObserver(() => { if (stop.disabled && reading) { reading = false; release(); } })
     .observe(stop, {attributes:true, attributeFilter:['disabled']});
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) release();
-    else if (reading && !speechSynthesis.paused) keepAwake();
+    else if (reading && !window.DhammaBooksReadAloudVoice.isSpeechPaused()) keepAwake();
   });
   addEventListener('pagehide', () => { reading = false; release(); });
 })();

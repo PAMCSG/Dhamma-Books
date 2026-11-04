@@ -239,6 +239,81 @@
     return utterance;
   }
 
+  // A page owns this small speech queue instead of relying on native resume.
+  // Some engines discard paused speech or report speaking=false while paused.
+  let pageSpeechController = null;
+  function createSpeechController(native) {
+    if (!native || !global.SpeechSynthesisUtterance) return native;
+    let queue = [], paused = false, generation = 0, current = null;
+    function clearNative() {
+      native.cancel();
+      if (native.paused) native.resume();
+    }
+    function play() {
+      if (paused || current || !queue.length) return;
+      const entry = queue[0], original = entry.utterance;
+      const offset = entry.offset, id = ++generation;
+      const utterance = new global.SpeechSynthesisUtterance(original.text.slice(offset));
+      for (const key of ['voice', 'lang', 'rate', 'pitch', 'volume']) {
+        if (original[key] !== undefined) utterance[key] = original[key];
+      }
+      current = utterance;
+      const live = () => id === generation && !paused && current === utterance && queue[0] === entry;
+      utterance.onboundary = event => {
+        if (!live()) return;
+        if (Number.isInteger(event.charIndex) && event.charIndex >= 0 && event.charIndex < utterance.text.length) {
+          entry.offset = Math.max(entry.offset, offset + event.charIndex);
+        }
+        original.onboundary?.({charIndex: entry.offset, charLength: event.charLength,
+          elapsedTime: event.elapsedTime, name: event.name});
+      };
+      utterance.onstart = event => { if (live()) original.onstart?.(event); };
+      const complete = (handler, event) => {
+        if (!live()) return;
+        current = null;
+        queue.shift();
+        try { handler?.(event); } finally { play(); }
+      };
+      utterance.onend = event => complete(original.onend, event);
+      utterance.onerror = event => complete(original.onerror, event);
+      native.speak(utterance);
+    }
+    const controller = Object.freeze({
+      get speaking() { return queue.length > 0; },
+      get pending() { return queue.length > 1; },
+      get paused() { return paused; },
+      getVoices: () => native.getVoices(),
+      addEventListener: (...args) => native.addEventListener(...args),
+      removeEventListener: (...args) => native.removeEventListener?.(...args),
+      get onvoiceschanged() { return native.onvoiceschanged; },
+      set onvoiceschanged(handler) { native.onvoiceschanged = handler; },
+      speak(utterance) { queue.push({utterance, offset: 0}); play(); },
+      pause() {
+        if (paused) return;
+        paused = true;
+        generation++;
+        current = null;
+        clearNative();
+      },
+      resume() {
+        if (!paused) return;
+        paused = false;
+        clearNative();
+        play();
+      },
+      cancel() {
+        generation++;
+        current = null;
+        queue = [];
+        paused = false;
+        clearNative();
+      }
+    });
+    pageSpeechController = controller;
+    return controller;
+  }
+  function isSpeechPaused() { return pageSpeechController?.paused ?? global.speechSynthesis?.paused ?? false; }
+
   const activeUtterances=new Set();
   function speakWithFallback(synth, chunk, rate, voices, choice, paliChoice, onend, onerror, onfallback) {
     const isPali=typeof chunk!=='string'&&chunk.lang==='latin';
@@ -352,6 +427,8 @@
     choosePaliVoice,
     paliBlocks,
     makeUtterance,
+    createSpeechController,
+    isSpeechPaused,
     speakWithFallback,
     createSpeechHighlighter,
     makePanelMovable

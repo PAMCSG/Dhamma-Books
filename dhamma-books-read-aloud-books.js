@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const profile = window.DhammaBooksReadAloudVoice;
-  const synth = window.speechSynthesis;
+  const synth = profile.createSpeechController(window.speechSynthesis);
   const topbar = document.querySelector('.topbar');
   const fontPlus = document.getElementById('fontPlus') || document.getElementById('larger');
   const enPanel = document.getElementById('enPanel');
@@ -54,7 +54,6 @@
   };
   const mode = () => enPanel && !enPanel.hidden ? 'en' : 'zh';
   let current = null, blocks = [], blockIndex = 0, chunks = [], chunkIndex = 0, token = 0, paused = false, active = false;
-  let currentUtterance = null, speechGeneration = 0, chunkOffset = 0;
 
   function setTop() {
     document.documentElement.style.setProperty('--db-readaloud-top', Math.ceil(topbar.getBoundingClientRect().bottom + 8) + 'px');
@@ -101,18 +100,12 @@
   }
   function finish(message) {
     token++;
-    resetSpeech();
+    synth?.cancel();
     clearHighlight();
     paused = false;
     setControls(false);
     pauseButton.textContent = labels[mode()].pause;
     status.textContent = message || labels[mode()].done;
-  }
-  function resetSpeech() {
-    speechGeneration++;
-    currentUtterance = null;
-    synth?.cancel();
-    if (synth?.paused) synth.resume();
   }
   function activeRoot() { return mode() === 'en' ? enPanel.querySelector('.reader-body') : (zhPanel?.querySelector('.book-body') || chineseBook?.querySelector('.book-body')); }
   function cleanText(el) {
@@ -191,42 +184,10 @@
       .filter(Boolean).map(text => ({text, lang:run.lang})));
   }
   function speakNext(runToken) {
-    if (runToken !== token || paused || !active) return;
+    if (runToken !== token) return;
     if (chunkIndex >= chunks.length) { blockIndex++; return speakBlock(runToken); }
-    const original = chunks[chunkIndex];
-    const offset = chunkOffset;
-    const chunk = {...original, text: original.text.slice(offset)};
-    if (!offset) current?.classList.toggle('db-readaloud-current', !speakingHighlight.show(chunk.text));
-    const generation = ++speechGeneration;
-    const live = () => runToken === token && generation === speechGeneration && !paused && active;
-    const advance = () => {
-      if (!live()) return;
-      currentUtterance = null;
-      chunkOffset = 0;
-      chunkIndex++;
-      speakNext(runToken);
-    };
-    // Keep a strong utterance reference and reject events from canceled speech.
-    // The wrapper also tracks Chinese/Pāli utterances made by the shared profile.
-    const engine = {
-      getVoices: () => synth.getVoices(),
-      speak(utterance) {
-        if (!live()) return;
-        currentUtterance = utterance;
-        const onend = utterance.onend, onerror = utterance.onerror;
-        const currentSpeech = () => live() && currentUtterance === utterance;
-        utterance.onboundary = event => {
-          if (!currentSpeech() || utterance.text.length !== chunk.text.length) return;
-          const index = event.charIndex;
-          if (Number.isInteger(index) && index >= 0 && index < chunk.text.length) {
-            chunkOffset = Math.max(chunkOffset, offset + index);
-          }
-        };
-        utterance.onend = event => { if (currentSpeech()) onend?.(event); };
-        utterance.onerror = event => { if (currentSpeech()) onerror?.(event); };
-        synth.speak(utterance);
-      }
-    };
+    const chunk = chunks[chunkIndex++];
+    current?.classList.toggle('db-readaloud-current', !speakingHighlight.show(chunk.text));
     let utterance;
     if (chunk.lang === 'en') {
       utterance = new SpeechSynthesisUtterance(chunk.text);
@@ -236,20 +197,20 @@
       utterance.rate = Number(rateSelect.value) || 1;
       if (voice) utterance.voice = voice;
     } else {
-      profile.speakWithFallback(engine, chunk, rateSelect.value, synth.getVoices(), voiceSelect.value, paliVoiceSelect.value,
-        advance,
-        () => { if (live()) finish(labels[mode()].error); },
+      profile.speakWithFallback(synth, chunk, rateSelect.value, synth.getVoices(), voiceSelect.value, paliVoiceSelect.value,
+        () => speakNext(runToken),
+        () => finish(labels[mode()].error),
         () => { status.textContent = mode() === 'en'
           ? 'Pāli voice unavailable on this device; trying an English voice.'
           : '此设备无法使用所选巴利语声音，正在尝试英语声音。'; });
       return;
     }
-    utterance.onend = advance;
-    utterance.onerror = event => { if (live() && event.error !== 'canceled' && event.error !== 'interrupted') finish(labels[mode()].error); };
-    engine.speak(utterance);
+    utterance.onend = () => speakNext(runToken);
+    utterance.onerror = event => { if (event.error !== 'canceled' && event.error !== 'interrupted') finish(labels[mode()].error); };
+    synth.speak(utterance);
   }
   function speakBlock(runToken) {
-    if (runToken !== token || paused || !active) return;
+    if (runToken !== token) return;
     if (blockIndex >= blocks.length) return finish();
     clearHighlight();
     const block = blocks[blockIndex];
@@ -262,14 +223,13 @@
       : mode() === 'en' ? (block.selected ? parts.map(text => ({text, lang:'en'})) : englishSpeechChunks(block.el))
       : profile.speechChunks(block.text);
     chunkIndex = 0;
-    chunkOffset = 0;
     status.textContent = mode() === 'en' ? `Reading passage ${blockIndex + 1} of ${blocks.length}` : `正在朗读第 ${blockIndex + 1} 段，共 ${blocks.length} 段`;
     speakNext(runToken);
   }
   function start() {
     if (!supported) return;
     token++;
-    resetSpeech();
+    synth.cancel();
     clearHighlight();
     const selected = selectedText();
     blocks = readableBlocks();
@@ -298,7 +258,7 @@
     const selected = selectedText();
     if (!selected) { status.textContent = labels[mode()].noSelection; return; }
     token++;
-    resetSpeech();
+    synth.cancel();
     clearHighlight();
     blocks = [selected];
     blockIndex = 0;
@@ -309,10 +269,8 @@
   }
   function pauseReading() {
     if (paused || pauseButton.disabled) return;
+    synth.pause();
     paused = true;
-    // Native resume can silently fail, or speaking can become false on pause.
-    // Cancel the current utterance and retain its last reported word boundary.
-    resetSpeech();
     pauseButton.textContent = labels[mode()].resume;
   }
   function hidePanel() {
@@ -332,8 +290,8 @@
   selectionButton.addEventListener('click', readSelection);
   stopButton.addEventListener('click', () => finish(labels[mode()].stopped));
   pauseButton.addEventListener('click', () => {
-    if (!supported || !active) return;
-    if (paused) { paused = false; resetSpeech(); speakNext(token); } else pauseReading();
+    if (!supported || pauseButton.disabled) return;
+    if (paused) { synth.resume(); paused = false; } else { synth.pause(); paused = true; }
     pauseButton.textContent = paused ? labels[mode()].resume : labels[mode()].pause;
   });
   voiceSelect.addEventListener('change', () => {
@@ -343,10 +301,10 @@
   paliVoiceSelect.addEventListener('change', () => profile.save({paliVoice:paliVoiceSelect.value}));
   readPaliSelect.addEventListener('change', () => profile.save({readPali:readPaliSelect.value === 'yes'}));
   addEventListener('resize', () => { if (!panel.hidden) setTop(); }, {passive:true});
-  addEventListener('beforeunload', resetSpeech);
+  addEventListener('beforeunload', () => synth?.cancel());
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && synth?.speaking && !paused) {
-      pauseReading(); status.textContent = labels[mode()].hidden;
+      synth.pause(); paused = true; pauseButton.textContent = labels[mode()].resume; status.textContent = labels[mode()].hidden;
     }
   });
   if (enPanel && zhPanel) {

@@ -1,8 +1,8 @@
 /* Shared read-aloud controls for Dhamma-Books editions with varied layouts. */
 (() => {
   'use strict';
-  const synth = window.speechSynthesis;
   const profile = window.DhammaBooksReadAloudVoice;
+  const synth = profile?.createSpeechController(window.speechSynthesis);
   const topbar = document.querySelector('.topbar,.toolbar,header');
   const fontPlus = document.getElementById('fontPlus') || document.getElementById('larger');
   if (!synth || !profile || !topbar || !fontPlus) return;
@@ -97,6 +97,7 @@
     my:{title:'အသံဖြင့်ဖတ်ရန်',button:'အသံဖြင့်ဖတ်ရန်',close:'ပိတ်ရန်',start:'ဤနေရာမှစရန်',selection:'ရွေးထားသောစာကိုဖတ်ရန်',restart:'ပြန်စရန်',pause:'ခဏရပ်ရန်',resume:'ဆက်ဖတ်ရန်',stop:'ရပ်ရန်',rate:'အမြန်နှုန်း',voice:'မြန်မာအသံ',automatic:'အလိုအလျောက်',onlineVoiceFemale:'Microsoft Nilar (အမျိုးသမီး)',onlineVoiceMale:'Microsoft Thiha (အမျိုးသား)',unavailableVoice:'မြန်မာအသံ မရှိပါ',paliVoice:'ပါဠိအသံ',indic:'အိန္ဒိယဘာသာအသံကို ဦးစားပေးရန်',english:'အင်္ဂလိပ်အသံ',readPali:'ပါဠိစာကိုဖတ်ရန်',no:'မဖတ်ပါ',yes:'ဖတ်ပါ',ready:'စတင်မည့်နေရာ သို့မဟုတ် ရွေးထားသောစာကို ရွေးပါ။',done:'ဖတ်ပြီးပါပြီ။',stopped:'ဖတ်ခြင်းရပ်လိုက်ပါပြီ။',error:'ဖတ်ရာတွင် အမှားဖြစ်ပါသည်။',onlineError:'အွန်လိုင်း မြန်မာအသံကို မရရှိနိုင်ပါ။ နောက်မှ ထပ်မံကြိုးစားပါ။',noVoice:'ဤစက် သို့မဟုတ် ဘရောက်ဇာတွင် မြန်မာအသံ မရှိပါ။',empty:'ဖတ်ရန်စာမရှိပါ။',noSelection:'ဖတ်ရန်စာကို အရင်ရွေးပါ။'}
   };
   let current = null, blocks = [], blockIndex = 0, chunks = [], chunkIndex = 0, token = 0, paused = false, active = false;
+  let pendingNext = false;
   let onlineAudio = null, onlineAudioUrl = '';
 
   function activeRoot() {
@@ -261,7 +262,7 @@
     }
     if (onlineAudioUrl) { URL.revokeObjectURL(onlineAudioUrl); onlineAudioUrl = ''; }
   }
-  function resetSpeechSynthesis() { stopOnlineAudio(); if (synth.paused) synth.resume(); synth.cancel(); }
+  function resetSpeechSynthesis() { stopOnlineAudio(); synth.cancel(); pendingNext = false; }
   function finish(message) { token++; resetSpeechSynthesis(); clearHighlight(); paused = false; setControls(false); pauseButton.textContent = labels[interfaceLanguage()].pause; status.textContent = message || labels[interfaceLanguage()].done; }
   function keepCurrentVisible(el) {
     const rect = el.getBoundingClientRect(), safeTop = topbar.getBoundingClientRect().bottom + 12, safeBottom = innerHeight - 40;
@@ -310,10 +311,16 @@
       const blob = await response.blob();
       if (runToken !== token) return;
       onlineAudioUrl = URL.createObjectURL(blob);
-      onlineAudio = new Audio(onlineAudioUrl);
-      onlineAudio.playbackRate = Number(rateSelect.value) || 1;
-      onlineAudio.onended = () => { stopOnlineAudio(); speakNext(runToken); };
-      onlineAudio.onerror = () => finish(labels.my.onlineError);
+      const audio = new Audio(onlineAudioUrl);
+      onlineAudio = audio;
+      audio.playbackRate = Number(rateSelect.value) || 1;
+      audio.onended = () => {
+        if (runToken !== token || onlineAudio !== audio) return;
+        stopOnlineAudio(); speakNext(runToken);
+      };
+      audio.onerror = () => {
+        if (runToken === token && onlineAudio === audio) finish(labels.my.onlineError);
+      };
       if (paused) return;
       await onlineAudio.play();
     } catch (_) {
@@ -322,6 +329,8 @@
   }
   function speakNext(runToken) {
     if (runToken !== token) return;
+    if (paused) { pendingNext = true; return; }
+    pendingNext = false;
     if (chunkIndex >= chunks.length) { blockIndex++; return speakBlock(runToken); }
     const chunk = chunks[chunkIndex++];
     current?.classList.toggle('db-readaloud-current', !speakingHighlight.show(chunk.text));
@@ -394,7 +403,8 @@
 
   function pauseReading() {
     if (!active || paused) return;
-    if (onlineAudio) onlineAudio.pause(); else synth.pause();
+    if (onlineAudio) onlineAudio.pause();
+    synth.pause();
     paused = true;
     pauseButton.textContent = labels[interfaceLanguage()].resume;
   }
@@ -411,9 +421,19 @@
   closeButton.addEventListener('click', hidePanel);
   startButton.addEventListener('click', start); selectionButton.addEventListener('click', readSelection); stopButton.addEventListener('click', () => finish(labels[interfaceLanguage()].stopped));
   pauseButton.addEventListener('click', () => {
-    if (onlineAudio) { if (paused) onlineAudio.play().catch(() => finish(labels.my.onlineError)); else onlineAudio.pause(); }
-    else { if (!synth.speaking) return; if (paused) synth.resume(); else synth.pause(); }
-    paused = !paused; pauseButton.textContent = paused ? labels[interfaceLanguage()].resume : labels[interfaceLanguage()].pause;
+    if (!active) return;
+    if (paused) {
+      paused = false;
+      synth.resume();
+      if (onlineAudio) {
+        const audio = onlineAudio, runToken = token;
+        audio.play().catch(() => {
+          if (runToken === token && onlineAudio === audio) finish(labels.my.onlineError);
+        });
+      }
+      else if (pendingNext) speakNext(token);
+    } else pauseReading();
+    pauseButton.textContent = paused ? labels[interfaceLanguage()].resume : labels[interfaceLanguage()].pause;
   });
   readPaliSelect.addEventListener('change', () => profile.save({readPali:readPaliSelect.value === 'yes'}));
   paliVoiceSelect.addEventListener('change', () => profile.save({paliVoice:paliVoiceSelect.value}));
