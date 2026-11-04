@@ -1,4 +1,4 @@
-/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.20 */
+/* Dhamma-Books shared bookmark, search, header, chanting-flow, and popup bootstrap behavior v1.3.21 */
 (function(){
   'use strict';
   const BOOKMARK_KEY='dhamma-books:bookmarks:'+location.pathname;
@@ -309,8 +309,10 @@
     if(!beforeSearch) beforeSearch={x:window.scrollX,y:window.scrollY};
     const units=searchUnits(visibleRoots());
     let first=null,total=0;
-    units.forEach(unit=>{
-      const found=normalize(unit.innerText||unit.textContent).includes(query);
+    // Read visible text before changing display, avoiding a full-book layout per paragraph.
+    const matches=units.map(unit=>normalize(unit.innerText||unit.textContent).includes(query));
+    units.forEach((unit,index)=>{
+      const found=matches[index];
       unit.dataset.dbSearchDisplay=unit.style.display;
       unit.style.display=found?unit.dataset.dbSearchDisplay:'none';
       if(!found) return;

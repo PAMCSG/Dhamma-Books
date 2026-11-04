@@ -1,0 +1,381 @@
+[
+  {
+    "width": 1440,
+    "layout": {
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "bodyWidth": 1440,
+      "headerHeight": 66,
+      "rects": [
+        {
+          "id": "contentsBtn",
+          "x": 319.0625,
+          "y": 13,
+          "w": 97.046875,
+          "h": 40
+        },
+        {
+          "id": "fontMinus",
+          "x": 424.109375,
+          "y": 13,
+          "w": 48.578125,
+          "h": 40
+        },
+        {
+          "id": "fontPlus",
+          "x": 480.6875,
+          "y": 13,
+          "w": 48.578125,
+          "h": 40
+        },
+        {
+          "id": "dbReadAloudButton",
+          "x": 537.265625,
+          "y": 13,
+          "w": 47,
+          "h": 40
+        },
+        {
+          "id": "db-bookmark-button",
+          "x": 592.265625,
+          "y": 13,
+          "w": 105.6875,
+          "h": 40
+        },
+        {
+          "id": "db-search-input",
+          "x": 705.953125,
+          "y": 13,
+          "w": 230,
+          "h": 40
+        },
+        {
+          "id": "db-search-button",
+          "x": 941.953125,
+          "y": 13,
+          "w": 76.203125,
+          "h": 40
+        }
+      ],
+      "cover": {
+        "x": 225,
+        "y": 123,
+        "width": 150,
+        "height": 229.65625,
+        "top": 123,
+        "right": 375,
+        "bottom": 352.65625,
+        "left": 225
+      },
+      "title": {
+        "x": 409,
+        "y": 123,
+        "width": 806,
+        "height": 182.5625,
+        "top": 123,
+        "right": 1215,
+        "bottom": 305.5625,
+        "left": 409
+      }
+    },
+    "passed": [
+      "header order and sticky position",
+      "cover left",
+      "no document overflow",
+      "font controls and Contents resize",
+      "Contents expand/collapse and link offset",
+      "footnote popup and transparent overlay",
+      "saved bookmark",
+      "Search and clear",
+      "selected speech start and close-to-pause",
+      "PCED lookup",
+      "inline Pāli uses preferred Indic voice"
+    ],
+    "dictionaryExcerpt": "Inflections\nsaṃsāra\nEnglish\nConcise Pali-English Dictionary by A.P. Buddhadatta Mahathera\n译中文\nsaṃsār"
+  },
+  {
+    "width": 320,
+    "layout": {
+      "viewport": 320,
+      "documentWidth": 320,
+      "bodyWidth": 320,
+      "headerHeight": 96.78125,
+      "rects": [
+        {
+          "id": "contentsBtn",
+          "x": 37,
+          "y": 11.390625,
+          "w": 72.890625,
+          "h": 34
+        },
+        {
+          "id": "fontMinus",
+          "x": 113.890625,
+          "y": 11.390625,
+          "w": 31.34375,
+          "h": 34
+        },
+        {
+          "id": "fontPlus",
+          "x": 149.234375,
+          "y": 11.390625,
+          "w": 31.34375,
+          "h": 34
+        },
+        {
+          "id": "dbReadAloudButton",
+          "x": 184.578125,
+          "y": 11.390625,
+          "w": 44,
+          "h": 34
+        },
+        {
+          "id": "db-bookmark-button",
+          "x": 232.578125,
+          "y": 6,
+          "w": 54,
+          "h": 44.78125
+        },
+        {
+          "id": "db-search-input",
+          "x": 6,
+          "y": 54.78125,
+          "w": 243.546875,
+          "h": 36
+        },
+        {
+          "id": "db-search-button",
+          "x": 255.546875,
+          "y": 55.78125,
+          "w": 58.453125,
+          "h": 34
+        }
+      ],
+      "cover": {
+        "x": 27,
+        "y": 131.78125,
+        "width": 92,
+        "height": 140.859375,
+        "top": 131.78125,
+        "right": 119,
+        "bottom": 272.640625,
+        "left": 27
+      },
+      "title": {
+        "x": 133,
+        "y": 131.78125,
+        "width": 160,
+        "height": 263.578125,
+        "top": 131.78125,
+        "right": 293,
+        "bottom": 395.359375,
+        "left": 133
+      }
+    },
+    "passed": [
+      "header order and sticky position",
+      "cover left",
+      "no document overflow",
+      "font controls and Contents resize",
+      "Contents expand/collapse and link offset",
+      "footnote popup and transparent overlay",
+      "saved bookmark",
+      "Search and clear",
+      "selected speech start and close-to-pause",
+      "PCED lookup",
+      "one-finger horizontal swipe containment",
+      "inline Pāli uses preferred Indic voice"
+    ],
+    "dictionaryExcerpt": "Inflections\nsaṃsāra\nEnglish\nConcise Pali-English Dictionary by A.P. Buddhadatta Mahathera\n译中文\nsaṃsār"
+  },
+  {
+    "width": 360,
+    "layout": {
+      "viewport": 360,
+      "documentWidth": 360,
+      "bodyWidth": 360,
+      "headerHeight": 96.78125,
+      "rects": [
+        {
+          "id": "contentsBtn",
+          "x": 37,
+          "y": 11.390625,
+          "w": 72.890625,
+          "h": 34
+        },
+        {
+          "id": "fontMinus",
+          "x": 113.890625,
+          "y": 11.390625,
+          "w": 31.34375,
+          "h": 34
+        },
+        {
+          "id": "fontPlus",
+          "x": 149.234375,
+          "y": 11.390625,
+          "w": 31.34375,
+          "h": 34
+        },
+        {
+          "id": "dbReadAloudButton",
+          "x": 184.578125,
+          "y": 11.390625,
+          "w": 44,
+          "h": 34
+        },
+        {
+          "id": "db-bookmark-button",
+          "x": 232.578125,
+          "y": 6,
+          "w": 54,
+          "h": 44.78125
+        },
+        {
+          "id": "db-search-input",
+          "x": 6,
+          "y": 54.78125,
+          "w": 283.546875,
+          "h": 36
+        },
+        {
+          "id": "db-search-button",
+          "x": 295.546875,
+          "y": 55.78125,
+          "w": 58.453125,
+          "h": 34
+        }
+      ],
+      "cover": {
+        "x": 27,
+        "y": 131.78125,
+        "width": 92,
+        "height": 140.859375,
+        "top": 131.78125,
+        "right": 119,
+        "bottom": 272.640625,
+        "left": 27
+      },
+      "title": {
+        "x": 133,
+        "y": 131.78125,
+        "width": 200,
+        "height": 212.09375,
+        "top": 131.78125,
+        "right": 333,
+        "bottom": 343.875,
+        "left": 133
+      }
+    },
+    "passed": [
+      "header order and sticky position",
+      "cover left",
+      "no document overflow",
+      "font controls and Contents resize",
+      "Contents expand/collapse and link offset",
+      "footnote popup and transparent overlay",
+      "saved bookmark",
+      "Search and clear",
+      "selected speech start and close-to-pause",
+      "PCED lookup",
+      "one-finger horizontal swipe containment",
+      "inline Pāli uses preferred Indic voice"
+    ],
+    "dictionaryExcerpt": "Inflections\nsaṃsāra\nEnglish\nConcise Pali-English Dictionary by A.P. Buddhadatta Mahathera\n译中文\nsaṃsār"
+  },
+  {
+    "width": 412,
+    "layout": {
+      "viewport": 412,
+      "documentWidth": 412,
+      "bodyWidth": 412,
+      "headerHeight": 96.78125,
+      "rects": [
+        {
+          "id": "contentsBtn",
+          "x": 40,
+          "y": 11.390625,
+          "w": 72.890625,
+          "h": 34
+        },
+        {
+          "id": "fontMinus",
+          "x": 116.890625,
+          "y": 11.390625,
+          "w": 31.34375,
+          "h": 34
+        },
+        {
+          "id": "fontPlus",
+          "x": 152.234375,
+          "y": 11.390625,
+          "w": 31.34375,
+          "h": 34
+        },
+        {
+          "id": "dbReadAloudButton",
+          "x": 187.578125,
+          "y": 11.390625,
+          "w": 44,
+          "h": 34
+        },
+        {
+          "id": "db-bookmark-button",
+          "x": 235.578125,
+          "y": 6,
+          "w": 63,
+          "h": 44.78125
+        },
+        {
+          "id": "db-search-input",
+          "x": 6,
+          "y": 54.78125,
+          "w": 335.546875,
+          "h": 36
+        },
+        {
+          "id": "db-search-button",
+          "x": 347.546875,
+          "y": 55.78125,
+          "w": 58.453125,
+          "h": 34
+        }
+      ],
+      "cover": {
+        "x": 27,
+        "y": 131.78125,
+        "width": 92,
+        "height": 140.859375,
+        "top": 131.78125,
+        "right": 119,
+        "bottom": 272.640625,
+        "left": 27
+      },
+      "title": {
+        "x": 133,
+        "y": 131.78125,
+        "width": 252,
+        "height": 167.625,
+        "top": 131.78125,
+        "right": 385,
+        "bottom": 299.40625,
+        "left": 133
+      }
+    },
+    "passed": [
+      "header order and sticky position",
+      "cover left",
+      "no document overflow",
+      "font controls and Contents resize",
+      "Contents expand/collapse and link offset",
+      "footnote popup and transparent overlay",
+      "saved bookmark",
+      "Search and clear",
+      "selected speech start and close-to-pause",
+      "PCED lookup",
+      "one-finger horizontal swipe containment",
+      "inline Pāli uses preferred Indic voice"
+    ],
+    "dictionaryExcerpt": "Inflections\nsaṃsāra\nEnglish\nConcise Pali-English Dictionary by A.P. Buddhadatta Mahathera\n译中文\nsaṃsār"
+  }
+]

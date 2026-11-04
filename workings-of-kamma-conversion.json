@@ -1,0 +1,51 @@
+{
+  "source": "Workings of Kamma 2nd Rev Ed Text- pamc 201708.docx",
+  "source_fonts": {
+    "Tahoma": 68458,
+    "Script MT Bold": 8,
+    "Times New Roman": 3,
+    "VriRomanPali CN": 1
+  },
+  "font_map": {
+    "English prose/quotations/notes": "Tahoma, Geneva, sans-serif",
+    "Pali": "Times New Roman, Noto Serif, serif; italic; #155CA8",
+    "Times New Roman": "Times New Roman, serif",
+    "Calibri": "Calibri, Carlito, sans-serif",
+    "Script MT Bold": "Script MT Bold, cursive",
+    "VriRomanPali CN": "Only punctuation/space in this source; no encoded Pali letters"
+  },
+  "counts": {
+    "paragraphs": 8217,
+    "tables": 66,
+    "image_uses": 15
+  },
+  "headings": 449,
+  "footnotes": 1000,
+  "endnotes": 360,
+  "image_files": [
+    "image10.png",
+    "image11.png",
+    "image12.png",
+    "image13.png",
+    "image14.png",
+    "image15.png",
+    "image16.png",
+    "image2.png",
+    "image3.png",
+    "image4.png",
+    "image5.png",
+    "image6.png",
+    "image7.png",
+    "image8.png",
+    "image9.png"
+  ],
+  "endnote_groups": {
+    "section-26": 57,
+    "section-37": 4,
+    "section-313": 179,
+    "section-353": 16,
+    "section-417": 71,
+    "section-423": 33
+  },
+  "unhandled": {}
+}
