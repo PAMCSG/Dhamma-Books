@@ -1,0 +1,994 @@
+{
+  "books": 23,
+  "cases": 51,
+  "report": [
+    {
+      "file": "aganna-anapanasati-difficulties-burmese.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "my-MM",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "aganna-anapanasati-difficulties-burmese.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "my-MM",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "anapana-vipassana-burmese.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "my-MM",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "anapana-vipassana-burmese.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "my-MM",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "bhikkhupatimokkha-hanyu-pinyin.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "zh-CN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "bhikkhupatimokkha-hanyu-pinyin.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "zh-CN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "bhikkhupatimokkha.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "zh-CN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "bhikkhupatimokkha.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "zh-CN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "daily-chants-burmese-corrected.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "my-MM",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "daily-chants-burmese-corrected.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "my-MM",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "daily-chants-burmese.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "my-MM",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "daily-chants-burmese.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "my-MM",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "daily-chants.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "en-GB",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "daily-chants.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "en-GB",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "dhammapada-pali-chinese.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "zh-CN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "dhammapada-pali-chinese.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "zh-CN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "mindfulness-of-breathing.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "en-GB",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "mindfulness-of-breathing.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "en-GB",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "paccayaniddeso-chinese.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "hi-IN",
+      "preexistingPageErrors": [
+        "TypeError: Cannot set properties of null (setting 'textContent')\n    at http://reader.test/paccayaniddeso-chinese.html:1198:72"
+      ],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "paccayaniddeso-chinese.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "hi-IN",
+      "preexistingPageErrors": [
+        "TypeError: Cannot set properties of null (setting 'textContent')\n    at http://reader.test/paccayaniddeso-chinese.html:1198:72"
+      ],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "paccayaniddeso.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "hi-IN",
+      "preexistingPageErrors": [
+        "TypeError: Cannot set properties of null (setting 'textContent')\n    at http://reader.test/paccayaniddeso.html:1188:72"
+      ],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "paccayaniddeso.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "hi-IN",
+      "preexistingPageErrors": [
+        "TypeError: Cannot set properties of null (setting 'textContent')\n    at http://reader.test/paccayaniddeso.html:1188:72"
+      ],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "pali-chanting-book-burmese.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "hi-IN",
+      "preexistingPageErrors": [
+        "TypeError: Cannot set properties of null (setting 'textContent')\n    at http://reader.test/pali-chanting-book-burmese.html:754:72"
+      ],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "pali-chanting-book-burmese.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "hi-IN",
+      "preexistingPageErrors": [
+        "TypeError: Cannot set properties of null (setting 'textContent')\n    at http://reader.test/pali-chanting-book-burmese.html:754:72"
+      ],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "pali-chanting-book-chinese.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "hi-IN",
+      "preexistingPageErrors": [
+        "TypeError: Cannot set properties of null (setting 'textContent')\n    at http://reader.test/pali-chanting-book-chinese.html:750:72"
+      ],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "pali-chanting-book-chinese.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "hi-IN",
+      "preexistingPageErrors": [
+        "TypeError: Cannot set properties of null (setting 'textContent')\n    at http://reader.test/pali-chanting-book-chinese.html:750:72"
+      ],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "pali-chanting-book.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "hi-IN",
+      "preexistingPageErrors": [
+        "TypeError: Cannot set properties of null (setting 'textContent')\n    at http://reader.test/pali-chanting-book.html:728:72"
+      ],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "pali-chanting-book.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "hi-IN",
+      "preexistingPageErrors": [
+        "TypeError: Cannot set properties of null (setting 'textContent')\n    at http://reader.test/pali-chanting-book.html:728:72"
+      ],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "patisambhidamagga-chinese.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "zh-CN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "patisambhidamagga-chinese.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "zh-CN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "patisambhidamagga.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "zh-CN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "patisambhidamagga.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "zh-CN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "samanera-sikkhapadani-hanyu-pinyin.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "hi-IN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "samanera-sikkhapadani-hanyu-pinyin.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "hi-IN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "samanera-sikkhapadani.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "zh-CN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "samanera-sikkhapadani.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "zh-CN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "the-buddhas-twelve-kinds-of-evil-retribution.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "zh-CN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "the-buddhas-twelve-kinds-of-evil-retribution.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "zh-CN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "the-only-way-for-realization-of-nibbana.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "en-GB",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "the-only-way-for-realization-of-nibbana.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "en-GB",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "the-requisites-of-enlightenment.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "zh-CN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "the-requisites-of-enlightenment.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "zh-CN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "workings-of-kamma.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "en-GB",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "workings-of-kamma.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "en-GB",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "zhiguan-fayao.html",
+      "width": 1440,
+      "mode": "installed voice",
+      "voice": "zh-CN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "zhiguan-fayao.html",
+      "width": 360,
+      "mode": "installed voice",
+      "voice": "zh-CN",
+      "preexistingPageErrors": [],
+      "passed": [
+        "pause/Continue with native speaking=false and broken resume",
+        "word-boundary continuation",
+        "voice and rate retained",
+        "close/reopen",
+        "repeated pause",
+        "stale callbacks ignored",
+        "Stop/restart"
+      ]
+    },
+    {
+      "file": "aganna-anapanasati-difficulties-burmese.html",
+      "width": 360,
+      "mode": "Burmese online audio",
+      "passed": [
+        "same audio position retained",
+        "close/reopen",
+        "ended while paused",
+        "pause/Continue during pending response",
+        "Stop"
+      ]
+    },
+    {
+      "file": "anapana-vipassana-burmese.html",
+      "width": 360,
+      "mode": "Burmese online audio",
+      "passed": [
+        "same audio position retained",
+        "close/reopen",
+        "ended while paused",
+        "pause/Continue during pending response",
+        "Stop"
+      ]
+    },
+    {
+      "file": "daily-chants-burmese-corrected.html",
+      "width": 360,
+      "mode": "Burmese online audio",
+      "passed": [
+        "same audio position retained",
+        "close/reopen",
+        "ended while paused",
+        "pause/Continue during pending response",
+        "Stop"
+      ]
+    },
+    {
+      "file": "daily-chants-burmese.html",
+      "width": 360,
+      "mode": "Burmese online audio",
+      "passed": [
+        "same audio position retained",
+        "close/reopen",
+        "ended while paused",
+        "pause/Continue during pending response",
+        "Stop"
+      ]
+    },
+    {
+      "file": "pali-chanting-book-burmese.html",
+      "width": 360,
+      "mode": "Burmese online audio",
+      "preexistingPageErrors": [
+        "TypeError: Cannot set properties of null (setting 'textContent')\n    at http://reader.test/pali-chanting-book-burmese.html:754:72"
+      ],
+      "passed": [
+        "same audio position retained",
+        "close/reopen",
+        "ended while paused",
+        "pause/Continue during pending response",
+        "Stop"
+      ]
+    }
+  ],
+  "additionalLanguageModeChecks": [
+    {
+      "file": "mindfulness-of-breathing.html",
+      "width": 1440,
+      "control": "#langEn",
+      "voice": "en-GB",
+      "passed": true
+    },
+    {
+      "file": "mindfulness-of-breathing.html",
+      "width": 1440,
+      "control": "#langZh",
+      "voice": "zh-CN",
+      "passed": true
+    },
+    {
+      "file": "mindfulness-of-breathing.html",
+      "width": 360,
+      "control": "#langEn",
+      "voice": "en-GB",
+      "passed": true
+    },
+    {
+      "file": "mindfulness-of-breathing.html",
+      "width": 360,
+      "control": "#langZh",
+      "voice": "zh-CN",
+      "passed": true
+    },
+    {
+      "file": "the-only-way-for-realization-of-nibbana.html",
+      "width": 1440,
+      "control": "#langEn",
+      "voice": "en-GB",
+      "passed": true
+    },
+    {
+      "file": "the-only-way-for-realization-of-nibbana.html",
+      "width": 1440,
+      "control": "#langZh",
+      "voice": "zh-CN",
+      "passed": true
+    },
+    {
+      "file": "the-only-way-for-realization-of-nibbana.html",
+      "width": 360,
+      "control": "#langEn",
+      "voice": "en-GB",
+      "passed": true
+    },
+    {
+      "file": "the-only-way-for-realization-of-nibbana.html",
+      "width": 360,
+      "control": "#langZh",
+      "voice": "zh-CN",
+      "passed": true
+    }
+  ],
+  "environment": "Chromium 153; simulated installed voices and online audio; 1440px desktop and 360px touch/mobile layouts. Audible physical-device playback requires confirmation.",
+  "scope": "All 23 Read Aloud HTML reading pages, including language variants, two Hanyu Pinyin editions and the older corrected Burmese alias.",
+  "preexistingPageIssue": "Five pages have a pre-existing resultCount search-counter initialization error. It was recorded separately and did not prevent Read Aloud checks. This change does not edit search code.",
+  "focusedMixedLanguageChecks": [
+    {
+      "file": "the-requisites-of-enlightenment.html",
+      "width": 1440,
+      "passed": [
+        "Continue with speaking=false and broken native resume",
+        "last word boundary retained",
+        "same voice and rate",
+        "stale speech callbacks ignored",
+        "close/reopen/Continue",
+        "Chinese to Pāli voice transition",
+        "Pāli Continue",
+        "Stop invalidates callbacks",
+        "no-boundary fallback",
+        "repeated pauses",
+        "restart clears native pause",
+        "English and mixed English/Pāli partial selections",
+        "language switching"
+      ]
+    },
+    {
+      "file": "the-requisites-of-enlightenment.html",
+      "width": 360,
+      "passed": [
+        "Continue with speaking=false and broken native resume",
+        "last word boundary retained",
+        "same voice and rate",
+        "stale speech callbacks ignored",
+        "close/reopen/Continue",
+        "Chinese to Pāli voice transition",
+        "Pāli Continue",
+        "Stop invalidates callbacks",
+        "no-boundary fallback",
+        "repeated pauses",
+        "restart clears native pause",
+        "English and mixed English/Pāli partial selections",
+        "language switching"
+      ]
+    },
+    {
+      "file": "the-buddhas-twelve-kinds-of-evil-retribution.html",
+      "width": 1440,
+      "passed": [
+        "Continue with speaking=false and broken native resume",
+        "last word boundary retained",
+        "same voice and rate",
+        "stale speech callbacks ignored",
+        "close/reopen/Continue",
+        "Chinese to Pāli voice transition",
+        "Pāli Continue",
+        "Stop invalidates callbacks",
+        "no-boundary fallback",
+        "repeated pauses",
+        "restart clears native pause"
+      ]
+    },
+    {
+      "file": "the-buddhas-twelve-kinds-of-evil-retribution.html",
+      "width": 360,
+      "passed": [
+        "Continue with speaking=false and broken native resume",
+        "last word boundary retained",
+        "same voice and rate",
+        "stale speech callbacks ignored",
+        "close/reopen/Continue",
+        "Chinese to Pāli voice transition",
+        "Pāli Continue",
+        "Stop invalidates callbacks",
+        "no-boundary fallback",
+        "repeated pauses",
+        "restart clears native pause"
+      ]
+    },
+    {
+      "file": "zhiguan-fayao.html",
+      "width": 1440,
+      "passed": [
+        "Continue with speaking=false and broken native resume",
+        "last word boundary retained",
+        "same voice and rate",
+        "stale speech callbacks ignored",
+        "close/reopen/Continue",
+        "Chinese to Pāli voice transition",
+        "Pāli Continue",
+        "Stop invalidates callbacks",
+        "no-boundary fallback",
+        "repeated pauses",
+        "restart clears native pause"
+      ]
+    },
+    {
+      "file": "zhiguan-fayao.html",
+      "width": 360,
+      "passed": [
+        "Continue with speaking=false and broken native resume",
+        "last word boundary retained",
+        "same voice and rate",
+        "stale speech callbacks ignored",
+        "close/reopen/Continue",
+        "Chinese to Pāli voice transition",
+        "Pāli Continue",
+        "Stop invalidates callbacks",
+        "no-boundary fallback",
+        "repeated pauses",
+        "restart clears native pause"
+      ]
+    }
+  ]
+}

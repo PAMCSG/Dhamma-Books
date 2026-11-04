@@ -172,13 +172,20 @@ The Azure subscription key remains only in the encrypted Cloudflare Worker secre
 Closing the Read Aloud panel—either with its × button or by pressing the header Read Aloud button again—must immediately pause active reading. It must not continue speaking while its controls are hidden. Reopening the panel shows the paused state and permits the reader to resume, stop or restart.
 
 Continue must remain usable when a paused browser reports `speechSynthesis.speaking`
-as false or its native resume operation does nothing. The text-block controller
-(`dhamma-books-read-aloud-books.js` version 1.1.3) retains the current chunk and
-the last reported word boundary, cancels speech on pause and starts a new
-utterance on Continue. Voices without boundary events may repeat the current
-short chunk. Preserve its language, selected voice, speed and highlight.
+as false or its native resume operation does nothing. All book controllers,
+including the Hanyu Pinyin inline panels, use `createSpeechController` from
+`dhamma-books-read-aloud-standard.js` version 1.4.8. It retains the current
+utterance and last reported word boundary, cancels speech on pause and starts
+the remaining text on Continue. Voices without boundary events may repeat the
+current short chunk. Preserve its language, selected voice, speed and highlight.
 Completion or error events from canceled utterances must never advance the
 reading position, retry speech while paused, or restart stopped reading.
+Screen-awake helpers use the shared paused state rather than the native flag.
+
+Online Burmese audio keeps its own audio position across pause/Continue. It must
+also continue correctly when paused before an online response arrives or when
+an audio completion event arrives during pause. Old audio events must not stop
+or restart a newer reading session.
 
 ### Consistency and non-regression rule
 
