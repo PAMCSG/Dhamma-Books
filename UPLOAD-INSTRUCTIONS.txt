@@ -1,16 +1,27 @@
-The Workings of Kamma — PCED correction (4 November 2026)
+Dhamma-Books — Read Aloud Continue correction, 4 November 2026
 
+Upload instructions
 1. Extract this ZIP.
-2. Upload the extracted files into your Dhamma-Books GitHub repository,
-   keeping the scripts/ and tests/ folders. Replace the existing files.
-3. Commit the upload and wait for GitHub Pages to finish publishing.
-4. Refresh the book with Ctrl+F5 (or close and reopen it on mobile).
-5. Click Magga, then Inflections. The standard brown popup should appear,
-   and the button should expand/collapse its declension table.
+2. Upload the extracted files to your Dhamma-Books GitHub repository, keeping
+   the tests/ folder and replacing the corresponding existing files.
+3. Commit and wait for GitHub Pages to finish publishing.
+4. Refresh with Ctrl+F5 on a computer, or close/reopen the book on mobile.
+5. In 觉悟资粮, start reading, press 暂停, then 继续. Also try closing the
+   controls and reopening them before pressing 继续.
 
-The three workings-of-kamma HTML/JS/CSS files are the website fix.
-The converter, documentation and test preserve and verify the correction.
-No index.html, covers, book text, or shared PCED files need replacing.
+The correction is in the shared text-block book Read Aloud controller.
+Its loader version is updated to 1.1.3 in 觉悟资粮, 止观法要 and
+佛陀的十二种恶报. Their text and other controls are unchanged.
 
-Verified in Chromium at desktop 1440px and mobile 320/360/412px.
-The original missing-style/inactive-button bug was reproduced before fixing.
+Continue restarts the current chunk from the last word boundary supplied by
+its voice. A voice without boundary events may repeat the current short
+chunk. Stop/restart and late canceled speech events are handled separately.
+
+Validation
+The original Continue failure was reproduced with a speech-engine simulation
+whose paused speaking flag becomes false and whose native resume does nothing.
+Chromium browser checks passed for all three real book pages at 1440px and
+360px, including pause/Continue, stale completion/error events, voice/speed,
+Chinese/Pāli transitions, close/reopen, stop and restart. English and mixed
+English/Pāli partial selections were also checked in 觉悟资粮. These checks
+use simulated voices; audible playback on the user's device needs a test.

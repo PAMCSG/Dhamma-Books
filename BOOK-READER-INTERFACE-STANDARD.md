@@ -171,6 +171,15 @@ The Azure subscription key remains only in the encrypted Cloudflare Worker secre
 
 Closing the Read Aloud panel—either with its × button or by pressing the header Read Aloud button again—must immediately pause active reading. It must not continue speaking while its controls are hidden. Reopening the panel shows the paused state and permits the reader to resume, stop or restart.
 
+Continue must remain usable when a paused browser reports `speechSynthesis.speaking`
+as false or its native resume operation does nothing. The text-block controller
+(`dhamma-books-read-aloud-books.js` version 1.1.3) retains the current chunk and
+the last reported word boundary, cancels speech on pause and starts a new
+utterance on Continue. Voices without boundary events may repeat the current
+short chunk. Preserve its language, selected voice, speed and highlight.
+Completion or error events from canceled utterances must never advance the
+reading position, retry speech while paused, or restart stopped reading.
+
 ### Consistency and non-regression rule
 
 Before adding a book-specific condition, compare the book's structure with an already approved reference. If the same semantic pattern exists, reuse the same classifier and speech-run logic. A book-specific exception is permitted only when the DOM structure genuinely cannot be represented by the shared configuration; document the reason beside the exception.

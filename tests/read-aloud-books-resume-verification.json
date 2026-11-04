@@ -1,0 +1,108 @@
+[
+  {
+    "file": "the-requisites-of-enlightenment.html",
+    "width": 1440,
+    "passed": [
+      "Continue with speaking=false and broken native resume",
+      "last word boundary retained",
+      "same voice and rate",
+      "stale speech callbacks ignored",
+      "close/reopen/Continue",
+      "Chinese to Pāli voice transition",
+      "Pāli Continue",
+      "Stop invalidates callbacks",
+      "no-boundary fallback",
+      "repeated pauses",
+      "restart clears native pause",
+      "English and mixed English/Pāli partial selections",
+      "language switching"
+    ]
+  },
+  {
+    "file": "the-requisites-of-enlightenment.html",
+    "width": 360,
+    "passed": [
+      "Continue with speaking=false and broken native resume",
+      "last word boundary retained",
+      "same voice and rate",
+      "stale speech callbacks ignored",
+      "close/reopen/Continue",
+      "Chinese to Pāli voice transition",
+      "Pāli Continue",
+      "Stop invalidates callbacks",
+      "no-boundary fallback",
+      "repeated pauses",
+      "restart clears native pause",
+      "English and mixed English/Pāli partial selections",
+      "language switching"
+    ]
+  },
+  {
+    "file": "the-buddhas-twelve-kinds-of-evil-retribution.html",
+    "width": 1440,
+    "passed": [
+      "Continue with speaking=false and broken native resume",
+      "last word boundary retained",
+      "same voice and rate",
+      "stale speech callbacks ignored",
+      "close/reopen/Continue",
+      "Chinese to Pāli voice transition",
+      "Pāli Continue",
+      "Stop invalidates callbacks",
+      "no-boundary fallback",
+      "repeated pauses",
+      "restart clears native pause"
+    ]
+  },
+  {
+    "file": "the-buddhas-twelve-kinds-of-evil-retribution.html",
+    "width": 360,
+    "passed": [
+      "Continue with speaking=false and broken native resume",
+      "last word boundary retained",
+      "same voice and rate",
+      "stale speech callbacks ignored",
+      "close/reopen/Continue",
+      "Chinese to Pāli voice transition",
+      "Pāli Continue",
+      "Stop invalidates callbacks",
+      "no-boundary fallback",
+      "repeated pauses",
+      "restart clears native pause"
+    ]
+  },
+  {
+    "file": "zhiguan-fayao.html",
+    "width": 1440,
+    "passed": [
+      "Continue with speaking=false and broken native resume",
+      "last word boundary retained",
+      "same voice and rate",
+      "stale speech callbacks ignored",
+      "close/reopen/Continue",
+      "Chinese to Pāli voice transition",
+      "Pāli Continue",
+      "Stop invalidates callbacks",
+      "no-boundary fallback",
+      "repeated pauses",
+      "restart clears native pause"
+    ]
+  },
+  {
+    "file": "zhiguan-fayao.html",
+    "width": 360,
+    "passed": [
+      "Continue with speaking=false and broken native resume",
+      "last word boundary retained",
+      "same voice and rate",
+      "stale speech callbacks ignored",
+      "close/reopen/Continue",
+      "Chinese to Pāli voice transition",
+      "Pāli Continue",
+      "Stop invalidates callbacks",
+      "no-boundary fallback",
+      "repeated pauses",
+      "restart clears native pause"
+    ]
+  }
+]
