@@ -1,27 +1,46 @@
-Dhamma-Books — Read Aloud Continue correction, 4 November 2026
+Dhamma-Books — all-books Read Aloud update, 4 November 2026
 
-Upload instructions
+This ZIP replaces the previous Read Aloud Continue correction ZIP.
+
+UPLOAD
 1. Extract this ZIP.
-2. Upload the extracted files to your Dhamma-Books GitHub repository, keeping
-   the tests/ folder and replacing the corresponding existing files.
+2. Upload the extracted files and folders into your Dhamma-Books GitHub
+   repository. Replace existing files and preserve scripts/ and tests/.
 3. Commit and wait for GitHub Pages to finish publishing.
-4. Refresh with Ctrl+F5 on a computer, or close/reopen the book on mobile.
-5. In 觉悟资粮, start reading, press 暂停, then 继续. Also try closing the
-   controls and reopening them before pressing 继续.
+4. Refresh with Ctrl+F5 on a computer, or close and reopen the book on mobile.
+5. Start reading, pause, and press Continue / 继续. Also close the controls,
+   reopen them, and press Continue. Please confirm audible playback on your device.
 
-The correction is in the shared text-block book Read Aloud controller.
-Its loader version is updated to 1.1.3 in 觉悟资粮, 止观法要 and
-佛陀的十二种恶报. Their text and other controls are unchanged.
+CHANGES
+All 23 reading pages now use one shared speech pause/Continue controller.
+This includes Chinese, English and Pāli reading, both Hanyu Pinyin editions,
+and the installed-voice path in Burmese books.
+Continue retains the voice, speed and last word boundary reported by the voice.
+If a voice supplies no boundaries, the current short chunk may repeat.
+Late events from canceled speech cannot advance paused or stopped reading.
+Burmese online audio retains its playback time and also handles pausing while
+loading or just as an audio segment finishes. Mobile screen-awake handling uses
+this same paused state.
 
-Continue restarts the current chunk from the last word boundary supplied by
-its voice. A voice without boundary events may repeat the current short
-chunk. Stop/restart and late canceled speech events are handled separately.
+No book wording, notes, covers, page layout or catalogue links are changed.
+The Workings of Kamma PCED correction already uploaded is retained.
 
-Validation
-The original Continue failure was reproduced with a speech-engine simulation
-whose paused speaking flag becomes false and whose native resume does nothing.
-Chromium browser checks passed for all three real book pages at 1440px and
-360px, including pause/Continue, stale completion/error events, voice/speed,
-Chinese/Pāli transitions, close/reopen, stop and restart. English and mixed
-English/Pāli partial selections were also checked in 觉悟资粮. These checks
-use simulated voices; audible playback on the user's device needs a test.
+VERSIONS
+Shared voice/profile: 1.4.8
+Universal reader: 1.3.7
+Text-block reader: 1.1.4
+Bhikkhupatimokkha reader: 1.0.4
+Vinaya Chinese reader: 1.2.2
+Mobile screen-awake helper: 1.0.1
+
+CHECKS
+23 actual reading pages at desktop and mobile sizes: 46 installed-voice cases.
+5 Burmese online-audio cases.
+8 additional English/Chinese language-switch checks.
+Focused mixed Chinese/Pāli, English/Pāli, partial-selection and voice tests.
+Shared-controller queue, boundaries, fallback, cancellation and stale-event tests.
+All automated playback uses simulated voices/audio in Chromium. Audible testing
+with installed device voices remains for the reader.
+
+The detailed report also records an older search-counter initialization error
+on five pages. It is separate from Read Aloud and was not altered by this update.
