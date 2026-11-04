@@ -31,6 +31,30 @@ Search now measures matching text before hiding paragraphs, avoiding repeated fu
 
 Machine-readable evidence: `workings-of-kamma-conversion.json`, `workings-of-kamma-source-verification.json`, `workings-of-kamma-browser-verification.json`.
 
+## PCED integration correction — 4 November 2026
+
+The original book deferred dictionary population until DOMContentLoaded, while the
+deferred shared popup script initialized earlier. Its empty-dictionary guard
+therefore skipped the shared styling and Inflections event listeners, although
+its modal observer could still render definitions later. The original browser
+check verified definitions but did not exercise the Inflections button.
+
+The book script now runs as a deferred script immediately after the standard data
+loader and populates the dictionary synchronously before popup initialization.
+The popup retains the existing shared resolver, data, language order and morphology.
+Its metadata identifies PCED 2.0.5.0 and the English edition's language order.
+Close buttons use the shared close-control styling. The dictionary's mobile
+position applies the header offset once, and long results remain inside the
+available viewport. The conversion script emits the same corrected loaders and
+markup. Book-specific JavaScript and CSS loader versions are now 1.0.1.
+
+`tests/workings-of-kamma-pced.mjs` reproduces the original missing styles and
+inactive Inflections button when `PCED_BASELINE_DIR` points to the original
+HTML/JavaScript. Against the correction it checks standard presentation, visible
+close control, English/Chinese ordering, table contents, expand/collapse, reopening,
+scroll reset, transparent overlay and viewport containment at 1440/320/360/412px,
+including delayed standard-data loading. No shared PCED files are changed.
+
 ## Reproduce
 
 Use Python with `lxml` and LibreOffice to save the `.doc` as `.docx`, then run from the repository parent:

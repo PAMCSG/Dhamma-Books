@@ -13,3 +13,7 @@ html body.kamma-reader.db-standard-contents .contents .toc-row{font-size:var(--r
 html body.kamma-reader.db-standard-contents .contents .toc-level-4{font-size:calc(var(--reader-size)*.95)}
 html body.kamma-reader.db-standard-contents .contents :is(.toc-level-5,.toc-level-6){font-size:calc(var(--reader-size)*.9)}
 .source-print-spacer{visibility:hidden}
+/* The shared mobile overlay already starts below the complete book header. */
+#dictModal .panel{max-height:calc(100vh - var(--kamma-header-height) - 32px);max-height:calc(100dvh - var(--kamma-header-height) - 32px)}
+#dictModal .panel-head,#dictModal .panel-meta{flex-shrink:0}
+@media(max-width:600px){#dictModal>.panel{top:6px}}

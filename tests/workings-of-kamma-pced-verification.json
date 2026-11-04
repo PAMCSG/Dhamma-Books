@@ -1,0 +1,98 @@
+[
+  {
+    "width": 1440,
+    "languageOrder": [
+      "English",
+      "中文",
+      "Burmese",
+      "Japanese",
+      "Vietnamese",
+      "Korean",
+      "Other"
+    ],
+    "color": "rgb(117, 72, 45)",
+    "passed": [
+      "synchronous dictionary initialization",
+      "standard popup presentation",
+      "Inflections expand/collapse",
+      "declension table contents",
+      "reopen and reset",
+      "version and language metadata",
+      "below-header placement",
+      "viewport containment",
+      "transparent overlay"
+    ]
+  },
+  {
+    "width": 320,
+    "languageOrder": [
+      "English",
+      "中文",
+      "Burmese",
+      "Japanese",
+      "Vietnamese",
+      "Korean",
+      "Other"
+    ],
+    "color": "rgb(117, 72, 45)",
+    "passed": [
+      "synchronous dictionary initialization",
+      "standard popup presentation",
+      "Inflections expand/collapse",
+      "declension table contents",
+      "reopen and reset",
+      "version and language metadata",
+      "below-header placement",
+      "viewport containment",
+      "transparent overlay"
+    ]
+  },
+  {
+    "width": 360,
+    "languageOrder": [
+      "English",
+      "中文",
+      "Burmese",
+      "Japanese",
+      "Vietnamese",
+      "Korean",
+      "Other"
+    ],
+    "color": "rgb(117, 72, 45)",
+    "passed": [
+      "synchronous dictionary initialization",
+      "standard popup presentation",
+      "Inflections expand/collapse",
+      "declension table contents",
+      "reopen and reset",
+      "version and language metadata",
+      "below-header placement",
+      "viewport containment",
+      "transparent overlay"
+    ]
+  },
+  {
+    "width": 412,
+    "languageOrder": [
+      "English",
+      "中文",
+      "Burmese",
+      "Japanese",
+      "Vietnamese",
+      "Korean",
+      "Other"
+    ],
+    "color": "rgb(117, 72, 45)",
+    "passed": [
+      "synchronous dictionary initialization",
+      "standard popup presentation",
+      "Inflections expand/collapse",
+      "declension table contents",
+      "reopen and reset",
+      "version and language metadata",
+      "below-header placement",
+      "viewport containment",
+      "transparent overlay"
+    ]
+  }
+]

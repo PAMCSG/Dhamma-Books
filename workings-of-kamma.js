@@ -1,9 +1,10 @@
 /* The Workings of Kamma: source navigation, notes and shared-reader integration. */
 (() => {
   'use strict';
-  // The shared PCED supplement fills this stable dictionary object on startup.
+  // This deferred script runs after the shared data and before popup setup.
+  // Populate synchronously: the popup checks for entries during initialization.
   window.PCED_ENTRIES={};
-  document.addEventListener('DOMContentLoaded',()=>window.PCEDStandardData?.applyTo(window.PCED_ENTRIES),{once:true});
+  window.PCEDStandardData.applyTo(window.PCED_ENTRIES);
   const header=document.querySelector('.topbar'), root=document.documentElement;
   const measure=()=>root.style.setProperty('--kamma-header-height',Math.ceil(header.getBoundingClientRect().height)+'px');
   measure();addEventListener('resize',measure,{passive:true});if(window.ResizeObserver)new ResizeObserver(measure).observe(header);
@@ -33,7 +34,7 @@
     if(word){
       const selection=getSelection();if(selection&&!selection.isCollapsed)return;
       document.getElementById('dictTitle').textContent=word.dataset.word;
-      document.getElementById('dictMeta').textContent='PCED';
+      document.getElementById('dictMeta').textContent='PCED 2.0.5.0 · English → 中文 → Burmese → Other';
       document.getElementById('dictBody').replaceChildren();
       const placeholder=document.createElement('p');placeholder.textContent='Looking up '+word.dataset.word+'…';document.getElementById('dictBody').append(placeholder);openModal(dictModal);
     }

@@ -1,0 +1,16 @@
+The Workings of Kamma — PCED correction (4 November 2026)
+
+1. Extract this ZIP.
+2. Upload the extracted files into your Dhamma-Books GitHub repository,
+   keeping the scripts/ and tests/ folders. Replace the existing files.
+3. Commit the upload and wait for GitHub Pages to finish publishing.
+4. Refresh the book with Ctrl+F5 (or close and reopen it on mobile).
+5. Click Magga, then Inflections. The standard brown popup should appear,
+   and the button should expand/collapse its declension table.
+
+The three workings-of-kamma HTML/JS/CSS files are the website fix.
+The converter, documentation and test preserve and verify the correction.
+No index.html, covers, book text, or shared PCED files need replacing.
+
+Verified in Chromium at desktop 1440px and mobile 320/360/412px.
+The original missing-style/inactive-button bug was reproduced before fixing.
