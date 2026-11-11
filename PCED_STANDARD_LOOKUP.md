@@ -1,7 +1,7 @@
 # Standard PCED Lookup
 
-Release date: 2026-09-20
-Lookup core: 3.9.4
+Release date: 2026-11-11
+Lookup core: 3.9.29
 Dictionary data: PCED 2.0.5.0 plus the verified standard supplement
 
 ## Scope
@@ -192,3 +192,30 @@ For verbs whose citation form ends in `-eti`, the productive `-ess-` future endi
 ### Dhamma Books landing-page display
 
 The Dhamma Books landing-page PCED search displays the same inflection banner as book and Tipiṭaka Reader popups whenever the shared resolver returns an inflected result. Acceptance example: `viheṭhessanti → viheṭheti`, followed by `third-person plural, future`.
+
+## Single-word terminology and source priority — 11 November 2026
+
+- Classify the complete Chinese-Tipitaka Pāli record before splitting any
+  alternative headwords. Sentence/phrase types, sentence punctuation, or a
+  multi-word alternative exclude the complete record from PCED dictionary
+  results. A comma inside a sentence must never expose that sentence's full
+  translation as a single-word definition. Genuine lists of single-word
+  alternatives and hyphenated lexical terms remain supported. Ordinary PCED source definitions are unchanged.
+- Apply this rule in the shared matcher, reader/book popups, and homepage
+  PCED search, including records marked 另加字典. Phrase/sentence records
+  remain available in Tipitaka-reader's separate 汉译巴利三藏 tab using
+  complete-word matching; its status, source, and deduplication rules remain.
+- Keep exact PCED surface entries ahead of different related headwords.
+  Within the same matched headword, display eligible Chinese-Tipitaka
+  definitions first, then 其它字典 and ordinary PCED language sections.
+  Show a visible non-exact relationship beside related meanings. A related
+  Chinese meaning belonging to the displayed lemma is not relegated below
+  all of that lemma's PCED languages.
+- In DN 5, handassa is handa + assa (sandhi), not a verified nominal
+  inflection of handa. Preserve an exact handassa source entry when present,
+  and show independently attested components and their meanings afterwards.
+- Book metadata is refreshed so a legacy suffix guess cannot contradict the
+  current shared analysis.
+- Regression examples: āvuso must not import the sentence acchariyaṃ,
+  āvuso, abbhutaṃ, āvuso!; handassa must show the sandhi and put handa's
+  eligible Chinese meaning before handa's other language definitions.

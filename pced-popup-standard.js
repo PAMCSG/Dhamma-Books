@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.33 — 2026-10-05 */
+/* PAMC cross-book PCED popup standard v1.8.34 — 2026-11-11 */
 (function () {
   'use strict';
 
@@ -62,7 +62,7 @@
     });
     morphologyPromise = Promise.resolve()
       .then(() => window.KaccayanaDeclension?.VERSION === '1.5.1' ? null : load('kaccayana-declension.js', '1.5.1'))
-      .then(() => core()?.version === '3.9.28' ? null : load('pced-lookup-core.js', '3.9.28'))
+      .then(() => core()?.version === '3.9.29' ? null : load('pced-lookup-core.js', '3.9.29'))
       .then(() => window.PaliLookupMorphology ? null : load('pali-lookup-morphology.js', '2.0-unicode-trial'))
       .then(() => window.PaliLookupMorphology || null);
     return morphologyPromise;
@@ -259,19 +259,31 @@
   window.PCEDDefinitionTranslation = Object.freeze({ renderItem: renderDictionaryItem });
 
   function isSingleWordRecord(row) {
-    return String(row?.pali || '').split(/\s*[,;/；，]\s*/)
-      .map(value => normalize(value)).some(value => value && !/\s/.test(value));
+    return !!core()?.singleWordTermForms?.(row).length;
   }
 
   function directPublishedRows(surface, allRows) {
     const exact = normalize(surface);
     if (!exact) return [];
-    return (Array.isArray(allRows) ? allRows : []).filter(row => {
-      if (Number(row?.deleted) || !row?.chinese) return false;
-      return String(row?.pali || '').split(/\s*[,;/；，]\s*/)
-        .map(value => normalize(value))
-        .some(value => value === exact && !/\s/.test(value));
-    }).map(row => ({ ...row, match: 'exact', matchedForm: exact }));
+    return (Array.isArray(allRows) ? allRows : []).filter(row =>
+      !Number(row?.deleted) && row?.chinese &&
+      core()?.singleWordTermForms?.(row).includes(exact)
+    ).map(row => ({ ...row, match: 'exact', matchedForm: exact }));
+  }
+
+  function termMatchNote(row, surface) {
+    if (!row.match || row.match === 'exact') return '';
+    const sandhi = row.match === 'sandhi';
+    return '<div class="lookup-rule">' + esc(surface) + ' → ' +
+      esc(sandhi ? row.decomposition.join(' + ') : row.matchedForm) +
+      (sandhi ? '（连声拆分，非精确匹配）' : '（词形对应，非精确匹配）') + '</div>';
+  }
+
+  function termHeadIndex(row, heads) {
+    if (row.match === 'exact') return 0;
+    const matched = normalize(row.matchedForm);
+    return heads.findIndex(head => normalize(head) === matched ||
+      normalize(dictionary()[head]?.headword) === matched);
   }
 
   function uniqueTermRows(rows) {
@@ -309,8 +321,7 @@
           '<div class="definition approved-term-definition"><span>' + approvedChineseHtml(row.chinese_html, row.chinese) + '</span>' +
             (source ? '<span class="source approved-term-source">（出处：' + esc(source) + '）</span>' : '') +
           '</div>' +
-          (row.match === 'inflected' ? '<div class="lookup-rule">' + esc(surface) + ' → ' +
-            esc(row.matchedForm) + '（已核实词形变化）</div>' : '') +
+          termMatchNote(row, surface) +
         '</div>';
       }).join('') + '</div>';
   }
@@ -327,38 +338,33 @@
       isSingleWordRecord(row) && String(row.status || '').trim() === '另加字典');
   }
 
-  function renderOtherDictionary(rows) {
+  function renderOtherDictionary(rows, surface) {
     if (!rows.length) return '';
     return '<div class="group-title" data-language="other-dictionary">Other Dictionary 其它字典</div>' +
       rows.map(row => '<div class="approved-term-block other-dictionary-entry">' +
         '<div class="source">' + esc(row.pali) + (row.source ? ' — ' + esc(row.source) : '') + '</div>' +
         '<div class="definition" style="white-space:pre-wrap">' +
-        approvedChineseHtml(row.chinese_html, row.chinese) + '</div></div>').join('');
+        approvedChineseHtml(row.chinese_html, row.chinese) + '</div>' + termMatchNote(row, surface) + '</div>').join('');
   }
 
-  function renderPublishedBlocks(rows, surface) {
-    return renderApprovedBlock(rows.filter(row => row.match !== 'inflected').filter(row => APPROVED.has(String(row.status || '').trim())), surface) +
-      renderOtherDictionary(otherDictionaryRows(surface, resolution(surface)).filter(row => row.match !== 'inflected'));
+  function renderPublishedBlocks(rows, otherRows, surface) {
+    const approved = renderApprovedBlock(rows.filter(row => APPROVED.has(String(row.status || '').trim())), surface);
+    return (approved ? '<div class="group-title" data-language="zh-tipitaka">汉译巴利三藏</div>' + approved : '') +
+      renderOtherDictionary(otherRows, surface);
   }
 
-  function renderEntry(head, approvedRows, surface, includeApproved, primaryLanguage) {
+  function renderEntry(head, approvedRows, otherRows, surface, primaryLanguage) {
     const entry = dictionary()[head];
     if (!entry) return '';
     const groups = core()?.dictionaryGroups(entry, primaryLanguage) || [];
     let html = '<div class="entry"><div class="headword">' + esc(entry.headword || head) + '</div>';
-    const approved = includeApproved ? renderPublishedBlocks(approvedRows, surface) : '';
-    if (approved) html += (approvedRows.length ? '<div class="group-title" data-language="zh-tipitaka">汉译巴利三藏</div>' : '') + approved;
+    // Source priority applies within this matched headword. A lemma's Chinese
+    // meaning must not be moved above a different exact surface entry.
+    html += renderPublishedBlocks(approvedRows, otherRows, surface);
     for (const group of groups) {
       html += '<div class="group-title" data-language="' + esc(group.key || 'other') + '">' +
         esc(groupTitle(group)) + '</div>';
       for (const item of group.entries) html += renderDictionaryItem(item, group.key || 'other', entry.headword || head);
-    }
-    if (includeApproved) {
-      const related = approvedRows.filter(row => row.match === 'inflected');
-      const otherRelated = otherDictionaryRows(surface, resolution(surface)).filter(row => row.match === 'inflected');
-      if (related.length || otherRelated.length) html +=
-        '<div class="group-title">Related forms / 相关词形（非精确匹配）</div>' +
-        renderApprovedBlock(related, surface) + renderOtherDictionary(otherRelated);
     }
     return html + '</div>';
   }
@@ -555,6 +561,7 @@
     const heads = result.allHeads || result.heads || [];
     const approvedRows = (Array.isArray(suppliedRows)
       ? suppliedRows : approvedWordRows(surface, result)).filter(isSingleWordRecord);
+    const otherRows = otherDictionaryRows(surface, result);
     const shown = heads.map(head => dictionary()[head]?.headword || head).join(', ');
     const parts = (result.components || []).map(item => item.surface).join(' + ');
     const zh = primaryLanguage === 'zh';
@@ -576,19 +583,26 @@
     else if (result.mode === 'alias' || result.mode === 'related') note = '<div class="note"><b>PCED form:</b> ' +
       esc(surface) + ' → <b>' + esc(shown) + '</b></div>';
     else if (result.mode === 'compound' || result.mode === 'sandhi' || parts) note = '<div class="note"><b>' +
-      (result.mode === 'sandhi' ? 'Sandhi' : 'Compound') + ' analysis:</b> ' + esc(surface) + ' → <b>' +
+      (result.mode === 'sandhi' || result.decompositionKind === 'sandhi' ? 'Sandhi / 连声' : 'Compound') + ' analysis:</b> ' + esc(surface) + ' → <b>' +
       esc(parts || shown) + '</b></div>';
 
     if (!heads.length) {
-      const approved = renderPublishedBlocks(approvedRows, surface);
+      const approved = renderPublishedBlocks(approvedRows, otherRows, surface);
       const approvedEntry = approved
         ? '<div class="entry"><div class="headword">' + esc(surface) + '</div>' +
-          '<div class="group-title" data-language="zh">中文</div>' + approved + '</div>' : '';
+          approved + '</div>' : '';
       return note + approvedEntry + '<div class="note"><b>No reliable PCED entry was found for ' +
         esc(surface) + '.</b><br>Only exact headwords, verified forms, conservative inflections, and verified compound or sandhi analyses were accepted.</div>';
     }
-    return note + renderInflectionPanel(heads[0], primaryLanguage, surface) + heads.map((head, index) =>
-      renderEntry(head, approvedRows, surface, index === 0, primaryLanguage)).join('');
+    const entries = heads.map((head, index) => renderEntry(head,
+      approvedRows.filter(row => termHeadIndex(row, heads) === index),
+      otherRows.filter(row => termHeadIndex(row, heads) === index), surface, primaryLanguage)).join('');
+    const remainingApproved = approvedRows.filter(row => termHeadIndex(row, heads) < 0);
+    const remainingOther = otherRows.filter(row => termHeadIndex(row, heads) < 0);
+    const related = remainingApproved.length || remainingOther.length
+      ? '<div class="group-title">Related forms / 相关词形（非精确匹配）</div>' +
+        renderPublishedBlocks(remainingApproved, remainingOther, surface) : '';
+    return note + renderInflectionPanel(heads[0], primaryLanguage, surface) + entries + related;
   }
 
   function selectedText(modal) {
@@ -959,7 +973,7 @@
     const approvedIndex = new Map();
     for (const row of rows) {
       if (!usable(row)) continue;
-      for (const form of String(row.pali || '').split(/\s*[,;/；，]\s*/).map(normalize)) {
+      for (const form of core()?.singleWordTermForms?.(row) || []) {
         if (!form || /\s/.test(form)) continue;
         if (!approvedIndex.has(form)) approvedIndex.set(form, []);
         approvedIndex.get(form).push(row);
@@ -1016,7 +1030,7 @@
       ...(result?.allHeads || []).map(normalize)
     ].filter(form => form && !/\s/.test(form)));
     for (const row of matched) {
-      for (const form of String(row?.pali || '').split(/\s*[,;/；，]\s*/).map(normalize)) {
+      for (const form of core()?.singleWordTermForms?.(row) || []) {
         if (form && !/\s/.test(form)) forms.add(form);
       }
     }
@@ -1110,6 +1124,19 @@
     if (phrase) runAI(modal, surface, 'both');
   }
 
+  function updateBookLookupMeta(modal, primaryLanguage) {
+    const meta = modal.querySelector('#dictMeta,#pced-meta');
+    if (!meta) return;
+    const sequence = {
+      zh: '中文 → English → Burmese → Other',
+      en: 'English → 中文 → Burmese → Other',
+      my: 'Burmese → English → 中文 → Other'
+    };
+    // Legacy page resolvers may have written an obsolete suffix guess here.
+    // The current relationship is already shown in the shared result body.
+    meta.textContent = 'PCED 2.0.5.0 · ' + (sequence[primaryLanguage] || sequence.zh);
+  }
+
   async function enhanceBook(modal) {
     const surface = selectedText(modal);
     if (!surface) return;
@@ -1117,6 +1144,7 @@
     const body = modal.querySelector('#dictBody') || modal.querySelector('#dictTab') || modal.querySelector('#pced-body');
     const includeChineseTipitaka = chineseTipitakaEnabledForBook();
     const primaryLanguage = preferredDictionaryLanguage();
+    updateBookLookupMeta(modal, primaryLanguage);
     if (body) body.innerHTML = renderDictionary(surface,
       includeChineseTipitaka ? approvedWordRows(surface, result) : [], primaryLanguage);
     resetTop(modal);
@@ -1689,6 +1717,7 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })();
+
 
 
 

@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.28 — 2026-10-05
+ * Version 3.9.29 — 2026-11-11
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,13 +10,15 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.28';
+  const VERSION = '3.9.29';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
 
   // Verified linguistic decompositions; every part must still be validated
   // as a complete PCED headword at runtime.
   const BUILTIN_DECOMPOSITIONS = Object.freeze({
+    // DN 5: handassa = handa + assa, not a nominal genitive of handa.
+    'handassa': Object.freeze({ kind: 'sandhi', preferSandhi: true, parts: Object.freeze(['handa', 'assa']) }),
     'tenupasaṅkami': Object.freeze({ kind: 'sandhi', parts: Object.freeze(['tena', 'upasaṅkami']) }),
     'yañca': Object.freeze({ kind: 'sandhi', parts: Object.freeze(['yaṃ', 'ca']) }),
     'panāhaṃ': Object.freeze({ kind: 'sandhi', parts: Object.freeze(['pana', 'ahaṃ']) }),
@@ -635,7 +637,7 @@
     if (!Array.isArray(rawParts)) return null;
     const parts = rawParts.map(item => cleanWord(typeof item === 'string' ? item : item?.surface || item?.form || item?.head))
       .filter(Boolean);
-    return parts.length >= 2 ? { kind: value.kind || 'compound', parts } : null;
+    return parts.length >= 2 ? { kind: value.kind || 'compound', parts, preferSandhi: !!value.preferSandhi } : null;
   }
 
   function decompositionFor(key, options = {}) {
@@ -932,6 +934,7 @@
             !result.heads.includes(head) && !result.componentHeads.includes(head))
         : [];
       result.allHeads = [...result.heads, ...result.componentHeads, ...result.lemmaHeads];
+      if (result.components?.length) result.decompositionKind = decompositionFor(normalized, options)?.kind || result.mode;
       return result;
     };
 
@@ -975,6 +978,17 @@
       } : addEntryDecomposition({
         ...base, mode: 'exact', tier: 1, heads: exactHeads, grammar: null
       }));
+    }
+
+    // A maintained sandhi can resemble a regular noun ending. Preserve an
+    // exact surface entry above, but do not run suffix guesses for this form.
+    const preferredSandhi = decompositionFor(normalized, options);
+    if (preferredSandhi?.kind === 'sandhi' && preferredSandhi.preferSandhi) {
+      const components = preferredSandhi.parts.map(part => resolvePart(part, context, options));
+      if (components.every(part => part.heads.length)) return finish({
+        ...base, mode: 'sandhi', tier: 4, components, resolvedForm: normalized,
+        notes: [`${clicked} → ${preferredSandhi.parts.join(' + ')} (sandhi)`]
+      });
     }
 
     const speechMatches = speechFormMatches(normalized);
@@ -1095,12 +1109,19 @@
   const APPROVED_TERM_INDEX_CACHE = new WeakMap();
   const PUBLISHED_TERM_INDEX_CACHE = new WeakMap();
 
-  function approvedTermAlternatives(pali) {
-    return String(pali || '').split(/\s*[,;/；，]\s*/)
-      .map(value => cleanWord(value))
-      // A single-word click must not inherit the translation of a phrase
-      // merely because that phrase happens to contain the same word.
-      .filter(value => value && !/\s/.test(value));
+  function singleWordTermForms(record) {
+    const row = typeof record === 'string' ? { pali: record } : (record || {});
+    // Classify the complete record before considering alternative headwords.
+    // Punctuation in a sentence must never create standalone dictionary keys.
+    if (/(?:句|短语|片語|片语|段落|sentence|phrase|passage)/i.test(String(row.type || ''))) return [];
+    const text = normalizeForMatch(row.pali);
+    if (!text || /[.!?。！？…:：।॥]/.test(text)) return [];
+    const forms = text.split(/\s*[,;/；，]\s*/).map(value => cleanWord(value));
+    // Every alternative must be a complete single word. Keeping just the
+    // short fragments of a mixed phrase/list leaks the phrase's translation.
+    const termForm = /^[a-zāīūṅñṭḍṇḷṃ]+(?:-[a-zāīūṅñṭḍṇḷṃ]+)*$/;
+    return forms.length && forms.every(form => termForm.test(form))
+      ? [...new Set(forms)] : [];
   }
 
   function approvedTermIndex(records, includeAllStatuses = false) {
@@ -1109,8 +1130,8 @@
     const index = new Map();
     for (const record of records) {
       if (!includeAllStatuses && !APPROVED_TERM_STATUSES.has(String(record?.status || '').trim())) continue;
-      if (!String(record?.chinese || '').trim()) continue;
-      for (const form of approvedTermAlternatives(record?.pali)) {
+      if (Number(record?.deleted) || !String(record?.chinese || '').trim()) continue;
+      for (const form of singleWordTermForms(record)) {
         if (!index.has(form)) index.set(form, []);
         index.get(form).push(record);
       }
@@ -1139,6 +1160,11 @@
 
     const exactRows = collect([exact], 'exact');
     if (exactRows.length) return exactRows;
+
+    const sandhi = decompositionFor(exact, options);
+    if (sandhi?.kind === 'sandhi' && sandhi.preferSandhi) {
+      return collect(sandhi.parts, 'sandhi').map(row => ({ ...row, decomposition: sandhi.parts }));
+    }
 
     // The ordinary dictionary may contain an exact inflected entry (for
     // example gotamo). That exact PCED hit must not prevent the approved-term
@@ -1753,6 +1779,7 @@
     inflectionCandidates,
     resolve,
     approvedTermMatches,
+    singleWordTermForms,
     classifySourceEntry,
     dictionaryGroups,
     localizedAnalysisText,
@@ -1762,6 +1789,7 @@
     verifiedDecompositions: BUILTIN_DECOMPOSITIONS
   });
 })(window);
+
 
 
 

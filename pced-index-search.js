@@ -1,4 +1,4 @@
-/* PCED landing-page search v1.7.20 — exact Pāli/diacritic-aware and multilingual. */
+/* PCED landing-page search v1.7.21 — exact Pāli/diacritic-aware and multilingual. */
 (function (global) {
   'use strict';
 
@@ -168,6 +168,10 @@
     const analysis = value => esc(global.PCEDLookupCore?.localizedAnalysisText?.(value, priority) || value);
     const grammar = result?.grammar;
     if (!grammar) {
+      if (result?.mode === 'sandhi' || result?.decompositionKind === 'sandhi') {
+        return '<div class="note"><b>Sandhi / 连声:</b> ' + esc(result.clicked || '') + ' → <b>' +
+          esc((result.components || []).map(part => part.surface).join(' + ')) + '</b></div>';
+      }
       if (result?.mode !== 'inflected') return '';
       const head = result.heads?.[0];
       const lemma = dictionary[head]?.headword || result.resolvedForm || head;
@@ -431,29 +435,42 @@
     }) || [];
     const seen = new Set();
     return rows.filter(row => {
-      const single = String(row?.pali || '').split(/\s*[,;/；，]\s*/)
-        .some(value => value.trim() && !/\s/.test(value.trim()));
+      const single = global.PCEDLookupCore?.singleWordTermForms?.(row).length;
       const signature = [row?.pali, row?.chinese, row?.source, row?.status].join('\u241f');
-      if (!single || !APPROVED_STATUSES.has(String(row?.status || '').trim()) || seen.has(signature)) return false;
+      if (!single || Number(row.deleted) || !APPROVED_STATUSES.has(String(row?.status || '').trim()) || seen.has(signature)) return false;
       seen.add(signature);
       return true;
     });
   }
 
-  function renderApprovedRows(rows) {
+  function termMatchNote(row, surface) {
+    if (!row.match || row.match === 'exact') return '';
+    const sandhi = row.match === 'sandhi';
+    return '<div class="lookup-rule">' + esc(surface) + ' → ' +
+      esc(sandhi ? row.decomposition.join(' + ') : row.matchedForm) +
+      (sandhi ? '（连声拆分，非精确匹配）' : '（词形对应，非精确匹配）') + '</div>';
+  }
+
+  function termHeadIndex(row, heads) {
+    if (row.match === 'exact') return 0;
+    const clean = value => global.PCEDLookupCore.cleanWord(value);
+    const matched = clean(row.matchedForm);
+    return heads.findIndex(head => clean(head) === matched || clean(dictionary[head]?.headword) === matched);
+  }
+
+  function renderApprovedRows(rows, surface) {
     if (!rows.length) return '';
     return '<div class="group-title" data-language="zh-tipitaka">汉译巴利三藏</div>' +
       '<div class="approved-term-block"><div class="source approved-term-title">玛欣德尊者和译藏团队</div>' +
       rows.map(row => '<div class="approved-term-row"><div class="definition approved-term-definition">' +
         approvedChineseHtml(row.chinese_html, row.chinese) + (row.source ? '<span class="source approved-term-source">（出处：' +
-          esc(row.source) + '）</span>' : '') + '</div></div>').join('') + '</div>';
+          esc(row.source) + '）</span>' : '') + '</div>' + termMatchNote(row, surface) + '</div>').join('') + '</div>';
   }
 
   function otherRowsForQuery(key) {
     const records = global.PCEDApprovedTerms?.records || [];
     const exact = String(key).trim().toLowerCase().normalize('NFC');
-    const direct = records.filter(row => String(row.pali || '').split(/\s*[,;/；，]\s*/)
-      .some(form => form.trim().toLowerCase().normalize('NFC') === exact));
+    const direct = records.filter(row => global.PCEDLookupCore?.singleWordTermForms?.(row).includes(exact));
     const matches = direct.some(row => row.status === '另加字典' && !Number(row.deleted)) ? direct :
       (global.PCEDLookupCore?.approvedTermMatches(key, resolve(key), {
         approvedTerms: records, includeAllStatuses: true
@@ -461,33 +478,35 @@
     const seen = new Set();
     return matches.filter(row => {
       const signature = [row.pali, row.chinese, row.source].join('\u241f');
-      if (Number(row.deleted) || !row.chinese || String(row.status || '').trim() !== '另加字典' || seen.has(signature)) return false;
+      if (Number(row.deleted) || !row.chinese || !global.PCEDLookupCore?.singleWordTermForms?.(row).length || String(row.status || '').trim() !== '另加字典' || seen.has(signature)) return false;
       seen.add(signature); return true;
     });
   }
 
-  function renderOtherRows(rows) {
+  function renderOtherRows(rows, surface) {
     if (!rows.length) return '';
     return '<div class="group-title" data-language="other-dictionary">Other Dictionary 其它字典</div>' +
       rows.map(row => '<div class="approved-term-block other-dictionary-entry"><div class="source">' +
         esc(row.pali) + (row.source ? ' — ' + esc(row.source) : '') + '</div>' +
-        '<div class="definition" style="white-space:pre-wrap">' + approvedChineseHtml(row.chinese_html, row.chinese) + '</div></div>').join('');
+        '<div class="definition" style="white-space:pre-wrap">' + approvedChineseHtml(row.chinese_html, row.chinese) + '</div>' + termMatchNote(row, surface) + '</div>').join('');
   }
 
-  function renderHead(key, priority, otherHtml = '', otherRelatedHtml = '', surface = key) {
+  function renderHead(key, priority, otherHtml = '', surface = key, heads = [key]) {
     const entry = dictionary[key];
     if (!entry) return '';
     const groups = global.PCEDLookupCore?.dictionaryGroups(entry, priority) || [];
     const approvedRows = priority === 'zh' ? approvedRowsForHead(key) : [];
-    const approved = renderApprovedRows(approvedRows.filter(row => row.match !== 'inflected'));
-    const relatedRows = approvedRows.filter(row => row.match === 'inflected');
-    const related = relatedRows.length ? '<div class="group-title">Related forms / 相关词形（非精确匹配）</div>' + renderApprovedRows(relatedRows) : '';
+    const clean = value => global.PCEDLookupCore.cleanWord(value);
+    const own = row => row.match === 'exact' || clean(row.matchedForm) === clean(key);
+    const approved = renderApprovedRows(approvedRows.filter(own), surface);
+    const relatedRows = approvedRows.filter(row => !own(row) && termHeadIndex(row, heads) < 0);
+    const related = relatedRows.length ? '<div class="group-title">Related forms / 相关词形（非精确匹配）</div>' + renderApprovedRows(relatedRows, surface) : '';
     return '<div class="entry"><div class="headword">' + esc(entry.headword || key) + '</div>' +
       renderInflectionPanel(key, priority, surface) +
       approved + otherHtml +
       groups.map(group => '<div class="group-title" data-language="' + esc(group.key) + '">' +
         esc(languageTitles[group.key] || group.title || 'Other') + '</div>' +
-        group.entries.map(item => renderDictionaryDefinition(item, group.key, entry.headword || key)).join('')).join('') + related + otherRelatedHtml + '</div>';
+        group.entries.map(item => renderDictionaryDefinition(item, group.key, entry.headword || key)).join('')).join('') + related + '</div>';
   }
 
   function renderLanguageResult(result, priority) {
@@ -505,15 +524,21 @@
       const note = !pali.marked && pali.heads.some(head => foldPali(head) === foldPali(query) && head !== query.toLowerCase())
         ? '<div class="note"><b>Diacritic-insensitive Pāli search:</b> ' + esc(query) +
           ' matched all exact spellings with possible Pāli diacritics.</div>' : '';
+      const otherRows = otherRowsForQuery(query);
+      const remainingOther = otherRows.filter(row => termHeadIndex(row, pali.heads) < 0);
+      const relatedOther = remainingOther.length
+        ? '<div class="group-title">Related forms / 相关词形（非精确匹配）</div>' + renderOtherRows(remainingOther, query) : '';
       return { query, heads: pali.heads, kind: 'pali', priority,
         html: note + renderGrammarNote(pali.resolution, priority) +
-          pali.heads.map((head, index) => renderHead(head, priority, index === 0 ? renderOtherRows(otherRowsForQuery(query).filter(row => row.match !== 'inflected')) : '', index === 0 && otherRowsForQuery(query).some(row => row.match === 'inflected') ? '<div class="group-title">Related forms / 相关词形（非精确匹配）</div>' + renderOtherRows(otherRowsForQuery(query).filter(row => row.match === 'inflected')) : '', query)).join('') };
+          pali.heads.map((head, index) => renderHead(head, priority,
+            renderOtherRows(otherRows.filter(row => termHeadIndex(row, pali.heads) === index), query),
+            query, pali.heads)).join('') + relatedOther };
     }
     // A query made entirely of Roman Pāli characters is a headword request.
     // If exact/verified Pāli lookup found nothing, do not reinterpret the same
     // letters as a substring inside unrelated dictionary definitions.
     if (PALI_ONLY.test(query)) {
-      const other = renderOtherRows(otherRowsForQuery(query));
+      const other = renderOtherRows(otherRowsForQuery(query), query);
       if (other) return { query, heads: [], kind: 'pali', priority, html: '<div class="entry"><div class="headword">' + esc(query) + '</div>' + other + '</div>' };
       return { query, heads: [], kind: 'none', priority,
         html: '<div class="note"><b>No reliable PCED entry was found for ' + esc(query) + '.</b></div>' };
@@ -601,12 +626,13 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.20' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.21' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })(window);
+
 
 
 
