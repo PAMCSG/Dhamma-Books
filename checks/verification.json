@@ -1,0 +1,275 @@
+{
+  "date": "2026-11-16",
+  "versions": {
+    "core": "3.9.30",
+    "popup": "1.8.35",
+    "index_search": "1.7.22"
+  },
+  "source_commits": {
+    "Dhamma-Books": "9ca8d5f64d4c99a630614cfa4706ac0c28f0c379",
+    "Tipitaka-reader": "26705c2856626973bbcaa60f9089a29faa180cb7"
+  },
+  "automated_checks": {
+    "new_eyya_lookup_and_renderer_checks": 26,
+    "entry_paths": 3,
+    "test_words": 10,
+    "existing_terminology_regressions": 15,
+    "expanded_declension_reference_paradigms": 74,
+    "cache_only_HTML_updates": 39,
+    "private_HTML_source_hashes_verified": 18,
+    "private_translation_route_preserved": true,
+    "same_core_in_both_repositories": true
+  },
+  "browser_verification": {
+    "status": "unavailable",
+    "reason": "Chromium launch failed because socket creation is not permitted in this execution environment. No interactive browser checks are claimed."
+  },
+  "pre_existing_test_failures": [
+    {
+      "test": "tests/pced-prefer-lemma.test.js",
+      "reason": "Expects the old preferLemma override to replace exact entries. Reproduced in unchanged baseline."
+    },
+    {
+      "test": "tests/pced-index-ascii-prefer-lemma.test.js",
+      "reason": "Expects English analysis in Chinese output. Reproduced in unchanged baseline."
+    }
+  ],
+  "teacher_review_worksheet_imported": false,
+  "manifest": [
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "patisambhidamagga.html",
+      "sha256": "6c96b92654362ff4216ea87dd1fe77de8c7b3b3c0d9882491072c56f34a9d0b3"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "pali-chanting-book-burmese-updated.html",
+      "sha256": "825ca356e7552823b13b91e16831458a1c680f0bcc5802323ff5b1d32320a6ad"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "pali-chanting-book-burmese.html",
+      "sha256": "fc070eb349180d9b429597cb5f8c8877079a02d3a453afb2746680866c9730e8"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "the-only-way-for-realization-of-nibbana.html",
+      "sha256": "63682050f5bbb1086a30d25b0ca606c967b021518eaaa3ba6ea1ea84a821b9ab"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "paccayaniddeso-chinese.html",
+      "sha256": "8ac21fe5fe1f89846737293132dca33e5b784745648ca24787025290cd2d0a41"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "mindfulness-of-breathing.html",
+      "sha256": "7438d548e1880565ac7ecb9a9ab25ec647b7fc79dfa06ca05be22bba119557b3"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "dhammapada-pali-chinese.html",
+      "sha256": "b0a6a9b6a15dc44d1f3232fe2b98918103b69350faaae5fed1c91819b6c09db6"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "menu-pinyinbooks.html",
+      "sha256": "20e409ffb910f8941fde08f1c2236eac709a41ad95cf273d394cb532b6a04b9e"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "index.html",
+      "sha256": "89aaa143561ac7e0bb1efe137f3e1f48e165db6d420fa867c240911de0bd2b19"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "zhiguan-fayao.html",
+      "sha256": "6d21cbfa102b35c50475037e7474305c7552cace0079db3add8a9882ff380aaf"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "daily-chants.html",
+      "sha256": "b6498951278943137d4462e477812e9ffd04b99c8318fbf1b0219513f298d420"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "the-requisites-of-enlightenment.html",
+      "sha256": "826acc821730b2f751f71d4f5cd6ed837acddb76a3ffa5e018a5e8ae9677bea7"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "paccayaniddeso.html",
+      "sha256": "5c347ab1262eaf5af812edc800de0686c145dd3c56ab2c28eba68fa584760bc0"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "bhikkhupatimokkha.html",
+      "sha256": "c37e4e44a9ebb8d39cf398424b982296db384fec3ccd90031c67cc4e2b7c3285"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "knowing-and-seeing.html",
+      "sha256": "62c4464b75b50f4f9d93b5b90ccb8441900e9c53824de45a167f6f9fc53220d5"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "the-buddhas-twelve-kinds-of-evil-retribution.html",
+      "sha256": "5238c573f779080dec1ea834fca86c8a5ef85558f2e8f7a93c5e7d43e4edb4de"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "pali-chanting-book-chinese.html",
+      "sha256": "57dbfaba0578a621063d4f598891b6f9b0afd18d8c1d4ebd2060034068b8fe30"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "workings-of-kamma.html",
+      "sha256": "d3dd28d126a9841d92d85301b82861045beae09c8df732f5c3de9736e0d91f2d"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "samanera-sikkhapadani-hanyu-pinyin.html",
+      "sha256": "b29726daafabb18c3c0fa625492e24bcd93a82881e6460ec223242d2d441095a"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "bhikkhupatimokkha-hanyu-pinyin.html",
+      "sha256": "39af9cd1769c268006c2643f1c6a481a759d8c677cd71ffb7e753674d3694f82"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "samanera-sikkhapadani.html",
+      "sha256": "36ce7867c0e4aebb0e5421c070cf7d6d581487ee96401dcb6bc7d1866c10bfb6"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "pali-chanting-book.html",
+      "sha256": "8fe4979a63f86e4ccb99f3fd50e115bcf3ce247749ca0736a47fb63d67854772"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "patisambhidamagga-chinese.html",
+      "sha256": "8ca574ac60b606a6a57f8ef9bb9ca753dde882f0d6098b44be53d8a02a857f71"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "pced-lookup-core.js",
+      "sha256": "432cebc6c673cd47d10a31097af213fbecf32655b805038d7bf8dc81f5d8fe18"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "pced-popup-standard.js",
+      "sha256": "bd33429936f914e2f2ca22be68063e234460a4f45acb0cff20f67036dee84016"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "pced-index-search.js",
+      "sha256": "024c17265e89ae9c28d06250bef6cebd34a36c9b22939d9b5be6a0401daa19e1"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "PCED_STANDARD_LOOKUP.md",
+      "sha256": "3138a59db19de0fe182d841e1b0fd4358caef4921ce895379a1422e8a49bfed0"
+    },
+    {
+      "repository": "PAMCSG/Dhamma-Books",
+      "path": "tests/pced-eyya.test.js",
+      "sha256": "b39bb4e48ae39063e0c017066073c9d6bb1b8529adf10680ad5527270ce19d1c"
+    },
+    {
+      "repository": "PAMCSG/Tipitaka-reader",
+      "path": "potthapadasutta.html",
+      "sha256": "774dbee66f6fec6aab1cfd01cddfcdeacc133fd375ea6b14dad13ad99f6c238b"
+    },
+    {
+      "repository": "PAMCSG/Tipitaka-reader",
+      "path": "ambatthasutta.html",
+      "sha256": "5975d948ae415fa8a8e22c5d12c4af93289ffd76081f1b3d15077cd0f22ddc3e"
+    },
+    {
+      "repository": "PAMCSG/Tipitaka-reader",
+      "path": "tevijjasutta.html",
+      "sha256": "5baf3a6be5f3641c3b8dcc1e029926c9ac4a1271012aa1a6465d13e193aa50de"
+    },
+    {
+      "repository": "PAMCSG/Tipitaka-reader",
+      "path": "patisambhidamagga-atthakatha.html",
+      "sha256": "5614332730ab0cc5978f336a5d894627d24b90d1b54098ab8554de3e537151cc"
+    },
+    {
+      "repository": "PAMCSG/Tipitaka-reader",
+      "path": "jaliyasutta.html",
+      "sha256": "c8b825a3bb574b381fe60d84c01ca9394ba5f592bbfc098cfe2fcdef9317ffba"
+    },
+    {
+      "repository": "PAMCSG/Tipitaka-reader",
+      "path": "mindfulness-of-breathing.html",
+      "sha256": "65ab6810e89900d388fde763297b45f437d5750704682779598d857ab95cbe3d"
+    },
+    {
+      "repository": "PAMCSG/Tipitaka-reader",
+      "path": "subhasutta.html",
+      "sha256": "b91da0294d5ef9ca88f46d3faf9a50eff83dbcf9fa3ea90aa9fca00a1e3f542e"
+    },
+    {
+      "repository": "PAMCSG/Tipitaka-reader",
+      "path": "kevattasutta.html",
+      "sha256": "234ac8bf9805c479d09a749b27cb1efbe3203c32eed226c4dcd8c99ad64c3e73"
+    },
+    {
+      "repository": "PAMCSG/Tipitaka-reader",
+      "path": "mahalisutta.html",
+      "sha256": "dbfbf30db6051f3469f42b52b2c1da007ff767657916cefada0c4b9f6aa2cca6"
+    },
+    {
+      "repository": "PAMCSG/Tipitaka-reader",
+      "path": "zhiguan-fayao.html",
+      "sha256": "5a7e27375083ee6c104925b8600578680a82938be3974e913ed942c7afab47d4"
+    },
+    {
+      "repository": "PAMCSG/Tipitaka-reader",
+      "path": "samannaphalasutta.html",
+      "sha256": "ab91bcb7a8f3bdb1f2eaaab4cdaa8d9b248e2ef75f4e85644088b5ec648a67a5"
+    },
+    {
+      "repository": "PAMCSG/Tipitaka-reader",
+      "path": "kutadantasutta.html",
+      "sha256": "3c79ddae34aacca34bdf098a3eb451142b2e09a858142bb1af15cbf3d56976eb"
+    },
+    {
+      "repository": "PAMCSG/Tipitaka-reader",
+      "path": "mahasihanadasutta.html",
+      "sha256": "8b6d568250b4f4ff735557edda4d1911bb5a55856424447ff25819e4055d971b"
+    },
+    {
+      "repository": "PAMCSG/Tipitaka-reader",
+      "path": "sonadandasutta.html",
+      "sha256": "8711f206279084238bdb2f06a06db05a902ce3acf6b0472a3ee191424d51834f"
+    },
+    {
+      "repository": "PAMCSG/Tipitaka-reader",
+      "path": "lohiccasutta.html",
+      "sha256": "4df1300eb254962c805f82a0f2ec430b4169c97d8c81ee7c08cf5716198339f2"
+    },
+    {
+      "repository": "PAMCSG/Tipitaka-reader",
+      "path": "brahmajalasutta.html",
+      "sha256": "67be2b7b6b67b7de5842656117734bb180d59652a707723071e29469edcda71a"
+    },
+    {
+      "repository": "PAMCSG/Tipitaka-reader",
+      "path": "pced-lookup-core.js",
+      "sha256": "432cebc6c673cd47d10a31097af213fbecf32655b805038d7bf8dc81f5d8fe18"
+    },
+    {
+      "repository": "PAMCSG/Tipitaka-reader",
+      "path": "pced-popup-standard.js",
+      "sha256": "189b5e1438e8f62a9193df4d6614573722000ae3bcc7874fafa4240f5abf8216"
+    },
+    {
+      "repository": "PAMCSG/Tipitaka-reader",
+      "path": "PCED_STANDARD_LOOKUP.md",
+      "sha256": "3138a59db19de0fe182d841e1b0fd4358caef4921ce895379a1422e8a49bfed0"
+    }
+  ]
+}
