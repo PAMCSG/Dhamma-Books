@@ -1,7 +1,7 @@
 # Standard PCED Lookup
 
-Release date: 2026-11-11
-Lookup core: 3.9.29
+Release date: 2026-11-16
+Lookup core: 3.9.30
 Dictionary data: PCED 2.0.5.0 plus the verified standard supplement
 
 ## Scope
@@ -219,3 +219,37 @@ The Dhamma Books landing-page PCED search displays the same inflection banner as
 - Regression examples: āvuso must not import the sentence acchariyaṃ,
   āvuso, abbhutaṃ, āvuso!; handassa must show the sandhi and put handa's
   eligible Chinese meaning before handa's other language definitions.
+
+
+## Optative -eyya recognition and presentation — 16 November 2026
+
+- Keep exact surface entries and all their dictionary meanings first. For a
+  recognised optative, follow them with the verb analysis, the Inflections
+  control, and the related base-verb definitions in the selected source order.
+- The ten maintained test relationships are vipateyya → vipatati,
+  pateyya → patati, gaccheyya → gacchati, āgaccheyya → āgacchati,
+  bhaveyya → bhavati, labheyya → labhati, passeyya → passati,
+  kareyya → karoti, suṇeyya → suṇāti, and jāneyya → jānāti.
+  The complete PCED lemma must exist in the host dictionary.
+- Other bare -eyya spellings are possible optatives only when an independently
+  attested PCED verb and its supported forward optative paradigm reproduce the
+  queried form. Keep all possible verbs and label the contextual ambiguity.
+  A dictionary key alone is insufficient. Never select karati for kareyya
+  merely because replacing -eyya with -ati produces an existing key.
+- An exact gerund, gerundive, noun, adjective or name does not acquire an
+  optative reading merely because it ends in -eyya. Preserve the exact vineyya
+  gerund and bhāgineyya noun without inventing a finite analysis.
+- Preserve diacritics in the core. Janeyya is not automatically jāneyya.
+  The homepage retains its explicitly labelled diacritic-insensitive search.
+- Display Optative (Sattamī), third-person singular, with its Chinese
+  equivalent and a contextual meaning note. Present this as a reading, not
+  the only meaning of a homograph.
+- Each possible verb has its own Inflections control and its own table.
+  Remove duplicate display records only when language, source label, source
+  code and complete definition are identical.
+- The 1,025-word teacher-review worksheet has not been imported into runtime
+  mappings. Its remaining proposed analyses await the teacher's review.
+- Synchronised release: core 3.9.30, popup 1.8.35, homepage search 1.7.22.
+  HTML loaders receive matching cache-version queries in both repositories.
+- Regression command: node tests/pced-eyya.test.js. To include the private
+  Reader renderer, set PCED_READER_REPO to its local directory.

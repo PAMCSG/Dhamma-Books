@@ -1,4 +1,4 @@
-/* PAMC cross-book PCED popup standard v1.8.34 — 2026-11-11 */
+/* PAMC cross-book PCED popup standard v1.8.35 — 2026-11-16 */
 (function () {
   'use strict';
 
@@ -62,7 +62,7 @@
     });
     morphologyPromise = Promise.resolve()
       .then(() => window.KaccayanaDeclension?.VERSION === '1.5.1' ? null : load('kaccayana-declension.js', '1.5.1'))
-      .then(() => core()?.version === '3.9.29' ? null : load('pced-lookup-core.js', '3.9.29'))
+      .then(() => core()?.version === '3.9.30' ? null : load('pced-lookup-core.js', '3.9.30'))
       .then(() => window.PaliLookupMorphology ? null : load('pali-lookup-morphology.js', '2.0-unicode-trial'))
       .then(() => window.PaliLookupMorphology || null);
     return morphologyPromise;
@@ -567,12 +567,15 @@
     const zh = primaryLanguage === 'zh';
     const analysis = value => esc(core()?.localizedAnalysisText?.(value, primaryLanguage) || value);
     let note = '';
-    if (result.mode === 'exact' && result.grammar) {
+    if ((result.mode === 'exact' || result.verbAnalyses?.length) && result.grammar) {
       const grammar = result.grammar;
-      const lemma = dictionary()[grammar.lemmaHead]?.headword || grammar.lemma;
+      const verbLemmas = result.verbAnalyses?.map(item => item.lemma);
+      const lemma = verbLemmas?.length ? verbLemmas.join(' / ')
+        : dictionary()[grammar.lemmaHead]?.headword || grammar.lemma;
       note = '<div class="note grammar-analysis"><b>' + (zh ? '动词词形：' : 'Verb form:') + '</b> ' + esc(surface) +
         ' → <b>' + esc(lemma) + '</b>' +
         (grammar.label ? '<br><span class="lookup-rule">' + analysis(zh ? grammar.labelZh || grammar.label : grammar.label) + '</span>' : '') +
+        (verbLemmas?.length > 1 ? '<br><span class="lookup-rule">' + (zh ? '有多个可能的原形，须依上下文选择。' : 'More than one base verb is possible; choose by context.') + '</span>' : '') +
         (grammar.meaning ? '<br><span class="lookup-rule">' + (zh ? '含义：' : 'Meaning: ') + '“' + analysis(zh ? grammar.meaningZh || grammar.meaning : grammar.meaning) + '”</span>' : '') +
         (grammar.formation ? '<br><span class="lookup-rule">' + (zh ? '词形构成：' : 'Form: ') + analysis(zh ? grammar.formationZh || grammar.formation : grammar.formation) + '</span>' : '') +
         (grammar.sourceNote ? '<br><span class="lookup-rule">' + (zh ? '注：' : 'Note: ') + analysis(zh ? grammar.sourceNoteZh || grammar.sourceNote : grammar.sourceNote) + '</span>' : '') +
@@ -594,6 +597,9 @@
       return note + approvedEntry + '<div class="note"><b>No reliable PCED entry was found for ' +
         esc(surface) + '.</b><br>Only exact headwords, verified forms, conservative inflections, and verified compound or sandhi analyses were accepted.</div>';
     }
+    const renderHead = head => renderEntry(head,
+      approvedRows.filter(row => termHeadIndex(row, heads) === heads.indexOf(head)),
+      otherRows.filter(row => termHeadIndex(row, heads) === heads.indexOf(head)), surface, primaryLanguage);
     const entries = heads.map((head, index) => renderEntry(head,
       approvedRows.filter(row => termHeadIndex(row, heads) === index),
       otherRows.filter(row => termHeadIndex(row, heads) === index), surface, primaryLanguage)).join('');
@@ -602,6 +608,13 @@
     const related = remainingApproved.length || remainingOther.length
       ? '<div class="group-title">Related forms / 相关词形（非精确匹配）</div>' +
         renderPublishedBlocks(remainingApproved, remainingOther, surface) : '';
+    if (result.verbAnalyses?.length) {
+      const exactHeads = result.mode === 'exact' ? result.heads : [];
+      const verbHeads = [...new Set(result.verbAnalyses.map(item => item.lemmaHead))];
+      return exactHeads.map(renderHead).join('') + note +
+        verbHeads.map(head => renderInflectionPanel(head, primaryLanguage, result.normalized)).join('') +
+        heads.filter(head => !exactHeads.includes(head)).map(renderHead).join('') + related;
+    }
     return note + renderInflectionPanel(heads[0], primaryLanguage, surface) + entries + related;
   }
 

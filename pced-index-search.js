@@ -1,4 +1,4 @@
-/* PCED landing-page search v1.7.21 — exact Pāli/diacritic-aware and multilingual. */
+/* PCED landing-page search v1.7.22 — exact entries followed by optative verb analysis. */
 (function (global) {
   'use strict';
 
@@ -180,13 +180,16 @@
         (result.rule ? '<br><span class="lookup-rule">' + analysis(result.rule) + '</span>' : '') +
         '</div>';
     }
-    const lemma = dictionary[grammar.lemmaHead]?.headword || grammar.lemma;
+    const verbLemmas = result.verbAnalyses?.map(item => item.lemma);
+    const lemma = verbLemmas?.length ? verbLemmas.join(' / ')
+      : dictionary[grammar.lemmaHead]?.headword || grammar.lemma;
     return '<div class="note grammar-analysis"><b>' + (zh ? '动词词形：' : 'Verb form:') + '</b> ' + esc(result.clicked || grammar.surface) +
       ' → <b>' + esc(lemma) + '</b>' +
-      (grammar.label ? '<br><span class="lookup-rule">' + analysis(grammar.label) + '</span>' : '') +
-      (grammar.meaning ? '<br><span class="lookup-rule">' + (zh ? '含义：' : 'Meaning: ') + '“' + analysis(grammar.meaning) + '”</span>' : '') +
+      (grammar.label ? '<br><span class="lookup-rule">' + analysis(zh ? grammar.labelZh || grammar.label : grammar.label) + '</span>' : '') +
+      (verbLemmas?.length > 1 ? '<br><span class="lookup-rule">' + (zh ? '有多个可能的原形，须依上下文选择。' : 'More than one base verb is possible; choose by context.') + '</span>' : '') +
+      (grammar.meaning ? '<br><span class="lookup-rule">' + (zh ? '含义：' : 'Meaning: ') + '“' + analysis(zh ? grammar.meaningZh || grammar.meaning : grammar.meaning) + '”</span>' : '') +
       (grammar.formation ? '<br><span class="lookup-rule">' + (zh ? '构词：' : 'Formation: ') + analysis(grammar.formation) + '</span>' : '') +
-      (grammar.sourceNote ? '<br><span class="lookup-rule">' + (zh ? '注：' : 'Note: ') + analysis(grammar.sourceNote) + '</span>' : '') +
+      (grammar.sourceNote ? '<br><span class="lookup-rule">' + (zh ? '注：' : 'Note: ') + analysis(zh ? grammar.sourceNoteZh || grammar.sourceNote : grammar.sourceNote) + '</span>' : '') +
       '</div>';
   }
 
@@ -491,7 +494,7 @@
         '<div class="definition" style="white-space:pre-wrap">' + approvedChineseHtml(row.chinese_html, row.chinese) + '</div>' + termMatchNote(row, surface) + '</div>').join('');
   }
 
-  function renderHead(key, priority, otherHtml = '', surface = key, heads = [key]) {
+  function renderHead(key, priority, otherHtml = '', surface = key, heads = [key], includeInflections = true) {
     const entry = dictionary[key];
     if (!entry) return '';
     const groups = global.PCEDLookupCore?.dictionaryGroups(entry, priority) || [];
@@ -502,7 +505,7 @@
     const relatedRows = approvedRows.filter(row => !own(row) && termHeadIndex(row, heads) < 0);
     const related = relatedRows.length ? '<div class="group-title">Related forms / 相关词形（非精确匹配）</div>' + renderApprovedRows(relatedRows, surface) : '';
     return '<div class="entry"><div class="headword">' + esc(entry.headword || key) + '</div>' +
-      renderInflectionPanel(key, priority, surface) +
+      (includeInflections ? renderInflectionPanel(key, priority, surface) : '') +
       approved + otherHtml +
       groups.map(group => '<div class="group-title" data-language="' + esc(group.key) + '">' +
         esc(languageTitles[group.key] || group.title || 'Other') + '</div>' +
@@ -528,6 +531,18 @@
       const remainingOther = otherRows.filter(row => termHeadIndex(row, pali.heads) < 0);
       const relatedOther = remainingOther.length
         ? '<div class="group-title">Related forms / 相关词形（非精确匹配）</div>' + renderOtherRows(remainingOther, query) : '';
+      if (pali.resolution?.verbAnalyses?.length) {
+        const result = pali.resolution;
+        const exactHeads = result.mode === 'exact' ? result.heads : [];
+        const verbHeads = unique(result.verbAnalyses.map(item => item.lemmaHead));
+        const render = head => renderHead(head, priority,
+          renderOtherRows(otherRows.filter(row => termHeadIndex(row, pali.heads) === pali.heads.indexOf(head)), query),
+          query, pali.heads, false);
+        return { query, heads: pali.heads, kind: 'pali', priority,
+          html: note + exactHeads.map(render).join('') + renderGrammarNote(result, priority) +
+            verbHeads.map(head => renderInflectionPanel(head, priority, result.normalized)).join('') +
+            pali.heads.filter(head => !exactHeads.includes(head)).map(render).join('') + relatedOther };
+      }
       return { query, heads: pali.heads, kind: 'pali', priority,
         html: note + renderGrammarNote(pali.resolution, priority) +
           pali.heads.map((head, index) => renderHead(head, priority,
@@ -626,7 +641,7 @@
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && modal?.classList.contains('open')) closeModal();
     });
-    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.21' });
+    global.PCEDIndexSearch = Object.freeze({ search, foldPali, version: '1.7.22' });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

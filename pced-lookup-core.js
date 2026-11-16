@@ -1,6 +1,6 @@
 /*
  * PAMC shared PCED lookup core
- * Version 3.9.29 — 2026-11-11
+ * Version 3.9.30 — 2026-11-16
  *
  * One resolver is shared by every book. Hosts provide their PCED data and
  * keep their own popup layout. A candidate is accepted only when it is a
@@ -10,9 +10,19 @@
 (function (global) {
   'use strict';
 
-  const VERSION = '3.9.29';
+  const VERSION = '3.9.30';
   const EDGE_NON_PALI = /^[^a-zāīūṅñṭḍṇḷṃ]+|[^a-zāīūṅñṭḍṇḷṃ]+$/g;
   const PALI_FORM = /^[a-zāīūṅñṭḍṇḷṃ]+$/;
+
+  // The ten optative test words discussed with the user. These are spelling-
+  // sensitive, maintained relationships, not an import of the unreviewed
+  // Tipiṭaka worksheet. The complete PCED lemma must still exist in the host.
+  const EYYA_TEST_LEMMAS = Object.freeze({
+    vipateyya: 'vipatati', pateyya: 'patati', gaccheyya: 'gacchati',
+    'āgaccheyya': 'āgacchati', bhaveyya: 'bhavati', labheyya: 'labhati',
+    passeyya: 'passati', kareyya: 'karoti', 'suṇeyya': 'suṇāti', 'jāneyya': 'jānāti'
+  });
+  const EYYA_TEST_VERBS = new Set(Object.values(EYYA_TEST_LEMMAS));
 
   // Verified linguistic decompositions; every part must still be validated
   // as a complete PCED headword at runtime.
@@ -141,6 +151,7 @@
       'Imperative (Pañcamī)': '命令式（Pañcamī）',
       'Optative': '祈愿式',
       'Optative (Sattamī)': '祈愿式（Sattamī）',
+      'Optative (Sattamī), third-person singular': '祈愿式（Sattamī），第三人称单数',
       'Future': '未来时',
       'Future (Bhavissanti)': '未来时（Bhavissanti）',
       'Present participle': '现在分词',
@@ -575,9 +586,12 @@
 
     suffixRules([
       ['eyyaṃ', 'ati'], ['eyyuṃ', 'ati'], ['eyyāsi', 'ati'], ['eyyātha', 'ati'],
-      ['eyyāmi', 'ati'], ['eyyāma', 'ati'], ['eyya', 'ati'],
-      ['eyyaṃ', 'eti'], ['eyyuṃ', 'eti'], ['eyya', 'eti']
+      ['eyyāmi', 'ati'], ['eyyāma', 'ati'],
+      ['eyyaṃ', 'eti'], ['eyyuṃ', 'eti']
     ], 'optative verb');
+    // Bare -eyya is handled by optativeVerbAnalyses(), including -āti and
+    // -oti verbs. Never accept a noun or an unrelated -ati homograph merely
+    // because replacing the ending produces an existing dictionary key.
 
     for (const lemmaEnding of ['ati', 'āti', 'eti', 'oti']) {
       suffixRules([
@@ -822,8 +836,50 @@
       grammar: { surface: word, lemma, lemmaHead: lemmaHeads[0], label, verified: true } }];
   }
 
+  function optativeVerbAnalyses(surface, context) {
+    const word = cleanWord(surface);
+    if (!word.endsWith('eyya')) return [];
+    const maintainedLemma = EYYA_TEST_LEMMAS[word];
+    const surfaceHeads = context.exact(word);
+    const surfaceText = surfaceHeads.flatMap(head => entryRecords(context.dictionary[head]))
+      .map(record => String(record.definition || '')).join(' ');
+    // An exact gerund, gerundive, name or noun is not proof of an optative.
+    // Retain it without inventing a finite reading unless PCED explicitly
+    // identifies a verbal reading, or the maintained whole word does so.
+    if (!maintainedLemma && surfaceHeads.length &&
+        !/\b(?:opt|pot)\s*[．.]|sattamī|祈愿|〔愿〕|\bkri\b|ကြိ/i.test(surfaceText)) return [];
+    const stem = word.slice(0, -4);
+    const lemmas = maintainedLemma ? [maintainedLemma]
+      : stem.length >= 2 ? ['ati', 'āti', 'eti', 'oti'].map(ending => stem + ending) : [];
+    return lemmas.flatMap(lemma => {
+      const lemmaHeads = context.exact(lemma);
+      const lemmaHead = lemmaHeads.find(head => {
+        const groups = verbParadigm(lemma, inflectionGrammarText(context.dictionary[head]));
+        return groups.some(group => /Optative/i.test(group.label) &&
+          (group.forms || group.persons?.flatMap(person => person.forms) || [])
+            .some(form => cleanWord(form) === word));
+      });
+      if (!lemmaHead) return [];
+      return [{
+        kind: 'optative', surface: word, lemma, lemmaHead,
+        label: 'Optative (Sattamī), third-person singular',
+        labelZh: '祈愿式（Sattamī），第三人称单数',
+        meaning: 'might / would / should …', meaningZh: '可能／会／应该……',
+        sourceNote: maintainedLemma
+          ? 'Optative reading; choose the meaning from context. Other exact dictionary meanings are retained.'
+          : 'Possible regular optative reading; confirm the verb and meaning from context.',
+        sourceNoteZh: maintainedLemma
+          ? '这是祈愿式的读法，具体含义须依上下文判断；保留原词条的其他义项。'
+          : '这是依规则分析的可能祈愿式，须依上下文确认动词及含义。',
+        verified: !!maintainedLemma
+      }];
+    });
+  }
+
   function exactVerbAnalysis(surface, exactHeads, context, options = {}) {
     const word = cleanWord(surface);
+    const optative = optativeVerbAnalyses(word, context);
+    if (optative.length) return optative[0];
     const maintained = options.grammarAnalyses?.[word] ||
       global.PCEDStandardData?.grammarAnalyses?.[word] ||
       BUILTIN_GRAMMAR_ANALYSES[word];
@@ -885,6 +941,10 @@
   function resolvePart(form, context, options) {
     let heads = context.exact(form);
     let method = heads.length ? 'exact' : 'none';
+    if (!heads.length && cleanWord(form).endsWith('eyya')) {
+      heads = optativeVerbAnalyses(form, context).map(analysis => analysis.lemmaHead);
+      if (heads.length) method = 'inflected';
+    }
     if (!heads.length) {
       for (const map of [options.fallbackAliases, options.aliases, BUILTIN_ALIASES]) {
         const mapped = formsFromMap(map, cleanWord(form));
@@ -929,8 +989,10 @@
       // Preserve the exact surface definitions first. When its grammatical
       // analysis identifies a separately attested verb lemma, display that
       // lemma's complete PCED entry after the surface entries in every host.
-      result.lemmaHeads = result.mode === 'exact' && result.grammar?.lemma
-        ? context.exact(result.grammar.lemma).filter(head =>
+      const verbLemmas = result.verbAnalyses?.length
+        ? result.verbAnalyses.map(analysis => analysis.lemma) : [result.grammar?.lemma].filter(Boolean);
+      result.lemmaHeads = result.mode === 'exact' && verbLemmas.length
+        ? [...new Set(verbLemmas.flatMap(lemma => context.exact(lemma)))].filter(head =>
             !result.heads.includes(head) && !result.componentHeads.includes(head))
         : [];
       result.allHeads = [...result.heads, ...result.componentHeads, ...result.lemmaHeads];
@@ -963,10 +1025,15 @@
     };
 
     const exactHeads = context.exact(normalized);
+    const optatives = optativeVerbAnalyses(normalized, context);
     const verifiedCandidates = [...verifiedInflectionCandidates(normalized, options),
       ...dictionaryAoristPluralCandidates(normalized, context)];
     const attestedPastHeads = explicitPastIndex(context.dictionary).get(normalized) || [];
     if (exactHeads.length) {
+      if (optatives.length) return finish({
+        ...base, mode: 'exact', tier: 1, heads: exactHeads,
+        grammar: optatives[0], verbAnalyses: optatives
+      });
       const exactVerbForm = EXACT_VERB_FORMS[normalized];
       if (exactVerbForm) return finish({
         ...base, mode: 'exact', tier: 1, heads: exactHeads, grammar: exactVerbForm
@@ -990,6 +1057,14 @@
         notes: [`${clicked} → ${preferredSandhi.parts.join(' + ')} (sandhi)`]
       });
     }
+
+    if (optatives.length) return finish({
+      ...base, mode: 'inflected', tier: 3,
+      heads: optatives.map(analysis => analysis.lemmaHead),
+      resolvedForm: optatives[0].lemma,
+      grammar: optatives[0], verbAnalyses: optatives,
+      rule: optatives[0].label, family: 'optative verb'
+    });
 
     const speechMatches = speechFormMatches(normalized);
     // A plain-letter speech query may recover an exact diacritic spelling.
@@ -1159,7 +1234,7 @@
     };
 
     const exactRows = collect([exact], 'exact');
-    if (exactRows.length) return exactRows;
+    if (exactRows.length && !resolution.verbAnalyses?.length) return exactRows;
 
     const sandhi = decompositionFor(exact, options);
     if (sandhi?.kind === 'sandhi' && sandhi.preferSandhi) {
@@ -1177,6 +1252,11 @@
       if (value && value !== exact && !inflectedForms.includes(value)) inflectedForms.push(value);
     };
 
+    // An exact -eyya PCED entry must not hide the independently identified
+    // verb's Chinese terminology. Keep the exact term first and attach each
+    // related term only to its own displayed lemma.
+    for (const analysis of resolution.verbAnalyses || []) addInflected(analysis.lemma);
+
     if (['alias', 'inflected'].includes(resolution.mode)) {
       addInflected(resolution.resolvedForm);
       for (const head of resolution.primaryHeads || resolution.heads || []) addInflected(head);
@@ -1184,7 +1264,7 @@
     for (const candidate of verifiedInflectionCandidates(exact, options)) addInflected(candidate.form);
     for (const candidate of inflectionCandidates(exact)) addInflected(candidate.form);
 
-    return collect(inflectedForms, 'inflected');
+    return [...exactRows, ...collect(inflectedForms, 'inflected')];
   }
 
   function classifySourceEntry(record, originalBucket = 'other') {
@@ -1194,13 +1274,22 @@
 
   function dictionaryGroups(entry, primaryLanguage = 'en') {
     const grouped = { en: [], zh: [], my: [], ja: [], vi: [], ko: [], other: [] };
+    const seen = new Set();
+    const addRecord = (record, bucket) => {
+      const language = classifySourceEntry(record, bucket);
+      const signature = [language, record.source || '', record.source_label || '',
+        String(record.definition || '').trim()].join('\u241f');
+      if (seen.has(signature)) return;
+      seen.add(signature);
+      grouped[language].push(record);
+    };
     for (const bucket of ['en', 'zh', 'my', 'vi', 'other']) {
       for (const record of Array.isArray(entry?.[bucket]) ? entry[bucket] : []) {
-        grouped[classifySourceEntry(record, bucket)].push(record);
+        addRecord(record, bucket);
       }
     }
     for (const record of [...(entry?.entries || []), ...(entry?.extra_entries || [])]) {
-      grouped[classifySourceEntry(record, 'zh')].push(record);
+      addRecord(record, 'zh');
     }
     const primary = ['en', 'zh', 'my'].includes(primaryLanguage) ? primaryLanguage : 'en';
     const order = primary === 'zh'
@@ -1400,7 +1489,7 @@
     const exception = VERB_TABLE_EXCEPTIONS[lemma];
     if (exception) return exception.map(copyGroup);
     const ending = ['āti', 'ati', 'eti', 'oti'].find(value => lemma.endsWith(value));
-    if (!ending || (!maintained && !/(?:\bkri\b|ကြိ|【(?:过|現|现|命|独)|\b(?:pr|imper|opt|fut|aor|ger|inf)\s*[．.]|\b(?:goes|does|makes|becomes)\b)/i.test(grammarText))) return [];
+    if (!ending || (!maintained && !EYYA_TEST_VERBS.has(lemma) && !/(?:\bkri\b|ကြိ|【(?:过|現|现|命|独)|\b(?:pr|imper|opt|fut|aor|ger|inf)\s*[．.]|\b(?:goes|does|makes|becomes)\b)/i.test(grammarText))) return [];
     const stem = lemma.slice(0, -ending.length);
     const endings = ending === 'eti'
       ? ['eti', 'enti', 'esi', 'etha', 'emi', 'ema']
@@ -1735,7 +1824,9 @@
     let grammar = null;
     if (!result && options.dictionary) {
       const context = resolutionContext(options);
-      grammar = exactVerbAnalysis(analysisSurface, context.exact(analysisSurface), context, options);
+      grammar = optativeVerbAnalyses(analysisSurface, context)
+        .find(analysis => cleanWord(analysis.lemma) === headword) ||
+        exactVerbAnalysis(analysisSurface, context.exact(analysisSurface), context, options);
       if (grammar && cleanWord(grammar.lemma) !== headword) {
         // Exact surface definitions remain first in the popup. Its button
         // uses the independently validated verb lemma and its source entry.
